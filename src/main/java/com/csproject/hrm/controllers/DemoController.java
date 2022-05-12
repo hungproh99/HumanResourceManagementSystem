@@ -14,7 +14,6 @@ public class DemoController {
 	@Autowired
 	public DemoController(DemoService demoService) {this.demoService = demoService;}
 	
-	
 	@GetMapping(path = "/list", params = "id")
 	public Demo getDemoById(@RequestParam(name = "id") Long id) {
 		return demoService.getDemoByID(id);
