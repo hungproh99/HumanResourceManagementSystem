@@ -12,4 +12,5 @@ public interface DemoRepository  extends JpaRepository<Demo, Long>{
 	
 	@Query(Q_FIND_DEMO_BY_ID)
 	Demo getDemoByID(Long id);
+	
 }
