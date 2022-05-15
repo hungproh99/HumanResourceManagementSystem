@@ -18,6 +18,6 @@ public class DemoService{
 		if(id <= 0){
 			throw new IllegalArgumentException();
 		}
-		return demoRepository.getDemoByID(id);
+		return demoRepository.getDemoBydemoId(id);
 	}
 }
