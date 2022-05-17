@@ -1,4 +1,4 @@
-package com.csproject.hrm.common;
+package com.csproject.hrm.controllers;
 
 import org.springframework.web.bind.annotation.*;
 
