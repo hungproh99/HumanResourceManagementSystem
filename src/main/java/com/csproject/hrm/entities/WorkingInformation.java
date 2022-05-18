@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Data
-@Builder
+@NoArgsConstructor
 @Entity
 @Table(name = "working_information")
 public class WorkingInformation {

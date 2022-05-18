@@ -2,12 +2,13 @@ package com.csproject.hrm.entities;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Date;
 
 @Data
-@Builder
+@NoArgsConstructor
 @Entity
 @Table(name = "work_contract")
 public class WorkContract {
