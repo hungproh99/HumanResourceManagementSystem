@@ -10,16 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "employee")
 public class Employee {
     @Id
     @Column(name = "employee_id")
     private String id;
-
-    @Column(name = "username")
-    private String username;
 
     @Column(name = "personal_email")
     @Email

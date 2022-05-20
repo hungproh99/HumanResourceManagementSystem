@@ -2,6 +2,7 @@ package com.csproject.hrm.jwt.config;
 
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.impl.UserDetailsServiceImpl;
+import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +20,7 @@ import java.io.IOException;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private static final com.sun.org.slf4j.internal.Logger Logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private static final Logger Logger = LoggerFactory.getLogger(AuthTokenFilter.class);
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
@@ -32,8 +33,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUsernameFromJwtToken(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                String id = jwtUtils.getIdFromJwtToken(jwt);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(id);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
                         null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
