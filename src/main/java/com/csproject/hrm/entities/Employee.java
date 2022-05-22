@@ -1,6 +1,7 @@
 package com.csproject.hrm.entities;
 
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "employee")
@@ -32,6 +35,7 @@ public class Employee {
     private String fullName;
 
     @Column(name = "gender")
+    @Type(type = "true_false")
     private boolean gender;
 
     @Column(name = "address")
@@ -49,9 +53,11 @@ public class Employee {
     @Column(name = "work_status")
     private String workStatus;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "role")
-    private Role role;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "employee_role",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Role> role;
 
     @Column(name = "manager_id")
     private String managerId;
@@ -73,5 +79,5 @@ public class Employee {
     private WorkingInformation workingInformation;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<RelativeInformation> relativeInformation = new ArrayList<>();
+    private List<RelativeInformation> relativeInformation;
 }
