@@ -1,16 +1,16 @@
-package com.csproject.hrm.services.impl;
+package com.csproject.hrm.services;
 
 import com.csproject.hrm.entities.Employee;
+import com.csproject.hrm.jwt.UserDetailsImpl;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
     @Autowired
     private EmployeeRepository employeeRepository;
 

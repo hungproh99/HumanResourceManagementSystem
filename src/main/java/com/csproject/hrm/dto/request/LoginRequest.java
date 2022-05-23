@@ -1,4 +1,4 @@
-package com.csproject.hrm.dto;
+package com.csproject.hrm.dto.request;
 
 import lombok.*;
 
@@ -10,11 +10,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @Builder
 public class LoginRequest {
-    @NonNull
-    @Email
-    @NotEmpty
     private String email;
-    @NonNull
-    @NotEmpty
     private String password;
 }

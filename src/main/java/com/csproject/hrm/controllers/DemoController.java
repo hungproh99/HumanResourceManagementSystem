@@ -1,7 +1,7 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.entities.Demo;
-import com.csproject.hrm.services.impl.DemoService;
+import com.csproject.hrm.services.DemoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

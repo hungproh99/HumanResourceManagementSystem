@@ -1,7 +1,7 @@
 package com.csproject.hrm.jwt.config;
 
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.services.impl.UserDetailsServiceImpl;
+import com.csproject.hrm.services.UserDetailsService;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Override
 

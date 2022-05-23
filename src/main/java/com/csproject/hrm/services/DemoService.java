@@ -1,4 +1,4 @@
-package com.csproject.hrm.services.impl;
+package com.csproject.hrm.services;
 
 
 import com.csproject.hrm.entities.Demo;
