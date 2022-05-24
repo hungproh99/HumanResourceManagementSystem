@@ -2,6 +2,7 @@ package com.csproject.hrm.jwt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.csproject.hrm.services.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
