@@ -1,18 +1,18 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.common.utils.Constants;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
 import com.csproject.hrm.dto.respone.JwtResponse;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.jwt.UserDetailsImpl;
 import com.csproject.hrm.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,17 +45,17 @@ public class LoginController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         int updatePassword = loginService.changePasswordByUsername(changePasswordRequest);
         if (updatePassword == 0) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Change password failed");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, Constants.REQUEST_FAIL);
         }
-        return ResponseEntity.ok("Change password successful");
+        return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, Constants.REQUEST_SUCCESS));
     }
 
     @PostMapping(URI_FORGOT_PASSWORD)
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
         int updatePassword = loginService.forgotPasswordByUsername(email);
         if (updatePassword == 0) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Forgot password failed");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, Constants.REQUEST_FAIL);
         }
-        return ResponseEntity.ok("Forgot password successful");
+        return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, Constants.REQUEST_SUCCESS));
     }
 }

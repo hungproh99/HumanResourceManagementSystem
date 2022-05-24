@@ -1,5 +1,6 @@
 package com.csproject.hrm.services;
 
+import com.csproject.hrm.common.utils.Constants;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
@@ -12,6 +13,8 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,28 +28,26 @@ import static org.passay.DictionaryRule.ERROR_CODE;
 @Service
 public class LoginService implements LoginServiceImpl {
     @Autowired
+    public JavaMailSender emailSender;
+    @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     EmployeeRepository employeeRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
-    @Autowired
-    JwtUtils jwtUtils;
 
     public Authentication getAuthentication(LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         String username = employeeRepository.findIdByCompanyEmail(email);
         if (email == null || email.isEmpty()) {
-            throw new CustomParameterConstraintException("Email can't not empty");
+            throw new CustomParameterConstraintException(Constants.NOT_EMPTY_EMAIL);
         } else if (!email.matches(EMAIL_VALIDATION)) {
-            throw new CustomParameterConstraintException("Invalid email format");
+            throw new CustomParameterConstraintException(Constants.INVALID_EMAIL_FORMAT);
         } else if (password == null || password.isEmpty()) {
-            throw new CustomParameterConstraintException("Password can't not empty");
+            throw new CustomParameterConstraintException(Constants.NOT_EMPTY_PASSWORD);
         } else if (username == null) {
-            throw new CustomDataNotFoundException("Don't have any user with " + email);
+            throw new CustomDataNotFoundException(Constants.NOT_EXIST_USER_WITH + email);
         }
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -63,17 +64,20 @@ public class LoginService implements LoginServiceImpl {
         String password = employeeRepository.findPasswordById(username);
         String encode_new_password = passwordEncoder.encode(new_password);
         if (email == null || email.isEmpty()) {
-            throw new CustomParameterConstraintException("Email can't not empty");
+            throw new CustomParameterConstraintException(Constants.NOT_EMPTY_EMAIL);
         } else if (!email.matches(EMAIL_VALIDATION)) {
-            throw new CustomParameterConstraintException("Invalid email format");
+            throw new CustomParameterConstraintException(Constants.INVALID_EMAIL_FORMAT);
+        } else if (old_password == null || old_password.isEmpty() || new_password == null
+                || new_password.isEmpty() || re_password == null || re_password.isEmpty()) {
+            throw new CustomParameterConstraintException(Constants.NOT_EMPTY_PASSWORD);
         } else if (username == null) {
-            throw new CustomDataNotFoundException("Don't have any user with " + email);
+            throw new CustomDataNotFoundException(Constants.NOT_EXIST_USER_WITH + email);
         } else if (!passwordEncoder.matches(old_password, password)) {
-            throw new CustomParameterConstraintException("Old-password is wrong");
+            throw new CustomParameterConstraintException(Constants.WRONG_OLD_PASSWORD);
         } else if (!new_password.equals(re_password)) {
-            throw new CustomParameterConstraintException("Re-password must match with new-password");
+            throw new CustomParameterConstraintException(Constants.NOT_MATCH_NEW_PASSWORD);
         } else if (new_password.equals(old_password)) {
-            throw new CustomParameterConstraintException("New-password don't same old-password");
+            throw new CustomParameterConstraintException(Constants.NOT_SAME_OLD_PASSWORD);
         }
         return employeeRepository.updatePassword(encode_new_password, username);
     }
@@ -81,16 +85,17 @@ public class LoginService implements LoginServiceImpl {
     public int forgotPasswordByUsername(String email) {
         String id = employeeRepository.findIdByCompanyEmail(email);
         if (email == null || email.isEmpty()) {
-            throw new CustomParameterConstraintException("Email can't not empty");
+            throw new CustomParameterConstraintException(Constants.NOT_EMPTY_EMAIL);
         } else if (!email.matches(EMAIL_VALIDATION)) {
-            throw new CustomParameterConstraintException("Invalid email format");
+            throw new CustomParameterConstraintException(Constants.INVALID_EMAIL_FORMAT);
         }
         if (id == null) {
-            throw new CustomDataNotFoundException("Don't have any user with " + email);
+            throw new CustomDataNotFoundException(Constants.NOT_EXIST_USER_WITH + email);
         }
         String generatePassword = generateCommonLangPassword();
         String encodePassword = passwordEncoder.encode(generatePassword);
-        System.out.println(generatePassword);
+        sendEmail(Constants.MY_EMAIL, Constants.FRIEND_EMAIL, Constants.SEND_PASSWORD_SUBJECT
+                , String.format(Constants.SEND_PASSWORD_TEXT, Constants.FRIEND_EMAIL, generatePassword));
         return employeeRepository.updatePassword(encodePassword, id);
     }
 
@@ -114,7 +119,7 @@ public class LoginService implements LoginServiceImpl {
             }
 
             public String getCharacters() {
-                return "!@#$%^&*()_+";
+                return Constants.SPECIAL_CHARACTER;
             }
         };
         CharacterRule splCharRule = new CharacterRule(specialChars);
@@ -122,5 +127,14 @@ public class LoginService implements LoginServiceImpl {
 
         String password = gen.generatePassword(10, splCharRule, lowerCaseRule, upperCaseRule, digitRule);
         return password;
+    }
+
+    public void sendEmail(String from, String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from);
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        emailSender.send(message);
     }
 }
