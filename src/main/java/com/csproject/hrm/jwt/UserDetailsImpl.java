@@ -1,4 +1,4 @@
-package com.csproject.hrm.services.impl;
+package com.csproject.hrm.jwt;
 
 import com.csproject.hrm.entities.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -1,4 +1,4 @@
-package com.csproject.hrm.dto;
+package com.csproject.hrm.dto.respone;
 
 import lombok.*;
 
