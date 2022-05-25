@@ -1,8 +1,8 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.common.utils.Constants;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
-import com.csproject.hrm.dto.response.JwtResponse;
+import com.csproject.hrm.dto.respone.JwtResponse;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.csproject.hrm.common.uri.Uri.*;
+import static com.csproject.hrm.common.utils.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
