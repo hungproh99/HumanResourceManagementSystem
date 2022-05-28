@@ -1,4 +1,4 @@
-package com.csproject.hrm.common.utils;
+package com.csproject.hrm.common.constant;
 
 public class Uri {
     public static final String REQUEST_MAPPING = "/hrm/api";

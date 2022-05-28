@@ -12,16 +12,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "area")
-public class Area {
+@Table(name = "contract_type")
+public class ContractType {
     @Id
-    @Column(name = "area_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "type_id")
     private Long id;
 
     @Column(name = "name")
     private String name;
 
-    @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-    private WorkingPlace workingPlace;
+    @OneToOne(mappedBy = "contractType", fetch = FetchType.LAZY)
+    private WorkingHistory workingHistory;
+
+    @OneToOne(mappedBy = "contractType", fetch = FetchType.LAZY)
+    private WorkingContract workingContract;
 }

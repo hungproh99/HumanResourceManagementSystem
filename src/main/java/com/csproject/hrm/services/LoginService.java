@@ -1,11 +1,10 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.common.utils.Constants;
+import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
-import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.impl.LoginServiceImpl;
 import org.passay.CharacterData;
@@ -22,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.csproject.hrm.common.utils.Constants.EMAIL_VALIDATION;
+import static com.csproject.hrm.common.constant.Constants.EMAIL_VALIDATION;
 import static org.passay.DictionaryRule.ERROR_CODE;
 
 @Service

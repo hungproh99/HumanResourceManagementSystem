@@ -6,9 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
@@ -33,9 +31,8 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(Employee employee) {
-        List<GrantedAuthority> authorities = employee.getRole().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getERole().name()))
-                .collect(Collectors.toList());
+        List<GrantedAuthority> authorities = new ArrayList<>
+                (Arrays.asList(new SimpleGrantedAuthority(employee.getRoleType().getERole().name())));
         return new UserDetailsImpl(
                 employee.getId(),
                 employee.getCompanyEmail(),
