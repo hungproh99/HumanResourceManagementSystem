@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="2803f37a-f2e2-4976-9be8-9c81ce84309d" name="DDL Mapping">
+      <data-sources db="b0582798-1ee3-4735-99c7-3a22e4030918" ddl="b7230bcd-fc73-4b75-baf8-b935af5d8f68" />
+      <scope>
+        <node kind="schema" qname="human-resource-management" />
+      </scope>
+    </mapping>
+  </component>
+  <component name="SqlDataSourceStorage">
+    <option name="dataSources">
+      <list>
+        <State>
+          <option name="id" value="b7230bcd-fc73-4b75-baf8-b935af5d8f68" />
+          <option name="name" value="human-resource-management@34.101.229.25 (DDL)" />
+          <option name="languageId" value="MySQL" />
+          <option name="parent" value="b0582798-1ee3-4735-99c7-3a22e4030918" />
+          <option name="urls">
+            <array>
+              <option value="file://$PROJECT_DIR$/script.sql" />
+            </array>
+          </option>
+          <option name="outLayout" value="File per object by schema and database.groovy" />
+        </State>
+      </list>
+    </option>
+  </component>
+</project>
