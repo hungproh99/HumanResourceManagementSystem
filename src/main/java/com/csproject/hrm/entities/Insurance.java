@@ -6,6 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Bank {
-	private Long bankID;
+public class Insurance {
+	private Long InsuranceID;
 }
