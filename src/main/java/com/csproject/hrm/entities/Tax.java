@@ -6,6 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Education {
-	private Long educationID;
+public class Tax {
+	private Long taxID;
 }
