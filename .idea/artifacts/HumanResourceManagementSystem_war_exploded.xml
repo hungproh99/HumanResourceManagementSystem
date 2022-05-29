@@ -94,7 +94,7 @@
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.13.2.2" />
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.13.2" />
           <element id="library" level="project" name="Maven: org.passay:passay:1.6.1" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.5" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.36" />
           <element id="library" level="project" name="Maven: com.google.auth:google-auth-library-appengine:1.6.0" />
           <element id="library" level="project" name="Maven: com.google.auth:google-auth-library-credentials:1.6.0" />
           <element id="library" level="project" name="Maven: com.google.auth:google-auth-library-oauth2-http:1.6.0" />
