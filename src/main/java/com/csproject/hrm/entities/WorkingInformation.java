@@ -3,6 +3,8 @@ package com.csproject.hrm.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,26 +18,22 @@ public class WorkingInformation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(table = "working_information")
-    private String recentPromotion;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "working_contract_id")
+    private WorkingContract workingContract;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "area_id")
-    private Area area;
+    @Column(name = "start_date")
+    private LocalDate startDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "office_id")
-    private Office office;
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "job_id")
-    private Job job;
+    @OneToMany(mappedBy = "workingInformation", fetch = FetchType.LAZY)
+    private List<Laudatory> laudatories;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contract_id")
-    private WorkContract workContract;
+    @OneToMany(mappedBy = "workingInformation", fetch = FetchType.LAZY)
+    private List<Discipline> disciplines;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+    @OneToMany(mappedBy = "workingInformation", fetch = FetchType.LAZY)
+    private List<Salary> salaries;
 }

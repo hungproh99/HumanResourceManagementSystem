@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -29,10 +29,10 @@ public class IdentityCard {
     private String placeOfResidence;
 
     @Column(name = "date_of_expiry")
-    private Date dateOfExpiry;
+    private LocalDate dateOfExpiry;
 
     @Column(name = "provide_date")
-    private Date provideDate;
+    private LocalDate provideDate;
 
     @Column(name = "provide_place")
     private String providePlace;

@@ -12,16 +12,15 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "area")
-public class Area {
+@Table(name = "laudatory_type")
+public class LaudatoryType {
     @Id
-    @Column(name = "area_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "type_id")
     private Long id;
 
     @Column(name = "name")
     private String name;
 
-    @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-    private WorkingPlace workingPlace;
+    @OneToOne(mappedBy = "laudatoryType", fetch = FetchType.LAZY)
+    private Laudatory laudatory;
 }

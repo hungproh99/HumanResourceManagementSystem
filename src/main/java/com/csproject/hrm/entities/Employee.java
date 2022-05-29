@@ -1,13 +1,11 @@
 package com.csproject.hrm.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import java.sql.Date;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -46,7 +44,7 @@ public class Employee {
     private String phoneNumber;
 
     @Column(name = "birth_date")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "marital_status")
     private String maritalStatus;
@@ -54,12 +52,9 @@ public class Employee {
     @Column(name = "work_status")
     private String workStatus;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinTable(name = "employee_role",
-            joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> role;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "role_type")
+    private RoleType roleType;
 
     @Column(name = "manager_id")
     private String managerId;
@@ -67,8 +62,11 @@ public class Employee {
     @Column(name = "avatar")
     private String avatar;
 
-    @Column(name = "insurance_id")
-    private String insuranceId;
+    @Column(name = "nick_name")
+    private String nickName;
+
+    @Column(name = "facebook")
+    private String facebook;
 
     @Column(name = "tax_code")
     private String taxCode;
@@ -77,9 +75,19 @@ public class Employee {
     @JoinColumn(name = "card_id")
     private IdentityCard identityCard;
 
-    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
-    private WorkingInformation workingInformation;
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    private List<WorkingContract> workingContract;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    private List<WorkingHistory> workingHistory;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
     private List<RelativeInformation> relativeInformation;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    private List<Education> educations;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "bank_id")
+    private Bank bank;
 }

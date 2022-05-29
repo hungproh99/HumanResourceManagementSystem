@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -24,14 +24,16 @@ public class RelativeInformation {
     private String parentName;
 
     @Column(name = "birth_date")
-    private Date birthDate;
+    private LocalDate birthDate;
 
-    @Column(name = "type")
-    private String type;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "type_id")
+    private RelativeType relativeType;
 
     @Column(name = "status")
     private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
     private Employee employee;
 }
