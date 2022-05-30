@@ -1,4 +1,4 @@
-package com.csproject.hrm.dto.respone;
+package com.csproject.hrm.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

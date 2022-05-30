@@ -34,7 +34,7 @@ public class Education {
     @Column(name = "status")
     private String status;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 }

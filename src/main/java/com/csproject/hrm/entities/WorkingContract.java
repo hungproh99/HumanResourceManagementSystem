@@ -20,7 +20,7 @@ public class WorkingContract {
     @Column(name = "working_contract_id")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
