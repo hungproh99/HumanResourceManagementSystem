@@ -12,30 +12,30 @@ import java.util.List;
 
 @Service
 public class HumanManagementService implements HumanManagementServiceImpl {
-
-    @Autowired
-    EmployeeRepository employeeRepository;
-
-    @Override
-    public List<HrmResponse> getListHumanResource(String offsetInput, String limitInput) {
-        int offset, limit;
-        if (offsetInput == null) {
-            offset = 0;
-        } else if (limitInput == null) {
-            limit = 10;
-        }
-        try {
-            offset = Integer.parseInt(offsetInput);
-            limit = Integer.parseInt(limitInput);
-            if (offset < 0) {
-                throw new CustomParameterConstraintException(Constants.OFFSET_INVALID);
-            } else if (limit < 0) {
-                throw new CustomParameterConstraintException(Constants.LIMIT_INVALID);
-            }
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException(e.getMessage());
-        }
-        List<HrmResponse> employeeResponses = employeeRepository.getListEmployee(offset, limit);
-        return employeeResponses;
-    }
+	
+	@Autowired
+	EmployeeRepository employeeRepository;
+	
+	@Override
+	public List<HrmResponse> getListHumanResource(String offsetInput, String limitInput) {
+		int offset, limit;
+		if(offsetInput == null){
+			offset = 0;
+		}else if(limitInput == null){
+			limit = 10;
+		}
+		try{
+			offset = Integer.parseInt(offsetInput);
+			limit = Integer.parseInt(limitInput);
+			if(offset < 0){
+				throw new CustomParameterConstraintException(Constants.OFFSET_INVALID);
+			}else if(limit < 0){
+				throw new CustomParameterConstraintException(Constants.LIMIT_INVALID);
+			}
+		}catch(NumberFormatException e){
+			throw new NumberFormatException(e.getMessage());
+		}
+		//        List<HrmResponse> employeeResponses = employeeRepository.getListEmployee(offset, limit);
+		return null;
+	}
 }
