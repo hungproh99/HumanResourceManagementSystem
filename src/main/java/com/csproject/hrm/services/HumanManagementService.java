@@ -8,6 +8,7 @@ import com.csproject.hrm.services.impl.HumanManagementServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.util.List;
 
 @Service
@@ -17,25 +18,21 @@ public class HumanManagementService implements HumanManagementServiceImpl {
     EmployeeRepository employeeRepository;
 
     @Override
-    public List<HrmResponse> getListHumanResource(String offsetInput, String limitInput) {
-        int offset, limit;
-        if (offsetInput == null) {
-            offset = 0;
-        } else if (limitInput == null) {
-            limit = 10;
-        }
+    public List<HrmResponse> getListHumanResource(String limitInput, String pageInput) {
+        int limit, page;
         try {
-            offset = Integer.parseInt(offsetInput);
             limit = Integer.parseInt(limitInput);
-            if (offset < 0) {
-                throw new CustomParameterConstraintException(Constants.OFFSET_INVALID);
+            page = Integer.parseInt(pageInput);
+            long maxPage = employeeRepository.count();
+            if (page < 0 || page > maxPage) {
+                throw new CustomParameterConstraintException(Constants.PAGE_INVALID + maxPage);
             } else if (limit < 0) {
                 throw new CustomParameterConstraintException(Constants.LIMIT_INVALID);
             }
         } catch (NumberFormatException e) {
             throw new NumberFormatException(e.getMessage());
         }
-        List<HrmResponse> employeeResponses = employeeRepository.getListEmployee(offset, limit);
+        List<HrmResponse> employeeResponses = employeeRepository.findAllEmployee(limit, page);
         return employeeResponses;
     }
 }

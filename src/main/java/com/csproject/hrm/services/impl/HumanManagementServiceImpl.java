@@ -5,5 +5,5 @@ import com.csproject.hrm.dto.response.HrmResponse;
 import java.util.List;
 
 public interface HumanManagementServiceImpl {
-    List<HrmResponse> getListHumanResource(String offset, String limit);
+    List<HrmResponse> getListHumanResource(String limit, String page);
 }

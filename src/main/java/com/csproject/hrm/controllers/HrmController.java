@@ -19,8 +19,8 @@ public class HrmController {
     HumanManagementService humanManagementService;
 
     @PostMapping(URI_GET_ALL_EMPLOYEE)
-    public ResponseEntity<?> getAllEmployee(@RequestParam String offset, @RequestParam String limit) {
-        List<HrmResponse> hrmResponses = humanManagementService.getListHumanResource(offset, limit);
+    public ResponseEntity<?> getAllEmployee(@RequestParam String limit, @RequestParam String page) {
+        List<HrmResponse> hrmResponses = humanManagementService.getListHumanResource(limit, page);
         return ResponseEntity.ok(hrmResponses);
     }
 }
