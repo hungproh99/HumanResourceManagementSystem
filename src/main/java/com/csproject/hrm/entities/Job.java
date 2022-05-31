@@ -25,9 +25,6 @@ public class Job {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "position")
-    private String position;
-
     @OneToOne(mappedBy = "job", fetch = FetchType.LAZY)
     private WorkingPlace workingPlace;
 }

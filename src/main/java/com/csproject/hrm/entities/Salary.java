@@ -19,7 +19,7 @@ public class Salary {
     @Column(name = "laudatory_id")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingInformation.class)
     @JoinColumn(name = "working_information_id")
     private WorkingInformation workingInformation;
 

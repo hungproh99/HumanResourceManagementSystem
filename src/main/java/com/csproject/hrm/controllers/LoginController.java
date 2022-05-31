@@ -3,7 +3,7 @@ package com.csproject.hrm.controllers;
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
 import com.csproject.hrm.dto.request.LoginRequest;
-import com.csproject.hrm.dto.respone.JwtResponse;
+import com.csproject.hrm.dto.response.JwtResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jwt.JwtUtils;

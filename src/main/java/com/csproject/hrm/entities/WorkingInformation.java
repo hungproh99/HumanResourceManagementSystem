@@ -18,7 +18,7 @@ public class WorkingInformation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingContract.class)
     @JoinColumn(name = "working_contract_id")
     private WorkingContract workingContract;
 

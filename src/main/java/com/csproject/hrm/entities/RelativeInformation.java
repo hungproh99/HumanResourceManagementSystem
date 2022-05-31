@@ -33,7 +33,7 @@ public class RelativeInformation {
     @Column(name = "status")
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 }
