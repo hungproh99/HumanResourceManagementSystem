@@ -1,14 +1,16 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.response.HrmResponse;
+import com.csproject.hrm.jooq.Context;
+import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.services.HumanManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
-import static com.csproject.hrm.common.constant.Uri.*;
+import static com.csproject.hrm.common.uri.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -19,8 +21,11 @@ public class HrmController {
     HumanManagementService humanManagementService;
 
     @PostMapping(URI_GET_ALL_EMPLOYEE)
-    public ResponseEntity<?> getAllEmployee(@RequestParam String limit, @RequestParam String page) {
-        List<HrmResponse> hrmResponses = humanManagementService.getListHumanResource(limit, page);
-        return ResponseEntity.ok(hrmResponses);
+    public ResponseEntity<?> getAllEmployee(@RequestParam Map<String, String> allRequestParams) {
+//        List<HrmResponse> hrmResponses = humanManagementService.getListHumanResource(limit, page);
+        Context context = new Context();
+        QueryParam queryParam = context.queryParam(allRequestParams);
+        return ResponseEntity.ok(queryParam.filters + "\n" + queryParam.pagination + "\n" + queryParam.orderByList);
+
     }
 }
