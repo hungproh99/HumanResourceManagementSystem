@@ -13,7 +13,7 @@ public class EmployeeController {
 	EmployeeRepository employeeRepository;
 	
 	@GetMapping("/list")
-	public ResponseEntity<?> getAll() {
-		return ResponseEntity.ok(employeeRepository.getListEmployee(0, 1000));
+	public ResponseEntity<?> getEmployeeDetail(@RequestParam String employeeID) {
+		return ResponseEntity.ok(employeeRepository.findById(employeeID));
 	}
 }

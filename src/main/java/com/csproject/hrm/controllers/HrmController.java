@@ -1,8 +1,6 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.response.HrmResponse;
-import com.csproject.hrm.jooq.Context;
-import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.services.HumanManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
