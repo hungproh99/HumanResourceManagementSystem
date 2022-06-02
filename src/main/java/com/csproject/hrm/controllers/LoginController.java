@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.csproject.hrm.common.constant.Uri.*;
+import static com.csproject.hrm.common.uri.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
