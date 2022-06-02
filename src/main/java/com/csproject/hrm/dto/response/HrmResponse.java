@@ -5,22 +5,25 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class HrmResponse {
     private String employee_id;
-    private String fullName;
+    private String full_name;
     private String email;
-    private String workStatus;
+    private String work_status;
     private String phone;
     private String gender;
-    private String birthDate;
+    private Date birth_date;
     private String job;
     private String office;
     private String area;
     private String contract;
     private String seniority;
-    private String startDate;
+    private Date start_date;
 }

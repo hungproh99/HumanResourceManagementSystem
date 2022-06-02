@@ -17,7 +17,7 @@ public class Constants {
     public static final String SEND_PASSWORD_TEXT = "Hello %s this is new reset password after you forgot %s \n Please don't send it for anyone";
     public static final String REQUEST_FAIL = "This request is failed";
     public static final String REQUEST_SUCCESS = "This request is successful";
-    public static final String OFFSET_INVALID = "Offset must integer >= 0";
+    public static final String PAGE_INVALID = "Page must integer >= 0 and <= ";
     public static final String LIMIT_INVALID = "Limit must integer >= 0";
     
 }
