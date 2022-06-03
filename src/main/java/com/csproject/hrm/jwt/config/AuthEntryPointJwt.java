@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.csproject.hrm.common.constant.Constants.ERROR_AUTHORIZED;
+
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
@@ -20,6 +22,6 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
         Logger.error("Unauthorized error: {}", authException.getMessage());
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ERROR_AUTHORIZED);
     }
 }

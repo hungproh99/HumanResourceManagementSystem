@@ -1,39 +1,99 @@
 package com.csproject.hrm.repositories.Custom;
 
+import static com.csproject.hrm.common.constant.Constants.*;
+
 import com.csproject.hrm.dto.response.HrmResponse;
+import com.csproject.hrm.jooq.DBConnection;
+import com.csproject.hrm.jooq.JooqHelper;
+import com.csproject.hrm.jooq.Pagination;
+import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.Impl.EmployeeRepositoryCustom;
-import org.hibernate.transform.Transformers;
+import lombok.AllArgsConstructor;
+import org.jooq.*;
+
+import static org.jooq.codegen.maven.example.Tables.WORKING_PLACE;
+import static org.jooq.codegen.maven.example.tables.Area.AREA;
+import static org.jooq.codegen.maven.example.tables.ContractType.CONTRACT_TYPE;
+import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.Job.JOB;
+import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
+import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
+import static org.jooq.impl.DSL.*;
+
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@AllArgsConstructor
 public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
+
+    private static final Map<String, Field<?>> field2Map;
+
+    static {
+        field2Map = new HashMap<>();
+        field2Map.put(EMPLOYEE_ID, EMPLOYEE.EMPLOYEE_ID);
+        field2Map.put(FULL_NAME, EMPLOYEE.FULL_NAME);
+    }
+
     @Autowired
-    private EntityManager entityManager;
+    private final JooqHelper queryHelper;
+    @Autowired
+    private final DBConnection connection;
 
     @Override
-    public List<HrmResponse> findAllEmployee(int limit, int page) {
-        String sql = "select e.employee_id,e.full_name ," +
-                "e.company_email as email,e.work_status ,e.phone_number as phone," +
-                "(case when e.gender = 1 then \"Male\" when e.gender = 2 then \"Felame\" end) as gender," +
-                "e.birth_date,j.position as job,o.name as office,a.name as area,ct.name as contract," +
-                "concat(year(curdate())-year(wc.start_date),' year ',month(curdate()-wc.start_date)," +
-                "' month ',day(curdate()-wc.start_date), ' day') as seniority,wc.start_date as start_date " +
-                "from employee e " +
-                "left join working_contract wc on e.employee_id = wc.employee_id " +
-                "left join contract_type ct on ct.type_id = wc.type_id " +
-                "left join working_place wp on wp.working_contract_id = wc.working_contract_id " +
-                "left join area a on a.area_id = wp.area_id " +
-                "left join office o on o.office_id = wp.office_id " +
-                "left join job j on j.job_id = wp.job_id limit :offset,:limit";
-        TypedQuery<HrmResponse> query = entityManager.createNativeQuery(sql)
-                .unwrap(org.hibernate.query.NativeQuery.class)
-                .setResultTransformer(Transformers.aliasToBean(HrmResponse.class));
-        query.setParameter("offset", (page - 1) * limit);
-        query.setParameter("limit", limit);
+    public List<HrmResponse> findAllEmployee(QueryParam queryParam) {
+        List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+        List<OrderField<?>> sortFields =
+                queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
 
-        return query.getResultList();
+        return findAllEmployee(conditions, sortFields, queryParam.pagination);
+    }
+
+    public List<HrmResponse> findAllEmployee(List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
+        final DSLContext dslContext = DSL.using(connection.getConnection());
+        final var query =
+                dslContext
+                        .select(
+                                EMPLOYEE.EMPLOYEE_ID,
+                                EMPLOYEE.FULL_NAME,
+                                EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+                                EMPLOYEE.WORK_STATUS,
+                                EMPLOYEE.PHONE_NUMBER.as(PHONE),
+                                when(EMPLOYEE.GENDER.eq(ZERO_CHARACTER), FEMALE)
+                                        .when(EMPLOYEE.GENDER.eq(ONE_CHARACTER), MALE).as(GENDER),
+                                EMPLOYEE.BIRTH_DATE,
+                                JOB.POSITION.as(JOB_NAME),
+                                OFFICE.NAME.as(OFFICE_NAME),
+                                AREA.NAME.as(AREA_NAME),
+                                CONTRACT_TYPE.NAME.as(CONTRACT),
+                                year(currentDate()).minus(year(WORKING_CONTRACT.START_DATE))
+                                        .concat(YEAR)
+                                        .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+                                        .concat(MONTH)
+                                        .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+                                        .concat(DAY)
+                                        .as(SENIORITY),
+                                WORKING_CONTRACT.START_DATE
+                        ).from(EMPLOYEE)
+                        .leftJoin(WORKING_CONTRACT).on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+                        .leftJoin(CONTRACT_TYPE).on(CONTRACT_TYPE.TYPE_ID.eq(WORKING_CONTRACT.TYPE_ID))
+                        .leftJoin(WORKING_PLACE).on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+                        .leftJoin(AREA).on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+                        .leftJoin(OFFICE).on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+                        .leftJoin(JOB).on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+                        .where(conditions)
+                        .orderBy(sortFields)
+                        .limit(pagination.limit)
+                        .offset(pagination.offset);
+
+        return query.fetchInto(HrmResponse.class);
+
     }
 }

@@ -1,6 +1,6 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.common.constant.Constants;
+import static com.csproject.hrm.common.constant.Constants.*;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
 import com.csproject.hrm.dto.response.JwtResponse;
 import com.csproject.hrm.dto.request.LoginRequest;
@@ -45,17 +45,17 @@ public class LoginController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         int updatePassword = loginService.changePasswordByUsername(changePasswordRequest);
         if (updatePassword == 0) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, Constants.REQUEST_FAIL);
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, REQUEST_FAIL);
         }
-        return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, Constants.REQUEST_SUCCESS));
+        return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
 
     @PostMapping(URI_FORGOT_PASSWORD)
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
         int updatePassword = loginService.forgotPasswordByUsername(email);
         if (updatePassword == 0) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, Constants.REQUEST_FAIL);
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, REQUEST_FAIL);
         }
-        return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, Constants.REQUEST_SUCCESS));
+        return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
 }

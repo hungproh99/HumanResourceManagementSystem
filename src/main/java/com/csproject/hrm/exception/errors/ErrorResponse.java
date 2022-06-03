@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
+import static com.csproject.hrm.common.constant.Constants.*;
+
 @Data
 public class ErrorResponse {
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     private Date timestamp;
 
     private int code;

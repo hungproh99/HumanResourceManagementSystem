@@ -1,5 +1,7 @@
 package com.csproject.hrm.jooq;
 
+import static com.csproject.hrm.common.constant.Constants.*;
+
 import com.csproject.hrm.common.enums.ComparisonOperator;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jwt.config.AuthEntryPointJwt;
@@ -11,6 +13,7 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.aspectj.util.LangUtil.isEmpty;
 
+@Component
 public class JooqHelper {
 
     private static final Logger Logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
@@ -36,7 +40,7 @@ public class JooqHelper {
             final Field<?> field = fieldMap.get(clause.field);
 
             if (Objects.isNull(field)) {
-                throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid OrderBy");
+                throw new CustomErrorException(HttpStatus.BAD_REQUEST, ORDER_BY_INVALID);
             }
             if (clause.orderBy.equals(OrderBy.ASC)) {
                 orderByList.add(field.asc().nullsLast());
@@ -66,7 +70,7 @@ public class JooqHelper {
                         final Field<?> field = fieldMap.get(filter.field);
 
                         if (Objects.isNull(field)) {
-                            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Filter");
+                            throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
                         }
 
                         final var newCondition = condition(filter, field);
@@ -82,7 +86,7 @@ public class JooqHelper {
     private Condition condition(QueryFilter filter, Field<?> field) {
 
         if (StringUtils.length(filter.condition) < 3) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Filter");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
         }
 
         final var subStr = filter.condition.substring(0, 3);
@@ -93,7 +97,7 @@ public class JooqHelper {
             case AEQ:
                 return field.upper().eq(value.toUpperCase());
             case ALK:
-                return field.upper().like("%" + value.toUpperCase() + "%");
+                return field.upper().like(PERCENT_CHARACTER + value.toUpperCase() + PERCENT_CHARACTER);
             case ALT:
                 return lt(field, value);
             case AGE:
@@ -111,7 +115,7 @@ public class JooqHelper {
             case ABT:
                 return bt(field, value);
             case ANL:
-                return field.upper().notLike("%" + value.toUpperCase() + "%");
+                return field.upper().notLike(PERCENT_CHARACTER + value.toUpperCase() + PERCENT_CHARACTER);
             default:
                 return DSL.noCondition();
         }
@@ -165,7 +169,7 @@ public class JooqHelper {
     }
 
     private Condition bt(Field<?> field, String value) {
-        final var split = value.split("-", 2);
+        final var split = value.split(DASH_CHARACTER, TWO_NUMBER);
         final var less = split[0];
         final var greater = split[1];
         if (field.getDataType().isTimestamp()) {

@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.csproject.hrm.common.constant.Constants.*;
+
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger Logger = LoggerFactory.getLogger(AuthTokenFilter.class);
@@ -48,9 +50,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private String parseJwt(HttpServletRequest request) {
 
-        String headerAuth = request.getHeader("Authorization");
+        String headerAuth = request.getHeader(AUTHORIZATION);
 
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
             return headerAuth.substring(7, headerAuth.length());
         }
         return null;
