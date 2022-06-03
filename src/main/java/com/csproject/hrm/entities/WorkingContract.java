@@ -43,6 +43,9 @@ public class WorkingContract {
     @Column(name = "base_salary")
     private String baseSalary;
 
+    @Column(name = "contract_url")
+    private String contractUrl;
+
     @OneToOne(mappedBy = "workingContract", fetch = FetchType.LAZY)
     private WorkingPlace workingPlace;
 

@@ -6,6 +6,7 @@ import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.services.HumanManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class HrmController {
     HumanManagementService humanManagementService;
 
     @GetMapping(URI_GET_ALL_EMPLOYEE)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllEmployee(@RequestParam Map<String, String> allRequestParams) {
         Context context = new Context();
         QueryParam queryParam = context.queryParam(allRequestParams);
