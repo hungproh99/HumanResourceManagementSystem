@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.csproject.hrm.HumanResourceManagementSystemApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 48.794 s - in com.csproject.hrm.HumanResourceManagementSystemApplicationTests

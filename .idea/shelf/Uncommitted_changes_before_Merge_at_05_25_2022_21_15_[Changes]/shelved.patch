@@ -1,0 +1,19 @@
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#MySQL\r\n#spring.datasource.url = jdbc:mysql://34.101.229.25:3306/human_resource_management\r\n#spring.datasource.username = ndh4899\r\n#spring.datasource.password = hungnd\r\n#spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL57Dialect\r\n#Google SQL\r\nspring.datasource.username = ndh4899\r\nspring.datasource.password = hungnd\r\nspring.cloud.gcp.sql.database-name = human-resource-management\r\nspring.cloud.gcp.sql.instance-connection-name = cappro-hrmsystem:asia-southeast2:human-resource-management\r\nspring.sql.init.mode = always\r\n#Common\r\nspring.jpa.generate-ddl = true\r\nspring.jpa.hibernate.ddl-auto = update\r\nspring.jpa.properties.hibernate.show_sql = true\r\nspring.jpa.properties.hibernate.use_sql_comments = true\r\nspring.jpa.properties.hibernate.format_sql = true\r\nspring.jpa.defer-datasource-initialization = true\r\nlogging.level.org.hibernate.SQL = DEBUG\r\nlogging.level.org.hibernate.type = TRACE\r\nserver.error.include-message = always\r\nserver.forward-headers-strategy = FRAMEWORK\r\nspring.mail.host =\r\nbezkoder.app.jwtSecret = human_resource_management\r\nbezkoder.app.jwtExpirationMs = 86400000\r\nspring.profiles.active = mysql
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/src/main/resources/application.properties b/src/main/resources/application.properties
+--- a/src/main/resources/application.properties	(revision 6b32be7ef6c88463009de50cc985116793de6349)
++++ b/src/main/resources/application.properties	(date 1653488124140)
+@@ -4,7 +4,7 @@
+ #spring.datasource.password = hungnd
+ #spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL57Dialect
+ #Google SQL
+-spring.datasource.username = ndh4899
++spring.datasource.username = root
+ spring.datasource.password = hungnd
+ spring.cloud.gcp.sql.database-name = human-resource-management
+ spring.cloud.gcp.sql.instance-connection-name = cappro-hrmsystem:asia-southeast2:human-resource-management

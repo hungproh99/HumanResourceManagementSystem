@@ -25,6 +25,4 @@ public interface EmployeeRepository extends JpaRepository<Employee, String>, Emp
 	
 	Boolean existsByCompanyEmail(String companyEmail);
 	
-	@Query(value = "select e from Employee e")
-	Employee getById(String s);
 }

@@ -1,0 +1,160 @@
+Index: src/main/java/com/csproject/hrm/services/DemoService.java
+===================================================================
+diff --git a/src/main/java/com/csproject/hrm/services/DemoService.java b/src/main/java/com/csproject/hrm/services/DemoService.java
+deleted file mode 100644
+--- a/src/main/java/com/csproject/hrm/services/DemoService.java	
++++ /dev/null	
+@@ -1,23 +0,0 @@
+-package com.csproject.hrm.services;
+-
+-
+-import com.csproject.hrm.entities.Demo;
+-import com.csproject.hrm.repositories.DemoRepository;
+-import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.stereotype.Service;
+-
+-@Service
+-public class DemoService{
+-	
+-	private final DemoRepository demoRepository;
+-	
+-	@Autowired
+-	public DemoService(DemoRepository demoRepository) {this.demoRepository = demoRepository;}
+-	
+-	public Demo getDemoByID(Long id) {
+-		if(id <= 0){
+-			throw new IllegalArgumentException();
+-		}
+-		return demoRepository.getDemoBydemoId(id);
+-	}
+-}
+\ No newline at end of file
+Index: src/main/java/com/csproject/hrm/controllers/DemoController.java
+===================================================================
+diff --git a/src/main/java/com/csproject/hrm/controllers/DemoController.java b/src/main/java/com/csproject/hrm/controllers/DemoController.java
+deleted file mode 100644
+--- a/src/main/java/com/csproject/hrm/controllers/DemoController.java	
++++ /dev/null	
+@@ -1,22 +0,0 @@
+-package com.csproject.hrm.controllers;
+-
+-import com.csproject.hrm.entities.Demo;
+-import com.csproject.hrm.services.DemoService;
+-import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.web.bind.annotation.*;
+-
+-@RestController
+-@RequestMapping(path = "demo")
+-public class DemoController {
+-	
+-	private final DemoService demoService;
+-	
+-	@Autowired
+-	public DemoController(DemoService demoService) {this.demoService = demoService;}
+-	
+-	@GetMapping(path = "/list", params = "id")
+-	public Demo getDemoById(@RequestParam(name = "id") Long id) {
+-		return demoService.getDemoByID(id);
+-	}
+-	
+-}
+\ No newline at end of file
+Index: src/main/java/com/csproject/hrm/entities/Demo2.java
+===================================================================
+diff --git a/src/main/java/com/csproject/hrm/entities/Demo2.java b/src/main/java/com/csproject/hrm/entities/Demo2.java
+deleted file mode 100644
+--- a/src/main/java/com/csproject/hrm/entities/Demo2.java	
++++ /dev/null	
+@@ -1,27 +0,0 @@
+-package com.csproject.hrm.entities;
+-
+-import com.fasterxml.jackson.annotation.JsonIgnore;
+-import lombok.*;
+-import org.hibernate.annotations.Cascade;
+-import org.hibernate.annotations.CascadeType;
+-
+-import javax.persistence.*;
+-import java.util.Set;
+-
+-@Getter
+-@Setter
+-@ToString
+-@RequiredArgsConstructor
+-@Entity
+-@Table(name = "Demo2")
+-public class Demo2 {
+-	@Id
+-	@Column(name = "id", nullable = false)
+-	private Long id;
+-	
+-	@OneToMany(mappedBy = "demo", fetch = FetchType.LAZY)
+-	@Cascade(value = {CascadeType.ALL})
+-	@JsonIgnore
+-	@ToString.Exclude
+-	private Set<Demo> injectionSchedules;
+-}
+\ No newline at end of file
+Index: src/main/java/com/csproject/hrm/entities/Demo.java
+===================================================================
+diff --git a/src/main/java/com/csproject/hrm/entities/Demo.java b/src/main/java/com/csproject/hrm/entities/Demo.java
+deleted file mode 100644
+--- a/src/main/java/com/csproject/hrm/entities/Demo.java	
++++ /dev/null	
+@@ -1,32 +0,0 @@
+-package com.csproject.hrm.entities;
+-
+-import com.sun.istack.NotNull;
+-import lombok.*;
+-import org.hibernate.Hibernate;
+-
+-import javax.persistence.*;
+-import java.time.LocalDate;
+-import java.util.Objects;
+-
+-@Getter
+-@Setter
+-@ToString
+-@RequiredArgsConstructor
+-@Entity
+-@Table(name = "Demo")
+-public class Demo {
+-	
+-	@Id
+-	@Column(name = "id")
+-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+-	@NotNull
+-	private Long demoID;
+-	@Column(name = "date", columnDefinition = "DATE")
+-	@NotNull
+-	private LocalDate Date;
+-	@ManyToOne(fetch = FetchType.LAZY)
+-	@JoinColumn(name = "demo2_id", referencedColumnName = "id")
+-	@ToString.Exclude
+-	private Demo2 demo;
+-	
+-}
+\ No newline at end of file
+Index: src/main/java/com/csproject/hrm/repositories/DemoRepository.java
+===================================================================
+diff --git a/src/main/java/com/csproject/hrm/repositories/DemoRepository.java b/src/main/java/com/csproject/hrm/repositories/DemoRepository.java
+deleted file mode 100644
+--- a/src/main/java/com/csproject/hrm/repositories/DemoRepository.java	
++++ /dev/null	
+@@ -1,16 +0,0 @@
+-package com.csproject.hrm.repositories;
+-
+-import com.csproject.hrm.entities.Demo;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import org.springframework.data.jpa.repository.Query;
+-
+-
+-public interface DemoRepository  extends JpaRepository<Demo, Long>{
+-	
+-	String Q_FIND_DEMO_BY_ID = "SELECT d FROM demo d LEFT JOIN FETCH d.demo2 v WHERE d.id = ?";
+-	
+-	
+-	@Query()
+-	Demo getDemoBydemoId(Long id);
+-	
+-}
+\ No newline at end of file
