@@ -1,7 +1,8 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.response.EmployeeDetailResponse;
-import com.csproject.hrm.dto.response.TaxAndInsuranceResponse;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.entities.Bank;
+import com.csproject.hrm.entities.Education;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
@@ -22,6 +23,7 @@ public class EmployeeDetailController {
 	@Autowired
 	EmployeeDetailRepository employeeDetailRepository;
 	
+	
 	@PreAuthorize(value = "hasRole('ADMIN')")
 	@GetMapping("main")
 	public ResponseEntity<?> findMainDetail(@RequestParam Map<String, String> requestParams) {
@@ -38,5 +40,32 @@ public class EmployeeDetailController {
 		QueryParam queryParam = context.queryParam(requestParams);
 		List<TaxAndInsuranceResponse> taxAndInsurance = employeeDetailRepository.findTaxAndInsurance(queryParam);
 		return ResponseEntity.ok(taxAndInsurance);
+	}
+	
+	@PreAuthorize(value = "hasRole('ADMIN')")
+	@GetMapping("add_info")
+	public ResponseEntity<?> findAdditionalInfo(@RequestParam Map<String, String> requestParams) {
+		Context context = new Context();
+		QueryParam queryParam = context.queryParam(requestParams);
+		List<EmployeeAdditionalInfo> additionalInfo = employeeDetailRepository.findAdditionalInfo(queryParam);
+		return ResponseEntity.ok(additionalInfo);
+	}
+	
+	@PreAuthorize(value = "hasRole('ADMIN')")
+	@GetMapping("bank")
+	public ResponseEntity<?> findBankInfo(@RequestParam Map<String, String> requestParams) {
+		Context context = new Context();
+		QueryParam queryParam = context.queryParam(requestParams);
+		List<Bank> bank = employeeDetailRepository.findBankByEmployeeID(queryParam);
+		return ResponseEntity.ok(bank);
+	}
+	
+	@PreAuthorize(value = "hasRole('ADMIN')")
+	@GetMapping("edu")
+	public ResponseEntity<?> findEducationInfo(@RequestParam Map<String, String> requestParams) {
+		Context context = new Context();
+		QueryParam queryParam = context.queryParam(requestParams);
+		List<Education> educations = employeeDetailRepository.findEducationByEmployeeID(queryParam);
+		return ResponseEntity.ok(educations);
 	}
 }

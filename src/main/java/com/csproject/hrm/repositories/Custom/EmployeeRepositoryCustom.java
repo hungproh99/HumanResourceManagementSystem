@@ -1,4 +1,4 @@
-package com.csproject.hrm.repositories.Impl;
+package com.csproject.hrm.repositories.Custom;
 
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.QueryParam;

@@ -1,7 +1,8 @@
 package com.csproject.hrm.repositories.Custom.impl;
 
-import com.csproject.hrm.dto.response.EmployeeDetailResponse;
-import com.csproject.hrm.dto.response.TaxAndInsuranceResponse;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.entities.Bank;
+import com.csproject.hrm.entities.Education;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.Custom.EmployeeDetailCustom;
 import lombok.AllArgsConstructor;
@@ -12,8 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.jooq.codegen.maven.example.Tables.INSURANCE;
-import static org.jooq.codegen.maven.example.Tables.WORKING_PLACE;
+import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.ContractType.CONTRACT_TYPE;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
@@ -37,6 +37,51 @@ public class EmployeeDetailCustomImpl implements EmployeeDetailCustom {
 	@Autowired
 	private final DBConnection connection;
 	
+	@Override
+	public List<Education> findEducationByEmployeeID(QueryParam queryParam) {
+		List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+		return findEducationByEmployeeID(conditions);
+	}
+	
+	public List<Education> findEducationByEmployeeID(List<Condition> conditions) {
+		final DSLContext dslContext = DSL.using(connection.getConnection());
+		final var query = dslContext.select(EDUCATION.EDUCATION_ID, EDUCATION.NAME_SCHOOL, EDUCATION.START_DATE,
+		                                    EDUCATION.END_DATE, EDUCATION.CERTIFICATE, EDUCATION.STATUS).from(EDUCATION)
+		                            .rightJoin(EMPLOYEE).on(EDUCATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID)).where(
+						conditions);
+		return query.fetchInto(Education.class);
+	}
+	
+	@Override
+	public List<Bank> findBankByEmployeeID(QueryParam queryParam) {
+		List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+		return findBankByEmployeeID(conditions);
+	}
+	
+	public List<Bank> findBankByEmployeeID(List<Condition> conditions) {
+		final DSLContext dslContext = DSL.using(connection.getConnection());
+		final var query = dslContext.select(BANK.BANK_ID, BANK.NAME_BANK, BANK.ADDRESS, BANK.ACCOUNT_NUMBER,
+		                                    BANK.ACCOUNT_NAME).from(BANK).rightJoin(EMPLOYEE).on(
+				BANK.BANK_ID.eq(EMPLOYEE.BANK_ID)).where(conditions);
+		return query.fetchInto(Bank.class);
+	}
+	
+	@Override
+	public List<EmployeeAdditionalInfo> findAdditionalInfo(QueryParam queryParam) {
+		List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+		return findAdditionalInfo(conditions);
+	}
+	
+	public List<EmployeeAdditionalInfo> findAdditionalInfo(List<Condition> conditions) {
+		final DSLContext dslContext = DSL.using(connection.getConnection());
+		final var query = dslContext.select(EMPLOYEE.ADDRESS, IDENTITY_CARD.PLACE_OF_RESIDENCE,
+		                                    IDENTITY_CARD.PLACE_OF_ORIGIN, IDENTITY_CARD.NATIONALITY,
+		                                    IDENTITY_CARD.CARD_ID, IDENTITY_CARD.PROVIDE_DATE,
+		                                    IDENTITY_CARD.PROVIDE_PLACE, EMPLOYEE.PHONE_NUMBER, EMPLOYEE.NICK_NAME,
+		                                    EMPLOYEE.FACEBOOK).from(EMPLOYEE).leftJoin(IDENTITY_CARD).on(
+				IDENTITY_CARD.CARD_ID.eq(EMPLOYEE.CARD_ID)).where(conditions);
+		return query.fetchInto(EmployeeAdditionalInfo.class);
+	}
 	
 	@Override
 	public List<TaxAndInsuranceResponse> findTaxAndInsurance(QueryParam queryParam) {

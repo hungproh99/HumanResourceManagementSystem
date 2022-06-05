@@ -1,8 +1,8 @@
-package com.csproject.hrm.repositories.Custom;
+package com.csproject.hrm.repositories.Custom.impl;
 
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.*;
-import com.csproject.hrm.repositories.Impl.EmployeeRepositoryCustom;
+import com.csproject.hrm.repositories.Custom.EmployeeRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
