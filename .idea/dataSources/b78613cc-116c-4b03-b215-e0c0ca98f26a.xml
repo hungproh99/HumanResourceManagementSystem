@@ -1040,951 +1040,173 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Host>localhost</Host>
       <Plugin>caching_sha2_password</Plugin>
     </user>
-    <table id="290" parent="275" name="area">
+    <table id="290" parent="279" name="mst_group">
       <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
+      <CollationName>utf8mb4_unicode_ci</CollationName>
     </table>
-    <table id="291" parent="275" name="bank">
+    <table id="291" parent="279" name="mst_japan">
       <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
+      <CollationName>utf8mb4_unicode_ci</CollationName>
     </table>
-    <table id="292" parent="275" name="contract_type">
+    <table id="292" parent="279" name="tbl_detail_user_japan">
       <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
+      <CollationName>utf8mb4_unicode_ci</CollationName>
     </table>
-    <table id="293" parent="275" name="demo">
+    <table id="293" parent="279" name="tbl_user">
       <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
+      <CollationName>utf8mb4_unicode_ci</CollationName>
     </table>
-    <table id="294" parent="275" name="demo2">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="295" parent="275" name="discipline">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="296" parent="275" name="discipline_type">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="297" parent="275" name="education">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="298" parent="275" name="employee">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="299" parent="275" name="identity_card">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="300" parent="275" name="insurance">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="301" parent="275" name="job">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="302" parent="275" name="laudatory">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="303" parent="275" name="laudatory_type">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="304" parent="275" name="office">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="305" parent="275" name="relative_information">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="306" parent="275" name="relative_type">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="307" parent="275" name="role_type">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="308" parent="275" name="salary">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="309" parent="275" name="tax">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="310" parent="275" name="working_contract">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="311" parent="275" name="working_history">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="312" parent="275" name="working_information">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <table id="313" parent="275" name="working_place">
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_unicode_520_ci</CollationName>
-    </table>
-    <column id="314" parent="290" name="area_id">
-      <AutoIncrement>2</AutoIncrement>
-      <DataType>bigint|0s</DataType>
+    <column id="294" parent="290" name="group_id">
+      <AutoIncrement>5</AutoIncrement>
+      <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="315" parent="290" name="name">
+    <column id="295" parent="290" name="group_name">
       <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <key id="316" parent="290" name="PRIMARY">
-      <ColNames>area_id</ColNames>
+    <key id="296" parent="290" name="PRIMARY">
+      <ColNames>group_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
     </key>
-    <column id="317" parent="291" name="bank_id">
-      <DataType>bigint|0s</DataType>
+    <column id="297" parent="291" name="code_level">
+      <DataType>varchar(15)|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="318" parent="291" name="account_name">
+    <column id="298" parent="291" name="name_level">
       <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="319" parent="291" name="account_number">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="320" parent="291" name="address">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="321" parent="291" name="name_bank">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <key id="322" parent="291" name="PRIMARY">
-      <ColNames>bank_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="323" parent="292" name="type_id">
-      <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="324" parent="292" name="name">
-      <DataType>varchar(255)|0s</DataType>
       <Position>2</Position>
     </column>
-    <key id="325" parent="292" name="PRIMARY">
-      <ColNames>type_id</ColNames>
+    <key id="299" parent="291" name="PRIMARY">
+      <ColNames>code_level</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
     </key>
-    <column id="326" parent="293" name="id">
+    <column id="300" parent="292" name="detail_user_japan_id">
       <AutoIncrement>1</AutoIncrement>
-      <DataType>bigint|0s</DataType>
+      <DataType>int|0s</DataType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="327" parent="293" name="date">
+    <column id="301" parent="292" name="user_id">
+      <DataType>int|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+    </column>
+    <column id="302" parent="292" name="code_level">
+      <DataType>varchar(15)|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+    </column>
+    <column id="303" parent="292" name="start_date">
       <DataType>date|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="328" parent="293" name="demo2_id">
-      <DataType>bigint|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <foreign-key id="329" parent="293" name="FK57l0tj0utsokhb7ayxefkat3n">
-      <ColNames>demo2_id</ColNames>
-      <RefColNames>id</RefColNames>
-      <RefTableName>demo2</RefTableName>
-    </foreign-key>
-    <index id="330" parent="293" name="FK57l0tj0utsokhb7ayxefkat3n">
-      <ColNames>demo2_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="331" parent="293" name="PRIMARY">
-      <ColNames>id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="332" parent="294" name="id">
-      <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <key id="333" parent="294" name="PRIMARY">
-      <ColNames>id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="334" parent="295" name="discipline_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="335" parent="295" name="date">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="336" parent="295" name="description">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="337" parent="295" name="punishment">
-      <DataType>varchar(255)|0s</DataType>
       <Position>4</Position>
     </column>
-    <column id="338" parent="295" name="status">
-      <DataType>varchar(255)|0s</DataType>
+    <column id="304" parent="292" name="end_date">
+      <DataType>date|0s</DataType>
+      <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="339" parent="295" name="title">
+    <column id="305" parent="292" name="total">
+      <DataType>int|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+    </column>
+    <foreign-key id="306" parent="292" name="tbl_detail_user_japan_ibfk_1">
+      <ColNames>user_id</ColNames>
+      <RefColNames>user_id</RefColNames>
+      <RefTableName>tbl_user</RefTableName>
+    </foreign-key>
+    <foreign-key id="307" parent="292" name="tbl_detail_user_japan_ibfk_2">
+      <ColNames>code_level</ColNames>
+      <RefColNames>code_level</RefColNames>
+      <RefTableName>mst_japan</RefTableName>
+    </foreign-key>
+    <index id="308" parent="292" name="user_id">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="309" parent="292" name="code_level">
+      <ColNames>code_level</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="310" parent="292" name="PRIMARY">
+      <ColNames>detail_user_japan_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+    </key>
+    <column id="311" parent="293" name="user_id">
+      <AutoIncrement>1</AutoIncrement>
+      <DataType>int|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+    </column>
+    <column id="312" parent="293" name="group_id">
+      <DataType>int|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+    </column>
+    <column id="313" parent="293" name="login_name">
+      <DataType>varchar(15)|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+    </column>
+    <column id="314" parent="293" name="password">
+      <DataType>varchar(50)|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+    </column>
+    <column id="315" parent="293" name="full_name">
+      <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+    </column>
+    <column id="316" parent="293" name="full_name_kana">
       <DataType>varchar(255)|0s</DataType>
       <Position>6</Position>
     </column>
-    <column id="340" parent="295" name="type_id">
-      <DataType>bigint|0s</DataType>
+    <column id="317" parent="293" name="email">
+      <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
       <Position>7</Position>
     </column>
-    <column id="341" parent="295" name="working_information_id">
-      <DataType>bigint|0s</DataType>
+    <column id="318" parent="293" name="tel">
+      <DataType>varchar(15)|0s</DataType>
+      <NotNull>1</NotNull>
       <Position>8</Position>
     </column>
-    <foreign-key id="342" parent="295" name="FK7pa865hyrhp12fljb3rqh7h28">
-      <ColNames>type_id</ColNames>
-      <RefColNames>type_id</RefColNames>
-      <RefTableName>discipline_type</RefTableName>
-    </foreign-key>
-    <foreign-key id="343" parent="295" name="FKhrolhrw5rulta6u6ujyjuly0x">
-      <ColNames>working_information_id</ColNames>
-      <RefColNames>working_information_id</RefColNames>
-      <RefTableName>working_information</RefTableName>
-    </foreign-key>
-    <index id="344" parent="295" name="FK7pa865hyrhp12fljb3rqh7h28">
-      <ColNames>type_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="345" parent="295" name="FKhrolhrw5rulta6u6ujyjuly0x">
-      <ColNames>working_information_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="346" parent="295" name="PRIMARY">
-      <ColNames>discipline_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="347" parent="296" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="348" parent="296" name="name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <key id="349" parent="296" name="PRIMARY">
-      <ColNames>type_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="350" parent="297" name="education_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="351" parent="297" name="certificate">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="352" parent="297" name="end_date">
+    <column id="319" parent="293" name="birthday">
       <DataType>date|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="353" parent="297" name="name_school">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="354" parent="297" name="start_date">
-      <DataType>date|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="355" parent="297" name="status">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <column id="356" parent="297" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>7</Position>
-    </column>
-    <foreign-key id="357" parent="297" name="FKrphg8gbx569xvj1txkkt91uy4">
-      <ColNames>employee_id</ColNames>
-      <RefColNames>employee_id</RefColNames>
-      <RefTableName>employee</RefTableName>
-    </foreign-key>
-    <index id="358" parent="297" name="FKrphg8gbx569xvj1txkkt91uy4">
-      <ColNames>employee_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="359" parent="297" name="PRIMARY">
-      <ColNames>education_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="360" parent="298" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="361" parent="298" name="address">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="362" parent="298" name="avatar">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="363" parent="298" name="birth_date">
-      <DataType>date|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="364" parent="298" name="company_email">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="365" parent="298" name="facebook">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <column id="366" parent="298" name="full_name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>7</Position>
-    </column>
-    <column id="367" parent="298" name="gender">
-      <DataType>char(1)|0s</DataType>
-      <Position>8</Position>
-    </column>
-    <column id="368" parent="298" name="manager_id">
-      <DataType>varchar(255)|0s</DataType>
       <Position>9</Position>
     </column>
-    <column id="369" parent="298" name="marital_status">
-      <DataType>varchar(255)|0s</DataType>
+    <column id="320" parent="293" name="rule">
+      <DataType>int|0s</DataType>
+      <NotNull>1</NotNull>
       <Position>10</Position>
     </column>
-    <column id="370" parent="298" name="nick_name">
+    <column id="321" parent="293" name="salt">
       <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
       <Position>11</Position>
     </column>
-    <column id="371" parent="298" name="password">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>12</Position>
-    </column>
-    <column id="372" parent="298" name="personal_email">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>13</Position>
-    </column>
-    <column id="373" parent="298" name="phone_number">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>14</Position>
-    </column>
-    <column id="374" parent="298" name="tax_code">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>15</Position>
-    </column>
-    <column id="375" parent="298" name="work_status">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>16</Position>
-    </column>
-    <column id="376" parent="298" name="bank_id">
-      <DataType>bigint|0s</DataType>
-      <Position>17</Position>
-    </column>
-    <column id="377" parent="298" name="card_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>18</Position>
-    </column>
-    <column id="378" parent="298" name="role_type">
-      <DataType>bigint|0s</DataType>
-      <Position>19</Position>
-    </column>
-    <foreign-key id="379" parent="298" name="FKicptso0qh4vmwt76bgf5hm9p6">
-      <ColNames>bank_id</ColNames>
-      <RefColNames>bank_id</RefColNames>
-      <RefTableName>bank</RefTableName>
+    <foreign-key id="322" parent="293" name="tbl_user_ibfk_1">
+      <ColNames>group_id</ColNames>
+      <RefColNames>group_id</RefColNames>
+      <RefTableName>mst_group</RefTableName>
     </foreign-key>
-    <foreign-key id="380" parent="298" name="FKe4gss4ey1fu5mxpe82eqnvac6">
-      <ColNames>card_id</ColNames>
-      <RefColNames>card_id</RefColNames>
-      <RefTableName>identity_card</RefTableName>
-    </foreign-key>
-    <foreign-key id="381" parent="298" name="FKqsqu0215r8to2n2ejj7ejcimv">
-      <ColNames>role_type</ColNames>
-      <RefColNames>type_id</RefColNames>
-      <RefTableName>role_type</RefTableName>
-    </foreign-key>
-    <index id="382" parent="298" name="FKicptso0qh4vmwt76bgf5hm9p6">
-      <ColNames>bank_id</ColNames>
+    <index id="323" parent="293" name="group_id">
+      <ColNames>group_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="383" parent="298" name="FKe4gss4ey1fu5mxpe82eqnvac6">
-      <ColNames>card_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="384" parent="298" name="FKqsqu0215r8to2n2ejj7ejcimv">
-      <ColNames>role_type</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="385" parent="298" name="PRIMARY">
-      <ColNames>employee_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="386" parent="299" name="card_id">
-      <DataType>varchar(255)|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="387" parent="299" name="date_of_expiry">
-      <DataType>date|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="388" parent="299" name="nationality">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="389" parent="299" name="place_of_origin">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="390" parent="299" name="place_of_residence">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="391" parent="299" name="provide_date">
-      <DataType>date|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <column id="392" parent="299" name="provide_place">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>7</Position>
-    </column>
-    <key id="393" parent="299" name="PRIMARY">
-      <ColNames>card_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="394" parent="300" name="insurance_id">
-      <AutoIncrement>1</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="395" parent="300" name="description">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="396" parent="300" name="insurance_name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="397" parent="300" name="percent">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="398" parent="300" name="title">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="399" parent="300" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <foreign-key id="400" parent="300" name="FKkc01geqp8o69wkj996142pjt">
-      <ColNames>employee_id</ColNames>
-      <RefColNames>employee_id</RefColNames>
-      <RefTableName>employee</RefTableName>
-    </foreign-key>
-    <index id="401" parent="300" name="FKkc01geqp8o69wkj996142pjt">
-      <ColNames>employee_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="402" parent="300" name="PRIMARY">
-      <ColNames>insurance_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="403" parent="301" name="job_id">
-      <AutoIncrement>2</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="404" parent="301" name="description">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="405" parent="301" name="title">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <key id="406" parent="301" name="PRIMARY">
-      <ColNames>job_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="407" parent="302" name="laudatory_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="408" parent="302" name="date">
-      <DataType>date|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="409" parent="302" name="description">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="410" parent="302" name="reward">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="411" parent="302" name="status">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="412" parent="302" name="title">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <column id="413" parent="302" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <Position>7</Position>
-    </column>
-    <column id="414" parent="302" name="working_information_id">
-      <DataType>bigint|0s</DataType>
-      <Position>8</Position>
-    </column>
-    <foreign-key id="415" parent="302" name="FKmtp17mjpsckvcbq4cthq5rc50">
-      <ColNames>type_id</ColNames>
-      <RefColNames>type_id</RefColNames>
-      <RefTableName>laudatory_type</RefTableName>
-    </foreign-key>
-    <foreign-key id="416" parent="302" name="FKbgpr6edk7yydps2e6xklmb3">
-      <ColNames>working_information_id</ColNames>
-      <RefColNames>working_information_id</RefColNames>
-      <RefTableName>working_information</RefTableName>
-    </foreign-key>
-    <index id="417" parent="302" name="FKmtp17mjpsckvcbq4cthq5rc50">
-      <ColNames>type_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="418" parent="302" name="FKbgpr6edk7yydps2e6xklmb3">
-      <ColNames>working_information_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="419" parent="302" name="PRIMARY">
-      <ColNames>laudatory_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="420" parent="303" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="421" parent="303" name="name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <key id="422" parent="303" name="PRIMARY">
-      <ColNames>type_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="423" parent="304" name="office_id">
-      <AutoIncrement>1</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="424" parent="304" name="address">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="425" parent="304" name="name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <key id="426" parent="304" name="PRIMARY">
-      <ColNames>office_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="427" parent="305" name="relative_id">
-      <AutoIncrement>1</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="428" parent="305" name="birth_date">
-      <DataType>date|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="429" parent="305" name="parent_name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="430" parent="305" name="status">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="431" parent="305" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="432" parent="305" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <foreign-key id="433" parent="305" name="FKmwkd588kl8gl2rfvi52gxut3">
-      <ColNames>employee_id</ColNames>
-      <RefColNames>employee_id</RefColNames>
-      <RefTableName>employee</RefTableName>
-    </foreign-key>
-    <foreign-key id="434" parent="305" name="FKkkno01o28goapehpudc6pvxgq">
-      <ColNames>type_id</ColNames>
-      <RefColNames>type_id</RefColNames>
-      <RefTableName>relative_type</RefTableName>
-    </foreign-key>
-    <index id="435" parent="305" name="FKmwkd588kl8gl2rfvi52gxut3">
-      <ColNames>employee_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="436" parent="305" name="FKkkno01o28goapehpudc6pvxgq">
-      <ColNames>type_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="437" parent="305" name="PRIMARY">
-      <ColNames>relative_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="438" parent="306" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="439" parent="306" name="name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <key id="440" parent="306" name="PRIMARY">
-      <ColNames>type_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="441" parent="307" name="type_id">
-      <AutoIncrement>4</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="442" parent="307" name="role">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <key id="443" parent="307" name="PRIMARY">
-      <ColNames>type_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="444" parent="308" name="laudatory_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="445" parent="308" name="end_date">
-      <DataType>date|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="446" parent="308" name="final_salary">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="447" parent="308" name="start_date">
-      <DataType>date|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="448" parent="308" name="subsidize">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="449" parent="308" name="working_information_id">
-      <DataType>bigint|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <foreign-key id="450" parent="308" name="FKcufgqt5je8savk7883du8yjl9">
-      <ColNames>working_information_id</ColNames>
-      <RefColNames>working_information_id</RefColNames>
-      <RefTableName>working_information</RefTableName>
-    </foreign-key>
-    <index id="451" parent="308" name="FKcufgqt5je8savk7883du8yjl9">
-      <ColNames>working_information_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="452" parent="308" name="PRIMARY">
-      <ColNames>laudatory_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="453" parent="309" name="tax_id">
-      <AutoIncrement>1</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="454" parent="309" name="description">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="455" parent="309" name="tax_name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="456" parent="309" name="title">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="457" parent="309" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <foreign-key id="458" parent="309" name="FKei7scukyxjxrwm8j14rxcgfpt">
-      <ColNames>employee_id</ColNames>
-      <RefColNames>employee_id</RefColNames>
-      <RefTableName>employee</RefTableName>
-    </foreign-key>
-    <index id="459" parent="309" name="FKei7scukyxjxrwm8j14rxcgfpt">
-      <ColNames>employee_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="460" parent="309" name="PRIMARY">
-      <ColNames>tax_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="461" parent="310" name="working_contract_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="462" parent="310" name="base_salary">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="463" parent="310" name="company_name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="464" parent="310" name="end_date">
-      <DataType>date|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="465" parent="310" name="start_date">
-      <DataType>date|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="466" parent="310" name="status">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <column id="467" parent="310" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <Position>7</Position>
-    </column>
-    <column id="468" parent="310" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>8</Position>
-    </column>
-    <column id="469" parent="310" name="contract_url">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>9</Position>
-    </column>
-    <foreign-key id="470" parent="310" name="FKm8lgm02fo7lbyk17tngsgw3h5">
-      <ColNames>type_id</ColNames>
-      <RefColNames>type_id</RefColNames>
-      <RefTableName>contract_type</RefTableName>
-    </foreign-key>
-    <foreign-key id="471" parent="310" name="FKsex4ws8s50gfamj8lgmweqgwr">
-      <ColNames>employee_id</ColNames>
-      <RefColNames>employee_id</RefColNames>
-      <RefTableName>employee</RefTableName>
-    </foreign-key>
-    <index id="472" parent="310" name="FKm8lgm02fo7lbyk17tngsgw3h5">
-      <ColNames>type_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="473" parent="310" name="FKsex4ws8s50gfamj8lgmweqgwr">
-      <ColNames>employee_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="474" parent="310" name="PRIMARY">
-      <ColNames>working_contract_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="475" parent="311" name="working_history_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="476" parent="311" name="company_name">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="477" parent="311" name="end_date">
-      <DataType>date|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="478" parent="311" name="start_date">
-      <DataType>date|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="479" parent="311" name="type_id">
-      <DataType>bigint|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <column id="480" parent="311" name="employee_id">
-      <DataType>varchar(255)|0s</DataType>
-      <Position>6</Position>
-    </column>
-    <foreign-key id="481" parent="311" name="FK6qaysc7f06g54a5xuyd150b6v">
-      <ColNames>type_id</ColNames>
-      <RefColNames>type_id</RefColNames>
-      <RefTableName>contract_type</RefTableName>
-    </foreign-key>
-    <foreign-key id="482" parent="311" name="FKifvk8c7onm47vh7rbdm6r7kun">
-      <ColNames>employee_id</ColNames>
-      <RefColNames>employee_id</RefColNames>
-      <RefTableName>employee</RefTableName>
-    </foreign-key>
-    <index id="483" parent="311" name="FK6qaysc7f06g54a5xuyd150b6v">
-      <ColNames>type_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="484" parent="311" name="FKifvk8c7onm47vh7rbdm6r7kun">
-      <ColNames>employee_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="485" parent="311" name="PRIMARY">
-      <ColNames>working_history_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="486" parent="312" name="working_information_id">
-      <AutoIncrement>1</AutoIncrement>
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="487" parent="312" name="end_date">
-      <DataType>date|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="488" parent="312" name="start_date">
-      <DataType>date|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="489" parent="312" name="working_contract_id">
-      <DataType>bigint|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <foreign-key id="490" parent="312" name="FKpwt7lucj88wg8odl56cb82h29">
-      <ColNames>working_contract_id</ColNames>
-      <RefColNames>working_contract_id</RefColNames>
-      <RefTableName>working_contract</RefTableName>
-    </foreign-key>
-    <index id="491" parent="312" name="FKpwt7lucj88wg8odl56cb82h29">
-      <ColNames>working_contract_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="492" parent="312" name="PRIMARY">
-      <ColNames>working_information_id</ColNames>
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-    </key>
-    <column id="493" parent="313" name="working_place_id">
-      <DataType>bigint|0s</DataType>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-    </column>
-    <column id="494" parent="313" name="area_id">
-      <DataType>bigint|0s</DataType>
-      <Position>2</Position>
-    </column>
-    <column id="495" parent="313" name="job_id">
-      <DataType>bigint|0s</DataType>
-      <Position>3</Position>
-    </column>
-    <column id="496" parent="313" name="office_id">
-      <DataType>bigint|0s</DataType>
-      <Position>4</Position>
-    </column>
-    <column id="497" parent="313" name="working_contract_id">
-      <DataType>bigint|0s</DataType>
-      <Position>5</Position>
-    </column>
-    <foreign-key id="498" parent="313" name="FKl7p5df5v5ogy5t8kcmxtt10xn">
-      <ColNames>area_id</ColNames>
-      <RefColNames>area_id</RefColNames>
-      <RefTableName>area</RefTableName>
-    </foreign-key>
-    <foreign-key id="499" parent="313" name="FKji3m1jnm02ymvmhv5gt72akd2">
-      <ColNames>job_id</ColNames>
-      <RefColNames>job_id</RefColNames>
-      <RefTableName>job</RefTableName>
-    </foreign-key>
-    <foreign-key id="500" parent="313" name="FK6h05fawo00dapm4d8t2fs4ca3">
-      <ColNames>office_id</ColNames>
-      <RefColNames>office_id</RefColNames>
-      <RefTableName>office</RefTableName>
-    </foreign-key>
-    <foreign-key id="501" parent="313" name="FKmsdabpyr5vht6g61nopmud2d2">
-      <ColNames>working_contract_id</ColNames>
-      <RefColNames>working_contract_id</RefColNames>
-      <RefTableName>working_contract</RefTableName>
-    </foreign-key>
-    <index id="502" parent="313" name="FKl7p5df5v5ogy5t8kcmxtt10xn">
-      <ColNames>area_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="503" parent="313" name="FKji3m1jnm02ymvmhv5gt72akd2">
-      <ColNames>job_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="504" parent="313" name="FK6h05fawo00dapm4d8t2fs4ca3">
-      <ColNames>office_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <index id="505" parent="313" name="FKmsdabpyr5vht6g61nopmud2d2">
-      <ColNames>working_contract_id</ColNames>
-      <Type>btree</Type>
-    </index>
-    <key id="506" parent="313" name="PRIMARY">
-      <ColNames>working_place_id</ColNames>
+    <key id="324" parent="293" name="PRIMARY">
+      <ColNames>user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
     </key>
