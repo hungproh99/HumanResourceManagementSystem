@@ -10,17 +10,19 @@ import java.sql.SQLException;
 @Component
 @Data
 public class DBConnection {
-    Connection connection;
+  Connection connection;
 
-    public DBConnection(Connection connection) {
-        this.connection = connection;
-    }
+  public DBConnection(Connection connection) {
+    this.connection = connection;
+  }
 
-    public DBConnection() {
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/human_resource_management", "root", "huy123");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+  public DBConnection() {
+    try {
+      connection =
+          DriverManager.getConnection(
+              "jdbc:mysql://localhost:3306/human_resource_management", "root", "huy123");
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
     }
+  }
 }

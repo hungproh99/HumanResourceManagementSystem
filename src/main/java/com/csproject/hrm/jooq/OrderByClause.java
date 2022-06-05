@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OrderByClause {
-    public String field;
-    public OrderBy orderBy;
+  public String field;
+  public OrderBy orderBy;
 }

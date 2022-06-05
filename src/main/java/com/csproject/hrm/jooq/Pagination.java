@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Pagination {
-    public static final int DEFAULT_OFFSET = 0;
-    public static final int DEFAULT_LIMIT = 10;
+  public static final int DEFAULT_OFFSET = 0;
+  public static final int DEFAULT_LIMIT = 10;
 
-    public int offset;
+  public int offset;
 
-    public int limit;
+  public int limit;
 
-    public static Pagination defaultPage() {
-        return new Pagination(DEFAULT_OFFSET, DEFAULT_LIMIT);
-    }
+  public static Pagination defaultPage() {
+    return new Pagination(DEFAULT_OFFSET, DEFAULT_LIMIT);
+  }
 }

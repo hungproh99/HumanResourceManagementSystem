@@ -14,14 +14,14 @@ import javax.persistence.*;
 @Entity
 @Table(name = "area")
 public class Area {
-    @Id
-    @Column(name = "area_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "area_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-    private WorkingPlace workingPlace;
+  @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
+  private WorkingPlace workingPlace;
 }

@@ -1,5 +1,6 @@
 package com.csproject.hrm.entities;
 
+import com.csproject.hrm.common.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,15 +15,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "role_type")
 public class RoleType {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "type_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "type_id")
+  private Long id;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "role")
-    private com.csproject.hrm.common.enums.ERole ERole;
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "role")
+  private ERole ERole;
 
-    @OneToOne(mappedBy = "roleType", fetch = FetchType.LAZY)
-    private Employee employee;
+  @OneToOne(mappedBy = "roleType", fetch = FetchType.LAZY)
+  private Employee employee;
 }

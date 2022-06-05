@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class QueryFilter {
-    public String field;
-    public String condition;
+  public String field;
+  public String condition;
 }

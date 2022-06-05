@@ -14,14 +14,14 @@ import javax.persistence.*;
 @Entity
 @Table(name = "laudatory_type")
 public class LaudatoryType {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "type_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "type_id")
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @OneToOne(mappedBy = "laudatoryType", fetch = FetchType.LAZY)
-    private Laudatory laudatory;
+  @OneToOne(mappedBy = "laudatoryType", fetch = FetchType.LAZY)
+  private Laudatory laudatory;
 }

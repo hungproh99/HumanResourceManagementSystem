@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class HrmResponseList {
-    private List<HrmResponse> hrmResponse;
-    private int total;
+  private List<HrmResponse> hrmResponse;
+  private int total;
 }

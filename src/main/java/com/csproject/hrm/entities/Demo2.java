@@ -1,7 +1,10 @@
 package com.csproject.hrm.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
@@ -15,13 +18,13 @@ import java.util.Set;
 @Entity
 @Table(name = "Demo2")
 public class Demo2 {
-	@Id
-	@Column(name = "id", nullable = false)
-	private Long id;
-	
-	@OneToMany(mappedBy = "demo", fetch = FetchType.LAZY)
-	@Cascade(value = {CascadeType.ALL})
-	@JsonIgnore
-	@ToString.Exclude
-	private Set<Demo> injectionSchedules;
+  @Id
+  @Column(name = "id", nullable = false)
+  private Long id;
+
+  @OneToMany(mappedBy = "demo", fetch = FetchType.LAZY)
+  @Cascade(value = {CascadeType.ALL})
+  @JsonIgnore
+  @ToString.Exclude
+  private Set<Demo> injectionSchedules;
 }

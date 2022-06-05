@@ -15,25 +15,25 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "working_history")
 public class WorkingHistory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "working_history_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "working_history_id")
+  private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
+  @JoinColumn(name = "employee_id")
+  private Employee employee;
 
-    @Column(name = "company_name")
-    private String companyName;
+  @Column(name = "company_name")
+  private String companyName;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "type_id")
-    private ContractType contractType;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "type_id")
+  private ContractType contractType;
 
-    @Column(name = "start_date")
-    private LocalDate startDate;
+  @Column(name = "start_date")
+  private LocalDate startDate;
 
-    @Column(name = "end_date")
-    private LocalDate endDate;
+  @Column(name = "end_date")
+  private LocalDate endDate;
 }

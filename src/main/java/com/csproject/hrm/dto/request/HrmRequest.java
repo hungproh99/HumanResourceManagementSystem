@@ -13,14 +13,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class HrmRequest {
-    private String fullName;
-    private String role;
-    private String phone;
-    private String gender;
-    private LocalDate birthDate;
-    private String job;
-    private String office;
-    private String area;
-    private BigDecimal baseSalary;
-    private String contractName;
+  private String fullName;
+  private String role;
+  private String phone;
+  private String gender;
+  private LocalDate birthDate;
+  private String job;
+  private String office;
+  private String area;
+  private BigDecimal baseSalary;
+  private String contractName;
 }
