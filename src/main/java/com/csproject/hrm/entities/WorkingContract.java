@@ -3,6 +3,7 @@ package com.csproject.hrm.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @Table(name = "working_contract")
 public class WorkingContract {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "working_contract_id")
     private Long id;
 
@@ -38,7 +40,10 @@ public class WorkingContract {
     private String status;
 
     @Column(name = "base_salary")
-    private String baseSalary;
+    private BigDecimal baseSalary;
+
+    @Column(name = "contract_url")
+    private String contractUrl;
 
     @Column(name = "contract_url")
     private String contractUrl;

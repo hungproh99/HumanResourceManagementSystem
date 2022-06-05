@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @Table(name = "salary")
 public class Salary {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "laudatory_id")
     private Long id;
 
@@ -24,10 +26,10 @@ public class Salary {
     private WorkingInformation workingInformation;
 
     @Column(name = "final_salary")
-    private String finalSalary;
+    private BigDecimal finalSalary;
 
     @Column(name = "subsidize")
-    private String subsidize;
+    private BigDecimal subsidize;
 
     @Column(name = "start_date")
     private LocalDate startDate;

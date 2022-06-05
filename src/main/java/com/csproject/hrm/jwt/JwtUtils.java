@@ -24,7 +24,7 @@ public class JwtUtils {
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         HashMap<String, Object> map = new HashMap<>();
-        map.put("User Data", userPrincipal);
+        map.put("User_Data", userPrincipal);
         return Jwts.builder()
                 .setSubject(userPrincipal.getId())
                 .addClaims(map)

@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Table(name = "bank")
 public class Bank {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bank_id")
     private Long id;
 
