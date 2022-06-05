@@ -1,9 +1,0 @@
-<changelist name="Uncommitted_changes_before_Merge_at_05_31_2022_20_36_[Changes]" date="1654004280479" recycled="true" deleted="true">
-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Merge_at_05_31_2022_20_36_[Changes]/shelved.patch" />
-  <option name="DESCRIPTION" value="Uncommitted changes before Merge at 05/31/2022 20:36 [Changes]" />
-  <binary>
-    <option name="BEFORE_PATH" value="target/HumanResourceManagementSystem-0.0.1-SNAPSHOT.war.original" />
-    <option name="AFTER_PATH" value="target/HumanResourceManagementSystem-0.0.1-SNAPSHOT.war.original" />
-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Merge_at_05_31_2022_20_36_[Changes]/HumanResourceManagementSystem-0.0.1-SNAPSHOT.war.original" />
-  </binary>
-</changelist>
