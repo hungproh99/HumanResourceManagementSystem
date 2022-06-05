@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Table(name = "contract_type")
 public class ContractType {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "type_id")
     private Long id;
 

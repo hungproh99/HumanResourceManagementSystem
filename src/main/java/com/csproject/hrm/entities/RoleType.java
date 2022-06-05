@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +21,7 @@ public class RoleType {
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "role")
-    private ERole ERole;
+    private com.csproject.hrm.common.enums.ERole ERole;
 
     @OneToOne(mappedBy = "roleType", fetch = FetchType.LAZY)
     private Employee employee;

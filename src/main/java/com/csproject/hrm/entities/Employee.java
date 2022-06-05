@@ -1,7 +1,6 @@
 package com.csproject.hrm.entities;
 
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -34,8 +33,7 @@ public class Employee {
     private String fullName;
 
     @Column(name = "gender")
-    @Type(type = "true_false")
-    private boolean gender;
+    private String gender;
 
     @Column(name = "address")
     private String address;
@@ -70,6 +68,9 @@ public class Employee {
 
     @Column(name = "tax_code")
     private String taxCode;
+
+    @Column(name = "current_situation")
+    private String currentSituation;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "card_id")

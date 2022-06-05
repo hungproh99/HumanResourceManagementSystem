@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Table(name = "relative_type")
 public class RelativeType {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "type_id")
     private Long id;
 

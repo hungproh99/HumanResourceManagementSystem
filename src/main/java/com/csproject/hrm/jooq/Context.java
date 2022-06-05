@@ -65,6 +65,14 @@ public class Context {
             int offset = Integer.parseInt(offsetStr);
             int limit = Integer.parseInt(limitStr);
 
+            if (offset < ZERO_NUMBER) {
+                throw new CustomErrorException(HttpStatus.BAD_REQUEST, INVALID_OFFSET);
+            }
+
+            if (limit < ZERO_NUMBER) {
+                throw new CustomErrorException(HttpStatus.BAD_REQUEST, INVALID_LIMIT);
+            }
+
             return new Pagination(offset * limit, limit);
         } catch (NumberFormatException e) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, INVALID_NUMBER_FORMAT);
