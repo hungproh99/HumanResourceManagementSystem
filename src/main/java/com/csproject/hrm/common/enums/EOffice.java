@@ -16,9 +16,9 @@ public enum EOffice {
     this.value = value;
   }
 
-  public static long of(String role) {
+  public static long of(String office) {
     for (EOffice eOffice : EOffice.values()) {
-      if (eOffice.label.equalsIgnoreCase(role)) {
+      if (eOffice.label.equalsIgnoreCase(office)) {
         return eOffice.value;
       }
     }

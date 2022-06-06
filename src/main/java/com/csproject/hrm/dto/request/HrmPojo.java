@@ -17,5 +17,4 @@ public class HrmPojo extends HrmRequest {
   private String password;
   private String workStatus;
   private String companyName;
-  private LocalDate startDate;
 }

@@ -1,4 +1,4 @@
-package com.csproject.hrm.repositories.Custom;
+package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;

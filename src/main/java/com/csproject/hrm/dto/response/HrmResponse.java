@@ -19,10 +19,10 @@ public class HrmResponse {
   private String phone;
   private String gender;
   private Date birth_date;
-  private String jobTitle;
-  private String office;
-  private String area;
+  private String grade;
+  private String office_name;
+  private String area_name;
   private String seniority;
-  private String position;
+  private String position_name;
   private String workingType;
 }

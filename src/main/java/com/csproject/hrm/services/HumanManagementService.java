@@ -1,5 +1,6 @@
 package com.csproject.hrm.services;
 
+import com.csproject.hrm.common.enums.EWorkStatus;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
@@ -33,16 +34,18 @@ public class HumanManagementService implements HumanManagementServiceImpl {
 
   @Override
   public void insertEmployee(HrmRequest hrmRequest) {
-    if (hrmRequest.getArea() == null
-        || hrmRequest.getFullName() == null
+    if (hrmRequest.getFullName() == null
         || hrmRequest.getRole() == null
-//        || hrmRequest.getContractName() == null
-        || hrmRequest.getJob() == null
-        || hrmRequest.getOffice() == null
         || hrmRequest.getPhone() == null
-//        || hrmRequest.getBaseSalary() == null
+        || hrmRequest.getGender() == null
         || hrmRequest.getBirthDate() == null
-        || hrmRequest.getGender() == null) {
+        || hrmRequest.getGrade() == null
+        || hrmRequest.getPosition() == null
+        || hrmRequest.getOffice() == null
+        || hrmRequest.getArea() == null
+        || hrmRequest.getWorkingType() == null
+        || hrmRequest.getManagerId() == null
+        || hrmRequest.getEmployeeType() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
       throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
@@ -56,16 +59,18 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   public void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
     hrmRequestList.forEach(
         hrmRequest -> {
-          if (hrmRequest.getArea() == null
-              || hrmRequest.getFullName() == null
+          if (hrmRequest.getFullName() == null
               || hrmRequest.getRole() == null
-//              || hrmRequest.getContractName() == null
-              || hrmRequest.getJob() == null
-              || hrmRequest.getOffice() == null
               || hrmRequest.getPhone() == null
-//              || hrmRequest.getBaseSalary() == null
+              || hrmRequest.getGender() == null
               || hrmRequest.getBirthDate() == null
-              || hrmRequest.getGender() == null) {
+              || hrmRequest.getGrade() == null
+              || hrmRequest.getPosition() == null
+              || hrmRequest.getOffice() == null
+              || hrmRequest.getArea() == null
+              || hrmRequest.getWorkingType() == null
+              || hrmRequest.getManagerId() == null
+              || hrmRequest.getEmployeeType() == null) {
             throw new CustomParameterConstraintException(FILL_NOT_FULL);
           } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
             throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
@@ -79,30 +84,27 @@ public class HumanManagementService implements HumanManagementServiceImpl {
     String employeeId = generateIdEmployee(hrmRequest.getFullName());
     String companyEmail = generateEmailEmployee(employeeId);
     String password = passwordEncoder.encode(loginService.generateCommonLangPassword());
-    String workStatus = "Working";
     String companyName = "HRM";
-    String contractStatus = "IN_EFFECT";
-    LocalDate startDate = LocalDate.now();
 
     HrmPojo hrmPojo =
         HrmPojo.builder()
+            .employeeId(employeeId)
+            .companyEmail(companyEmail)
+            .password(password)
+            .workStatus(EWorkStatus.ACTIVE.name())
+            .companyName(companyName)
             .fullName(hrmRequest.getFullName())
             .role(hrmRequest.getRole())
             .phone(hrmRequest.getPhone())
             .gender(hrmRequest.getGender())
             .birthDate(hrmRequest.getBirthDate())
-            .job(hrmRequest.getJob())
+            .grade(hrmRequest.getGrade())
+            .position(hrmRequest.getPosition())
             .office(hrmRequest.getOffice())
             .area(hrmRequest.getArea())
-//            .baseSalary(hrmRequest.getBaseSalary())
-//            .contractName(hrmRequest.getContractName())
-            .employeeId(employeeId)
-            .companyEmail(companyEmail)
-            .password(password)
-            .workStatus(workStatus)
-            .companyName(companyName)
-//            .contractStatus(contractStatus)
-            .startDate(startDate)
+            .workingType(hrmRequest.getWorkingType())
+            .managerId(hrmRequest.getManagerId())
+            .employeeType(hrmRequest.getEmployeeType())
             .build();
 
     loginService.sendEmail(
