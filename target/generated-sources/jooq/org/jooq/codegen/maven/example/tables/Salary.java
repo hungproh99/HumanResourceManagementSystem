@@ -4,12 +4,14 @@
 package org.jooq.codegen.maven.example.tables;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row6;
@@ -50,7 +52,7 @@ public class Salary extends TableImpl<SalaryRecord> {
     /**
      * The column <code>human_resource_management.salary.laudatory_id</code>.
      */
-    public final TableField<SalaryRecord, Long> LAUDATORY_ID = createField(DSL.name("laudatory_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<SalaryRecord, Long> LAUDATORY_ID = createField(DSL.name("laudatory_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.salary.end_date</code>.
@@ -60,7 +62,7 @@ public class Salary extends TableImpl<SalaryRecord> {
     /**
      * The column <code>human_resource_management.salary.final_salary</code>.
      */
-    public final TableField<SalaryRecord, String> FINAL_SALARY = createField(DSL.name("final_salary"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<SalaryRecord, BigDecimal> FINAL_SALARY = createField(DSL.name("final_salary"), SQLDataType.DECIMAL(19, 2), this, "");
 
     /**
      * The column <code>human_resource_management.salary.start_date</code>.
@@ -70,7 +72,7 @@ public class Salary extends TableImpl<SalaryRecord> {
     /**
      * The column <code>human_resource_management.salary.subsidize</code>.
      */
-    public final TableField<SalaryRecord, String> SUBSIDIZE = createField(DSL.name("subsidize"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<SalaryRecord, BigDecimal> SUBSIDIZE = createField(DSL.name("subsidize"), SQLDataType.DECIMAL(19, 2), this, "");
 
     /**
      * The column
@@ -116,6 +118,11 @@ public class Salary extends TableImpl<SalaryRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<SalaryRecord, Long> getIdentity() {
+        return (Identity<SalaryRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -172,7 +179,7 @@ public class Salary extends TableImpl<SalaryRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, LocalDate, String, LocalDate, String, Long> fieldsRow() {
+    public Row6<Long, LocalDate, BigDecimal, LocalDate, BigDecimal, Long> fieldsRow() {
         return (Row6) super.fieldsRow();
     }
 }

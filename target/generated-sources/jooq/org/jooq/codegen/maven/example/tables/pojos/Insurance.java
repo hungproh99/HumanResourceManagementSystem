@@ -16,41 +16,41 @@ public class Insurance implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long   insuranceId;
+    private String address;
     private String description;
     private String insuranceName;
     private String percent;
     private String title;
     private String employeeId;
-    private String address;
 
     public Insurance() {}
 
     public Insurance(Insurance value) {
         this.insuranceId = value.insuranceId;
+        this.address = value.address;
         this.description = value.description;
         this.insuranceName = value.insuranceName;
         this.percent = value.percent;
         this.title = value.title;
         this.employeeId = value.employeeId;
-        this.address = value.address;
     }
 
     public Insurance(
         Long   insuranceId,
+        String address,
         String description,
         String insuranceName,
         String percent,
         String title,
-        String employeeId,
-        String address
+        String employeeId
     ) {
         this.insuranceId = insuranceId;
+        this.address = address;
         this.description = description;
         this.insuranceName = insuranceName;
         this.percent = percent;
         this.title = title;
         this.employeeId = employeeId;
-        this.address = address;
     }
 
     /**
@@ -65,6 +65,21 @@ public class Insurance implements Serializable {
      */
     public Insurance setInsuranceId(Long insuranceId) {
         this.insuranceId = insuranceId;
+        return this;
+    }
+
+    /**
+     * Getter for <code>human_resource_management.insurance.address</code>.
+     */
+    public String getAddress() {
+        return this.address;
+    }
+
+    /**
+     * Setter for <code>human_resource_management.insurance.address</code>.
+     */
+    public Insurance setAddress(String address) {
+        this.address = address;
         return this;
     }
 
@@ -145,21 +160,6 @@ public class Insurance implements Serializable {
         return this;
     }
 
-    /**
-     * Getter for <code>human_resource_management.insurance.address</code>.
-     */
-    public String getAddress() {
-        return this.address;
-    }
-
-    /**
-     * Setter for <code>human_resource_management.insurance.address</code>.
-     */
-    public Insurance setAddress(String address) {
-        this.address = address;
-        return this;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -174,6 +174,12 @@ public class Insurance implements Serializable {
                 return false;
         }
         else if (!this.insuranceId.equals(other.insuranceId))
+            return false;
+        if (this.address == null) {
+            if (other.address != null)
+                return false;
+        }
+        else if (!this.address.equals(other.address))
             return false;
         if (this.description == null) {
             if (other.description != null)
@@ -205,12 +211,6 @@ public class Insurance implements Serializable {
         }
         else if (!this.employeeId.equals(other.employeeId))
             return false;
-        if (this.address == null) {
-            if (other.address != null)
-                return false;
-        }
-        else if (!this.address.equals(other.address))
-            return false;
         return true;
     }
 
@@ -219,12 +219,12 @@ public class Insurance implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.insuranceId == null) ? 0 : this.insuranceId.hashCode());
+        result = prime * result + ((this.address == null) ? 0 : this.address.hashCode());
         result = prime * result + ((this.description == null) ? 0 : this.description.hashCode());
         result = prime * result + ((this.insuranceName == null) ? 0 : this.insuranceName.hashCode());
         result = prime * result + ((this.percent == null) ? 0 : this.percent.hashCode());
         result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
-        result = prime * result + ((this.address == null) ? 0 : this.address.hashCode());
         return result;
     }
 
@@ -233,12 +233,12 @@ public class Insurance implements Serializable {
         StringBuilder sb = new StringBuilder("Insurance (");
 
         sb.append(insuranceId);
+        sb.append(", ").append(address);
         sb.append(", ").append(description);
         sb.append(", ").append(insuranceName);
         sb.append(", ").append(percent);
         sb.append(", ").append(title);
         sb.append(", ").append(employeeId);
-        sb.append(", ").append(address);
 
         sb.append(")");
         return sb.toString();

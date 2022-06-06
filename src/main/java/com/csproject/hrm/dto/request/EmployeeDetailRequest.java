@@ -1,4 +1,4 @@
-package com.csproject.hrm.dto.response;
+package com.csproject.hrm.dto.request;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeDetailResponse {
+public class EmployeeDetailRequest {
   private String full_name;
   private String employee_id;
   private LocalDate email;

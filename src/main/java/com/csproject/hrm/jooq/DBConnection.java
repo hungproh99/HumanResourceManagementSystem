@@ -8,18 +8,19 @@ import java.sql.*;
 @Component
 @Data
 public class DBConnection {
-    Connection connection;
-    
-    public DBConnection(Connection connection) {
-        this.connection = connection;
+  Connection connection;
+
+  public DBConnection(Connection connection) {
+    this.connection = connection;
+  }
+
+  public DBConnection() {
+    try {
+      connection =
+          DriverManager.getConnection(
+              "jdbc:mysql://localhost:3306/human_resource_management", "ndh4899", "hungnd");
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
     }
-    
-    public DBConnection() {
-        try{
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/human_resource_management", "ndh4899",
-                                                     "hungnd");
-        }catch(SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
+  }
 }

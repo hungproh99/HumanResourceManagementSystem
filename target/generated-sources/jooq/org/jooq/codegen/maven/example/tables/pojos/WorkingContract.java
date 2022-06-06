@@ -5,6 +5,7 @@ package org.jooq.codegen.maven.example.tables.pojos;
 
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -16,15 +17,15 @@ public class WorkingContract implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long      workingContractId;
-    private String    baseSalary;
-    private String    companyName;
-    private LocalDate endDate;
-    private LocalDate startDate;
-    private String    status;
-    private Long      typeId;
-    private String    employeeId;
-    private String    contractUrl;
+    private Long       workingContractId;
+    private BigDecimal baseSalary;
+    private String     companyName;
+    private String     contractUrl;
+    private LocalDate  endDate;
+    private LocalDate  startDate;
+    private String     status;
+    private Long       typeId;
+    private String     employeeId;
 
     public WorkingContract() {}
 
@@ -32,34 +33,34 @@ public class WorkingContract implements Serializable {
         this.workingContractId = value.workingContractId;
         this.baseSalary = value.baseSalary;
         this.companyName = value.companyName;
+        this.contractUrl = value.contractUrl;
         this.endDate = value.endDate;
         this.startDate = value.startDate;
         this.status = value.status;
         this.typeId = value.typeId;
         this.employeeId = value.employeeId;
-        this.contractUrl = value.contractUrl;
     }
 
     public WorkingContract(
-        Long      workingContractId,
-        String    baseSalary,
-        String    companyName,
-        LocalDate endDate,
-        LocalDate startDate,
-        String    status,
-        Long      typeId,
-        String    employeeId,
-        String    contractUrl
+        Long       workingContractId,
+        BigDecimal baseSalary,
+        String     companyName,
+        String     contractUrl,
+        LocalDate  endDate,
+        LocalDate  startDate,
+        String     status,
+        Long       typeId,
+        String     employeeId
     ) {
         this.workingContractId = workingContractId;
         this.baseSalary = baseSalary;
         this.companyName = companyName;
+        this.contractUrl = contractUrl;
         this.endDate = endDate;
         this.startDate = startDate;
         this.status = status;
         this.typeId = typeId;
         this.employeeId = employeeId;
-        this.contractUrl = contractUrl;
     }
 
     /**
@@ -83,7 +84,7 @@ public class WorkingContract implements Serializable {
      * Getter for
      * <code>human_resource_management.working_contract.base_salary</code>.
      */
-    public String getBaseSalary() {
+    public BigDecimal getBaseSalary() {
         return this.baseSalary;
     }
 
@@ -91,7 +92,7 @@ public class WorkingContract implements Serializable {
      * Setter for
      * <code>human_resource_management.working_contract.base_salary</code>.
      */
-    public WorkingContract setBaseSalary(String baseSalary) {
+    public WorkingContract setBaseSalary(BigDecimal baseSalary) {
         this.baseSalary = baseSalary;
         return this;
     }
@@ -110,6 +111,23 @@ public class WorkingContract implements Serializable {
      */
     public WorkingContract setCompanyName(String companyName) {
         this.companyName = companyName;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.working_contract.contract_url</code>.
+     */
+    public String getContractUrl() {
+        return this.contractUrl;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_contract.contract_url</code>.
+     */
+    public WorkingContract setContractUrl(String contractUrl) {
+        this.contractUrl = contractUrl;
         return this;
     }
 
@@ -198,23 +216,6 @@ public class WorkingContract implements Serializable {
         return this;
     }
 
-    /**
-     * Getter for
-     * <code>human_resource_management.working_contract.contract_url</code>.
-     */
-    public String getContractUrl() {
-        return this.contractUrl;
-    }
-
-    /**
-     * Setter for
-     * <code>human_resource_management.working_contract.contract_url</code>.
-     */
-    public WorkingContract setContractUrl(String contractUrl) {
-        this.contractUrl = contractUrl;
-        return this;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -241,6 +242,12 @@ public class WorkingContract implements Serializable {
                 return false;
         }
         else if (!this.companyName.equals(other.companyName))
+            return false;
+        if (this.contractUrl == null) {
+            if (other.contractUrl != null)
+                return false;
+        }
+        else if (!this.contractUrl.equals(other.contractUrl))
             return false;
         if (this.endDate == null) {
             if (other.endDate != null)
@@ -272,12 +279,6 @@ public class WorkingContract implements Serializable {
         }
         else if (!this.employeeId.equals(other.employeeId))
             return false;
-        if (this.contractUrl == null) {
-            if (other.contractUrl != null)
-                return false;
-        }
-        else if (!this.contractUrl.equals(other.contractUrl))
-            return false;
         return true;
     }
 
@@ -288,12 +289,12 @@ public class WorkingContract implements Serializable {
         result = prime * result + ((this.workingContractId == null) ? 0 : this.workingContractId.hashCode());
         result = prime * result + ((this.baseSalary == null) ? 0 : this.baseSalary.hashCode());
         result = prime * result + ((this.companyName == null) ? 0 : this.companyName.hashCode());
+        result = prime * result + ((this.contractUrl == null) ? 0 : this.contractUrl.hashCode());
         result = prime * result + ((this.endDate == null) ? 0 : this.endDate.hashCode());
         result = prime * result + ((this.startDate == null) ? 0 : this.startDate.hashCode());
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.typeId == null) ? 0 : this.typeId.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
-        result = prime * result + ((this.contractUrl == null) ? 0 : this.contractUrl.hashCode());
         return result;
     }
 
@@ -304,12 +305,12 @@ public class WorkingContract implements Serializable {
         sb.append(workingContractId);
         sb.append(", ").append(baseSalary);
         sb.append(", ").append(companyName);
+        sb.append(", ").append(contractUrl);
         sb.append(", ").append(endDate);
         sb.append(", ").append(startDate);
         sb.append(", ").append(status);
         sb.append(", ").append(typeId);
         sb.append(", ").append(employeeId);
-        sb.append(", ").append(contractUrl);
 
         sb.append(")");
         return sb.toString();

@@ -6,6 +6,7 @@ package org.jooq.codegen.maven.example.tables;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row2;
@@ -47,7 +48,7 @@ public class LaudatoryType extends TableImpl<LaudatoryTypeRecord> {
     /**
      * The column <code>human_resource_management.laudatory_type.type_id</code>.
      */
-    public final TableField<LaudatoryTypeRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<LaudatoryTypeRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.laudatory_type.name</code>.
@@ -93,6 +94,11 @@ public class LaudatoryType extends TableImpl<LaudatoryTypeRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<LaudatoryTypeRecord, Long> getIdentity() {
+        return (Identity<LaudatoryTypeRecord, Long>) super.getIdentity();
     }
 
     @Override

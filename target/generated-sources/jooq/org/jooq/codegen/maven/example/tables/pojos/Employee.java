@@ -21,6 +21,7 @@ public class Employee implements Serializable {
     private String    avatar;
     private LocalDate birthDate;
     private String    companyEmail;
+    private String    currentSituation;
     private String    facebook;
     private String    fullName;
     private String    gender;
@@ -44,6 +45,7 @@ public class Employee implements Serializable {
         this.avatar = value.avatar;
         this.birthDate = value.birthDate;
         this.companyEmail = value.companyEmail;
+        this.currentSituation = value.currentSituation;
         this.facebook = value.facebook;
         this.fullName = value.fullName;
         this.gender = value.gender;
@@ -66,6 +68,7 @@ public class Employee implements Serializable {
         String    avatar,
         LocalDate birthDate,
         String    companyEmail,
+        String    currentSituation,
         String    facebook,
         String    fullName,
         String    gender,
@@ -86,6 +89,7 @@ public class Employee implements Serializable {
         this.avatar = avatar;
         this.birthDate = birthDate;
         this.companyEmail = companyEmail;
+        this.currentSituation = currentSituation;
         this.facebook = facebook;
         this.fullName = fullName;
         this.gender = gender;
@@ -174,6 +178,23 @@ public class Employee implements Serializable {
      */
     public Employee setCompanyEmail(String companyEmail) {
         this.companyEmail = companyEmail;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.employee.current_situation</code>.
+     */
+    public String getCurrentSituation() {
+        return this.currentSituation;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.employee.current_situation</code>.
+     */
+    public Employee setCurrentSituation(String currentSituation) {
+        this.currentSituation = currentSituation;
         return this;
     }
 
@@ -430,6 +451,12 @@ public class Employee implements Serializable {
         }
         else if (!this.companyEmail.equals(other.companyEmail))
             return false;
+        if (this.currentSituation == null) {
+            if (other.currentSituation != null)
+                return false;
+        }
+        else if (!this.currentSituation.equals(other.currentSituation))
+            return false;
         if (this.facebook == null) {
             if (other.facebook != null)
                 return false;
@@ -526,6 +553,7 @@ public class Employee implements Serializable {
         result = prime * result + ((this.avatar == null) ? 0 : this.avatar.hashCode());
         result = prime * result + ((this.birthDate == null) ? 0 : this.birthDate.hashCode());
         result = prime * result + ((this.companyEmail == null) ? 0 : this.companyEmail.hashCode());
+        result = prime * result + ((this.currentSituation == null) ? 0 : this.currentSituation.hashCode());
         result = prime * result + ((this.facebook == null) ? 0 : this.facebook.hashCode());
         result = prime * result + ((this.fullName == null) ? 0 : this.fullName.hashCode());
         result = prime * result + ((this.gender == null) ? 0 : this.gender.hashCode());
@@ -552,6 +580,7 @@ public class Employee implements Serializable {
         sb.append(", ").append(avatar);
         sb.append(", ").append(birthDate);
         sb.append(", ").append(companyEmail);
+        sb.append(", ").append(currentSituation);
         sb.append(", ").append(facebook);
         sb.append(", ").append(fullName);
         sb.append(", ").append(gender);

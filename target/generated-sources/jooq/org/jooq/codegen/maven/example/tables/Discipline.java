@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row8;
@@ -51,7 +52,7 @@ public class Discipline extends TableImpl<DisciplineRecord> {
      * The column
      * <code>human_resource_management.discipline.discipline_id</code>.
      */
-    public final TableField<DisciplineRecord, Long> DISCIPLINE_ID = createField(DSL.name("discipline_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<DisciplineRecord, Long> DISCIPLINE_ID = createField(DSL.name("discipline_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.discipline.date</code>.
@@ -128,6 +129,11 @@ public class Discipline extends TableImpl<DisciplineRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<DisciplineRecord, Long> getIdentity() {
+        return (Identity<DisciplineRecord, Long>) super.getIdentity();
     }
 
     @Override

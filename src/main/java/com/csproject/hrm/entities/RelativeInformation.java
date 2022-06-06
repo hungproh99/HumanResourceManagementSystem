@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -15,25 +12,28 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "relative_information")
 public class RelativeInformation {
-    @Id
-    @Column(name = "relative_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "relative_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "parent_name")
-    private String parentName;
+  @Column(name = "parent_name")
+  private String parentName;
 
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
+  @Column(name = "birth_date")
+  private LocalDate birthDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "type_id")
-    private RelativeType relativeType;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "type_id")
+  private RelativeType relativeType;
 
-    @Column(name = "status")
-    private String status;
+  @Column(name = "status")
+  private String status;
 
-    @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+  @Column(name = "contact")
+  private String contact;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
+  @JoinColumn(name = "employee_id")
+  private Employee employee;
 }

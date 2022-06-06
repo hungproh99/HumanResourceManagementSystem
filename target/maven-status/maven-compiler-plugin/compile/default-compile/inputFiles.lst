@@ -9,11 +9,8 @@ D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproj
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\exception\CustomErrorException.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\Office.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\RoleType.java
-D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\Demo.java
-D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\Demo2.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\entities\RelativeInformation.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\Education.java
-D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\records\DemoRecord.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\records\RelativeInformationRecord.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\RelativeInformation.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\repositories\EmployeeRepository.java
@@ -64,7 +61,6 @@ D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\IdentityCard.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\dto\response\HrmResponse.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\Insurance.java
-D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\records\Demo2Record.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\exception\errors\ErrorResponse.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\IdentityCard.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\records\RelativeTypeRecord.java
@@ -118,7 +114,6 @@ D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproj
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\WorkingContract.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\Employee.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\jooq\OrderByClause.java
-D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\Demo.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\entities\Laudatory.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\entities\Employee.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\records\EmployeeRecord.java
@@ -140,7 +135,6 @@ D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproj
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\jwt\config\WebSecurityConfig.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\WorkingHistory.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\common\enums\ComparisonOperator.java
-D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\Demo2.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\target\generated-sources\jooq\org\jooq\codegen\maven\example\tables\pojos\RelativeInformation.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\controllers\LoginController.java
 D:\FPTU\Semester 9\SWP490\HumanResourceManagementSystem\src\main\java\com\csproject\hrm\entities\Insurance.java

@@ -63,6 +63,11 @@ public class Tax extends TableImpl<TaxRecord> {
     public final TableField<TaxRecord, String> TAX_NAME = createField(DSL.name("tax_name"), SQLDataType.VARCHAR(255), this, "");
 
     /**
+     * The column <code>human_resource_management.tax.percent</code>.
+     */
+    public final TableField<TaxRecord, String> PERCENT = createField(DSL.name("percent"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
      * The column <code>human_resource_management.tax.title</code>.
      */
     public final TableField<TaxRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255), this, "");
@@ -71,11 +76,6 @@ public class Tax extends TableImpl<TaxRecord> {
      * The column <code>human_resource_management.tax.employee_id</code>.
      */
     public final TableField<TaxRecord, String> EMPLOYEE_ID = createField(DSL.name("employee_id"), SQLDataType.VARCHAR(255), this, "");
-
-    /**
-     * The column <code>human_resource_management.tax.percent</code>.
-     */
-    public final TableField<TaxRecord, String> PERCENT = createField(DSL.name("percent"), SQLDataType.VARCHAR(255), this, "");
 
     private Tax(Name alias, Table<TaxRecord> aliased) {
         this(alias, aliased, null);

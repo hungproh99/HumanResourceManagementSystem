@@ -6,6 +6,7 @@ package org.jooq.codegen.maven.example.tables;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row2;
@@ -48,7 +49,7 @@ public class DisciplineType extends TableImpl<DisciplineTypeRecord> {
      * The column
      * <code>human_resource_management.discipline_type.type_id</code>.
      */
-    public final TableField<DisciplineTypeRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<DisciplineTypeRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.discipline_type.name</code>.
@@ -94,6 +95,11 @@ public class DisciplineType extends TableImpl<DisciplineTypeRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<DisciplineTypeRecord, Long> getIdentity() {
+        return (Identity<DisciplineTypeRecord, Long>) super.getIdentity();
     }
 
     @Override

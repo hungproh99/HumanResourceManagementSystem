@@ -18,9 +18,9 @@ public class Tax implements Serializable {
     private Long   taxId;
     private String description;
     private String taxName;
+    private String percent;
     private String title;
     private String employeeId;
-    private String percent;
 
     public Tax() {}
 
@@ -28,25 +28,25 @@ public class Tax implements Serializable {
         this.taxId = value.taxId;
         this.description = value.description;
         this.taxName = value.taxName;
+        this.percent = value.percent;
         this.title = value.title;
         this.employeeId = value.employeeId;
-        this.percent = value.percent;
     }
 
     public Tax(
         Long   taxId,
         String description,
         String taxName,
+        String percent,
         String title,
-        String employeeId,
-        String percent
+        String employeeId
     ) {
         this.taxId = taxId;
         this.description = description;
         this.taxName = taxName;
+        this.percent = percent;
         this.title = title;
         this.employeeId = employeeId;
-        this.percent = percent;
     }
 
     /**
@@ -95,6 +95,21 @@ public class Tax implements Serializable {
     }
 
     /**
+     * Getter for <code>human_resource_management.tax.percent</code>.
+     */
+    public String getPercent() {
+        return this.percent;
+    }
+
+    /**
+     * Setter for <code>human_resource_management.tax.percent</code>.
+     */
+    public Tax setPercent(String percent) {
+        this.percent = percent;
+        return this;
+    }
+
+    /**
      * Getter for <code>human_resource_management.tax.title</code>.
      */
     public String getTitle() {
@@ -121,21 +136,6 @@ public class Tax implements Serializable {
      */
     public Tax setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
-        return this;
-    }
-
-    /**
-     * Getter for <code>human_resource_management.tax.percent</code>.
-     */
-    public String getPercent() {
-        return this.percent;
-    }
-
-    /**
-     * Setter for <code>human_resource_management.tax.percent</code>.
-     */
-    public Tax setPercent(String percent) {
-        this.percent = percent;
         return this;
     }
 
@@ -166,6 +166,12 @@ public class Tax implements Serializable {
         }
         else if (!this.taxName.equals(other.taxName))
             return false;
+        if (this.percent == null) {
+            if (other.percent != null)
+                return false;
+        }
+        else if (!this.percent.equals(other.percent))
+            return false;
         if (this.title == null) {
             if (other.title != null)
                 return false;
@@ -178,12 +184,6 @@ public class Tax implements Serializable {
         }
         else if (!this.employeeId.equals(other.employeeId))
             return false;
-        if (this.percent == null) {
-            if (other.percent != null)
-                return false;
-        }
-        else if (!this.percent.equals(other.percent))
-            return false;
         return true;
     }
 
@@ -194,9 +194,9 @@ public class Tax implements Serializable {
         result = prime * result + ((this.taxId == null) ? 0 : this.taxId.hashCode());
         result = prime * result + ((this.description == null) ? 0 : this.description.hashCode());
         result = prime * result + ((this.taxName == null) ? 0 : this.taxName.hashCode());
+        result = prime * result + ((this.percent == null) ? 0 : this.percent.hashCode());
         result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
-        result = prime * result + ((this.percent == null) ? 0 : this.percent.hashCode());
         return result;
     }
 
@@ -207,9 +207,9 @@ public class Tax implements Serializable {
         sb.append(taxId);
         sb.append(", ").append(description);
         sb.append(", ").append(taxName);
+        sb.append(", ").append(percent);
         sb.append(", ").append(title);
         sb.append(", ").append(employeeId);
-        sb.append(", ").append(percent);
 
         sb.append(")");
         return sb.toString();

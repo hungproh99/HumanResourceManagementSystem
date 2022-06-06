@@ -10,15 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
-    @Autowired
-    private EmployeeRepository employeeRepository;
+public class UserDetailsService
+    implements org.springframework.security.core.userdetails.UserDetailsService {
+  @Autowired private EmployeeRepository employeeRepository;
 
-    @Override
-    @Transactional
-    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
-        return UserDetailsImpl.build(employee);
-    }
+  @Override
+  @Transactional
+  public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+    Employee employee =
+        employeeRepository
+            .findById(id)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+    return UserDetailsImpl.build(employee);
+  }
 }

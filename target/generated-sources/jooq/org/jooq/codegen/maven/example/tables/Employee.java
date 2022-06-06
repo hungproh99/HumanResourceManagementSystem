@@ -12,7 +12,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row19;
+import org.jooq.Row20;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -73,6 +73,12 @@ public class Employee extends TableImpl<EmployeeRecord> {
     public final TableField<EmployeeRecord, String> COMPANY_EMAIL = createField(DSL.name("company_email"), SQLDataType.VARCHAR(255), this, "");
 
     /**
+     * The column
+     * <code>human_resource_management.employee.current_situation</code>.
+     */
+    public final TableField<EmployeeRecord, String> CURRENT_SITUATION = createField(DSL.name("current_situation"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
      * The column <code>human_resource_management.employee.facebook</code>.
      */
     public final TableField<EmployeeRecord, String> FACEBOOK = createField(DSL.name("facebook"), SQLDataType.VARCHAR(255), this, "");
@@ -85,7 +91,7 @@ public class Employee extends TableImpl<EmployeeRecord> {
     /**
      * The column <code>human_resource_management.employee.gender</code>.
      */
-    public final TableField<EmployeeRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.CHAR(1), this, "");
+    public final TableField<EmployeeRecord, String> GENDER = createField(DSL.name("gender"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>human_resource_management.employee.manager_id</code>.
@@ -258,11 +264,11 @@ public class Employee extends TableImpl<EmployeeRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row19 type methods
+    // Row20 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row19<String, String, String, LocalDate, String, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long> fieldsRow() {
-        return (Row19) super.fieldsRow();
+    public Row20<String, String, String, LocalDate, String, String, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long> fieldsRow() {
+        return (Row20) super.fieldsRow();
     }
 }

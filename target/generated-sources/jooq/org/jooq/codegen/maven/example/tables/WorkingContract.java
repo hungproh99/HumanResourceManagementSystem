@@ -4,12 +4,14 @@
 package org.jooq.codegen.maven.example.tables;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row9;
@@ -52,19 +54,25 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
      * The column
      * <code>human_resource_management.working_contract.working_contract_id</code>.
      */
-    public final TableField<WorkingContractRecord, Long> WORKING_CONTRACT_ID = createField(DSL.name("working_contract_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WorkingContractRecord, Long> WORKING_CONTRACT_ID = createField(DSL.name("working_contract_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column
      * <code>human_resource_management.working_contract.base_salary</code>.
      */
-    public final TableField<WorkingContractRecord, String> BASE_SALARY = createField(DSL.name("base_salary"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<WorkingContractRecord, BigDecimal> BASE_SALARY = createField(DSL.name("base_salary"), SQLDataType.DECIMAL(19, 2), this, "");
 
     /**
      * The column
      * <code>human_resource_management.working_contract.company_name</code>.
      */
     public final TableField<WorkingContractRecord, String> COMPANY_NAME = createField(DSL.name("company_name"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_contract.contract_url</code>.
+     */
+    public final TableField<WorkingContractRecord, String> CONTRACT_URL = createField(DSL.name("contract_url"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column
@@ -95,12 +103,6 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
      * <code>human_resource_management.working_contract.employee_id</code>.
      */
     public final TableField<WorkingContractRecord, String> EMPLOYEE_ID = createField(DSL.name("employee_id"), SQLDataType.VARCHAR(255), this, "");
-
-    /**
-     * The column
-     * <code>human_resource_management.working_contract.contract_url</code>.
-     */
-    public final TableField<WorkingContractRecord, String> CONTRACT_URL = createField(DSL.name("contract_url"), SQLDataType.VARCHAR(255), this, "");
 
     private WorkingContract(Name alias, Table<WorkingContractRecord> aliased) {
         this(alias, aliased, null);
@@ -141,6 +143,11 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<WorkingContractRecord, Long> getIdentity() {
+        return (Identity<WorkingContractRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -209,7 +216,7 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<Long, String, String, LocalDate, LocalDate, String, Long, String, String> fieldsRow() {
+    public Row9<Long, BigDecimal, String, String, LocalDate, LocalDate, String, Long, String> fieldsRow() {
         return (Row9) super.fieldsRow();
     }
 }

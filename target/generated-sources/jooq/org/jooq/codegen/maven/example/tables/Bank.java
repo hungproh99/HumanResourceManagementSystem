@@ -6,6 +6,7 @@ package org.jooq.codegen.maven.example.tables;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row5;
@@ -46,7 +47,7 @@ public class Bank extends TableImpl<BankRecord> {
     /**
      * The column <code>human_resource_management.bank.bank_id</code>.
      */
-    public final TableField<BankRecord, Long> BANK_ID = createField(DSL.name("bank_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<BankRecord, Long> BANK_ID = createField(DSL.name("bank_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.bank.account_name</code>.
@@ -106,6 +107,11 @@ public class Bank extends TableImpl<BankRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<BankRecord, Long> getIdentity() {
+        return (Identity<BankRecord, Long>) super.getIdentity();
     }
 
     @Override

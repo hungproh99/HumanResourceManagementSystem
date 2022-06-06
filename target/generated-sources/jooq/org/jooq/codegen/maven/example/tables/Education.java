@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row7;
@@ -51,7 +52,7 @@ public class Education extends TableImpl<EducationRecord> {
     /**
      * The column <code>human_resource_management.education.education_id</code>.
      */
-    public final TableField<EducationRecord, Long> EDUCATION_ID = createField(DSL.name("education_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<EducationRecord, Long> EDUCATION_ID = createField(DSL.name("education_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.education.certificate</code>.
@@ -121,6 +122,11 @@ public class Education extends TableImpl<EducationRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<EducationRecord, Long> getIdentity() {
+        return (Identity<EducationRecord, Long>) super.getIdentity();
     }
 
     @Override

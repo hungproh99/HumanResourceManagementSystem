@@ -10,8 +10,6 @@ import org.jooq.UniqueKey;
 import org.jooq.codegen.maven.example.tables.Area;
 import org.jooq.codegen.maven.example.tables.Bank;
 import org.jooq.codegen.maven.example.tables.ContractType;
-import org.jooq.codegen.maven.example.tables.Demo;
-import org.jooq.codegen.maven.example.tables.Demo2;
 import org.jooq.codegen.maven.example.tables.Discipline;
 import org.jooq.codegen.maven.example.tables.DisciplineType;
 import org.jooq.codegen.maven.example.tables.Education;
@@ -34,8 +32,6 @@ import org.jooq.codegen.maven.example.tables.WorkingPlace;
 import org.jooq.codegen.maven.example.tables.records.AreaRecord;
 import org.jooq.codegen.maven.example.tables.records.BankRecord;
 import org.jooq.codegen.maven.example.tables.records.ContractTypeRecord;
-import org.jooq.codegen.maven.example.tables.records.Demo2Record;
-import org.jooq.codegen.maven.example.tables.records.DemoRecord;
 import org.jooq.codegen.maven.example.tables.records.DisciplineRecord;
 import org.jooq.codegen.maven.example.tables.records.DisciplineTypeRecord;
 import org.jooq.codegen.maven.example.tables.records.EducationRecord;
@@ -73,8 +69,6 @@ public class Keys {
     public static final UniqueKey<AreaRecord> KEY_AREA_PRIMARY = Internal.createUniqueKey(Area.AREA, DSL.name("KEY_area_PRIMARY"), new TableField[] { Area.AREA.AREA_ID }, true);
     public static final UniqueKey<BankRecord> KEY_BANK_PRIMARY = Internal.createUniqueKey(Bank.BANK, DSL.name("KEY_bank_PRIMARY"), new TableField[] { Bank.BANK.BANK_ID }, true);
     public static final UniqueKey<ContractTypeRecord> KEY_CONTRACT_TYPE_PRIMARY = Internal.createUniqueKey(ContractType.CONTRACT_TYPE, DSL.name("KEY_contract_type_PRIMARY"), new TableField[] { ContractType.CONTRACT_TYPE.TYPE_ID }, true);
-    public static final UniqueKey<DemoRecord> KEY_DEMO_PRIMARY = Internal.createUniqueKey(Demo.DEMO, DSL.name("KEY_demo_PRIMARY"), new TableField[] { Demo.DEMO.ID }, true);
-    public static final UniqueKey<Demo2Record> KEY_DEMO2_PRIMARY = Internal.createUniqueKey(Demo2.DEMO2, DSL.name("KEY_demo2_PRIMARY"), new TableField[] { Demo2.DEMO2.ID }, true);
     public static final UniqueKey<DisciplineRecord> KEY_DISCIPLINE_PRIMARY = Internal.createUniqueKey(Discipline.DISCIPLINE, DSL.name("KEY_discipline_PRIMARY"), new TableField[] { Discipline.DISCIPLINE.DISCIPLINE_ID }, true);
     public static final UniqueKey<DisciplineTypeRecord> KEY_DISCIPLINE_TYPE_PRIMARY = Internal.createUniqueKey(DisciplineType.DISCIPLINE_TYPE, DSL.name("KEY_discipline_type_PRIMARY"), new TableField[] { DisciplineType.DISCIPLINE_TYPE.TYPE_ID }, true);
     public static final UniqueKey<EducationRecord> KEY_EDUCATION_PRIMARY = Internal.createUniqueKey(Education.EDUCATION, DSL.name("KEY_education_PRIMARY"), new TableField[] { Education.EDUCATION.EDUCATION_ID }, true);
@@ -99,7 +93,6 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<DemoRecord, Demo2Record> FK57L0TJ0UTSOKHB7AYXEFKAT3N = Internal.createForeignKey(Demo.DEMO, DSL.name("FK57l0tj0utsokhb7ayxefkat3n"), new TableField[] { Demo.DEMO.DEMO2_ID }, Keys.KEY_DEMO2_PRIMARY, new TableField[] { Demo2.DEMO2.ID }, true);
     public static final ForeignKey<DisciplineRecord, DisciplineTypeRecord> FK7PA865HYRHP12FLJB3RQH7H28 = Internal.createForeignKey(Discipline.DISCIPLINE, DSL.name("FK7pa865hyrhp12fljb3rqh7h28"), new TableField[] { Discipline.DISCIPLINE.TYPE_ID }, Keys.KEY_DISCIPLINE_TYPE_PRIMARY, new TableField[] { DisciplineType.DISCIPLINE_TYPE.TYPE_ID }, true);
     public static final ForeignKey<DisciplineRecord, WorkingInformationRecord> FKHROLHRW5RULTA6U6UJYJULY0X = Internal.createForeignKey(Discipline.DISCIPLINE, DSL.name("FKhrolhrw5rulta6u6ujyjuly0x"), new TableField[] { Discipline.DISCIPLINE.WORKING_INFORMATION_ID }, Keys.KEY_WORKING_INFORMATION_PRIMARY, new TableField[] { WorkingInformation.WORKING_INFORMATION.WORKING_INFORMATION_ID }, true);
     public static final ForeignKey<EducationRecord, EmployeeRecord> FKRPHG8GBX569XVJ1TXKKT91UY4 = Internal.createForeignKey(Education.EDUCATION, DSL.name("FKrphg8gbx569xvj1txkkt91uy4"), new TableField[] { Education.EDUCATION.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);

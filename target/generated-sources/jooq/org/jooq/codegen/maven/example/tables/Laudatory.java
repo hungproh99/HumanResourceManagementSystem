@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row8;
@@ -51,7 +52,7 @@ public class Laudatory extends TableImpl<LaudatoryRecord> {
     /**
      * The column <code>human_resource_management.laudatory.laudatory_id</code>.
      */
-    public final TableField<LaudatoryRecord, Long> LAUDATORY_ID = createField(DSL.name("laudatory_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<LaudatoryRecord, Long> LAUDATORY_ID = createField(DSL.name("laudatory_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.laudatory.date</code>.
@@ -127,6 +128,11 @@ public class Laudatory extends TableImpl<LaudatoryRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<LaudatoryRecord, Long> getIdentity() {
+        return (Identity<LaudatoryRecord, Long>) super.getIdentity();
     }
 
     @Override

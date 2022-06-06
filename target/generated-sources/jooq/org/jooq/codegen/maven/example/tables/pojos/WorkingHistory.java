@@ -19,6 +19,7 @@ public class WorkingHistory implements Serializable {
     private Long      workingHistoryId;
     private String    companyName;
     private LocalDate endDate;
+    private String    position;
     private LocalDate startDate;
     private Long      typeId;
     private String    employeeId;
@@ -29,6 +30,7 @@ public class WorkingHistory implements Serializable {
         this.workingHistoryId = value.workingHistoryId;
         this.companyName = value.companyName;
         this.endDate = value.endDate;
+        this.position = value.position;
         this.startDate = value.startDate;
         this.typeId = value.typeId;
         this.employeeId = value.employeeId;
@@ -38,6 +40,7 @@ public class WorkingHistory implements Serializable {
         Long      workingHistoryId,
         String    companyName,
         LocalDate endDate,
+        String    position,
         LocalDate startDate,
         Long      typeId,
         String    employeeId
@@ -45,6 +48,7 @@ public class WorkingHistory implements Serializable {
         this.workingHistoryId = workingHistoryId;
         this.companyName = companyName;
         this.endDate = endDate;
+        this.position = position;
         this.startDate = startDate;
         this.typeId = typeId;
         this.employeeId = employeeId;
@@ -98,6 +102,23 @@ public class WorkingHistory implements Serializable {
      */
     public WorkingHistory setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.working_history.position</code>.
+     */
+    public String getPosition() {
+        return this.position;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_history.position</code>.
+     */
+    public WorkingHistory setPosition(String position) {
+        this.position = position;
         return this;
     }
 
@@ -179,6 +200,12 @@ public class WorkingHistory implements Serializable {
         }
         else if (!this.endDate.equals(other.endDate))
             return false;
+        if (this.position == null) {
+            if (other.position != null)
+                return false;
+        }
+        else if (!this.position.equals(other.position))
+            return false;
         if (this.startDate == null) {
             if (other.startDate != null)
                 return false;
@@ -207,6 +234,7 @@ public class WorkingHistory implements Serializable {
         result = prime * result + ((this.workingHistoryId == null) ? 0 : this.workingHistoryId.hashCode());
         result = prime * result + ((this.companyName == null) ? 0 : this.companyName.hashCode());
         result = prime * result + ((this.endDate == null) ? 0 : this.endDate.hashCode());
+        result = prime * result + ((this.position == null) ? 0 : this.position.hashCode());
         result = prime * result + ((this.startDate == null) ? 0 : this.startDate.hashCode());
         result = prime * result + ((this.typeId == null) ? 0 : this.typeId.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
@@ -220,6 +248,7 @@ public class WorkingHistory implements Serializable {
         sb.append(workingHistoryId);
         sb.append(", ").append(companyName);
         sb.append(", ").append(endDate);
+        sb.append(", ").append(position);
         sb.append(", ").append(startDate);
         sb.append(", ").append(typeId);
         sb.append(", ").append(employeeId);

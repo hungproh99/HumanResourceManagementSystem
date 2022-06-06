@@ -13,7 +13,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -60,6 +60,12 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
      * <code>human_resource_management.relative_information.birth_date</code>.
      */
     public final TableField<RelativeInformationRecord, LocalDate> BIRTH_DATE = createField(DSL.name("birth_date"), SQLDataType.LOCALDATE, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.relative_information.contact</code>.
+     */
+    public final TableField<RelativeInformationRecord, String> CONTACT = createField(DSL.name("contact"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column
@@ -195,11 +201,11 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, LocalDate, String, String, String, Long> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Long, LocalDate, String, String, String, String, Long> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

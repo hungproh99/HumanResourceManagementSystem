@@ -16,12 +16,15 @@ import static com.csproject.hrm.common.constant.Constants.ERROR_AUTHORIZED;
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
-    private static final Logger Logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+  private static final Logger Logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
-        Logger.error("Unauthorized error: {}", authException.getMessage());
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ERROR_AUTHORIZED);
-    }
+  @Override
+  public void commence(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      AuthenticationException authException)
+      throws IOException, ServletException {
+    Logger.error("Unauthorized error: {}", authException.getMessage());
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ERROR_AUTHORIZED);
+  }
 }

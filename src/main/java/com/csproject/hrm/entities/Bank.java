@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -14,23 +11,23 @@ import javax.persistence.*;
 @Entity
 @Table(name = "bank")
 public class Bank {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bank_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "bank_id")
+  private Long id;
 
-    @Column(name = "name_bank")
-    private String nameBank;
+  @Column(name = "name_bank")
+  private String nameBank;
 
-    @Column(name = "address")
-    private String address;
+  @Column(name = "address")
+  private String address;
 
-    @Column(name = "account_number")
-    private String accountNumber;
+  @Column(name = "account_number")
+  private String accountNumber;
 
-    @Column(name = "account_name")
-    private String accountName;
+  @Column(name = "account_name")
+  private String accountName;
 
-    @OneToOne(mappedBy = "bank", fetch = FetchType.LAZY)
-    private Employee employee;
+  @OneToOne(mappedBy = "bank", fetch = FetchType.LAZY)
+  private Employee employee;
 }

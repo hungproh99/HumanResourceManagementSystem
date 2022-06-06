@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -15,31 +12,31 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "laudatory")
 public class Laudatory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "laudatory_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "laudatory_id")
+  private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingInformation.class)
-    @JoinColumn(name = "working_information_id")
-    private WorkingInformation workingInformation;
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingInformation.class)
+  @JoinColumn(name = "working_information_id")
+  private WorkingInformation workingInformation;
 
-    @Column(name = "title")
-    private String title;
+  @Column(name = "title")
+  private String title;
 
-    @Column(name = "description")
-    private String description;
+  @Column(name = "description")
+  private String description;
 
-    @Column(name = "date")
-    private LocalDate date;
+  @Column(name = "date")
+  private LocalDate date;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "type_id")
-    private LaudatoryType laudatoryType;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "type_id")
+  private LaudatoryType laudatoryType;
 
-    @Column(name = "status")
-    private String status;
+  @Column(name = "status")
+  private String status;
 
-    @Column(name = "reward")
-    private String reward;
+  @Column(name = "reward")
+  private String reward;
 }

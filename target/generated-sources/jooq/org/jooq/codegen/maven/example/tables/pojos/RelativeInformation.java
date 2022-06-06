@@ -18,6 +18,7 @@ public class RelativeInformation implements Serializable {
 
     private Long      relativeId;
     private LocalDate birthDate;
+    private String    contact;
     private String    parentName;
     private String    status;
     private String    employeeId;
@@ -28,6 +29,7 @@ public class RelativeInformation implements Serializable {
     public RelativeInformation(RelativeInformation value) {
         this.relativeId = value.relativeId;
         this.birthDate = value.birthDate;
+        this.contact = value.contact;
         this.parentName = value.parentName;
         this.status = value.status;
         this.employeeId = value.employeeId;
@@ -37,6 +39,7 @@ public class RelativeInformation implements Serializable {
     public RelativeInformation(
         Long      relativeId,
         LocalDate birthDate,
+        String    contact,
         String    parentName,
         String    status,
         String    employeeId,
@@ -44,6 +47,7 @@ public class RelativeInformation implements Serializable {
     ) {
         this.relativeId = relativeId;
         this.birthDate = birthDate;
+        this.contact = contact;
         this.parentName = parentName;
         this.status = status;
         this.employeeId = employeeId;
@@ -81,6 +85,23 @@ public class RelativeInformation implements Serializable {
      */
     public RelativeInformation setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.relative_information.contact</code>.
+     */
+    public String getContact() {
+        return this.contact;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.relative_information.contact</code>.
+     */
+    public RelativeInformation setContact(String contact) {
+        this.contact = contact;
         return this;
     }
 
@@ -173,6 +194,12 @@ public class RelativeInformation implements Serializable {
         }
         else if (!this.birthDate.equals(other.birthDate))
             return false;
+        if (this.contact == null) {
+            if (other.contact != null)
+                return false;
+        }
+        else if (!this.contact.equals(other.contact))
+            return false;
         if (this.parentName == null) {
             if (other.parentName != null)
                 return false;
@@ -206,6 +233,7 @@ public class RelativeInformation implements Serializable {
         int result = 1;
         result = prime * result + ((this.relativeId == null) ? 0 : this.relativeId.hashCode());
         result = prime * result + ((this.birthDate == null) ? 0 : this.birthDate.hashCode());
+        result = prime * result + ((this.contact == null) ? 0 : this.contact.hashCode());
         result = prime * result + ((this.parentName == null) ? 0 : this.parentName.hashCode());
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
@@ -219,6 +247,7 @@ public class RelativeInformation implements Serializable {
 
         sb.append(relativeId);
         sb.append(", ").append(birthDate);
+        sb.append(", ").append(contact);
         sb.append(", ").append(parentName);
         sb.append(", ").append(status);
         sb.append(", ").append(employeeId);

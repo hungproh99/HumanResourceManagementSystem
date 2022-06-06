@@ -66,40 +66,10 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
     }
 
     /**
-     * Setter for <code>human_resource_management.tax.title</code>.
-     */
-    public TaxRecord setTitle(String value) {
-        set(3, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>human_resource_management.tax.title</code>.
-     */
-    public String getTitle() {
-        return (String) get(3);
-    }
-
-    /**
-     * Setter for <code>human_resource_management.tax.employee_id</code>.
-     */
-    public TaxRecord setEmployeeId(String value) {
-        set(4, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>human_resource_management.tax.employee_id</code>.
-     */
-    public String getEmployeeId() {
-        return (String) get(4);
-    }
-
-    /**
      * Setter for <code>human_resource_management.tax.percent</code>.
      */
     public TaxRecord setPercent(String value) {
-        set(5, value);
+        set(3, value);
         return this;
     }
 
@@ -107,6 +77,36 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
      * Getter for <code>human_resource_management.tax.percent</code>.
      */
     public String getPercent() {
+        return (String) get(3);
+    }
+
+    /**
+     * Setter for <code>human_resource_management.tax.title</code>.
+     */
+    public TaxRecord setTitle(String value) {
+        set(4, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>human_resource_management.tax.title</code>.
+     */
+    public String getTitle() {
+        return (String) get(4);
+    }
+
+    /**
+     * Setter for <code>human_resource_management.tax.employee_id</code>.
+     */
+    public TaxRecord setEmployeeId(String value) {
+        set(5, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>human_resource_management.tax.employee_id</code>.
+     */
+    public String getEmployeeId() {
         return (String) get(5);
     }
 
@@ -150,17 +150,17 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
 
     @Override
     public Field<String> field4() {
-        return Tax.TAX.TITLE;
+        return Tax.TAX.PERCENT;
     }
 
     @Override
     public Field<String> field5() {
-        return Tax.TAX.EMPLOYEE_ID;
+        return Tax.TAX.TITLE;
     }
 
     @Override
     public Field<String> field6() {
-        return Tax.TAX.PERCENT;
+        return Tax.TAX.EMPLOYEE_ID;
     }
 
     @Override
@@ -180,17 +180,17 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
 
     @Override
     public String component4() {
-        return getTitle();
+        return getPercent();
     }
 
     @Override
     public String component5() {
-        return getEmployeeId();
+        return getTitle();
     }
 
     @Override
     public String component6() {
-        return getPercent();
+        return getEmployeeId();
     }
 
     @Override
@@ -210,17 +210,17 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
 
     @Override
     public String value4() {
-        return getTitle();
+        return getPercent();
     }
 
     @Override
     public String value5() {
-        return getEmployeeId();
+        return getTitle();
     }
 
     @Override
     public String value6() {
-        return getPercent();
+        return getEmployeeId();
     }
 
     @Override
@@ -243,19 +243,19 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
 
     @Override
     public TaxRecord value4(String value) {
-        setTitle(value);
+        setPercent(value);
         return this;
     }
 
     @Override
     public TaxRecord value5(String value) {
-        setEmployeeId(value);
+        setTitle(value);
         return this;
     }
 
     @Override
     public TaxRecord value6(String value) {
-        setPercent(value);
+        setEmployeeId(value);
         return this;
     }
 
@@ -284,15 +284,15 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
     /**
      * Create a detached, initialised TaxRecord
      */
-    public TaxRecord(Long taxId, String description, String taxName, String title, String employeeId, String percent) {
+    public TaxRecord(Long taxId, String description, String taxName, String percent, String title, String employeeId) {
         super(Tax.TAX);
 
         setTaxId(taxId);
         setDescription(description);
         setTaxName(taxName);
+        setPercent(percent);
         setTitle(title);
         setEmployeeId(employeeId);
-        setPercent(percent);
     }
 
     /**
@@ -305,9 +305,9 @@ public class TaxRecord extends UpdatableRecordImpl<TaxRecord> implements Record6
             setTaxId(value.getTaxId());
             setDescription(value.getDescription());
             setTaxName(value.getTaxName());
+            setPercent(value.getPercent());
             setTitle(value.getTitle());
             setEmployeeId(value.getEmployeeId());
-            setPercent(value.getPercent());
         }
     }
 }

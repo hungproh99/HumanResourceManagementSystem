@@ -1,9 +1,6 @@
 package com.csproject.hrm.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,14 +10,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class HrmRequest {
-    private String fullName;
-    private String role;
-    private String phone;
-    private String gender;
-    private LocalDate birthDate;
-    private String job;
-    private String office;
-    private String area;
-    private BigDecimal baseSalary;
-    private String contractName;
+  private String fullName;
+  private String role;
+  private String phone;
+  private String gender;
+  private LocalDate birthDate;
+  private String job;
+  private String office;
+  private String area;
+  private BigDecimal baseSalary;
+  private String contractName;
 }

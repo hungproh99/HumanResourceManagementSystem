@@ -7,8 +7,6 @@ package org.jooq.codegen.maven.example;
 import org.jooq.codegen.maven.example.tables.Area;
 import org.jooq.codegen.maven.example.tables.Bank;
 import org.jooq.codegen.maven.example.tables.ContractType;
-import org.jooq.codegen.maven.example.tables.Demo;
-import org.jooq.codegen.maven.example.tables.Demo2;
 import org.jooq.codegen.maven.example.tables.Discipline;
 import org.jooq.codegen.maven.example.tables.DisciplineType;
 import org.jooq.codegen.maven.example.tables.Education;
@@ -50,16 +48,6 @@ public class Tables {
      * The table <code>human_resource_management.contract_type</code>.
      */
     public static final ContractType CONTRACT_TYPE = ContractType.CONTRACT_TYPE;
-
-    /**
-     * The table <code>human_resource_management.demo</code>.
-     */
-    public static final Demo DEMO = Demo.DEMO;
-
-    /**
-     * The table <code>human_resource_management.demo2</code>.
-     */
-    public static final Demo2 DEMO2 = Demo2.DEMO2;
 
     /**
      * The table <code>human_resource_management.discipline</code>.

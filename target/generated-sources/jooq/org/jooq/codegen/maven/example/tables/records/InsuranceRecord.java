@@ -36,10 +36,25 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
     }
 
     /**
+     * Setter for <code>human_resource_management.insurance.address</code>.
+     */
+    public InsuranceRecord setAddress(String value) {
+        set(1, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>human_resource_management.insurance.address</code>.
+     */
+    public String getAddress() {
+        return (String) get(1);
+    }
+
+    /**
      * Setter for <code>human_resource_management.insurance.description</code>.
      */
     public InsuranceRecord setDescription(String value) {
-        set(1, value);
+        set(2, value);
         return this;
     }
 
@@ -47,7 +62,7 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
      * Getter for <code>human_resource_management.insurance.description</code>.
      */
     public String getDescription() {
-        return (String) get(1);
+        return (String) get(2);
     }
 
     /**
@@ -55,7 +70,7 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
      * <code>human_resource_management.insurance.insurance_name</code>.
      */
     public InsuranceRecord setInsuranceName(String value) {
-        set(2, value);
+        set(3, value);
         return this;
     }
 
@@ -64,14 +79,14 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
      * <code>human_resource_management.insurance.insurance_name</code>.
      */
     public String getInsuranceName() {
-        return (String) get(2);
+        return (String) get(3);
     }
 
     /**
      * Setter for <code>human_resource_management.insurance.percent</code>.
      */
     public InsuranceRecord setPercent(String value) {
-        set(3, value);
+        set(4, value);
         return this;
     }
 
@@ -79,14 +94,14 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
      * Getter for <code>human_resource_management.insurance.percent</code>.
      */
     public String getPercent() {
-        return (String) get(3);
+        return (String) get(4);
     }
 
     /**
      * Setter for <code>human_resource_management.insurance.title</code>.
      */
     public InsuranceRecord setTitle(String value) {
-        set(4, value);
+        set(5, value);
         return this;
     }
 
@@ -94,14 +109,14 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
      * Getter for <code>human_resource_management.insurance.title</code>.
      */
     public String getTitle() {
-        return (String) get(4);
+        return (String) get(5);
     }
 
     /**
      * Setter for <code>human_resource_management.insurance.employee_id</code>.
      */
     public InsuranceRecord setEmployeeId(String value) {
-        set(5, value);
+        set(6, value);
         return this;
     }
 
@@ -109,21 +124,6 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
      * Getter for <code>human_resource_management.insurance.employee_id</code>.
      */
     public String getEmployeeId() {
-        return (String) get(5);
-    }
-
-    /**
-     * Setter for <code>human_resource_management.insurance.address</code>.
-     */
-    public InsuranceRecord setAddress(String value) {
-        set(6, value);
-        return this;
-    }
-
-    /**
-     * Getter for <code>human_resource_management.insurance.address</code>.
-     */
-    public String getAddress() {
         return (String) get(6);
     }
 
@@ -157,32 +157,32 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
 
     @Override
     public Field<String> field2() {
-        return Insurance.INSURANCE.DESCRIPTION;
+        return Insurance.INSURANCE.ADDRESS;
     }
 
     @Override
     public Field<String> field3() {
-        return Insurance.INSURANCE.INSURANCE_NAME;
+        return Insurance.INSURANCE.DESCRIPTION;
     }
 
     @Override
     public Field<String> field4() {
-        return Insurance.INSURANCE.PERCENT;
+        return Insurance.INSURANCE.INSURANCE_NAME;
     }
 
     @Override
     public Field<String> field5() {
-        return Insurance.INSURANCE.TITLE;
+        return Insurance.INSURANCE.PERCENT;
     }
 
     @Override
     public Field<String> field6() {
-        return Insurance.INSURANCE.EMPLOYEE_ID;
+        return Insurance.INSURANCE.TITLE;
     }
 
     @Override
     public Field<String> field7() {
-        return Insurance.INSURANCE.ADDRESS;
+        return Insurance.INSURANCE.EMPLOYEE_ID;
     }
 
     @Override
@@ -192,32 +192,32 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
 
     @Override
     public String component2() {
-        return getDescription();
+        return getAddress();
     }
 
     @Override
     public String component3() {
-        return getInsuranceName();
+        return getDescription();
     }
 
     @Override
     public String component4() {
-        return getPercent();
+        return getInsuranceName();
     }
 
     @Override
     public String component5() {
-        return getTitle();
+        return getPercent();
     }
 
     @Override
     public String component6() {
-        return getEmployeeId();
+        return getTitle();
     }
 
     @Override
     public String component7() {
-        return getAddress();
+        return getEmployeeId();
     }
 
     @Override
@@ -227,32 +227,32 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
 
     @Override
     public String value2() {
-        return getDescription();
+        return getAddress();
     }
 
     @Override
     public String value3() {
-        return getInsuranceName();
+        return getDescription();
     }
 
     @Override
     public String value4() {
-        return getPercent();
+        return getInsuranceName();
     }
 
     @Override
     public String value5() {
-        return getTitle();
+        return getPercent();
     }
 
     @Override
     public String value6() {
-        return getEmployeeId();
+        return getTitle();
     }
 
     @Override
     public String value7() {
-        return getAddress();
+        return getEmployeeId();
     }
 
     @Override
@@ -263,37 +263,37 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
 
     @Override
     public InsuranceRecord value2(String value) {
-        setDescription(value);
+        setAddress(value);
         return this;
     }
 
     @Override
     public InsuranceRecord value3(String value) {
-        setInsuranceName(value);
+        setDescription(value);
         return this;
     }
 
     @Override
     public InsuranceRecord value4(String value) {
-        setPercent(value);
+        setInsuranceName(value);
         return this;
     }
 
     @Override
     public InsuranceRecord value5(String value) {
-        setTitle(value);
+        setPercent(value);
         return this;
     }
 
     @Override
     public InsuranceRecord value6(String value) {
-        setEmployeeId(value);
+        setTitle(value);
         return this;
     }
 
     @Override
     public InsuranceRecord value7(String value) {
-        setAddress(value);
+        setEmployeeId(value);
         return this;
     }
 
@@ -323,16 +323,16 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
     /**
      * Create a detached, initialised InsuranceRecord
      */
-    public InsuranceRecord(Long insuranceId, String description, String insuranceName, String percent, String title, String employeeId, String address) {
+    public InsuranceRecord(Long insuranceId, String address, String description, String insuranceName, String percent, String title, String employeeId) {
         super(Insurance.INSURANCE);
 
         setInsuranceId(insuranceId);
+        setAddress(address);
         setDescription(description);
         setInsuranceName(insuranceName);
         setPercent(percent);
         setTitle(title);
         setEmployeeId(employeeId);
-        setAddress(address);
     }
 
     /**
@@ -343,12 +343,12 @@ public class InsuranceRecord extends UpdatableRecordImpl<InsuranceRecord> implem
 
         if (value != null) {
             setInsuranceId(value.getInsuranceId());
+            setAddress(value.getAddress());
             setDescription(value.getDescription());
             setInsuranceName(value.getInsuranceName());
             setPercent(value.getPercent());
             setTitle(value.getTitle());
             setEmployeeId(value.getEmployeeId());
-            setAddress(value.getAddress());
         }
     }
 }

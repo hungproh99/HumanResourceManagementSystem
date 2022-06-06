@@ -5,6 +5,7 @@ package org.jooq.codegen.maven.example.tables.pojos;
 
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -16,12 +17,12 @@ public class Salary implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long      laudatoryId;
-    private LocalDate endDate;
-    private String    finalSalary;
-    private LocalDate startDate;
-    private String    subsidize;
-    private Long      workingInformationId;
+    private Long       laudatoryId;
+    private LocalDate  endDate;
+    private BigDecimal finalSalary;
+    private LocalDate  startDate;
+    private BigDecimal subsidize;
+    private Long       workingInformationId;
 
     public Salary() {}
 
@@ -35,12 +36,12 @@ public class Salary implements Serializable {
     }
 
     public Salary(
-        Long      laudatoryId,
-        LocalDate endDate,
-        String    finalSalary,
-        LocalDate startDate,
-        String    subsidize,
-        Long      workingInformationId
+        Long       laudatoryId,
+        LocalDate  endDate,
+        BigDecimal finalSalary,
+        LocalDate  startDate,
+        BigDecimal subsidize,
+        Long       workingInformationId
     ) {
         this.laudatoryId = laudatoryId;
         this.endDate = endDate;
@@ -83,14 +84,14 @@ public class Salary implements Serializable {
     /**
      * Getter for <code>human_resource_management.salary.final_salary</code>.
      */
-    public String getFinalSalary() {
+    public BigDecimal getFinalSalary() {
         return this.finalSalary;
     }
 
     /**
      * Setter for <code>human_resource_management.salary.final_salary</code>.
      */
-    public Salary setFinalSalary(String finalSalary) {
+    public Salary setFinalSalary(BigDecimal finalSalary) {
         this.finalSalary = finalSalary;
         return this;
     }
@@ -113,14 +114,14 @@ public class Salary implements Serializable {
     /**
      * Getter for <code>human_resource_management.salary.subsidize</code>.
      */
-    public String getSubsidize() {
+    public BigDecimal getSubsidize() {
         return this.subsidize;
     }
 
     /**
      * Setter for <code>human_resource_management.salary.subsidize</code>.
      */
-    public Salary setSubsidize(String subsidize) {
+    public Salary setSubsidize(BigDecimal subsidize) {
         this.subsidize = subsidize;
         return this;
     }

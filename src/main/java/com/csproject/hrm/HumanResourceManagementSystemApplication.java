@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @SpringBootApplication
 public class HumanResourceManagementSystemApplication extends SpringBootServletInitializer {
-	
-	public static void main(String[] args) {
-		SpringApplication.run(HumanResourceManagementSystemApplication.class, args);
-	}
-	
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(HumanResourceManagementSystemApplication.class);
-	}
+
+  public static void main(String[] args) {
+    SpringApplication.run(HumanResourceManagementSystemApplication.class, args);
+  }
+
+  @Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    return application.sources(HumanResourceManagementSystemApplication.class);
+  }
 }

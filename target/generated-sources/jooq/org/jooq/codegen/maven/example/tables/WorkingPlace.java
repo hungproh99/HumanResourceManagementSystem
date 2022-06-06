@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row5;
@@ -51,7 +52,7 @@ public class WorkingPlace extends TableImpl<WorkingPlaceRecord> {
      * The column
      * <code>human_resource_management.working_place.working_place_id</code>.
      */
-    public final TableField<WorkingPlaceRecord, Long> WORKING_PLACE_ID = createField(DSL.name("working_place_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WorkingPlaceRecord, Long> WORKING_PLACE_ID = createField(DSL.name("working_place_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>human_resource_management.working_place.area_id</code>.
@@ -114,6 +115,11 @@ public class WorkingPlace extends TableImpl<WorkingPlaceRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<WorkingPlaceRecord, Long> getIdentity() {
+        return (Identity<WorkingPlaceRecord, Long>) super.getIdentity();
     }
 
     @Override

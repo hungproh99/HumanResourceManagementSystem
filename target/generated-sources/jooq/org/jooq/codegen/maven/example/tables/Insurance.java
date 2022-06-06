@@ -54,6 +54,11 @@ public class Insurance extends TableImpl<InsuranceRecord> {
     public final TableField<InsuranceRecord, Long> INSURANCE_ID = createField(DSL.name("insurance_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
+     * The column <code>human_resource_management.insurance.address</code>.
+     */
+    public final TableField<InsuranceRecord, String> ADDRESS = createField(DSL.name("address"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
      * The column <code>human_resource_management.insurance.description</code>.
      */
     public final TableField<InsuranceRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(255), this, "");
@@ -78,11 +83,6 @@ public class Insurance extends TableImpl<InsuranceRecord> {
      * The column <code>human_resource_management.insurance.employee_id</code>.
      */
     public final TableField<InsuranceRecord, String> EMPLOYEE_ID = createField(DSL.name("employee_id"), SQLDataType.VARCHAR(255), this, "");
-
-    /**
-     * The column <code>human_resource_management.insurance.address</code>.
-     */
-    public final TableField<InsuranceRecord, String> ADDRESS = createField(DSL.name("address"), SQLDataType.VARCHAR(255), this, "");
 
     private Insurance(Name alias, Table<InsuranceRecord> aliased) {
         this(alias, aliased, null);

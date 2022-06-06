@@ -1,9 +1,6 @@
 package com.csproject.hrm.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +9,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class HrmResponseList {
-    private List<HrmResponse> hrmResponse;
-    private int total;
+  private List<HrmResponse> hrmResponse;
+  private int total;
 }

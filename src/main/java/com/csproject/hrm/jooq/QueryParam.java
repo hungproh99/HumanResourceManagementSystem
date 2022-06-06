@@ -1,9 +1,6 @@
 package com.csproject.hrm.jooq;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,20 +10,20 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class QueryParam {
-    public Pagination pagination;
+  public Pagination pagination;
 
-    public List<QueryFilter> filters;
+  public List<QueryFilter> filters;
 
-    public List<OrderByClause> orderByList;
+  public List<OrderByClause> orderByList;
 
-    public static QueryParam defaultParam() {
+  public static QueryParam defaultParam() {
 
-        final var param = new QueryParam();
+    final var param = new QueryParam();
 
-        param.setPagination(Pagination.defaultPage());
-        param.setFilters(Collections.EMPTY_LIST);
-        param.setOrderByList(Collections.EMPTY_LIST);
+    param.setPagination(Pagination.defaultPage());
+    param.setFilters(Collections.EMPTY_LIST);
+    param.setOrderByList(Collections.EMPTY_LIST);
 
-        return param;
-    }
+    return param;
+  }
 }

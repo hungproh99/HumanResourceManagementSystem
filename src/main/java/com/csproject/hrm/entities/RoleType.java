@@ -1,12 +1,8 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,15 +11,15 @@ import java.util.List;
 @Entity
 @Table(name = "role_type")
 public class RoleType {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "type_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "type_id")
+  private Long id;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "role")
-    private com.csproject.hrm.common.enums.ERole ERole;
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "role")
+  private com.csproject.hrm.common.enums.ERole ERole;
 
-    @OneToOne(mappedBy = "roleType", fetch = FetchType.LAZY)
-    private Employee employee;
+  @OneToOne(mappedBy = "roleType", fetch = FetchType.LAZY)
+  private Employee employee;
 }

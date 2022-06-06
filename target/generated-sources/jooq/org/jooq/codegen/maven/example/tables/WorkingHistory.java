@@ -10,9 +10,10 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -52,7 +53,7 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
      * The column
      * <code>human_resource_management.working_history.working_history_id</code>.
      */
-    public final TableField<WorkingHistoryRecord, Long> WORKING_HISTORY_ID = createField(DSL.name("working_history_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WorkingHistoryRecord, Long> WORKING_HISTORY_ID = createField(DSL.name("working_history_id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column
@@ -65,6 +66,12 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
      * <code>human_resource_management.working_history.end_date</code>.
      */
     public final TableField<WorkingHistoryRecord, LocalDate> END_DATE = createField(DSL.name("end_date"), SQLDataType.LOCALDATE, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_history.position</code>.
+     */
+    public final TableField<WorkingHistoryRecord, String> POSITION = createField(DSL.name("position"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column
@@ -123,6 +130,11 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : HumanResourceManagement.HUMAN_RESOURCE_MANAGEMENT;
+    }
+
+    @Override
+    public Identity<WorkingHistoryRecord, Long> getIdentity() {
+        return (Identity<WorkingHistoryRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -187,11 +199,11 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, String, LocalDate, LocalDate, Long, String> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Long, String, LocalDate, String, LocalDate, Long, String> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }
