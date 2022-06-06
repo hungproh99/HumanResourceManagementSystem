@@ -34,7 +34,7 @@ public class Laudatory {
   private LocalDate date;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "laudatory_type")
   private LaudatoryType laudatoryType;
 
   @Column(name = "status")

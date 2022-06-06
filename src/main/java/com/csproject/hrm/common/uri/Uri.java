@@ -7,4 +7,5 @@ public class Uri {
   public static final String URI_FORGOT_PASSWORD = "/forgot_password";
   public static final String URI_GET_ALL_EMPLOYEE = "/get_all_employee";
   public static final String URI_INSERT_EMPLOYEE = "/add_employee";
+  public static final String URI_INSERT_MULTI_EMPLOYEE = "/add_multi_employee";
 }

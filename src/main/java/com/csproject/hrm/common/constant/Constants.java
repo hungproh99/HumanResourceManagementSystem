@@ -34,8 +34,6 @@ public class Constants {
   public static final String FULL_NAME = "fullName";
   public static final String EMAIL = "email";
   public static final String PHONE = "phone";
-  public static final String FEMALE = "Female";
-  public static final String MALE = "Male";
   public static final String GENDER = "gender";
   public static final String JOB_NAME = "job";
   public static final String OFFICE_NAME = "office";

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
@@ -35,8 +36,15 @@ public class HrmController {
 
   @PostMapping(URI_INSERT_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> addEmployeeByForm(@RequestBody HrmRequest hrmRequest) {
+  public ResponseEntity<?> addEmployee(@RequestBody HrmRequest hrmRequest) {
     humanManagementService.insertEmployee(hrmRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(URI_INSERT_MULTI_EMPLOYEE)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> addMultiEmployee(@RequestBody List<HrmRequest> hrmRequestList) {
+    humanManagementService.insertMultiEmployee(hrmRequestList);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

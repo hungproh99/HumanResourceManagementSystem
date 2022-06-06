@@ -1,7 +1,7 @@
 package com.csproject.hrm.repositories.Custom.Impl;
 
 import com.csproject.hrm.common.enums.*;
-import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -9,17 +9,14 @@ import com.csproject.hrm.jooq.Pagination;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.Custom.EmployeeRepositoryCustom;
 import lombok.AllArgsConstructor;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.OrderField;
-import org.jooq.codegen.maven.example.tables.records.EmployeeRecord;
+import org.jooq.*;
 import org.jooq.codegen.maven.example.tables.records.WorkingContractRecord;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +41,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     field2Map = new HashMap<>();
     field2Map.put(EMPLOYEE_ID, EMPLOYEE.EMPLOYEE_ID);
     field2Map.put(FULL_NAME, EMPLOYEE.FULL_NAME);
-    field2Map.put(STATUS, EMPLOYEE.WORK_STATUS);
+    //    field2Map.put(STATUS, EMPLOYEE.W);
   }
 
   @Autowired private final JooqHelper queryHelper;
@@ -60,73 +57,38 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public void insertEmployee(
-      HrmRequest hrmRequest,
-      String employeeId,
-      String companyEmail,
-      String password,
-      String workStatus,
-      String companyName,
-      String contractStatus,
-      LocalDate startDate) {
+  public void insertEmployee(HrmPojo hrmPojo) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext.transaction(
         configuration -> {
-          DSLContext ctx = DSL.using(configuration);
-          EmployeeRecord employeeRecord =
-              ctx.insertInto(
-                      EMPLOYEE,
-                      EMPLOYEE.EMPLOYEE_ID,
-                      EMPLOYEE.FULL_NAME,
-                      EMPLOYEE.COMPANY_EMAIL,
-                      EMPLOYEE.WORK_STATUS,
-                      EMPLOYEE.PHONE_NUMBER,
-                      EMPLOYEE.GENDER,
-                      EMPLOYEE.BIRTH_DATE,
-                      EMPLOYEE.ROLE_TYPE)
-                  .values(
-                      employeeId,
-                      hrmRequest.getFullName(),
-                      companyEmail,
-                      workStatus,
-                      hrmRequest.getPhone(),
-                      hrmRequest.getGender(),
-                      hrmRequest.getBirthDate(),
-                      ERole.of(hrmRequest.getRole()))
-                  .returning(EMPLOYEE.EMPLOYEE_ID)
-                  .fetchOne();
+          insertEmployeeRecord(
+              configuration,
+              hrmPojo.getEmployeeId(),
+              hrmPojo.getFullName(),
+              hrmPojo.getCompanyEmail(),
+              hrmPojo.getWorkStatus(),
+              hrmPojo.getPhone(),
+              hrmPojo.getGender(),
+              hrmPojo.getBirthDate(),
+              ERole.of(hrmPojo.getRole()));
 
           WorkingContractRecord workingContractRecord =
-              ctx.insertInto(
-                      WORKING_CONTRACT,
-                      WORKING_CONTRACT.EMPLOYEE_ID,
-                      WORKING_CONTRACT.BASE_SALARY,
-                      WORKING_CONTRACT.COMPANY_NAME,
-                      WORKING_CONTRACT.START_DATE,
-                      WORKING_CONTRACT.STATUS,
-                      WORKING_CONTRACT.TYPE_ID)
-                  .values(
-                      employeeId,
-                      hrmRequest.getBaseSalary(),
-                      companyName,
-                      startDate,
-                      contractStatus,
-                      EContractType.of(hrmRequest.getContractName()))
-                  .returning()
+              insertWorkingContractRecord(
+                      configuration,
+                      hrmPojo.getEmployeeId(),
+                      BigDecimal.ONE,
+                      hrmPojo.getCompanyName(),
+                      hrmPojo.getStartDate(),
+                      "hrmPojo.getContractStatus()",
+                      EContractType.of("hrmPojo.getContractName()"))
                   .fetchOne();
 
-          ctx.insertInto(
-                  WORKING_PLACE,
-                  WORKING_PLACE.WORKING_CONTRACT_ID,
-                  WORKING_PLACE.AREA_ID,
-                  WORKING_PLACE.JOB_ID,
-                  WORKING_PLACE.OFFICE_ID)
-              .values(
-                  workingContractRecord.getWorkingContractId(),
-                  EArea.of(hrmRequest.getArea()),
-                  EJob.of(hrmRequest.getJob()),
-                  EOffice.of(hrmRequest.getOffice()))
-              .execute();
+          insertWorkingPlace(
+              configuration,
+              workingContractRecord.getWorkingContractId(),
+              EArea.of(hrmPojo.getArea()),
+              EJob.of(hrmPojo.getJob()),
+              EOffice.of(hrmPojo.getOffice()));
         });
   }
 
@@ -158,18 +120,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         dslContext
             .selectCount()
             .from(EMPLOYEE)
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(CONTRACT_TYPE)
-            .on(CONTRACT_TYPE.TYPE_ID.eq(WORKING_CONTRACT.TYPE_ID))
-            .leftJoin(WORKING_PLACE)
-            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(AREA)
-            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-            .leftJoin(OFFICE)
-            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
-            .leftJoin(JOB)
-            .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
             .where(conditions)
             .orderBy(sortFields)
             .limit(pagination.limit)
@@ -187,11 +137,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
                 EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-                EMPLOYEE.WORK_STATUS,
+                when(EMPLOYEE.WORKING_STATUS.eq(Byte.parseByte("1")), ""),
                 EMPLOYEE.PHONE_NUMBER.as(PHONE),
-                when(EMPLOYEE.GENDER.eq(FEMALE), FEMALE)
-                    .when(EMPLOYEE.GENDER.eq(MALE), MALE)
-                    .as(GENDER),
+                EMPLOYEE.GENDER.as(GENDER),
                 EMPLOYEE.BIRTH_DATE,
                 JOB.TITLE.as(JOB_NAME),
                 OFFICE.NAME.as(OFFICE_NAME),
@@ -204,13 +152,12 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                     .concat(MONTH)
                     .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
                     .concat(DAY)
-                    .as(SENIORITY),
-                WORKING_CONTRACT.START_DATE)
+                    .as(SENIORITY))
             .from(EMPLOYEE)
             .leftJoin(WORKING_CONTRACT)
             .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(CONTRACT_TYPE)
-            .on(CONTRACT_TYPE.TYPE_ID.eq(WORKING_CONTRACT.TYPE_ID))
+            //            .leftJoin(CONTRACT_TYPE)
+            //            .on(CONTRACT_TYPE.TYPE_ID.eq(WORKING_CONTRACT.TYPE_ID))
             .leftJoin(WORKING_PLACE)
             .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
             .leftJoin(AREA)
@@ -225,5 +172,69 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             .offset(pagination.offset);
 
     return query.fetchInto(HrmResponse.class);
+  }
+
+  private int insertEmployeeRecord(
+      Configuration config,
+      String employeeId,
+      String fullName,
+      String companyEmail,
+      String workStatus,
+      String phone,
+      String gender,
+      LocalDate birthDate,
+      long role) {
+    final var query =
+        DSL.using(config)
+            .insertInto(
+                EMPLOYEE,
+                EMPLOYEE.EMPLOYEE_ID,
+                EMPLOYEE.FULL_NAME,
+                EMPLOYEE.COMPANY_EMAIL,
+                //                "EMPLOYEE.WORK_STATUS",
+                EMPLOYEE.PHONE_NUMBER,
+                EMPLOYEE.GENDER,
+                EMPLOYEE.BIRTH_DATE,
+                EMPLOYEE.ROLE_TYPE)
+            .values(employeeId, fullName, companyEmail, phone, gender, birthDate, role)
+            .execute();
+    return query;
+  }
+
+  private InsertResultStep<WorkingContractRecord> insertWorkingContractRecord(
+      Configuration config,
+      String employeeId,
+      BigDecimal baseSalary,
+      String companyName,
+      LocalDate startDate,
+      String contractStatus,
+      long contractType) {
+
+    final var query =
+        DSL.using(config)
+            .insertInto(
+                WORKING_CONTRACT,
+                WORKING_CONTRACT.EMPLOYEE_ID,
+                WORKING_CONTRACT.BASE_SALARY,
+                WORKING_CONTRACT.COMPANY_NAME,
+                WORKING_CONTRACT.START_DATE)
+            .values(employeeId, baseSalary, companyName, startDate)
+            .returning();
+    return query;
+  }
+
+  private int insertWorkingPlace(
+      Configuration config, long workingContractId, long area, long job, long office) {
+    final var query =
+        DSL.using(config)
+            .insertInto(
+                WORKING_PLACE,
+                WORKING_PLACE.WORKING_CONTRACT_ID,
+                WORKING_PLACE.AREA_ID,
+                WORKING_PLACE.JOB_ID,
+                WORKING_PLACE.OFFICE_ID)
+            .values(workingContractId, area, job, office)
+            .execute();
+    return query;
   }
 }

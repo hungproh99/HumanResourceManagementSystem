@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -50,8 +51,9 @@ public class Employee {
   @Column(name = "marital_status")
   private String maritalStatus;
 
-  @Column(name = "work_status")
-  private String workStatus;
+  @Column(name = "working_status")
+  @Type(type = "boolean")
+  private Boolean workingStatus;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "role_type")
@@ -94,4 +96,12 @@ public class Employee {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "bank_id")
   private Bank bank;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "employee_type_id")
+  private EmployeeType employeeType;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "working_type_id")
+  private WorkingType workingType;
 }

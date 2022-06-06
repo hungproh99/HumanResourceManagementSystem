@@ -12,22 +12,19 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "job")
-public class Job {
+@Table(name = "employee_type")
+public class EmployeeType {
   @Id
-  @Column(name = "job_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "type_id")
   private Long id;
 
-  @Column(name = "title")
-  private String title;
-
-  @Column(name = "position")
-  private String position;
+  @Column(name = "name")
+  private String name;
 
   @Column(name = "description")
   private String description;
 
-  @OneToOne(mappedBy = "job", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  @OneToOne(mappedBy = "employeeType", fetch = FetchType.LAZY)
+  private Employee employee;
 }

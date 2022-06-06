@@ -33,7 +33,7 @@ public class Discipline {
   private String date;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "discipline_type")
   private DisciplineType disciplineType;
 
   @Column(name = "status")

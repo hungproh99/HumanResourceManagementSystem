@@ -1,17 +1,16 @@
 package com.csproject.hrm.dto.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 public class HrmRequest {
   private String fullName;
   private String role;
@@ -21,6 +20,7 @@ public class HrmRequest {
   private String job;
   private String office;
   private String area;
-  private BigDecimal baseSalary;
-  private String contractName;
+  private String workingType;
+  private String managerId;
+  private String employeeType;
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -30,7 +31,7 @@ public class WorkingContract {
   private String companyName;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "contract_type")
   private ContractType contractType;
 
   @Column(name = "start_date")
@@ -38,9 +39,6 @@ public class WorkingContract {
 
   @Column(name = "end_date")
   private LocalDate endDate;
-
-  @Column(name = "status")
-  private String status;
 
   @Column(name = "base_salary")
   private BigDecimal baseSalary;
@@ -53,4 +51,8 @@ public class WorkingContract {
 
   @OneToMany(mappedBy = "workingContract", fetch = FetchType.LAZY)
   private List<WorkingInformation> workingInformation;
+
+  @Column(name = "contract_status")
+  @Type(type = "boolean")
+  private Boolean contractStatus;
 }

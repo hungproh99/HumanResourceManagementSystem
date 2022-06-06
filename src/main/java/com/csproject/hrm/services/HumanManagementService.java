@@ -1,5 +1,6 @@
 package com.csproject.hrm.services;
 
+import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
@@ -35,17 +36,46 @@ public class HumanManagementService implements HumanManagementServiceImpl {
     if (hrmRequest.getArea() == null
         || hrmRequest.getFullName() == null
         || hrmRequest.getRole() == null
-        || hrmRequest.getContractName() == null
+//        || hrmRequest.getContractName() == null
         || hrmRequest.getJob() == null
         || hrmRequest.getOffice() == null
         || hrmRequest.getPhone() == null
-        || hrmRequest.getBaseSalary() == null
+//        || hrmRequest.getBaseSalary() == null
         || hrmRequest.getBirthDate() == null
         || hrmRequest.getGender() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
       throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
     }
+    HrmPojo hrmPojo = createHrmPojo(hrmRequest);
+
+    employeeRepository.insertEmployee(hrmPojo);
+  }
+
+  @Override
+  public void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
+    hrmRequestList.forEach(
+        hrmRequest -> {
+          if (hrmRequest.getArea() == null
+              || hrmRequest.getFullName() == null
+              || hrmRequest.getRole() == null
+//              || hrmRequest.getContractName() == null
+              || hrmRequest.getJob() == null
+              || hrmRequest.getOffice() == null
+              || hrmRequest.getPhone() == null
+//              || hrmRequest.getBaseSalary() == null
+              || hrmRequest.getBirthDate() == null
+              || hrmRequest.getGender() == null) {
+            throw new CustomParameterConstraintException(FILL_NOT_FULL);
+          } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
+            throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+          }
+          HrmPojo hrmPojo = createHrmPojo(hrmRequest);
+          employeeRepository.insertEmployee(hrmPojo);
+        });
+  }
+
+  private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
     String employeeId = generateIdEmployee(hrmRequest.getFullName());
     String companyEmail = generateEmailEmployee(employeeId);
     String password = passwordEncoder.encode(loginService.generateCommonLangPassword());
@@ -54,28 +84,40 @@ public class HumanManagementService implements HumanManagementServiceImpl {
     String contractStatus = "IN_EFFECT";
     LocalDate startDate = LocalDate.now();
 
+    HrmPojo hrmPojo =
+        HrmPojo.builder()
+            .fullName(hrmRequest.getFullName())
+            .role(hrmRequest.getRole())
+            .phone(hrmRequest.getPhone())
+            .gender(hrmRequest.getGender())
+            .birthDate(hrmRequest.getBirthDate())
+            .job(hrmRequest.getJob())
+            .office(hrmRequest.getOffice())
+            .area(hrmRequest.getArea())
+//            .baseSalary(hrmRequest.getBaseSalary())
+//            .contractName(hrmRequest.getContractName())
+            .employeeId(employeeId)
+            .companyEmail(companyEmail)
+            .password(password)
+            .workStatus(workStatus)
+            .companyName(companyName)
+//            .contractStatus(contractStatus)
+            .startDate(startDate)
+            .build();
+
     loginService.sendEmail(
         FROM_EMAIL,
         TO_EMAIL,
         SEND_PASSWORD_SUBJECT,
         String.format(SEND_PASSWORD_TEXT, employeeId, password));
-
-    employeeRepository.insertEmployee(
-        hrmRequest,
-        employeeId,
-        companyEmail,
-        password,
-        workStatus,
-        companyName,
-        contractStatus,
-        startDate);
+    return hrmPojo;
   }
 
-  public String generateEmailEmployee(String id) {
+  private String generateEmailEmployee(String id) {
     return id + DOMAIN_EMAIL;
   }
 
-  public String generateIdEmployee(String fullName) {
+  private String generateIdEmployee(String fullName) {
     String[] splitSpace = fullName.split("\\s+");
     String standForName = splitSpace[splitSpace.length - 1];
     for (int index = 0; index < splitSpace.length - 1; index++) {

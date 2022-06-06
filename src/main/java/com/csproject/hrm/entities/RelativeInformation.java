@@ -27,7 +27,7 @@ public class RelativeInformation {
   private LocalDate birthDate;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "relative_type")
   private RelativeType relativeType;
 
   @Column(name = "status")
