@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.JOB_INVALID;
 
 public enum EJob {
-  IT("IT", "Develop 1", 1);
+  DEV1_IT("Develop 1", "IT", 1);
 
-  private String grade;
-  private String position;
-  private long value;
+  private final String grade;
+  private final String position;
+  private final long value;
 
   EJob(String grade, String position, long value) {
     this.grade = grade;

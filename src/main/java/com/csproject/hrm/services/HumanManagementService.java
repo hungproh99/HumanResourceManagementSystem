@@ -1,6 +1,7 @@
 package com.csproject.hrm.services;
 
 import com.csproject.hrm.common.enums.EWorkStatus;
+import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -21,8 +21,7 @@ import static com.csproject.hrm.common.constant.Constants.*;
 @Service
 public class HumanManagementService implements HumanManagementServiceImpl {
   @Autowired EmployeeRepository employeeRepository;
-
-  @Autowired LoginService loginService;
+  @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
 
   @Override
@@ -81,9 +80,9 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   }
 
   private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
-    String employeeId = generateIdEmployee(hrmRequest.getFullName());
-    String companyEmail = generateEmailEmployee(employeeId);
-    String password = passwordEncoder.encode(loginService.generateCommonLangPassword());
+    String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName());
+    String companyEmail = generalFunction.generateEmailEmployee(employeeId);
+    String password = passwordEncoder.encode(generalFunction.generateCommonLangPassword());
     String companyName = "HRM";
 
     HrmPojo hrmPojo =
@@ -107,26 +106,11 @@ public class HumanManagementService implements HumanManagementServiceImpl {
             .employeeType(hrmRequest.getEmployeeType())
             .build();
 
-    loginService.sendEmail(
+    generalFunction.sendEmail(
         FROM_EMAIL,
         TO_EMAIL,
         SEND_PASSWORD_SUBJECT,
         String.format(SEND_PASSWORD_TEXT, employeeId, password));
     return hrmPojo;
-  }
-
-  private String generateEmailEmployee(String id) {
-    return id + DOMAIN_EMAIL;
-  }
-
-  private String generateIdEmployee(String fullName) {
-    String[] splitSpace = fullName.split("\\s+");
-    String standForName = splitSpace[splitSpace.length - 1];
-    for (int index = 0; index < splitSpace.length - 1; index++) {
-      standForName += splitSpace[index].substring(ZERO_NUMBER, ONE_NUMBER);
-    }
-    int count = employeeRepository.countEmployeeSameStartName(standForName);
-    String id = standForName + (count + 1);
-    return id;
   }
 }

@@ -6,11 +6,12 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.EMPLOYEE_TYPE_INVALID;
 
 public enum EEmployeeType {
-  FULL_TIME("Full Time", 1),
-  PART_TIME("Part Time", 2);
+  TRAINEE("Trainee", 1),
+  OFFICIAL_EMPLOYEE("Official Employee", 2),
+  PROBATIONARY_STAFF("Probationary Staff", 3);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   EEmployeeType(String label, long value) {
     this.label = label;

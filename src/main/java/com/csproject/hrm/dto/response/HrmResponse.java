@@ -15,7 +15,7 @@ public class HrmResponse {
   private String employee_id;
   private String full_name;
   private String email;
-  private String work_status;
+  private String working_status;
   private String phone;
   private String gender;
   private Date birth_date;
@@ -24,5 +24,5 @@ public class HrmResponse {
   private String area_name;
   private String seniority;
   private String position_name;
-  private String workingType;
+  private String working_name;
 }
