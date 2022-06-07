@@ -17,7 +17,8 @@ public class HrmRequest {
   private String phone;
   private String gender;
   private LocalDate birthDate;
-  private String job;
+  private String grade;
+  private String position;
   private String office;
   private String area;
   private String workingType;

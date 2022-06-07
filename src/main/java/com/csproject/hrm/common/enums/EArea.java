@@ -16,9 +16,9 @@ public enum EArea {
     this.value = value;
   }
 
-  public static long of(String role) {
+  public static long of(String area) {
     for (EArea eArea : EArea.values()) {
-      if (eArea.label.equalsIgnoreCase(role)) {
+      if (eArea.label.equalsIgnoreCase(area)) {
         return eArea.value;
       }
     }

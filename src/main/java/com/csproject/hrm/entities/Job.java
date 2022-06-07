@@ -19,8 +19,8 @@ public class Job {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "title")
-  private String title;
+  @Column(name = "grade")
+  private String grade;
 
   @Column(name = "position")
   private String position;
@@ -29,5 +29,5 @@ public class Job {
   private String description;
 
   @OneToOne(mappedBy = "job", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  private WorkingContract workingContract;
 }

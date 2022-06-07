@@ -1,7 +1,7 @@
 package com.csproject.hrm.repositories;
 
 import com.csproject.hrm.entities.Employee;
-import com.csproject.hrm.repositories.Custom.EmployeeRepositoryCustom;
+import com.csproject.hrm.repositories.custom.EmployeeRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

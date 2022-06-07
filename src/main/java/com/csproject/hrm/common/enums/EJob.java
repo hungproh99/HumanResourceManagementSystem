@@ -6,19 +6,21 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.JOB_INVALID;
 
 public enum EJob {
-  IT("IT", 1);
+  DEV1_IT("Develop 1", "IT", 1);
 
-  private String label;
-  private long value;
+  private final String grade;
+  private final String position;
+  private final long value;
 
-  EJob(String label, long value) {
-    this.label = label;
+  EJob(String grade, String position, long value) {
+    this.grade = grade;
+    this.position = position;
     this.value = value;
   }
 
-  public static long of(String role) {
+  public static long of(String grade, String position) {
     for (EJob eJob : EJob.values()) {
-      if (eJob.label.equalsIgnoreCase(role)) {
+      if (eJob.grade.equalsIgnoreCase(grade) && eJob.position.equalsIgnoreCase(position)) {
         return eJob.value;
       }
     }

@@ -23,5 +23,5 @@ public class Area {
   private String name;
 
   @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  private WorkingContract workingContract;
 }

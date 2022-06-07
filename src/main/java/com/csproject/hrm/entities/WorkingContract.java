@@ -46,13 +46,22 @@ public class WorkingContract {
   @Column(name = "contract_url")
   private String contractUrl;
 
-  @OneToOne(mappedBy = "workingContract", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
-
   @OneToMany(mappedBy = "workingContract", fetch = FetchType.LAZY)
   private List<WorkingInformation> workingInformation;
 
   @Column(name = "contract_status")
   @Type(type = "boolean")
   private Boolean contractStatus;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "area_id")
+  private Area area;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "office_id")
+  private Office office;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "job_id")
+  private Job job;
 }

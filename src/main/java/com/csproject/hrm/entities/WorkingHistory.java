@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -30,6 +27,9 @@ public class WorkingHistory {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "type_id")
   private ContractType contractType;
+
+  @Column(name = "position")
+  private String position;
 
   @Column(name = "start_date")
   private LocalDate startDate;

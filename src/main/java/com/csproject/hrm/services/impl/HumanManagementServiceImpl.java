@@ -1,5 +1,6 @@
 package com.csproject.hrm.services.impl;
 
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -12,4 +13,16 @@ public interface HumanManagementServiceImpl {
   void insertEmployee(HrmRequest hrmRequest);
 
   void insertMultiEmployee(List<HrmRequest> hrmRequestList);
+
+  List<WorkingTypeDto> getListWorkingType();
+
+  List<EmployeeTypeDto> getListEmployeeType();
+
+  List<RoleDto> getListRoleType();
+
+  List<OfficeDto> getListOffice();
+
+  List<AreaDto> getListArea();
+
+  List<JobDto> getListJob();
 }
