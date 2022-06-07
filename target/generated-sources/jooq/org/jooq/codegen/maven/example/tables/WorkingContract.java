@@ -12,15 +12,17 @@ import java.util.List;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row9;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.codegen.maven.example.HumanResourceManagement;
+import org.jooq.codegen.maven.example.Indexes;
 import org.jooq.codegen.maven.example.Keys;
 import org.jooq.codegen.maven.example.tables.records.WorkingContractRecord;
 import org.jooq.impl.DSL;
@@ -104,6 +106,36 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
      */
     public final TableField<WorkingContractRecord, String> EMPLOYEE_ID = createField(DSL.name("employee_id"), SQLDataType.VARCHAR(255), this, "");
 
+    /**
+     * The column
+     * <code>human_resource_management.working_contract.contract_status</code>.
+     */
+    public final TableField<WorkingContractRecord, Boolean> CONTRACT_STATUS = createField(DSL.name("contract_status"), SQLDataType.BIT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_contract.area_id</code>.
+     */
+    public final TableField<WorkingContractRecord, Long> AREA_ID = createField(DSL.name("area_id"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_contract.contract_type</code>.
+     */
+    public final TableField<WorkingContractRecord, Long> CONTRACT_TYPE = createField(DSL.name("contract_type"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_contract.job_id</code>.
+     */
+    public final TableField<WorkingContractRecord, Long> JOB_ID = createField(DSL.name("job_id"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_contract.office_id</code>.
+     */
+    public final TableField<WorkingContractRecord, Long> OFFICE_ID = createField(DSL.name("office_id"), SQLDataType.BIGINT, this, "");
+
     private WorkingContract(Name alias, Table<WorkingContractRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -146,6 +178,11 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.asList(Indexes.WORKING_CONTRACT_FKSEX4WS8S50GFAMJ8LGMWEQGWR);
+    }
+
+    @Override
     public Identity<WorkingContractRecord, Long> getIdentity() {
         return (Identity<WorkingContractRecord, Long>) super.getIdentity();
     }
@@ -157,32 +194,70 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
 
     @Override
     public List<ForeignKey<WorkingContractRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.FKM8LGM02FO7LBYK17TNGSGW3H5, Keys.FKSEX4WS8S50GFAMJ8LGMWEQGWR);
+        return Arrays.asList(Keys.FKM8LGM02FO7LBYK17TNGSGW3H5, Keys.FKM4VP3IHAOYHR5QRSOVQWIPBP6, Keys.FKC334JINAJFM1LFSEDUXLJ82PT, Keys.FK3CFMGM415JS09EAVMIUGYXE6R, Keys.FKOD4LOT1MBTXVMKUI2RALP7435);
     }
 
-    private transient ContractType _contractType;
-    private transient Employee _employee;
+    private transient ContractType _fkm8lgm02fo7lbyk17tngsgw3h5;
+    private transient Area _area;
+    private transient ContractType _fkc334jinajfm1lfseduxlj82pt;
+    private transient Job _job;
+    private transient Office _office;
 
     /**
      * Get the implicit join path to the
-     * <code>human_resource_management.contract_type</code> table.
+     * <code>human_resource_management.contract_type</code> table, via the
+     * <code>FKm8lgm02fo7lbyk17tngsgw3h5</code> key.
      */
-    public ContractType contractType() {
-        if (_contractType == null)
-            _contractType = new ContractType(this, Keys.FKM8LGM02FO7LBYK17TNGSGW3H5);
+    public ContractType fkm8lgm02fo7lbyk17tngsgw3h5() {
+        if (_fkm8lgm02fo7lbyk17tngsgw3h5 == null)
+            _fkm8lgm02fo7lbyk17tngsgw3h5 = new ContractType(this, Keys.FKM8LGM02FO7LBYK17TNGSGW3H5);
 
-        return _contractType;
+        return _fkm8lgm02fo7lbyk17tngsgw3h5;
     }
 
     /**
      * Get the implicit join path to the
-     * <code>human_resource_management.employee</code> table.
+     * <code>human_resource_management.area</code> table.
      */
-    public Employee employee() {
-        if (_employee == null)
-            _employee = new Employee(this, Keys.FKSEX4WS8S50GFAMJ8LGMWEQGWR);
+    public Area area() {
+        if (_area == null)
+            _area = new Area(this, Keys.FKM4VP3IHAOYHR5QRSOVQWIPBP6);
 
-        return _employee;
+        return _area;
+    }
+
+    /**
+     * Get the implicit join path to the
+     * <code>human_resource_management.contract_type</code> table, via the
+     * <code>FKc334jinajfm1lfseduxlj82pt</code> key.
+     */
+    public ContractType fkc334jinajfm1lfseduxlj82pt() {
+        if (_fkc334jinajfm1lfseduxlj82pt == null)
+            _fkc334jinajfm1lfseduxlj82pt = new ContractType(this, Keys.FKC334JINAJFM1LFSEDUXLJ82PT);
+
+        return _fkc334jinajfm1lfseduxlj82pt;
+    }
+
+    /**
+     * Get the implicit join path to the
+     * <code>human_resource_management.job</code> table.
+     */
+    public Job job() {
+        if (_job == null)
+            _job = new Job(this, Keys.FK3CFMGM415JS09EAVMIUGYXE6R);
+
+        return _job;
+    }
+
+    /**
+     * Get the implicit join path to the
+     * <code>human_resource_management.office</code> table.
+     */
+    public Office office() {
+        if (_office == null)
+            _office = new Office(this, Keys.FKOD4LOT1MBTXVMKUI2RALP7435);
+
+        return _office;
     }
 
     @Override
@@ -212,11 +287,11 @@ public class WorkingContract extends TableImpl<WorkingContractRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row9 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row9<Long, BigDecimal, String, String, LocalDate, LocalDate, String, Long, String> fieldsRow() {
-        return (Row9) super.fieldsRow();
+    public Row14<Long, BigDecimal, String, String, LocalDate, LocalDate, String, Long, String, Boolean, Long, Long, Long, Long> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

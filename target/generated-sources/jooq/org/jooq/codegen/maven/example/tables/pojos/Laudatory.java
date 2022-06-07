@@ -22,7 +22,7 @@ public class Laudatory implements Serializable {
     private String    reward;
     private String    status;
     private String    title;
-    private Long      typeId;
+    private Long      laudatoryType;
     private Long      workingInformationId;
 
     public Laudatory() {}
@@ -34,7 +34,7 @@ public class Laudatory implements Serializable {
         this.reward = value.reward;
         this.status = value.status;
         this.title = value.title;
-        this.typeId = value.typeId;
+        this.laudatoryType = value.laudatoryType;
         this.workingInformationId = value.workingInformationId;
     }
 
@@ -45,7 +45,7 @@ public class Laudatory implements Serializable {
         String    reward,
         String    status,
         String    title,
-        Long      typeId,
+        Long      laudatoryType,
         Long      workingInformationId
     ) {
         this.laudatoryId = laudatoryId;
@@ -54,7 +54,7 @@ public class Laudatory implements Serializable {
         this.reward = reward;
         this.status = status;
         this.title = title;
-        this.typeId = typeId;
+        this.laudatoryType = laudatoryType;
         this.workingInformationId = workingInformationId;
     }
 
@@ -149,17 +149,19 @@ public class Laudatory implements Serializable {
     }
 
     /**
-     * Getter for <code>human_resource_management.laudatory.type_id</code>.
+     * Getter for
+     * <code>human_resource_management.laudatory.laudatory_type</code>.
      */
-    public Long getTypeId() {
-        return this.typeId;
+    public Long getLaudatoryType() {
+        return this.laudatoryType;
     }
 
     /**
-     * Setter for <code>human_resource_management.laudatory.type_id</code>.
+     * Setter for
+     * <code>human_resource_management.laudatory.laudatory_type</code>.
      */
-    public Laudatory setTypeId(Long typeId) {
-        this.typeId = typeId;
+    public Laudatory setLaudatoryType(Long laudatoryType) {
+        this.laudatoryType = laudatoryType;
         return this;
     }
 
@@ -225,11 +227,11 @@ public class Laudatory implements Serializable {
         }
         else if (!this.title.equals(other.title))
             return false;
-        if (this.typeId == null) {
-            if (other.typeId != null)
+        if (this.laudatoryType == null) {
+            if (other.laudatoryType != null)
                 return false;
         }
-        else if (!this.typeId.equals(other.typeId))
+        else if (!this.laudatoryType.equals(other.laudatoryType))
             return false;
         if (this.workingInformationId == null) {
             if (other.workingInformationId != null)
@@ -250,7 +252,7 @@ public class Laudatory implements Serializable {
         result = prime * result + ((this.reward == null) ? 0 : this.reward.hashCode());
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
-        result = prime * result + ((this.typeId == null) ? 0 : this.typeId.hashCode());
+        result = prime * result + ((this.laudatoryType == null) ? 0 : this.laudatoryType.hashCode());
         result = prime * result + ((this.workingInformationId == null) ? 0 : this.workingInformationId.hashCode());
         return result;
     }
@@ -265,7 +267,7 @@ public class Laudatory implements Serializable {
         sb.append(", ").append(reward);
         sb.append(", ").append(status);
         sb.append(", ").append(title);
-        sb.append(", ").append(typeId);
+        sb.append(", ").append(laudatoryType);
         sb.append(", ").append(workingInformationId);
 
         sb.append(")");

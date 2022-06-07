@@ -11,6 +11,7 @@ import org.jooq.codegen.maven.example.tables.Discipline;
 import org.jooq.codegen.maven.example.tables.DisciplineType;
 import org.jooq.codegen.maven.example.tables.Education;
 import org.jooq.codegen.maven.example.tables.Employee;
+import org.jooq.codegen.maven.example.tables.EmployeeType;
 import org.jooq.codegen.maven.example.tables.IdentityCard;
 import org.jooq.codegen.maven.example.tables.Insurance;
 import org.jooq.codegen.maven.example.tables.Job;
@@ -26,6 +27,7 @@ import org.jooq.codegen.maven.example.tables.WorkingContract;
 import org.jooq.codegen.maven.example.tables.WorkingHistory;
 import org.jooq.codegen.maven.example.tables.WorkingInformation;
 import org.jooq.codegen.maven.example.tables.WorkingPlace;
+import org.jooq.codegen.maven.example.tables.WorkingType;
 
 
 /**
@@ -68,6 +70,11 @@ public class Tables {
      * The table <code>human_resource_management.employee</code>.
      */
     public static final Employee EMPLOYEE = Employee.EMPLOYEE;
+
+    /**
+     * The table <code>human_resource_management.employee_type</code>.
+     */
+    public static final EmployeeType EMPLOYEE_TYPE = EmployeeType.EMPLOYEE_TYPE;
 
     /**
      * The table <code>human_resource_management.identity_card</code>.
@@ -143,4 +150,9 @@ public class Tables {
      * The table <code>human_resource_management.working_place</code>.
      */
     public static final WorkingPlace WORKING_PLACE = WorkingPlace.WORKING_PLACE;
+
+    /**
+     * The table <code>human_resource_management.working_type</code>.
+     */
+    public static final WorkingType WORKING_TYPE = WorkingType.WORKING_TYPE;
 }

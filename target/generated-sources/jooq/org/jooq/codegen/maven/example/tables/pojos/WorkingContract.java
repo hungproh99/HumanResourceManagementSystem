@@ -26,6 +26,11 @@ public class WorkingContract implements Serializable {
     private String     status;
     private Long       typeId;
     private String     employeeId;
+    private Boolean    contractStatus;
+    private Long       areaId;
+    private Long       contractType;
+    private Long       jobId;
+    private Long       officeId;
 
     public WorkingContract() {}
 
@@ -39,6 +44,11 @@ public class WorkingContract implements Serializable {
         this.status = value.status;
         this.typeId = value.typeId;
         this.employeeId = value.employeeId;
+        this.contractStatus = value.contractStatus;
+        this.areaId = value.areaId;
+        this.contractType = value.contractType;
+        this.jobId = value.jobId;
+        this.officeId = value.officeId;
     }
 
     public WorkingContract(
@@ -50,7 +60,12 @@ public class WorkingContract implements Serializable {
         LocalDate  startDate,
         String     status,
         Long       typeId,
-        String     employeeId
+        String     employeeId,
+        Boolean    contractStatus,
+        Long       areaId,
+        Long       contractType,
+        Long       jobId,
+        Long       officeId
     ) {
         this.workingContractId = workingContractId;
         this.baseSalary = baseSalary;
@@ -61,6 +76,11 @@ public class WorkingContract implements Serializable {
         this.status = status;
         this.typeId = typeId;
         this.employeeId = employeeId;
+        this.contractStatus = contractStatus;
+        this.areaId = areaId;
+        this.contractType = contractType;
+        this.jobId = jobId;
+        this.officeId = officeId;
     }
 
     /**
@@ -216,6 +236,91 @@ public class WorkingContract implements Serializable {
         return this;
     }
 
+    /**
+     * Getter for
+     * <code>human_resource_management.working_contract.contract_status</code>.
+     */
+    public Boolean getContractStatus() {
+        return this.contractStatus;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_contract.contract_status</code>.
+     */
+    public WorkingContract setContractStatus(Boolean contractStatus) {
+        this.contractStatus = contractStatus;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.working_contract.area_id</code>.
+     */
+    public Long getAreaId() {
+        return this.areaId;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_contract.area_id</code>.
+     */
+    public WorkingContract setAreaId(Long areaId) {
+        this.areaId = areaId;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.working_contract.contract_type</code>.
+     */
+    public Long getContractType() {
+        return this.contractType;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_contract.contract_type</code>.
+     */
+    public WorkingContract setContractType(Long contractType) {
+        this.contractType = contractType;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.working_contract.job_id</code>.
+     */
+    public Long getJobId() {
+        return this.jobId;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_contract.job_id</code>.
+     */
+    public WorkingContract setJobId(Long jobId) {
+        this.jobId = jobId;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.working_contract.office_id</code>.
+     */
+    public Long getOfficeId() {
+        return this.officeId;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.working_contract.office_id</code>.
+     */
+    public WorkingContract setOfficeId(Long officeId) {
+        this.officeId = officeId;
+        return this;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -279,6 +384,36 @@ public class WorkingContract implements Serializable {
         }
         else if (!this.employeeId.equals(other.employeeId))
             return false;
+        if (this.contractStatus == null) {
+            if (other.contractStatus != null)
+                return false;
+        }
+        else if (!this.contractStatus.equals(other.contractStatus))
+            return false;
+        if (this.areaId == null) {
+            if (other.areaId != null)
+                return false;
+        }
+        else if (!this.areaId.equals(other.areaId))
+            return false;
+        if (this.contractType == null) {
+            if (other.contractType != null)
+                return false;
+        }
+        else if (!this.contractType.equals(other.contractType))
+            return false;
+        if (this.jobId == null) {
+            if (other.jobId != null)
+                return false;
+        }
+        else if (!this.jobId.equals(other.jobId))
+            return false;
+        if (this.officeId == null) {
+            if (other.officeId != null)
+                return false;
+        }
+        else if (!this.officeId.equals(other.officeId))
+            return false;
         return true;
     }
 
@@ -295,6 +430,11 @@ public class WorkingContract implements Serializable {
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.typeId == null) ? 0 : this.typeId.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
+        result = prime * result + ((this.contractStatus == null) ? 0 : this.contractStatus.hashCode());
+        result = prime * result + ((this.areaId == null) ? 0 : this.areaId.hashCode());
+        result = prime * result + ((this.contractType == null) ? 0 : this.contractType.hashCode());
+        result = prime * result + ((this.jobId == null) ? 0 : this.jobId.hashCode());
+        result = prime * result + ((this.officeId == null) ? 0 : this.officeId.hashCode());
         return result;
     }
 
@@ -311,6 +451,11 @@ public class WorkingContract implements Serializable {
         sb.append(", ").append(status);
         sb.append(", ").append(typeId);
         sb.append(", ").append(employeeId);
+        sb.append(", ").append(contractStatus);
+        sb.append(", ").append(areaId);
+        sb.append(", ").append(contractType);
+        sb.append(", ").append(jobId);
+        sb.append(", ").append(officeId);
 
         sb.append(")");
         return sb.toString();

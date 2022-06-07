@@ -12,7 +12,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row20;
+import org.jooq.Row22;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -131,14 +131,21 @@ public class Employee extends TableImpl<EmployeeRecord> {
     public final TableField<EmployeeRecord, String> TAX_CODE = createField(DSL.name("tax_code"), SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>human_resource_management.employee.work_status</code>.
+     * The column
+     * <code>human_resource_management.employee.working_status</code>.
      */
-    public final TableField<EmployeeRecord, String> WORK_STATUS = createField(DSL.name("work_status"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<EmployeeRecord, Boolean> WORKING_STATUS = createField(DSL.name("working_status"), SQLDataType.BIT, this, "");
 
     /**
      * The column <code>human_resource_management.employee.bank_id</code>.
      */
     public final TableField<EmployeeRecord, Long> BANK_ID = createField(DSL.name("bank_id"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.employee.employee_type_id</code>.
+     */
+    public final TableField<EmployeeRecord, Long> EMPLOYEE_TYPE_ID = createField(DSL.name("employee_type_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>human_resource_management.employee.card_id</code>.
@@ -149,6 +156,12 @@ public class Employee extends TableImpl<EmployeeRecord> {
      * The column <code>human_resource_management.employee.role_type</code>.
      */
     public final TableField<EmployeeRecord, Long> ROLE_TYPE = createField(DSL.name("role_type"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.employee.working_type_id</code>.
+     */
+    public final TableField<EmployeeRecord, Long> WORKING_TYPE_ID = createField(DSL.name("working_type_id"), SQLDataType.BIGINT, this, "");
 
     private Employee(Name alias, Table<EmployeeRecord> aliased) {
         this(alias, aliased, null);
@@ -197,12 +210,14 @@ public class Employee extends TableImpl<EmployeeRecord> {
 
     @Override
     public List<ForeignKey<EmployeeRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.FKICPTSO0QH4VMWT76BGF5HM9P6, Keys.FKE4GSS4EY1FU5MXPE82EQNVAC6, Keys.FKQSQU0215R8TO2N2EJJ7EJCIMV);
+        return Arrays.asList(Keys.FKICPTSO0QH4VMWT76BGF5HM9P6, Keys.FKKS0JNJWHW9TJWA2B1L0KLV1FB, Keys.FKE4GSS4EY1FU5MXPE82EQNVAC6, Keys.FKQSQU0215R8TO2N2EJJ7EJCIMV, Keys.FKT1X6RUBIH99KWGV4VY4HK32XT);
     }
 
     private transient Bank _bank;
+    private transient EmployeeType _employeeType;
     private transient IdentityCard _identityCard;
     private transient RoleType _roleType;
+    private transient WorkingType _workingType;
 
     /**
      * Get the implicit join path to the
@@ -213,6 +228,17 @@ public class Employee extends TableImpl<EmployeeRecord> {
             _bank = new Bank(this, Keys.FKICPTSO0QH4VMWT76BGF5HM9P6);
 
         return _bank;
+    }
+
+    /**
+     * Get the implicit join path to the
+     * <code>human_resource_management.employee_type</code> table.
+     */
+    public EmployeeType employeeType() {
+        if (_employeeType == null)
+            _employeeType = new EmployeeType(this, Keys.FKKS0JNJWHW9TJWA2B1L0KLV1FB);
+
+        return _employeeType;
     }
 
     /**
@@ -235,6 +261,17 @@ public class Employee extends TableImpl<EmployeeRecord> {
             _roleType = new RoleType(this, Keys.FKQSQU0215R8TO2N2EJJ7EJCIMV);
 
         return _roleType;
+    }
+
+    /**
+     * Get the implicit join path to the
+     * <code>human_resource_management.working_type</code> table.
+     */
+    public WorkingType workingType() {
+        if (_workingType == null)
+            _workingType = new WorkingType(this, Keys.FKT1X6RUBIH99KWGV4VY4HK32XT);
+
+        return _workingType;
     }
 
     @Override
@@ -264,11 +301,11 @@ public class Employee extends TableImpl<EmployeeRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row20 type methods
+    // Row22 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row20<String, String, String, LocalDate, String, String, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long> fieldsRow() {
-        return (Row20) super.fieldsRow();
+    public Row22<String, String, String, LocalDate, String, String, String, String, String, String, String, String, String, String, String, String, Boolean, Long, Long, String, Long, Long> fieldsRow() {
+        return (Row22) super.fieldsRow();
     }
 }

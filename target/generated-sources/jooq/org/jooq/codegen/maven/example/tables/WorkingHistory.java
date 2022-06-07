@@ -69,12 +69,6 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
 
     /**
      * The column
-     * <code>human_resource_management.working_history.position</code>.
-     */
-    public final TableField<WorkingHistoryRecord, String> POSITION = createField(DSL.name("position"), SQLDataType.VARCHAR(255), this, "");
-
-    /**
-     * The column
      * <code>human_resource_management.working_history.start_date</code>.
      */
     public final TableField<WorkingHistoryRecord, LocalDate> START_DATE = createField(DSL.name("start_date"), SQLDataType.LOCALDATE, this, "");
@@ -90,6 +84,12 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
      * <code>human_resource_management.working_history.employee_id</code>.
      */
     public final TableField<WorkingHistoryRecord, String> EMPLOYEE_ID = createField(DSL.name("employee_id"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.working_history.position</code>.
+     */
+    public final TableField<WorkingHistoryRecord, String> POSITION = createField(DSL.name("position"), SQLDataType.VARCHAR(255), this, "");
 
     private WorkingHistory(Name alias, Table<WorkingHistoryRecord> aliased) {
         this(alias, aliased, null);
@@ -203,7 +203,7 @@ public class WorkingHistory extends TableImpl<WorkingHistoryRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, String, LocalDate, String, LocalDate, Long, String> fieldsRow() {
+    public Row7<Long, String, LocalDate, LocalDate, Long, String, String> fieldsRow() {
         return (Row7) super.fieldsRow();
     }
 }

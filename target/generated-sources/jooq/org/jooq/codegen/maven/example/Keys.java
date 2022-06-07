@@ -14,6 +14,7 @@ import org.jooq.codegen.maven.example.tables.Discipline;
 import org.jooq.codegen.maven.example.tables.DisciplineType;
 import org.jooq.codegen.maven.example.tables.Education;
 import org.jooq.codegen.maven.example.tables.Employee;
+import org.jooq.codegen.maven.example.tables.EmployeeType;
 import org.jooq.codegen.maven.example.tables.IdentityCard;
 import org.jooq.codegen.maven.example.tables.Insurance;
 import org.jooq.codegen.maven.example.tables.Job;
@@ -29,6 +30,7 @@ import org.jooq.codegen.maven.example.tables.WorkingContract;
 import org.jooq.codegen.maven.example.tables.WorkingHistory;
 import org.jooq.codegen.maven.example.tables.WorkingInformation;
 import org.jooq.codegen.maven.example.tables.WorkingPlace;
+import org.jooq.codegen.maven.example.tables.WorkingType;
 import org.jooq.codegen.maven.example.tables.records.AreaRecord;
 import org.jooq.codegen.maven.example.tables.records.BankRecord;
 import org.jooq.codegen.maven.example.tables.records.ContractTypeRecord;
@@ -36,6 +38,7 @@ import org.jooq.codegen.maven.example.tables.records.DisciplineRecord;
 import org.jooq.codegen.maven.example.tables.records.DisciplineTypeRecord;
 import org.jooq.codegen.maven.example.tables.records.EducationRecord;
 import org.jooq.codegen.maven.example.tables.records.EmployeeRecord;
+import org.jooq.codegen.maven.example.tables.records.EmployeeTypeRecord;
 import org.jooq.codegen.maven.example.tables.records.IdentityCardRecord;
 import org.jooq.codegen.maven.example.tables.records.InsuranceRecord;
 import org.jooq.codegen.maven.example.tables.records.JobRecord;
@@ -51,6 +54,7 @@ import org.jooq.codegen.maven.example.tables.records.WorkingContractRecord;
 import org.jooq.codegen.maven.example.tables.records.WorkingHistoryRecord;
 import org.jooq.codegen.maven.example.tables.records.WorkingInformationRecord;
 import org.jooq.codegen.maven.example.tables.records.WorkingPlaceRecord;
+import org.jooq.codegen.maven.example.tables.records.WorkingTypeRecord;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 
@@ -73,6 +77,7 @@ public class Keys {
     public static final UniqueKey<DisciplineTypeRecord> KEY_DISCIPLINE_TYPE_PRIMARY = Internal.createUniqueKey(DisciplineType.DISCIPLINE_TYPE, DSL.name("KEY_discipline_type_PRIMARY"), new TableField[] { DisciplineType.DISCIPLINE_TYPE.TYPE_ID }, true);
     public static final UniqueKey<EducationRecord> KEY_EDUCATION_PRIMARY = Internal.createUniqueKey(Education.EDUCATION, DSL.name("KEY_education_PRIMARY"), new TableField[] { Education.EDUCATION.EDUCATION_ID }, true);
     public static final UniqueKey<EmployeeRecord> KEY_EMPLOYEE_PRIMARY = Internal.createUniqueKey(Employee.EMPLOYEE, DSL.name("KEY_employee_PRIMARY"), new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
+    public static final UniqueKey<EmployeeTypeRecord> KEY_EMPLOYEE_TYPE_PRIMARY = Internal.createUniqueKey(EmployeeType.EMPLOYEE_TYPE, DSL.name("KEY_employee_type_PRIMARY"), new TableField[] { EmployeeType.EMPLOYEE_TYPE.TYPE_ID }, true);
     public static final UniqueKey<IdentityCardRecord> KEY_IDENTITY_CARD_PRIMARY = Internal.createUniqueKey(IdentityCard.IDENTITY_CARD, DSL.name("KEY_identity_card_PRIMARY"), new TableField[] { IdentityCard.IDENTITY_CARD.CARD_ID }, true);
     public static final UniqueKey<InsuranceRecord> KEY_INSURANCE_PRIMARY = Internal.createUniqueKey(Insurance.INSURANCE, DSL.name("KEY_insurance_PRIMARY"), new TableField[] { Insurance.INSURANCE.INSURANCE_ID }, true);
     public static final UniqueKey<JobRecord> KEY_JOB_PRIMARY = Internal.createUniqueKey(Job.JOB, DSL.name("KEY_job_PRIMARY"), new TableField[] { Job.JOB.JOB_ID }, true);
@@ -88,26 +93,32 @@ public class Keys {
     public static final UniqueKey<WorkingHistoryRecord> KEY_WORKING_HISTORY_PRIMARY = Internal.createUniqueKey(WorkingHistory.WORKING_HISTORY, DSL.name("KEY_working_history_PRIMARY"), new TableField[] { WorkingHistory.WORKING_HISTORY.WORKING_HISTORY_ID }, true);
     public static final UniqueKey<WorkingInformationRecord> KEY_WORKING_INFORMATION_PRIMARY = Internal.createUniqueKey(WorkingInformation.WORKING_INFORMATION, DSL.name("KEY_working_information_PRIMARY"), new TableField[] { WorkingInformation.WORKING_INFORMATION.WORKING_INFORMATION_ID }, true);
     public static final UniqueKey<WorkingPlaceRecord> KEY_WORKING_PLACE_PRIMARY = Internal.createUniqueKey(WorkingPlace.WORKING_PLACE, DSL.name("KEY_working_place_PRIMARY"), new TableField[] { WorkingPlace.WORKING_PLACE.WORKING_PLACE_ID }, true);
+    public static final UniqueKey<WorkingTypeRecord> KEY_WORKING_TYPE_PRIMARY = Internal.createUniqueKey(WorkingType.WORKING_TYPE, DSL.name("KEY_working_type_PRIMARY"), new TableField[] { WorkingType.WORKING_TYPE.TYPE_ID }, true);
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<DisciplineRecord, DisciplineTypeRecord> FK7PA865HYRHP12FLJB3RQH7H28 = Internal.createForeignKey(Discipline.DISCIPLINE, DSL.name("FK7pa865hyrhp12fljb3rqh7h28"), new TableField[] { Discipline.DISCIPLINE.TYPE_ID }, Keys.KEY_DISCIPLINE_TYPE_PRIMARY, new TableField[] { DisciplineType.DISCIPLINE_TYPE.TYPE_ID }, true);
+    public static final ForeignKey<DisciplineRecord, DisciplineTypeRecord> FK6JP23S0JELE70TK4GXDVYX5SA = Internal.createForeignKey(Discipline.DISCIPLINE, DSL.name("FK6jp23s0jele70tk4gxdvyx5sa"), new TableField[] { Discipline.DISCIPLINE.DISCIPLINE_TYPE }, Keys.KEY_DISCIPLINE_TYPE_PRIMARY, new TableField[] { DisciplineType.DISCIPLINE_TYPE.TYPE_ID }, true);
     public static final ForeignKey<DisciplineRecord, WorkingInformationRecord> FKHROLHRW5RULTA6U6UJYJULY0X = Internal.createForeignKey(Discipline.DISCIPLINE, DSL.name("FKhrolhrw5rulta6u6ujyjuly0x"), new TableField[] { Discipline.DISCIPLINE.WORKING_INFORMATION_ID }, Keys.KEY_WORKING_INFORMATION_PRIMARY, new TableField[] { WorkingInformation.WORKING_INFORMATION.WORKING_INFORMATION_ID }, true);
     public static final ForeignKey<EducationRecord, EmployeeRecord> FKRPHG8GBX569XVJ1TXKKT91UY4 = Internal.createForeignKey(Education.EDUCATION, DSL.name("FKrphg8gbx569xvj1txkkt91uy4"), new TableField[] { Education.EDUCATION.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
     public static final ForeignKey<EmployeeRecord, IdentityCardRecord> FKE4GSS4EY1FU5MXPE82EQNVAC6 = Internal.createForeignKey(Employee.EMPLOYEE, DSL.name("FKe4gss4ey1fu5mxpe82eqnvac6"), new TableField[] { Employee.EMPLOYEE.CARD_ID }, Keys.KEY_IDENTITY_CARD_PRIMARY, new TableField[] { IdentityCard.IDENTITY_CARD.CARD_ID }, true);
     public static final ForeignKey<EmployeeRecord, BankRecord> FKICPTSO0QH4VMWT76BGF5HM9P6 = Internal.createForeignKey(Employee.EMPLOYEE, DSL.name("FKicptso0qh4vmwt76bgf5hm9p6"), new TableField[] { Employee.EMPLOYEE.BANK_ID }, Keys.KEY_BANK_PRIMARY, new TableField[] { Bank.BANK.BANK_ID }, true);
+    public static final ForeignKey<EmployeeRecord, EmployeeTypeRecord> FKKS0JNJWHW9TJWA2B1L0KLV1FB = Internal.createForeignKey(Employee.EMPLOYEE, DSL.name("FKks0jnjwhw9tjwa2b1l0klv1fb"), new TableField[] { Employee.EMPLOYEE.EMPLOYEE_TYPE_ID }, Keys.KEY_EMPLOYEE_TYPE_PRIMARY, new TableField[] { EmployeeType.EMPLOYEE_TYPE.TYPE_ID }, true);
     public static final ForeignKey<EmployeeRecord, RoleTypeRecord> FKQSQU0215R8TO2N2EJJ7EJCIMV = Internal.createForeignKey(Employee.EMPLOYEE, DSL.name("FKqsqu0215r8to2n2ejj7ejcimv"), new TableField[] { Employee.EMPLOYEE.ROLE_TYPE }, Keys.KEY_ROLE_TYPE_PRIMARY, new TableField[] { RoleType.ROLE_TYPE.TYPE_ID }, true);
+    public static final ForeignKey<EmployeeRecord, WorkingTypeRecord> FKT1X6RUBIH99KWGV4VY4HK32XT = Internal.createForeignKey(Employee.EMPLOYEE, DSL.name("FKt1x6rubih99kwgv4vy4hk32xt"), new TableField[] { Employee.EMPLOYEE.WORKING_TYPE_ID }, Keys.KEY_WORKING_TYPE_PRIMARY, new TableField[] { WorkingType.WORKING_TYPE.TYPE_ID }, true);
     public static final ForeignKey<InsuranceRecord, EmployeeRecord> FKKC01GEQP8O69WKJ996142PJT = Internal.createForeignKey(Insurance.INSURANCE, DSL.name("FKkc01geqp8o69wkj996142pjt"), new TableField[] { Insurance.INSURANCE.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
     public static final ForeignKey<LaudatoryRecord, WorkingInformationRecord> FKBGPR6EDK7YYDPS2E6XKLMB3 = Internal.createForeignKey(Laudatory.LAUDATORY, DSL.name("FKbgpr6edk7yydps2e6xklmb3"), new TableField[] { Laudatory.LAUDATORY.WORKING_INFORMATION_ID }, Keys.KEY_WORKING_INFORMATION_PRIMARY, new TableField[] { WorkingInformation.WORKING_INFORMATION.WORKING_INFORMATION_ID }, true);
-    public static final ForeignKey<LaudatoryRecord, LaudatoryTypeRecord> FKMTP17MJPSCKVCBQ4CTHQ5RC50 = Internal.createForeignKey(Laudatory.LAUDATORY, DSL.name("FKmtp17mjpsckvcbq4cthq5rc50"), new TableField[] { Laudatory.LAUDATORY.TYPE_ID }, Keys.KEY_LAUDATORY_TYPE_PRIMARY, new TableField[] { LaudatoryType.LAUDATORY_TYPE.TYPE_ID }, true);
-    public static final ForeignKey<RelativeInformationRecord, RelativeTypeRecord> FKKKNO01O28GOAPEHPUDC6PVXGQ = Internal.createForeignKey(RelativeInformation.RELATIVE_INFORMATION, DSL.name("FKkkno01o28goapehpudc6pvxgq"), new TableField[] { RelativeInformation.RELATIVE_INFORMATION.TYPE_ID }, Keys.KEY_RELATIVE_TYPE_PRIMARY, new TableField[] { RelativeType.RELATIVE_TYPE.TYPE_ID }, true);
+    public static final ForeignKey<LaudatoryRecord, LaudatoryTypeRecord> FKDWWDN9LF3A8IPWBM6CVI7CA6W = Internal.createForeignKey(Laudatory.LAUDATORY, DSL.name("FKdwwdn9lf3a8ipwbm6cvi7ca6w"), new TableField[] { Laudatory.LAUDATORY.LAUDATORY_TYPE }, Keys.KEY_LAUDATORY_TYPE_PRIMARY, new TableField[] { LaudatoryType.LAUDATORY_TYPE.TYPE_ID }, true);
+    public static final ForeignKey<RelativeInformationRecord, RelativeTypeRecord> FKFYPQKGJRT16ET5DQ5JUFNM6SM = Internal.createForeignKey(RelativeInformation.RELATIVE_INFORMATION, DSL.name("FKfypqkgjrt16et5dq5jufnm6sm"), new TableField[] { RelativeInformation.RELATIVE_INFORMATION.RELATIVE_TYPE }, Keys.KEY_RELATIVE_TYPE_PRIMARY, new TableField[] { RelativeType.RELATIVE_TYPE.TYPE_ID }, true);
     public static final ForeignKey<RelativeInformationRecord, EmployeeRecord> FKMWKD588KL8GL2RFVI52GXUT3 = Internal.createForeignKey(RelativeInformation.RELATIVE_INFORMATION, DSL.name("FKmwkd588kl8gl2rfvi52gxut3"), new TableField[] { RelativeInformation.RELATIVE_INFORMATION.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
     public static final ForeignKey<SalaryRecord, WorkingInformationRecord> FKCUFGQT5JE8SAVK7883DU8YJL9 = Internal.createForeignKey(Salary.SALARY, DSL.name("FKcufgqt5je8savk7883du8yjl9"), new TableField[] { Salary.SALARY.WORKING_INFORMATION_ID }, Keys.KEY_WORKING_INFORMATION_PRIMARY, new TableField[] { WorkingInformation.WORKING_INFORMATION.WORKING_INFORMATION_ID }, true);
     public static final ForeignKey<TaxRecord, EmployeeRecord> FKEI7SCUKYXJXRWM8J14RXCGFPT = Internal.createForeignKey(Tax.TAX, DSL.name("FKei7scukyxjxrwm8j14rxcgfpt"), new TableField[] { Tax.TAX.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
+    public static final ForeignKey<WorkingContractRecord, JobRecord> FK3CFMGM415JS09EAVMIUGYXE6R = Internal.createForeignKey(WorkingContract.WORKING_CONTRACT, DSL.name("FK3cfmgm415js09eavmiugyxe6r"), new TableField[] { WorkingContract.WORKING_CONTRACT.JOB_ID }, Keys.KEY_JOB_PRIMARY, new TableField[] { Job.JOB.JOB_ID }, true);
+    public static final ForeignKey<WorkingContractRecord, ContractTypeRecord> FKC334JINAJFM1LFSEDUXLJ82PT = Internal.createForeignKey(WorkingContract.WORKING_CONTRACT, DSL.name("FKc334jinajfm1lfseduxlj82pt"), new TableField[] { WorkingContract.WORKING_CONTRACT.CONTRACT_TYPE }, Keys.KEY_CONTRACT_TYPE_PRIMARY, new TableField[] { ContractType.CONTRACT_TYPE.TYPE_ID }, true);
+    public static final ForeignKey<WorkingContractRecord, AreaRecord> FKM4VP3IHAOYHR5QRSOVQWIPBP6 = Internal.createForeignKey(WorkingContract.WORKING_CONTRACT, DSL.name("FKm4vp3ihaoyhr5qrsovqwipbp6"), new TableField[] { WorkingContract.WORKING_CONTRACT.AREA_ID }, Keys.KEY_AREA_PRIMARY, new TableField[] { Area.AREA.AREA_ID }, true);
     public static final ForeignKey<WorkingContractRecord, ContractTypeRecord> FKM8LGM02FO7LBYK17TNGSGW3H5 = Internal.createForeignKey(WorkingContract.WORKING_CONTRACT, DSL.name("FKm8lgm02fo7lbyk17tngsgw3h5"), new TableField[] { WorkingContract.WORKING_CONTRACT.TYPE_ID }, Keys.KEY_CONTRACT_TYPE_PRIMARY, new TableField[] { ContractType.CONTRACT_TYPE.TYPE_ID }, true);
-    public static final ForeignKey<WorkingContractRecord, EmployeeRecord> FKSEX4WS8S50GFAMJ8LGMWEQGWR = Internal.createForeignKey(WorkingContract.WORKING_CONTRACT, DSL.name("FKsex4ws8s50gfamj8lgmweqgwr"), new TableField[] { WorkingContract.WORKING_CONTRACT.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
+    public static final ForeignKey<WorkingContractRecord, OfficeRecord> FKOD4LOT1MBTXVMKUI2RALP7435 = Internal.createForeignKey(WorkingContract.WORKING_CONTRACT, DSL.name("FKod4lot1mbtxvmkui2ralp7435"), new TableField[] { WorkingContract.WORKING_CONTRACT.OFFICE_ID }, Keys.KEY_OFFICE_PRIMARY, new TableField[] { Office.OFFICE.OFFICE_ID }, true);
     public static final ForeignKey<WorkingHistoryRecord, ContractTypeRecord> FK6QAYSC7F06G54A5XUYD150B6V = Internal.createForeignKey(WorkingHistory.WORKING_HISTORY, DSL.name("FK6qaysc7f06g54a5xuyd150b6v"), new TableField[] { WorkingHistory.WORKING_HISTORY.TYPE_ID }, Keys.KEY_CONTRACT_TYPE_PRIMARY, new TableField[] { ContractType.CONTRACT_TYPE.TYPE_ID }, true);
     public static final ForeignKey<WorkingHistoryRecord, EmployeeRecord> FKIFVK8C7ONM47VH7RBDM6R7KUN = Internal.createForeignKey(WorkingHistory.WORKING_HISTORY, DSL.name("FKifvk8c7onm47vh7rbdm6r7kun"), new TableField[] { WorkingHistory.WORKING_HISTORY.EMPLOYEE_ID }, Keys.KEY_EMPLOYEE_PRIMARY, new TableField[] { Employee.EMPLOYEE.EMPLOYEE_ID }, true);
     public static final ForeignKey<WorkingInformationRecord, WorkingContractRecord> FKPWT7LUCJ88WG8ODL56CB82H29 = Internal.createForeignKey(WorkingInformation.WORKING_INFORMATION, DSL.name("FKpwt7lucj88wg8odl56cb82h29"), new TableField[] { WorkingInformation.WORKING_INFORMATION.WORKING_CONTRACT_ID }, Keys.KEY_WORKING_CONTRACT_PRIMARY, new TableField[] { WorkingContract.WORKING_CONTRACT.WORKING_CONTRACT_ID }, true);

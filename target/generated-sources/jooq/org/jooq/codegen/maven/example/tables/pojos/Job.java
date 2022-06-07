@@ -18,6 +18,8 @@ public class Job implements Serializable {
     private Long   jobId;
     private String description;
     private String title;
+    private String grade;
+    private String position;
 
     public Job() {}
 
@@ -25,16 +27,22 @@ public class Job implements Serializable {
         this.jobId = value.jobId;
         this.description = value.description;
         this.title = value.title;
+        this.grade = value.grade;
+        this.position = value.position;
     }
 
     public Job(
         Long   jobId,
         String description,
-        String title
+        String title,
+        String grade,
+        String position
     ) {
         this.jobId = jobId;
         this.description = description;
         this.title = title;
+        this.grade = grade;
+        this.position = position;
     }
 
     /**
@@ -82,6 +90,36 @@ public class Job implements Serializable {
         return this;
     }
 
+    /**
+     * Getter for <code>human_resource_management.job.grade</code>.
+     */
+    public String getGrade() {
+        return this.grade;
+    }
+
+    /**
+     * Setter for <code>human_resource_management.job.grade</code>.
+     */
+    public Job setGrade(String grade) {
+        this.grade = grade;
+        return this;
+    }
+
+    /**
+     * Getter for <code>human_resource_management.job.position</code>.
+     */
+    public String getPosition() {
+        return this.position;
+    }
+
+    /**
+     * Setter for <code>human_resource_management.job.position</code>.
+     */
+    public Job setPosition(String position) {
+        this.position = position;
+        return this;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -109,6 +147,18 @@ public class Job implements Serializable {
         }
         else if (!this.title.equals(other.title))
             return false;
+        if (this.grade == null) {
+            if (other.grade != null)
+                return false;
+        }
+        else if (!this.grade.equals(other.grade))
+            return false;
+        if (this.position == null) {
+            if (other.position != null)
+                return false;
+        }
+        else if (!this.position.equals(other.position))
+            return false;
         return true;
     }
 
@@ -119,6 +169,8 @@ public class Job implements Serializable {
         result = prime * result + ((this.jobId == null) ? 0 : this.jobId.hashCode());
         result = prime * result + ((this.description == null) ? 0 : this.description.hashCode());
         result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
+        result = prime * result + ((this.grade == null) ? 0 : this.grade.hashCode());
+        result = prime * result + ((this.position == null) ? 0 : this.position.hashCode());
         return result;
     }
 
@@ -129,6 +181,8 @@ public class Job implements Serializable {
         sb.append(jobId);
         sb.append(", ").append(description);
         sb.append(", ").append(title);
+        sb.append(", ").append(grade);
+        sb.append(", ").append(position);
 
         sb.append(")");
         return sb.toString();

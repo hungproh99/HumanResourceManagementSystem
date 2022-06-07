@@ -18,40 +18,40 @@ public class RelativeInformation implements Serializable {
 
     private Long      relativeId;
     private LocalDate birthDate;
-    private String    contact;
     private String    parentName;
     private String    status;
     private String    employeeId;
-    private Long      typeId;
+    private Long      relativeType;
+    private String    contact;
 
     public RelativeInformation() {}
 
     public RelativeInformation(RelativeInformation value) {
         this.relativeId = value.relativeId;
         this.birthDate = value.birthDate;
-        this.contact = value.contact;
         this.parentName = value.parentName;
         this.status = value.status;
         this.employeeId = value.employeeId;
-        this.typeId = value.typeId;
+        this.relativeType = value.relativeType;
+        this.contact = value.contact;
     }
 
     public RelativeInformation(
         Long      relativeId,
         LocalDate birthDate,
-        String    contact,
         String    parentName,
         String    status,
         String    employeeId,
-        Long      typeId
+        Long      relativeType,
+        String    contact
     ) {
         this.relativeId = relativeId;
         this.birthDate = birthDate;
-        this.contact = contact;
         this.parentName = parentName;
         this.status = status;
         this.employeeId = employeeId;
-        this.typeId = typeId;
+        this.relativeType = relativeType;
+        this.contact = contact;
     }
 
     /**
@@ -85,23 +85,6 @@ public class RelativeInformation implements Serializable {
      */
     public RelativeInformation setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
-        return this;
-    }
-
-    /**
-     * Getter for
-     * <code>human_resource_management.relative_information.contact</code>.
-     */
-    public String getContact() {
-        return this.contact;
-    }
-
-    /**
-     * Setter for
-     * <code>human_resource_management.relative_information.contact</code>.
-     */
-    public RelativeInformation setContact(String contact) {
-        this.contact = contact;
         return this;
     }
 
@@ -158,18 +141,35 @@ public class RelativeInformation implements Serializable {
 
     /**
      * Getter for
-     * <code>human_resource_management.relative_information.type_id</code>.
+     * <code>human_resource_management.relative_information.relative_type</code>.
      */
-    public Long getTypeId() {
-        return this.typeId;
+    public Long getRelativeType() {
+        return this.relativeType;
     }
 
     /**
      * Setter for
-     * <code>human_resource_management.relative_information.type_id</code>.
+     * <code>human_resource_management.relative_information.relative_type</code>.
      */
-    public RelativeInformation setTypeId(Long typeId) {
-        this.typeId = typeId;
+    public RelativeInformation setRelativeType(Long relativeType) {
+        this.relativeType = relativeType;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.relative_information.contact</code>.
+     */
+    public String getContact() {
+        return this.contact;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.relative_information.contact</code>.
+     */
+    public RelativeInformation setContact(String contact) {
+        this.contact = contact;
         return this;
     }
 
@@ -194,12 +194,6 @@ public class RelativeInformation implements Serializable {
         }
         else if (!this.birthDate.equals(other.birthDate))
             return false;
-        if (this.contact == null) {
-            if (other.contact != null)
-                return false;
-        }
-        else if (!this.contact.equals(other.contact))
-            return false;
         if (this.parentName == null) {
             if (other.parentName != null)
                 return false;
@@ -218,11 +212,17 @@ public class RelativeInformation implements Serializable {
         }
         else if (!this.employeeId.equals(other.employeeId))
             return false;
-        if (this.typeId == null) {
-            if (other.typeId != null)
+        if (this.relativeType == null) {
+            if (other.relativeType != null)
                 return false;
         }
-        else if (!this.typeId.equals(other.typeId))
+        else if (!this.relativeType.equals(other.relativeType))
+            return false;
+        if (this.contact == null) {
+            if (other.contact != null)
+                return false;
+        }
+        else if (!this.contact.equals(other.contact))
             return false;
         return true;
     }
@@ -233,11 +233,11 @@ public class RelativeInformation implements Serializable {
         int result = 1;
         result = prime * result + ((this.relativeId == null) ? 0 : this.relativeId.hashCode());
         result = prime * result + ((this.birthDate == null) ? 0 : this.birthDate.hashCode());
-        result = prime * result + ((this.contact == null) ? 0 : this.contact.hashCode());
         result = prime * result + ((this.parentName == null) ? 0 : this.parentName.hashCode());
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.employeeId == null) ? 0 : this.employeeId.hashCode());
-        result = prime * result + ((this.typeId == null) ? 0 : this.typeId.hashCode());
+        result = prime * result + ((this.relativeType == null) ? 0 : this.relativeType.hashCode());
+        result = prime * result + ((this.contact == null) ? 0 : this.contact.hashCode());
         return result;
     }
 
@@ -247,11 +247,11 @@ public class RelativeInformation implements Serializable {
 
         sb.append(relativeId);
         sb.append(", ").append(birthDate);
-        sb.append(", ").append(contact);
         sb.append(", ").append(parentName);
         sb.append(", ").append(status);
         sb.append(", ").append(employeeId);
-        sb.append(", ").append(typeId);
+        sb.append(", ").append(relativeType);
+        sb.append(", ").append(contact);
 
         sb.append(")");
         return sb.toString();

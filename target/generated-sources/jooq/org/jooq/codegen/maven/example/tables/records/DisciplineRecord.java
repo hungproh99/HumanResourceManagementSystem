@@ -113,17 +113,19 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
     }
 
     /**
-     * Setter for <code>human_resource_management.discipline.type_id</code>.
+     * Setter for
+     * <code>human_resource_management.discipline.discipline_type</code>.
      */
-    public DisciplineRecord setTypeId(Long value) {
+    public DisciplineRecord setDisciplineType(Long value) {
         set(6, value);
         return this;
     }
 
     /**
-     * Getter for <code>human_resource_management.discipline.type_id</code>.
+     * Getter for
+     * <code>human_resource_management.discipline.discipline_type</code>.
      */
-    public Long getTypeId() {
+    public Long getDisciplineType() {
         return (Long) get(6);
     }
 
@@ -199,7 +201,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
 
     @Override
     public Field<Long> field7() {
-        return Discipline.DISCIPLINE.TYPE_ID;
+        return Discipline.DISCIPLINE.DISCIPLINE_TYPE;
     }
 
     @Override
@@ -239,7 +241,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
 
     @Override
     public Long component7() {
-        return getTypeId();
+        return getDisciplineType();
     }
 
     @Override
@@ -279,7 +281,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
 
     @Override
     public Long value7() {
-        return getTypeId();
+        return getDisciplineType();
     }
 
     @Override
@@ -325,7 +327,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
 
     @Override
     public DisciplineRecord value7(Long value) {
-        setTypeId(value);
+        setDisciplineType(value);
         return this;
     }
 
@@ -362,7 +364,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
     /**
      * Create a detached, initialised DisciplineRecord
      */
-    public DisciplineRecord(Long disciplineId, String date, String description, String punishment, String status, String title, Long typeId, Long workingInformationId) {
+    public DisciplineRecord(Long disciplineId, String date, String description, String punishment, String status, String title, Long disciplineType, Long workingInformationId) {
         super(Discipline.DISCIPLINE);
 
         setDisciplineId(disciplineId);
@@ -371,7 +373,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
         setPunishment(punishment);
         setStatus(status);
         setTitle(title);
-        setTypeId(typeId);
+        setDisciplineType(disciplineType);
         setWorkingInformationId(workingInformationId);
     }
 
@@ -388,7 +390,7 @@ public class DisciplineRecord extends UpdatableRecordImpl<DisciplineRecord> impl
             setPunishment(value.getPunishment());
             setStatus(value.getStatus());
             setTitle(value.getTitle());
-            setTypeId(value.getTypeId());
+            setDisciplineType(value.getDisciplineType());
             setWorkingInformationId(value.getWorkingInformationId());
         }
     }

@@ -21,7 +21,7 @@ public class Discipline implements Serializable {
     private String punishment;
     private String status;
     private String title;
-    private Long   typeId;
+    private Long   disciplineType;
     private Long   workingInformationId;
 
     public Discipline() {}
@@ -33,7 +33,7 @@ public class Discipline implements Serializable {
         this.punishment = value.punishment;
         this.status = value.status;
         this.title = value.title;
-        this.typeId = value.typeId;
+        this.disciplineType = value.disciplineType;
         this.workingInformationId = value.workingInformationId;
     }
 
@@ -44,7 +44,7 @@ public class Discipline implements Serializable {
         String punishment,
         String status,
         String title,
-        Long   typeId,
+        Long   disciplineType,
         Long   workingInformationId
     ) {
         this.disciplineId = disciplineId;
@@ -53,7 +53,7 @@ public class Discipline implements Serializable {
         this.punishment = punishment;
         this.status = status;
         this.title = title;
-        this.typeId = typeId;
+        this.disciplineType = disciplineType;
         this.workingInformationId = workingInformationId;
     }
 
@@ -150,17 +150,19 @@ public class Discipline implements Serializable {
     }
 
     /**
-     * Getter for <code>human_resource_management.discipline.type_id</code>.
+     * Getter for
+     * <code>human_resource_management.discipline.discipline_type</code>.
      */
-    public Long getTypeId() {
-        return this.typeId;
+    public Long getDisciplineType() {
+        return this.disciplineType;
     }
 
     /**
-     * Setter for <code>human_resource_management.discipline.type_id</code>.
+     * Setter for
+     * <code>human_resource_management.discipline.discipline_type</code>.
      */
-    public Discipline setTypeId(Long typeId) {
-        this.typeId = typeId;
+    public Discipline setDisciplineType(Long disciplineType) {
+        this.disciplineType = disciplineType;
         return this;
     }
 
@@ -226,11 +228,11 @@ public class Discipline implements Serializable {
         }
         else if (!this.title.equals(other.title))
             return false;
-        if (this.typeId == null) {
-            if (other.typeId != null)
+        if (this.disciplineType == null) {
+            if (other.disciplineType != null)
                 return false;
         }
-        else if (!this.typeId.equals(other.typeId))
+        else if (!this.disciplineType.equals(other.disciplineType))
             return false;
         if (this.workingInformationId == null) {
             if (other.workingInformationId != null)
@@ -251,7 +253,7 @@ public class Discipline implements Serializable {
         result = prime * result + ((this.punishment == null) ? 0 : this.punishment.hashCode());
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
         result = prime * result + ((this.title == null) ? 0 : this.title.hashCode());
-        result = prime * result + ((this.typeId == null) ? 0 : this.typeId.hashCode());
+        result = prime * result + ((this.disciplineType == null) ? 0 : this.disciplineType.hashCode());
         result = prime * result + ((this.workingInformationId == null) ? 0 : this.workingInformationId.hashCode());
         return result;
     }
@@ -266,7 +268,7 @@ public class Discipline implements Serializable {
         sb.append(", ").append(punishment);
         sb.append(", ").append(status);
         sb.append(", ").append(title);
-        sb.append(", ").append(typeId);
+        sb.append(", ").append(disciplineType);
         sb.append(", ").append(workingInformationId);
 
         sb.append(")");

@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -29,9 +26,12 @@ public class RelativeInformation {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "relative_type")
   private RelativeType relativeType;
-
+  
   @Column(name = "status")
   private String status;
+  
+  @Column(name = "contact")
+  private String contact;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")

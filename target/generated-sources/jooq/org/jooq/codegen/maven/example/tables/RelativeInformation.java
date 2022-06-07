@@ -63,12 +63,6 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
 
     /**
      * The column
-     * <code>human_resource_management.relative_information.contact</code>.
-     */
-    public final TableField<RelativeInformationRecord, String> CONTACT = createField(DSL.name("contact"), SQLDataType.VARCHAR(255), this, "");
-
-    /**
-     * The column
      * <code>human_resource_management.relative_information.parent_name</code>.
      */
     public final TableField<RelativeInformationRecord, String> PARENT_NAME = createField(DSL.name("parent_name"), SQLDataType.VARCHAR(255), this, "");
@@ -87,9 +81,15 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
 
     /**
      * The column
-     * <code>human_resource_management.relative_information.type_id</code>.
+     * <code>human_resource_management.relative_information.relative_type</code>.
      */
-    public final TableField<RelativeInformationRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT, this, "");
+    public final TableField<RelativeInformationRecord, Long> RELATIVE_TYPE = createField(DSL.name("relative_type"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column
+     * <code>human_resource_management.relative_information.contact</code>.
+     */
+    public final TableField<RelativeInformationRecord, String> CONTACT = createField(DSL.name("contact"), SQLDataType.VARCHAR(255), this, "");
 
     private RelativeInformation(Name alias, Table<RelativeInformationRecord> aliased) {
         this(alias, aliased, null);
@@ -146,7 +146,7 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
 
     @Override
     public List<ForeignKey<RelativeInformationRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.FKMWKD588KL8GL2RFVI52GXUT3, Keys.FKKKNO01O28GOAPEHPUDC6PVXGQ);
+        return Arrays.asList(Keys.FKMWKD588KL8GL2RFVI52GXUT3, Keys.FKFYPQKGJRT16ET5DQ5JUFNM6SM);
     }
 
     private transient Employee _employee;
@@ -169,7 +169,7 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
      */
     public RelativeType relativeType() {
         if (_relativeType == null)
-            _relativeType = new RelativeType(this, Keys.FKKKNO01O28GOAPEHPUDC6PVXGQ);
+            _relativeType = new RelativeType(this, Keys.FKFYPQKGJRT16ET5DQ5JUFNM6SM);
 
         return _relativeType;
     }
@@ -205,7 +205,7 @@ public class RelativeInformation extends TableImpl<RelativeInformationRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, LocalDate, String, String, String, String, Long> fieldsRow() {
+    public Row7<Long, LocalDate, String, String, String, Long, String> fieldsRow() {
         return (Row7) super.fieldsRow();
     }
 }

@@ -80,9 +80,10 @@ public class Laudatory extends TableImpl<LaudatoryRecord> {
     public final TableField<LaudatoryRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>human_resource_management.laudatory.type_id</code>.
+     * The column
+     * <code>human_resource_management.laudatory.laudatory_type</code>.
      */
-    public final TableField<LaudatoryRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT, this, "");
+    public final TableField<LaudatoryRecord, Long> LAUDATORY_TYPE = createField(DSL.name("laudatory_type"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column
@@ -142,7 +143,7 @@ public class Laudatory extends TableImpl<LaudatoryRecord> {
 
     @Override
     public List<ForeignKey<LaudatoryRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.FKMTP17MJPSCKVCBQ4CTHQ5RC50, Keys.FKBGPR6EDK7YYDPS2E6XKLMB3);
+        return Arrays.asList(Keys.FKDWWDN9LF3A8IPWBM6CVI7CA6W, Keys.FKBGPR6EDK7YYDPS2E6XKLMB3);
     }
 
     private transient LaudatoryType _laudatoryType;
@@ -154,7 +155,7 @@ public class Laudatory extends TableImpl<LaudatoryRecord> {
      */
     public LaudatoryType laudatoryType() {
         if (_laudatoryType == null)
-            _laudatoryType = new LaudatoryType(this, Keys.FKMTP17MJPSCKVCBQ4CTHQ5RC50);
+            _laudatoryType = new LaudatoryType(this, Keys.FKDWWDN9LF3A8IPWBM6CVI7CA6W);
 
         return _laudatoryType;
     }

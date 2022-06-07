@@ -1,6 +1,5 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.request.EmployeeDetailRequest;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.entities.*;
@@ -8,7 +7,6 @@ import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.EmployeeDetailCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
-import org.jooq.codegen.maven.example.tables.records.WorkingContractRecord;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,73 +37,73 @@ public class EmployeeDetailCustomImpl implements EmployeeDetailCustom {
 
   @Override
   public void updateMainDetail(EmployeeDetailRequest detailRequest) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    dslContext.transaction(
-        configuration -> {
-          DSLContext ctx = DSL.using(configuration);
-          int employeeRecord =
-              ctx.insertInto(
-                      EMPLOYEE,
-                      EMPLOYEE.EMPLOYEE_ID,
-                      EMPLOYEE.FULL_NAME,
-                      EMPLOYEE.WORK_STATUS,
-                      EMPLOYEE.PHONE_NUMBER,
-                      EMPLOYEE.BIRTH_DATE,
-                      EMPLOYEE.COMPANY_EMAIL,
-                      EMPLOYEE.GENDER,
-                      EMPLOYEE.MARITAL_STATUS)
-                  .values(
-                      detailRequest.getEmployee_id(),
-                      detailRequest.getFull_name(),
-                      detailRequest.getWork_status(),
-                      detailRequest.getPhone(),
-                      detailRequest.getBirth_date(),
-                      detailRequest.getCompanyEmail(),
-                      detailRequest.getGender(),
-                      detailRequest.getMaritalStatus())
-                  .onDuplicateKeyUpdate()
-                  .set(EMPLOYEE.FULL_NAME, detailRequest.getFull_name())
-                  .set(EMPLOYEE.WORK_STATUS, detailRequest.getWork_status())
-                  .set(EMPLOYEE.PHONE_NUMBER, detailRequest.getPhone())
-                  .set(EMPLOYEE.BIRTH_DATE, detailRequest.getBirth_date())
-                  .set(EMPLOYEE.COMPANY_EMAIL, detailRequest.getCompanyEmail())
-                  .set(EMPLOYEE.GENDER, detailRequest.getGender())
-                  .set(EMPLOYEE.MARITAL_STATUS, detailRequest.getMaritalStatus())
-                  .execute();
-
-          WorkingContractRecord workingContractRecord =
-              ctx.insertInto(
-                      WORKING_CONTRACT,
-                      WORKING_CONTRACT.EMPLOYEE_ID,
-                      WORKING_CONTRACT.BASE_SALARY,
-                      WORKING_CONTRACT.COMPANY_NAME,
-                      WORKING_CONTRACT.START_DATE,
-                      WORKING_CONTRACT.STATUS,
-                      WORKING_CONTRACT.TYPE_ID)
-                  .values(
-                      employeeId,
-                      hrmRequest.getBaseSalary(),
-                      companyName,
-                      startDate,
-                      contractStatus,
-                      EContractType.of(hrmRequest.getContractName()))
-                  .onDuplicateKeyUpdate()
-                  .returning()
-                  .fetchOne();
-
-          ctx.insertInto(
-                  WORKING_PLACE,
-                  WORKING_PLACE.WORKING_CONTRACT_ID,
-                  WORKING_PLACE.AREA_ID,
-                  WORKING_PLACE.JOB_ID,
-                  WORKING_PLACE.OFFICE_ID)
-              .values(
-                  workingContractRecord.getWorkingContractId(),
-                  EArea.of(hrmRequest.getArea()),
-                  EJob.of(hrmRequest.getJob()),
-                  EOffice.of(hrmRequest.getOffice()))
-              .execute();
-        });
+    //    final DSLContext dslContext = DSL.using(connection.getConnection());
+    //    dslContext.transaction(
+    //        configuration -> {
+    //          DSLContext ctx = DSL.using(configuration);
+    //          int employeeRecord =
+    //              ctx.insertInto(
+    //                      EMPLOYEE,
+    //                      EMPLOYEE.EMPLOYEE_ID,
+    //                      EMPLOYEE.FULL_NAME,
+    //                      EMPLOYEE.WORK_STATUS,
+    //                      EMPLOYEE.PHONE_NUMBER,
+    //                      EMPLOYEE.BIRTH_DATE,
+    //                      EMPLOYEE.COMPANY_EMAIL,
+    //                      EMPLOYEE.GENDER,
+    //                      EMPLOYEE.MARITAL_STATUS)
+    //                  .values(
+    //                      detailRequest.getEmployee_id(),
+    //                      detailRequest.getFull_name(),
+    //                      detailRequest.getWork_status(),
+    //                      detailRequest.getPhone(),
+    //                      detailRequest.getBirth_date(),
+    //                      detailRequest.getCompanyEmail(),
+    //                      detailRequest.getGender(),
+    //                      detailRequest.getMaritalStatus())
+    //                  .onDuplicateKeyUpdate()
+    //                  .set(EMPLOYEE.FULL_NAME, detailRequest.getFull_name())
+    //                  .set(EMPLOYEE.WORK_STATUS, detailRequest.getWork_status())
+    //                  .set(EMPLOYEE.PHONE_NUMBER, detailRequest.getPhone())
+    //                  .set(EMPLOYEE.BIRTH_DATE, detailRequest.getBirth_date())
+    //                  .set(EMPLOYEE.COMPANY_EMAIL, detailRequest.getCompanyEmail())
+    //                  .set(EMPLOYEE.GENDER, detailRequest.getGender())
+    //                  .set(EMPLOYEE.MARITAL_STATUS, detailRequest.getMaritalStatus())
+    //                  .execute();
+    //
+    //          WorkingContractRecord workingContractRecord =
+    //              ctx.insertInto(
+    //                      WORKING_CONTRACT,
+    //                      WORKING_CONTRACT.EMPLOYEE_ID,
+    //                      WORKING_CONTRACT.BASE_SALARY,
+    //                      WORKING_CONTRACT.COMPANY_NAME,
+    //                      WORKING_CONTRACT.START_DATE,
+    //                      WORKING_CONTRACT.STATUS,
+    //                      WORKING_CONTRACT.TYPE_ID)
+    //                  .values(
+    //                      employeeId,
+    //                      hrmRequest.getBaseSalary(),
+    //                      companyName,
+    //                      startDate,
+    //                      contractStatus,
+    //                      EContractType.of(hrmRequest.getContractName()))
+    //                  .onDuplicateKeyUpdate()
+    //                  .returning()
+    //                  .fetchOne();
+    //
+    //          ctx.insertInto(
+    //                  WORKING_PLACE,
+    //                  WORKING_PLACE.WORKING_CONTRACT_ID,
+    //                  WORKING_PLACE.AREA_ID,
+    //                  WORKING_PLACE.JOB_ID,
+    //                  WORKING_PLACE.OFFICE_ID)
+    //              .values(
+    //                  workingContractRecord.getWorkingContractId(),
+    //                  EArea.of(hrmRequest.getArea()),
+    //                  EJob.of(hrmRequest.getJob()),
+    //                  EOffice.of(hrmRequest.getOffice()))
+    //              .execute();
+    //        });
   }
 
   @Override
@@ -253,18 +251,16 @@ public class EmployeeDetailCustomImpl implements EmployeeDetailCustom {
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
                 EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-                EMPLOYEE.WORK_STATUS,
+                EMPLOYEE.WORKING_STATUS,
                 EMPLOYEE.PHONE_NUMBER.as(PHONE),
                 EMPLOYEE.MARITAL_STATUS,
                 EMPLOYEE.AVATAR,
-                when(EMPLOYEE.GENDER.eq(FEMALE), FEMALE)
-                    .when(EMPLOYEE.GENDER.eq(MALE), MALE)
-                    .as(GENDER),
+                EMPLOYEE.GENDER,
                 EMPLOYEE.BIRTH_DATE,
-                JOB.TITLE.as(JOB_NAME),
+                JOB.TITLE,
                 OFFICE.NAME.as(OFFICE_NAME),
                 AREA.NAME.as(AREA_NAME),
-                CONTRACT_TYPE.NAME.as(CONTRACT),
+                CONTRACT_TYPE.NAME,
                 year(currentDate())
                     .minus(year(WORKING_CONTRACT.START_DATE))
                     .concat(YEAR)

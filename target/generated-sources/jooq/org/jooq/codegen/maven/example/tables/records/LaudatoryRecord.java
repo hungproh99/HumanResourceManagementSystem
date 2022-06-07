@@ -113,17 +113,19 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
     }
 
     /**
-     * Setter for <code>human_resource_management.laudatory.type_id</code>.
+     * Setter for
+     * <code>human_resource_management.laudatory.laudatory_type</code>.
      */
-    public LaudatoryRecord setTypeId(Long value) {
+    public LaudatoryRecord setLaudatoryType(Long value) {
         set(6, value);
         return this;
     }
 
     /**
-     * Getter for <code>human_resource_management.laudatory.type_id</code>.
+     * Getter for
+     * <code>human_resource_management.laudatory.laudatory_type</code>.
      */
-    public Long getTypeId() {
+    public Long getLaudatoryType() {
         return (Long) get(6);
     }
 
@@ -199,7 +201,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
 
     @Override
     public Field<Long> field7() {
-        return Laudatory.LAUDATORY.TYPE_ID;
+        return Laudatory.LAUDATORY.LAUDATORY_TYPE;
     }
 
     @Override
@@ -239,7 +241,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
 
     @Override
     public Long component7() {
-        return getTypeId();
+        return getLaudatoryType();
     }
 
     @Override
@@ -279,7 +281,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
 
     @Override
     public Long value7() {
-        return getTypeId();
+        return getLaudatoryType();
     }
 
     @Override
@@ -325,7 +327,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
 
     @Override
     public LaudatoryRecord value7(Long value) {
-        setTypeId(value);
+        setLaudatoryType(value);
         return this;
     }
 
@@ -362,7 +364,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
     /**
      * Create a detached, initialised LaudatoryRecord
      */
-    public LaudatoryRecord(Long laudatoryId, LocalDate date, String description, String reward, String status, String title, Long typeId, Long workingInformationId) {
+    public LaudatoryRecord(Long laudatoryId, LocalDate date, String description, String reward, String status, String title, Long laudatoryType, Long workingInformationId) {
         super(Laudatory.LAUDATORY);
 
         setLaudatoryId(laudatoryId);
@@ -371,7 +373,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
         setReward(reward);
         setStatus(status);
         setTitle(title);
-        setTypeId(typeId);
+        setLaudatoryType(laudatoryType);
         setWorkingInformationId(workingInformationId);
     }
 
@@ -388,7 +390,7 @@ public class LaudatoryRecord extends UpdatableRecordImpl<LaudatoryRecord> implem
             setReward(value.getReward());
             setStatus(value.getStatus());
             setTitle(value.getTitle());
-            setTypeId(value.getTypeId());
+            setLaudatoryType(value.getLaudatoryType());
             setWorkingInformationId(value.getWorkingInformationId());
         }
     }

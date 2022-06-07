@@ -16,6 +16,7 @@ import org.jooq.codegen.maven.example.tables.Discipline;
 import org.jooq.codegen.maven.example.tables.DisciplineType;
 import org.jooq.codegen.maven.example.tables.Education;
 import org.jooq.codegen.maven.example.tables.Employee;
+import org.jooq.codegen.maven.example.tables.EmployeeType;
 import org.jooq.codegen.maven.example.tables.IdentityCard;
 import org.jooq.codegen.maven.example.tables.Insurance;
 import org.jooq.codegen.maven.example.tables.Job;
@@ -31,6 +32,7 @@ import org.jooq.codegen.maven.example.tables.WorkingContract;
 import org.jooq.codegen.maven.example.tables.WorkingHistory;
 import org.jooq.codegen.maven.example.tables.WorkingInformation;
 import org.jooq.codegen.maven.example.tables.WorkingPlace;
+import org.jooq.codegen.maven.example.tables.WorkingType;
 import org.jooq.impl.SchemaImpl;
 
 
@@ -81,6 +83,11 @@ public class HumanResourceManagement extends SchemaImpl {
      * The table <code>human_resource_management.employee</code>.
      */
     public final Employee EMPLOYEE = Employee.EMPLOYEE;
+
+    /**
+     * The table <code>human_resource_management.employee_type</code>.
+     */
+    public final EmployeeType EMPLOYEE_TYPE = EmployeeType.EMPLOYEE_TYPE;
 
     /**
      * The table <code>human_resource_management.identity_card</code>.
@@ -158,6 +165,11 @@ public class HumanResourceManagement extends SchemaImpl {
     public final WorkingPlace WORKING_PLACE = WorkingPlace.WORKING_PLACE;
 
     /**
+     * The table <code>human_resource_management.working_type</code>.
+     */
+    public final WorkingType WORKING_TYPE = WorkingType.WORKING_TYPE;
+
+    /**
      * No further instances allowed
      */
     private HumanResourceManagement() {
@@ -180,6 +192,7 @@ public class HumanResourceManagement extends SchemaImpl {
             DisciplineType.DISCIPLINE_TYPE,
             Education.EDUCATION,
             Employee.EMPLOYEE,
+            EmployeeType.EMPLOYEE_TYPE,
             IdentityCard.IDENTITY_CARD,
             Insurance.INSURANCE,
             Job.JOB,
@@ -194,7 +207,8 @@ public class HumanResourceManagement extends SchemaImpl {
             WorkingContract.WORKING_CONTRACT,
             WorkingHistory.WORKING_HISTORY,
             WorkingInformation.WORKING_INFORMATION,
-            WorkingPlace.WORKING_PLACE
+            WorkingPlace.WORKING_PLACE,
+            WorkingType.WORKING_TYPE
         );
     }
 }

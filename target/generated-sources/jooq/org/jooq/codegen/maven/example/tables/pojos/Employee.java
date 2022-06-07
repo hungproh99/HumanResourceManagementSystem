@@ -32,10 +32,12 @@ public class Employee implements Serializable {
     private String    personalEmail;
     private String    phoneNumber;
     private String    taxCode;
-    private String    workStatus;
+    private Boolean   workingStatus;
     private Long      bankId;
+    private Long      employeeTypeId;
     private String    cardId;
     private Long      roleType;
+    private Long      workingTypeId;
 
     public Employee() {}
 
@@ -56,10 +58,12 @@ public class Employee implements Serializable {
         this.personalEmail = value.personalEmail;
         this.phoneNumber = value.phoneNumber;
         this.taxCode = value.taxCode;
-        this.workStatus = value.workStatus;
+        this.workingStatus = value.workingStatus;
         this.bankId = value.bankId;
+        this.employeeTypeId = value.employeeTypeId;
         this.cardId = value.cardId;
         this.roleType = value.roleType;
+        this.workingTypeId = value.workingTypeId;
     }
 
     public Employee(
@@ -79,10 +83,12 @@ public class Employee implements Serializable {
         String    personalEmail,
         String    phoneNumber,
         String    taxCode,
-        String    workStatus,
+        Boolean   workingStatus,
         Long      bankId,
+        Long      employeeTypeId,
         String    cardId,
-        Long      roleType
+        Long      roleType,
+        Long      workingTypeId
     ) {
         this.employeeId = employeeId;
         this.address = address;
@@ -100,10 +106,12 @@ public class Employee implements Serializable {
         this.personalEmail = personalEmail;
         this.phoneNumber = phoneNumber;
         this.taxCode = taxCode;
-        this.workStatus = workStatus;
+        this.workingStatus = workingStatus;
         this.bankId = bankId;
+        this.employeeTypeId = employeeTypeId;
         this.cardId = cardId;
         this.roleType = roleType;
+        this.workingTypeId = workingTypeId;
     }
 
     /**
@@ -353,17 +361,19 @@ public class Employee implements Serializable {
     }
 
     /**
-     * Getter for <code>human_resource_management.employee.work_status</code>.
+     * Getter for
+     * <code>human_resource_management.employee.working_status</code>.
      */
-    public String getWorkStatus() {
-        return this.workStatus;
+    public Boolean getWorkingStatus() {
+        return this.workingStatus;
     }
 
     /**
-     * Setter for <code>human_resource_management.employee.work_status</code>.
+     * Setter for
+     * <code>human_resource_management.employee.working_status</code>.
      */
-    public Employee setWorkStatus(String workStatus) {
-        this.workStatus = workStatus;
+    public Employee setWorkingStatus(Boolean workingStatus) {
+        this.workingStatus = workingStatus;
         return this;
     }
 
@@ -379,6 +389,23 @@ public class Employee implements Serializable {
      */
     public Employee setBankId(Long bankId) {
         this.bankId = bankId;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.employee.employee_type_id</code>.
+     */
+    public Long getEmployeeTypeId() {
+        return this.employeeTypeId;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.employee.employee_type_id</code>.
+     */
+    public Employee setEmployeeTypeId(Long employeeTypeId) {
+        this.employeeTypeId = employeeTypeId;
         return this;
     }
 
@@ -409,6 +436,23 @@ public class Employee implements Serializable {
      */
     public Employee setRoleType(Long roleType) {
         this.roleType = roleType;
+        return this;
+    }
+
+    /**
+     * Getter for
+     * <code>human_resource_management.employee.working_type_id</code>.
+     */
+    public Long getWorkingTypeId() {
+        return this.workingTypeId;
+    }
+
+    /**
+     * Setter for
+     * <code>human_resource_management.employee.working_type_id</code>.
+     */
+    public Employee setWorkingTypeId(Long workingTypeId) {
+        this.workingTypeId = workingTypeId;
         return this;
     }
 
@@ -517,17 +561,23 @@ public class Employee implements Serializable {
         }
         else if (!this.taxCode.equals(other.taxCode))
             return false;
-        if (this.workStatus == null) {
-            if (other.workStatus != null)
+        if (this.workingStatus == null) {
+            if (other.workingStatus != null)
                 return false;
         }
-        else if (!this.workStatus.equals(other.workStatus))
+        else if (!this.workingStatus.equals(other.workingStatus))
             return false;
         if (this.bankId == null) {
             if (other.bankId != null)
                 return false;
         }
         else if (!this.bankId.equals(other.bankId))
+            return false;
+        if (this.employeeTypeId == null) {
+            if (other.employeeTypeId != null)
+                return false;
+        }
+        else if (!this.employeeTypeId.equals(other.employeeTypeId))
             return false;
         if (this.cardId == null) {
             if (other.cardId != null)
@@ -540,6 +590,12 @@ public class Employee implements Serializable {
                 return false;
         }
         else if (!this.roleType.equals(other.roleType))
+            return false;
+        if (this.workingTypeId == null) {
+            if (other.workingTypeId != null)
+                return false;
+        }
+        else if (!this.workingTypeId.equals(other.workingTypeId))
             return false;
         return true;
     }
@@ -564,10 +620,12 @@ public class Employee implements Serializable {
         result = prime * result + ((this.personalEmail == null) ? 0 : this.personalEmail.hashCode());
         result = prime * result + ((this.phoneNumber == null) ? 0 : this.phoneNumber.hashCode());
         result = prime * result + ((this.taxCode == null) ? 0 : this.taxCode.hashCode());
-        result = prime * result + ((this.workStatus == null) ? 0 : this.workStatus.hashCode());
+        result = prime * result + ((this.workingStatus == null) ? 0 : this.workingStatus.hashCode());
         result = prime * result + ((this.bankId == null) ? 0 : this.bankId.hashCode());
+        result = prime * result + ((this.employeeTypeId == null) ? 0 : this.employeeTypeId.hashCode());
         result = prime * result + ((this.cardId == null) ? 0 : this.cardId.hashCode());
         result = prime * result + ((this.roleType == null) ? 0 : this.roleType.hashCode());
+        result = prime * result + ((this.workingTypeId == null) ? 0 : this.workingTypeId.hashCode());
         return result;
     }
 
@@ -591,10 +649,12 @@ public class Employee implements Serializable {
         sb.append(", ").append(personalEmail);
         sb.append(", ").append(phoneNumber);
         sb.append(", ").append(taxCode);
-        sb.append(", ").append(workStatus);
+        sb.append(", ").append(workingStatus);
         sb.append(", ").append(bankId);
+        sb.append(", ").append(employeeTypeId);
         sb.append(", ").append(cardId);
         sb.append(", ").append(roleType);
+        sb.append(", ").append(workingTypeId);
 
         sb.append(")");
         return sb.toString();

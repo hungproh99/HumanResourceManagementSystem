@@ -80,9 +80,10 @@ public class Discipline extends TableImpl<DisciplineRecord> {
     public final TableField<DisciplineRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255), this, "");
 
     /**
-     * The column <code>human_resource_management.discipline.type_id</code>.
+     * The column
+     * <code>human_resource_management.discipline.discipline_type</code>.
      */
-    public final TableField<DisciplineRecord, Long> TYPE_ID = createField(DSL.name("type_id"), SQLDataType.BIGINT, this, "");
+    public final TableField<DisciplineRecord, Long> DISCIPLINE_TYPE = createField(DSL.name("discipline_type"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column
@@ -143,7 +144,7 @@ public class Discipline extends TableImpl<DisciplineRecord> {
 
     @Override
     public List<ForeignKey<DisciplineRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.FK7PA865HYRHP12FLJB3RQH7H28, Keys.FKHROLHRW5RULTA6U6UJYJULY0X);
+        return Arrays.asList(Keys.FK6JP23S0JELE70TK4GXDVYX5SA, Keys.FKHROLHRW5RULTA6U6UJYJULY0X);
     }
 
     private transient DisciplineType _disciplineType;
@@ -155,7 +156,7 @@ public class Discipline extends TableImpl<DisciplineRecord> {
      */
     public DisciplineType disciplineType() {
         if (_disciplineType == null)
-            _disciplineType = new DisciplineType(this, Keys.FK7PA865HYRHP12FLJB3RQH7H28);
+            _disciplineType = new DisciplineType(this, Keys.FK6JP23S0JELE70TK4GXDVYX5SA);
 
         return _disciplineType;
     }
