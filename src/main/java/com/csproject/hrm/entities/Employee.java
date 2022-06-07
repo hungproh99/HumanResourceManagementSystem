@@ -1,6 +1,10 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -29,7 +33,7 @@ public class Employee {
   @Column(name = "password")
   private String password;
 
-  @Column(name = "full_name")
+  @Column(name = "fullName")
   private String fullName;
 
   @Column(name = "gender")
@@ -47,8 +51,9 @@ public class Employee {
   @Column(name = "marital_status")
   private String maritalStatus;
 
-  @Column(name = "work_status")
-  private String workStatus;
+  @Column(name = "working_status")
+  @Type(type = "boolean")
+  private Boolean workingStatus;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "role_type")
@@ -92,9 +97,11 @@ public class Employee {
   @JoinColumn(name = "bank_id")
   private Bank bank;
 
-  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<WorkingContract> tax;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "employee_type_id")
+  private EmployeeType employeeType;
 
-  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<WorkingContract> insurance;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "working_type_id")
+  private WorkingType workingType;
 }

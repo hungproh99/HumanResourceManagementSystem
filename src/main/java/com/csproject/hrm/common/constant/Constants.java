@@ -4,7 +4,7 @@ public class Constants {
   public static final String EMAIL_VALIDATION =
       "^[a-z][a-z0-9_\\.]{5,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
   public static final String FROM_EMAIL = "huynq08120@gmail.com";
-  public static final String TO_EMAIL = "hihihd37@gmail.com";
+  public static final String TO_EMAIL = "huynb0812@gmail.com";
   public static final String NOT_EMPTY_EMAIL = "Email can't not empty";
   public static final String INVALID_EMAIL_FORMAT = "Invalid email format";
   public static final String NOT_EMPTY_PASSWORD = "Password can't not empty";
@@ -15,7 +15,9 @@ public class Constants {
   public static final String SPECIAL_CHARACTER = "!@#$%^&*()_+";
   public static final String SEND_PASSWORD_SUBJECT = "SEND NEW PASSWORD";
   public static final String SEND_PASSWORD_TEXT =
-      "Hello %s this is new reset password after you forgot %s \n Please don't send it for anyone";
+      "<p style=\"color:black;\">Hello <strong>%s</strong> this is new reset password after you forgot <strong>%s</strong>"
+          + "<br>Please don't send it for anyone"
+          + "<br>You can change password in this link <a href=\"http://localhost:3000/forgot\">Change Password</a></p>";
   public static final String REQUEST_FAIL = "This request is failed";
   public static final String REQUEST_SUCCESS = "This request is successful";
   public static final String ORDER_BY_INVALID = "Invalid OrderBy";
@@ -34,13 +36,12 @@ public class Constants {
   public static final String FULL_NAME = "fullName";
   public static final String EMAIL = "email";
   public static final String PHONE = "phone";
-  public static final String FEMALE = "Female";
-  public static final String MALE = "Male";
   public static final String GENDER = "gender";
-  public static final String JOB_NAME = "job";
-  public static final String OFFICE_NAME = "office";
-  public static final String AREA_NAME = "area";
-  public static final String CONTRACT = "contract";
+  public static final String GRADE = "grade";
+  public static final String OFFICE_NAME = "office_name";
+  public static final String AREA_NAME = "area_name";
+  public static final String POSITION_NAME = "position_name";
+  public static final String WORKING_NAME = "working_name";
   public static final String SENIORITY = "seniority";
   public static final String YEAR = " year ";
   public static final String MONTH = " month ";
@@ -57,10 +58,10 @@ public class Constants {
   public static final String AUTHORIZATION = "Authorization";
   public static final String BEARER = "Bearer ";
   public static final String PATTERN = "/hrm/api/**";
-
-  public static final String STATUS = "status";
+  public static final String WORKING_STATUS = "working_status";
   public static final String ROLE_INVALID = "Invalid Role";
-  public static final String CONTRACT_TYPE_INVALID = "Invalid Contract Type";
+  public static final String WORKING_TYPE_INVALID = "Invalid Working Type";
+  public static final String EMPLOYEE_TYPE_INVALID = "Invalid Employee Type";
   public static final String AREA_INVALID = "Invalid Area";
   public static final String JOB_INVALID = "Invalid Job";
   public static final String OFFICE_INVALID = "Invalid Office";
@@ -70,4 +71,5 @@ public class Constants {
   public static final String INVALID_PHONE_FORMAT = "Invalid phone format";
   public static final String INVALID_OFFSET = "Invalid offset";
   public static final String INVALID_LIMIT = "Invalid limit";
+  public static final String WORK_STATUS_INVALID = "Invalid Work Status";
 }

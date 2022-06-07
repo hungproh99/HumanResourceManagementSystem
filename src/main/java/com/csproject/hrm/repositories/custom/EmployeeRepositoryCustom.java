@@ -1,28 +1,30 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.dto.EmployeeTypeDto;
+import com.csproject.hrm.dto.dto.RoleDto;
+import com.csproject.hrm.dto.dto.WorkingTypeDto;
+import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface EmployeeRepositoryCustom {
   List<HrmResponse> findAllEmployee(QueryParam queryParam);
 
-  void insertEmployee(
-      HrmRequest hrmRequest,
-      String employeeId,
-      String companyEmail,
-      String password,
-      String workStatus,
-      String companyName,
-      String contractStatus,
-      LocalDate startDate);
+  void insertEmployee(HrmPojo hrmPojo);
+
+  void insertMultiEmployee(List<HrmPojo> hrmPojos);
 
   int countEmployeeSameStartName(String fullName);
 
   int countAllEmployeeByCondition(QueryParam queryParam);
+
+  List<WorkingTypeDto> getListWorkingType();
+
+  List<EmployeeTypeDto> getListEmployeeType();
+
+  List<RoleDto> getListRoleType();
 }

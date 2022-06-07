@@ -1,6 +1,10 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import com.csproject.hrm.common.enums.ERole;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -18,7 +22,7 @@ public class RoleType {
 
   @Enumerated(value = EnumType.STRING)
   @Column(name = "role")
-  private com.csproject.hrm.common.enums.ERole ERole;
+  private ERole ERole;
 
   @OneToOne(mappedBy = "roleType", fetch = FetchType.LAZY)
   private Employee employee;

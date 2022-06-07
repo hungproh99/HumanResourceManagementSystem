@@ -8,17 +8,17 @@ import static com.csproject.hrm.common.constant.Constants.AREA_INVALID;
 public enum EArea {
   BACK_OFFICE("Back Office", 1);
 
-  private final String label;
-  private final long value;
+  private String label;
+  private long value;
 
   EArea(String label, long value) {
     this.label = label;
     this.value = value;
   }
 
-  public static long of(String role) {
+  public static long of(String area) {
     for (EArea eArea : EArea.values()) {
-      if (eArea.label.equalsIgnoreCase(role)) {
+      if (eArea.label.equalsIgnoreCase(area)) {
         return eArea.value;
       }
     }

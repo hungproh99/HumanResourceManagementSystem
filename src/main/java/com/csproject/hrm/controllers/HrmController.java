@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
@@ -35,8 +36,45 @@ public class HrmController {
 
   @PostMapping(URI_INSERT_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> addEmployeeByForm(@RequestBody HrmRequest hrmRequest) {
+  public ResponseEntity<?> addEmployee(@RequestBody HrmRequest hrmRequest) {
     humanManagementService.insertEmployee(hrmRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(URI_INSERT_MULTI_EMPLOYEE)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> addMultiEmployee(@RequestBody List<HrmRequest> hrmRequestList) {
+    humanManagementService.insertMultiEmployee(hrmRequestList);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @GetMapping(URI_LIST_WORKING_TYPE)
+  public ResponseEntity<?> getListWorkingType() {
+    return ResponseEntity.ok(humanManagementService.getListWorkingType());
+  }
+
+  @GetMapping(URI_LIST_EMPLOYEE_TYPE)
+  public ResponseEntity<?> getListEmployeeType() {
+    return ResponseEntity.ok(humanManagementService.getListEmployeeType());
+  }
+
+  @GetMapping(URI_LIST_AREA)
+  public ResponseEntity<?> getListArea() {
+    return ResponseEntity.ok(humanManagementService.getListArea());
+  }
+
+  @GetMapping(URI_LIST_JOB)
+  public ResponseEntity<?> getListJob() {
+    return ResponseEntity.ok(humanManagementService.getListJob());
+  }
+
+  @GetMapping(URI_LIST_OFFICE)
+  public ResponseEntity<?> getListOffice() {
+    return ResponseEntity.ok(humanManagementService.getListOffice());
+  }
+
+  @GetMapping(URI_LIST_ROLE_TYPE)
+  public ResponseEntity<?> getListRoleType() {
+    return ResponseEntity.ok(humanManagementService.getListRoleType());
   }
 }

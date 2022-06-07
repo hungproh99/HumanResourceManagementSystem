@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -30,7 +33,7 @@ public class Discipline {
   private String date;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "discipline_type")
   private DisciplineType disciplineType;
 
   @Column(name = "status")

@@ -1,6 +1,9 @@
 package com.csproject.hrm.dto.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 
@@ -12,14 +15,14 @@ public class HrmResponse {
   private String employee_id;
   private String full_name;
   private String email;
-  private String work_status;
+  private String working_status;
   private String phone;
   private String gender;
   private Date birth_date;
-  private String job;
-  private String office;
-  private String area;
-  private String contract;
+  private String grade;
+  private String office_name;
+  private String area_name;
   private String seniority;
-  private Date start_date;
+  private String position_name;
+  private String working_name;
 }

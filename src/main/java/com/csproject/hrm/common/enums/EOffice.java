@@ -8,17 +8,17 @@ import static com.csproject.hrm.common.constant.Constants.OFFICE_INVALID;
 public enum EOffice {
   HN_OFFICE("Ha Noi Office", 1);
 
-  private final String label;
-  private final long value;
+  private String label;
+  private long value;
 
   EOffice(String label, long value) {
     this.label = label;
     this.value = value;
   }
 
-  public static long of(String role) {
+  public static long of(String office) {
     for (EOffice eOffice : EOffice.values()) {
-      if (eOffice.label.equalsIgnoreCase(role)) {
+      if (eOffice.label.equalsIgnoreCase(office)) {
         return eOffice.value;
       }
     }

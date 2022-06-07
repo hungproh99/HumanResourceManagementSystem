@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -20,5 +23,5 @@ public class Area {
   private String name;
 
   @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  private WorkingContract workingContract;
 }

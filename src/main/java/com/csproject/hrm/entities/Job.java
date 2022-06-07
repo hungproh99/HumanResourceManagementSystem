@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -16,12 +19,15 @@ public class Job {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "title")
-  private String title;
+  @Column(name = "grade")
+  private String grade;
+
+  @Column(name = "position")
+  private String position;
 
   @Column(name = "description")
   private String description;
 
   @OneToOne(mappedBy = "job", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  private WorkingContract workingContract;
 }

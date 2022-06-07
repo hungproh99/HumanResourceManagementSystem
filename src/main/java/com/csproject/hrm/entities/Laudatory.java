@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -31,7 +34,7 @@ public class Laudatory {
   private LocalDate date;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "laudatory_type")
   private LaudatoryType laudatoryType;
 
   @Column(name = "status")

@@ -1,16 +1,13 @@
 package com.csproject.hrm.services;
 
+import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.request.ChangePasswordRequest;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.impl.LoginServiceImpl;
-import org.passay.CharacterData;
-import org.passay.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,11 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.passay.DictionaryRule.ERROR_CODE;
 
 @Service
 public class LoginService implements LoginServiceImpl {
-  @Autowired public JavaMailSender emailSender;
+  @Autowired GeneralFunction generalFunction;
   @Autowired AuthenticationManager authenticationManager;
   @Autowired EmployeeRepository employeeRepository;
   @Autowired PasswordEncoder passwordEncoder;
@@ -89,54 +85,13 @@ public class LoginService implements LoginServiceImpl {
     if (id == null) {
       throw new CustomDataNotFoundException(NOT_EXIST_USER_WITH + email);
     }
-    String generatePassword = generateCommonLangPassword();
+    String generatePassword = generalFunction.generateCommonLangPassword();
     String encodePassword = passwordEncoder.encode(generatePassword);
-    sendEmail(
+    generalFunction.sendEmail(
         FROM_EMAIL,
         TO_EMAIL,
         SEND_PASSWORD_SUBJECT,
         String.format(SEND_PASSWORD_TEXT, id, generatePassword));
     return employeeRepository.updatePassword(encodePassword, id);
-  }
-
-  public String generateCommonLangPassword() {
-    PasswordGenerator gen = new PasswordGenerator();
-    CharacterData lowerCaseChars = EnglishCharacterData.LowerCase;
-    CharacterRule lowerCaseRule = new CharacterRule(lowerCaseChars);
-    lowerCaseRule.setNumberOfCharacters(2);
-
-    CharacterData upperCaseChars = EnglishCharacterData.UpperCase;
-    CharacterRule upperCaseRule = new CharacterRule(upperCaseChars);
-    upperCaseRule.setNumberOfCharacters(2);
-
-    CharacterData digitChars = EnglishCharacterData.Digit;
-    CharacterRule digitRule = new CharacterRule(digitChars);
-    digitRule.setNumberOfCharacters(2);
-
-    CharacterData specialChars =
-        new CharacterData() {
-          public String getErrorCode() {
-            return ERROR_CODE;
-          }
-
-          public String getCharacters() {
-            return SPECIAL_CHARACTER;
-          }
-        };
-    CharacterRule splCharRule = new CharacterRule(specialChars);
-    splCharRule.setNumberOfCharacters(2);
-
-    String password =
-        gen.generatePassword(10, splCharRule, lowerCaseRule, upperCaseRule, digitRule);
-    return password;
-  }
-
-  public void sendEmail(String from, String to, String subject, String text) {
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom(from);
-    message.setTo(to);
-    message.setSubject(subject);
-    message.setText(text);
-    emailSender.send(message);
   }
 }

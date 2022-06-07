@@ -7,4 +7,11 @@ public class Uri {
   public static final String URI_FORGOT_PASSWORD = "/forgot_password";
   public static final String URI_GET_ALL_EMPLOYEE = "/get_all_employee";
   public static final String URI_INSERT_EMPLOYEE = "/add_employee";
+  public static final String URI_INSERT_MULTI_EMPLOYEE = "/add_multi_employee";
+  public static final String URI_LIST_WORKING_TYPE = "/list_working_type";
+  public static final String URI_LIST_EMPLOYEE_TYPE = "/list_employee_type";
+  public static final String URI_LIST_OFFICE = "/list_office";
+  public static final String URI_LIST_AREA = "/list_area";
+  public static final String URI_LIST_JOB = "/list_job";
+  public static final String URI_LIST_ROLE_TYPE = "/list_role_type";
 }
