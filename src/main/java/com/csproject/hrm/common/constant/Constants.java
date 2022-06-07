@@ -15,7 +15,9 @@ public class Constants {
   public static final String SPECIAL_CHARACTER = "!@#$%^&*()_+";
   public static final String SEND_PASSWORD_SUBJECT = "SEND NEW PASSWORD";
   public static final String SEND_PASSWORD_TEXT =
-      "Hello %s this is new reset password after you forgot %s \n Please don't send it for anyone";
+      "<p style=\"color:black;\">Hello <strong>%s</strong> this is new reset password after you forgot <strong>%s</strong>"
+          + "<br>Please don't send it for anyone"
+          + "<br>You can change password in this link <a href=\"http://localhost:3000/forgot\">Change Password</a></p>";
   public static final String REQUEST_FAIL = "This request is failed";
   public static final String REQUEST_SUCCESS = "This request is successful";
   public static final String ORDER_BY_INVALID = "Invalid OrderBy";

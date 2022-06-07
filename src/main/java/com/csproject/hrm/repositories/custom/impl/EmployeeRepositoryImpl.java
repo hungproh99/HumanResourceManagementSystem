@@ -1,6 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.dto.EmployeeTypeDto;
+import com.csproject.hrm.dto.dto.RoleDto;
+import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.DBConnection;
@@ -20,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.jooq.codegen.maven.example.Tables.WORKING_TYPE;
+import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
@@ -85,6 +88,43 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         });
   }
 
+  @Override
+  public void insertMultiEmployee(List<HrmPojo> hrmPojos) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext.transaction(
+        configuration -> {
+          hrmPojos.forEach(
+              hrmPojo -> {
+                queries.add(
+                    insertEmployeeRecord(
+                        configuration,
+                        hrmPojo.getEmployeeId(),
+                        hrmPojo.getCompanyEmail(),
+                        hrmPojo.getPassword(),
+                        EWorkStatus.of(hrmPojo.getWorkStatus()),
+                        hrmPojo.getFullName(),
+                        ERole.of(hrmPojo.getRole()),
+                        hrmPojo.getPhone(),
+                        hrmPojo.getGender(),
+                        hrmPojo.getBirthDate(),
+                        EWorkingType.of(hrmPojo.getWorkingType()),
+                        hrmPojo.getManagerId(),
+                        EEmployeeType.of(hrmPojo.getEmployeeType())));
+                queries.add(
+                    insertWorkingContractRecord(
+                        configuration,
+                        hrmPojo.getEmployeeId(),
+                        hrmPojo.getCompanyName(),
+                        EArea.of(hrmPojo.getArea()),
+                        EJob.of(hrmPojo.getGrade(), hrmPojo.getPosition()),
+                        EOffice.of(hrmPojo.getOffice())));
+              });
+
+          DSL.using(configuration).batch(queries).execute();
+        });
+  }
+
   public int countEmployeeSameStartName(String standForName) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
@@ -105,6 +145,33 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     return dslContext.fetchCount(findAllEmployee(conditions, sortFields, queryParam.pagination));
+  }
+
+  @Override
+  public List<WorkingTypeDto> getListWorkingType() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(WORKING_TYPE.TYPE_ID, WORKING_TYPE.NAME, WORKING_TYPE.DESCRIPTION)
+        .from(WORKING_TYPE)
+        .fetchInto(WorkingTypeDto.class);
+  }
+
+  @Override
+  public List<EmployeeTypeDto> getListEmployeeType() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE_TYPE.TYPE_ID, EMPLOYEE_TYPE.NAME, EMPLOYEE_TYPE.DESCRIPTION)
+        .from(EMPLOYEE_TYPE)
+        .fetchInto(EmployeeTypeDto.class);
+  }
+
+  @Override
+  public List<RoleDto> getListRoleType() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(ROLE_TYPE.TYPE_ID, ROLE_TYPE.ROLE)
+        .from(ROLE_TYPE)
+        .fetchInto(RoleDto.class);
   }
 
   public Select<?> findAllEmployee(

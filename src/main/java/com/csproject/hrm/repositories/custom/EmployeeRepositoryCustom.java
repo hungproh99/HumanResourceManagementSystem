@@ -1,5 +1,8 @@
 package com.csproject.hrm.repositories.custom;
 
+import com.csproject.hrm.dto.dto.EmployeeTypeDto;
+import com.csproject.hrm.dto.dto.RoleDto;
+import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.QueryParam;
@@ -13,7 +16,15 @@ public interface EmployeeRepositoryCustom {
 
   void insertEmployee(HrmPojo hrmPojo);
 
+  void insertMultiEmployee(List<HrmPojo> hrmPojos);
+
   int countEmployeeSameStartName(String fullName);
 
   int countAllEmployeeByCondition(QueryParam queryParam);
+
+  List<WorkingTypeDto> getListWorkingType();
+
+  List<EmployeeTypeDto> getListEmployeeType();
+
+  List<RoleDto> getListRoleType();
 }

@@ -2,18 +2,21 @@ package com.csproject.hrm.services;
 
 import com.csproject.hrm.common.enums.EWorkStatus;
 import com.csproject.hrm.common.general.GeneralFunction;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.repositories.ContractRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.impl.HumanManagementServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -21,6 +24,7 @@ import static com.csproject.hrm.common.constant.Constants.*;
 @Service
 public class HumanManagementService implements HumanManagementServiceImpl {
   @Autowired EmployeeRepository employeeRepository;
+  @Autowired ContractRepository contractRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
 
@@ -56,6 +60,7 @@ public class HumanManagementService implements HumanManagementServiceImpl {
 
   @Override
   public void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
+    List<HrmPojo> hrmPojos = new ArrayList<>();
     hrmRequestList.forEach(
         hrmRequest -> {
           if (hrmRequest.getFullName() == null
@@ -75,8 +80,39 @@ public class HumanManagementService implements HumanManagementServiceImpl {
             throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
           }
           HrmPojo hrmPojo = createHrmPojo(hrmRequest);
-          employeeRepository.insertEmployee(hrmPojo);
+          hrmPojos.add(hrmPojo);
         });
+    employeeRepository.insertMultiEmployee(hrmPojos);
+  }
+
+  @Override
+  public List<WorkingTypeDto> getListWorkingType() {
+    return employeeRepository.getListWorkingType();
+  }
+
+  @Override
+  public List<EmployeeTypeDto> getListEmployeeType() {
+    return employeeRepository.getListEmployeeType();
+  }
+
+  @Override
+  public List<RoleDto> getListRoleType() {
+    return employeeRepository.getListRoleType();
+  }
+
+  @Override
+  public List<OfficeDto> getListOffice() {
+    return contractRepository.getListOffice();
+  }
+
+  @Override
+  public List<AreaDto> getListArea() {
+    return contractRepository.getListArea();
+  }
+
+  @Override
+  public List<JobDto> getListJob() {
+    return contractRepository.getListJob();
   }
 
   private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
@@ -105,12 +141,12 @@ public class HumanManagementService implements HumanManagementServiceImpl {
             .managerId(hrmRequest.getManagerId())
             .employeeType(hrmRequest.getEmployeeType())
             .build();
-
-    generalFunction.sendEmail(
-        FROM_EMAIL,
-        TO_EMAIL,
-        SEND_PASSWORD_SUBJECT,
-        String.format(SEND_PASSWORD_TEXT, employeeId, password));
+    //
+    //    generalFunction.sendEmail(
+    //        FROM_EMAIL,
+    //        TO_EMAIL,
+    //        SEND_PASSWORD_SUBJECT,
+    //        String.format(SEND_PASSWORD_TEXT, employeeId, password));
     return hrmPojo;
   }
 }

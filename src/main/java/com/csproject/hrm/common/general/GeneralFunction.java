@@ -9,9 +9,12 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.passay.DictionaryRule.ERROR_CODE;
@@ -69,11 +72,19 @@ public class GeneralFunction {
   }
 
   public void sendEmail(String from, String to, String subject, String text) {
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom(from);
-    message.setTo(to);
-    message.setSubject(subject);
-    message.setText(text);
-    emailSender.send(message);
+    MimeMessage message = emailSender.createMimeMessage();
+
+    boolean multipart = true;
+
+    try {
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+      message.setContent(text, "text/html");
+      helper.setTo(to);
+      helper.setFrom(from);
+      helper.setSubject(subject);
+      emailSender.send(message);
+    } catch (MessagingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
