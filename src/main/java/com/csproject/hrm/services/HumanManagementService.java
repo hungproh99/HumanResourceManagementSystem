@@ -54,6 +54,10 @@ public class HumanManagementService implements HumanManagementServiceImpl {
       throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
+    String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName(), 0);
+    String companyEmail = generalFunction.generateEmailEmployee(employeeId);
+    hrmPojo.setEmployeeId(employeeId);
+    hrmPojo.setCompanyEmail(companyEmail);
 
     employeeRepository.insertEmployee(hrmPojo);
   }
@@ -80,8 +84,20 @@ public class HumanManagementService implements HumanManagementServiceImpl {
             throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
           }
           HrmPojo hrmPojo = createHrmPojo(hrmRequest);
+          int countList = 0;
+          for (HrmPojo hrm : hrmPojos) {
+            if (hrmPojo.getFullName().equalsIgnoreCase(hrm.getFullName())) {
+              countList++;
+            }
+          }
+          String employeeId =
+              generalFunction.generateIdEmployee(hrmRequest.getFullName(), countList);
+          String companyEmail = generalFunction.generateEmailEmployee(employeeId);
+          hrmPojo.setEmployeeId(employeeId);
+          hrmPojo.setCompanyEmail(companyEmail);
           hrmPojos.add(hrmPojo);
         });
+
     employeeRepository.insertMultiEmployee(hrmPojos);
   }
 
@@ -116,15 +132,11 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   }
 
   private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
-    String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName());
-    String companyEmail = generalFunction.generateEmailEmployee(employeeId);
     String password = passwordEncoder.encode(generalFunction.generateCommonLangPassword());
     String companyName = "HRM";
 
     HrmPojo hrmPojo =
         HrmPojo.builder()
-            .employeeId(employeeId)
-            .companyEmail(companyEmail)
             .password(password)
             .workStatus(EWorkStatus.ACTIVE.name())
             .companyName(companyName)
