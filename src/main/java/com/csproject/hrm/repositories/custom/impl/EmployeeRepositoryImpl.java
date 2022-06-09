@@ -204,18 +204,15 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list) {
+  public List<HrmResponse> findEmployeeByListId(List<String> list) {
     List<Condition> conditions = new ArrayList<>();
     Condition condition = noCondition();
     for (String id : list) {
-      condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
-      conditions.add(condition);
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
     }
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    conditions.add(condition);
 
-    return findAllEmployee(conditions, sortFields, queryParam.pagination)
-        .fetchInto(HrmResponse.class);
+    return findEmployeeByListIdByCondition(conditions).fetchInto(HrmResponse.class);
   }
 
   public Select<?> findAllEmployee(
@@ -238,9 +235,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             year(currentDate())
                 .minus(year(WORKING_CONTRACT.START_DATE))
                 .concat(YEAR)
-                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
                 .concat(MONTH)
-                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
                 .concat(DAY)
                 .as(SENIORITY),
             JOB.POSITION.as(POSITION_NAME),
@@ -359,5 +356,45 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .set(WORKING_CONTRACT.OFFICE_ID, officeId)
         .set(WORKING_CONTRACT.START_DATE, startDate)
         .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId));
+  }
+
+  private Select<?> findEmployeeByListIdByCondition(List<Condition> conditions) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactive"))
+                .as(WORKING_STATUS),
+            EMPLOYEE.PHONE_NUMBER.as(PHONE),
+            EMPLOYEE.GENDER.as(GENDER),
+            EMPLOYEE.BIRTH_DATE,
+            JOB.GRADE.as(GRADE),
+            OFFICE.NAME.as(OFFICE_NAME),
+            AREA.NAME.as(AREA_NAME),
+            year(currentDate())
+                .minus(year(WORKING_CONTRACT.START_DATE))
+                .concat(YEAR)
+                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+                .concat(MONTH)
+                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+                .concat(DAY)
+                .as(SENIORITY),
+            JOB.POSITION.as(POSITION_NAME),
+            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions);
   }
 }

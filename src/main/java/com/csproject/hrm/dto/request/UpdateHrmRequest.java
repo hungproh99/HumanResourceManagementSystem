@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Builder
 public class UpdateHrmRequest {
   private String fullName;
-  private String emailCompany;
   private boolean workingStatus;
   private String phone;
   private String gender;

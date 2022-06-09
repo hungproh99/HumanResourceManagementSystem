@@ -8,7 +8,9 @@ import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
+import com.csproject.hrm.entities.Employee;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.ContractRepository;
@@ -17,6 +19,7 @@ import com.csproject.hrm.services.impl.HumanManagementServiceImpl;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -139,15 +143,19 @@ public class HumanManagementService implements HumanManagementServiceImpl {
 
   @Override
   public void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId) {
+    Optional<Employee> employee = employeeRepository.findById(employeeId);
+    if (employee.isEmpty()) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
+    }
     employeeRepository.updateEmployeeById(updateHrmRequest, employeeId);
   }
 
   @Override
-  public void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list) {
+  public void exportEmployeeToCsv(Writer writer, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
-      List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
+      List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(list);
       try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
         for (HrmResponse hrmResponse : hrmResponses) {
           csvPrinter.printRecord(
@@ -166,6 +174,7 @@ public class HumanManagementService implements HumanManagementServiceImpl {
               hrmResponse.getWorking_name());
         }
       } catch (IOException e) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, CAN_NOT_WRITE_CSV);
       }
     }
   }

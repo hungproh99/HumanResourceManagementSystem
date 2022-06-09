@@ -21,6 +21,8 @@ import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.passay.DictionaryRule.ERROR_CODE;
@@ -45,7 +47,9 @@ public class GeneralFunction {
       standForName.append(splitSpace[index].charAt(ZERO_NUMBER));
     }
     int count = employeeRepository.countEmployeeSameStartName(standForName.toString()) + countList;
-    return standForName.toString() + (count + 1);
+    String temp = Normalizer.normalize(standForName.toString() + (count + 1), Normalizer.Form.NFD);
+    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    return pattern.matcher(temp).replaceAll("");
   }
 
   public String generateCommonLangPassword() {
@@ -90,11 +94,9 @@ public class GeneralFunction {
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      helper.setText(String.format(data, id, password), "text/html");
+      message.setContent(String.format(data, id, password), "text/html");
       emailSender.send(message);
-    } catch (MessagingException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
+    } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
     }
   }

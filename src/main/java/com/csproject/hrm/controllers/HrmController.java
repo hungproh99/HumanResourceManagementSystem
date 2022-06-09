@@ -81,7 +81,7 @@ public class HrmController {
     return ResponseEntity.ok(humanManagementService.getListRoleType());
   }
 
-  @PostMapping(URI_UPDATE_EMPLOYEE)
+  @PutMapping(URI_UPDATE_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> updateEmployee(
       @RequestBody UpdateHrmRequest updateHrmRequest,
@@ -90,18 +90,13 @@ public class HrmController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @GetMapping(URI_DOWNLOAD_CSV_EMPLOYEE)
+  @GetMapping(value = URI_DOWNLOAD_CSV_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadCsvEmployee(
-      HttpServletResponse servletResponse,
-      @RequestBody List<String> listId,
-      @RequestParam Map<String, String> allRequestParams)
-      throws IOException {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
+      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
     servletResponse.setContentType("text/csv");
     servletResponse.addHeader("Content-Disposition", "attachment; filename=\"employees.csv\"");
-    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), queryParam, listId);
+    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

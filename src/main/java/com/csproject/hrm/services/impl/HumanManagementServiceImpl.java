@@ -3,7 +3,6 @@ package com.csproject.hrm.services.impl;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
-import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 
@@ -31,5 +30,5 @@ public interface HumanManagementServiceImpl {
 
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
-  void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list);
+  void exportEmployeeToCsv(Writer writer, List<String> list);
 }

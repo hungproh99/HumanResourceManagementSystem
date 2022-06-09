@@ -31,5 +31,5 @@ public interface EmployeeRepositoryCustom {
 
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
-  List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list);
+  List<HrmResponse> findEmployeeByListId(List<String> list);
 }

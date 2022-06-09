@@ -1,9 +1,0 @@
-Hi, <strong>%s</strong>
-
-This is new reset password after you forgot: <strong>%s</strong>
-
-Please don't send it for anyone.
-
-You can change password in this link <a href="http://localhost:3000/forgot">Change Password</a>
-
-Regards.
