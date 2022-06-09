@@ -201,11 +201,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .select(
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
-                EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+                EMPLOYEE.COMPANY_EMAIL,
                 (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
-                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactive"))
+                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactivate"))
                     .as(WORKING_STATUS),
-                EMPLOYEE.PHONE_NUMBER.as(PHONE),
+                EMPLOYEE.PHONE_NUMBER,
                 EMPLOYEE.MARITAL_STATUS,
                 EMPLOYEE.AVATAR,
                 EMPLOYEE.GENDER,
@@ -222,6 +222,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                     .concat(DAY)
                     .as(SENIORITY),
                 WORKING_CONTRACT.START_DATE,
+                WORKING_CONTRACT.CONTRACT_URL,
                 JOB.POSITION.as(POSITION_NAME),
                 WORKING_TYPE.NAME.as(WORKING_NAME))
             .from(EMPLOYEE)
@@ -235,7 +236,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
     return query.fetchInto(EmployeeDetailResponse.class);
   }
