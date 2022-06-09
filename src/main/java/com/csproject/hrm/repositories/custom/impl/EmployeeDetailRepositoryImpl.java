@@ -101,7 +101,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(RELATIVE_INFORMATION)
             .rightJoin(EMPLOYEE)
             .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(RelativeInformation.class);
   }
 
@@ -118,7 +118,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(WORKING_HISTORY)
             .rightJoin(EMPLOYEE)
             .on(WORKING_HISTORY.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(WorkingHistory.class);
   }
 
@@ -137,7 +137,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EDUCATION)
             .rightJoin(EMPLOYEE)
             .on(EDUCATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(Education.class);
   }
 
@@ -151,7 +151,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(BANK)
             .rightJoin(EMPLOYEE)
             .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(Bank.class);
   }
 
@@ -174,7 +174,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EMPLOYEE)
             .leftJoin(IDENTITY_CARD)
             .on(IDENTITY_CARD.CARD_ID.eq(EMPLOYEE.CARD_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(EmployeeAdditionalInfo.class);
   }
 
@@ -183,13 +183,17 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
-            .select(TAX.TAX_ID, INSURANCE.INSURANCE_ID, INSURANCE.INSURANCE_NAME, INSURANCE.ADDRESS)
+            .select(
+                EMPLOYEE.TAX_CODE,
+                INSURANCE.INSURANCE_ID,
+                INSURANCE.INSURANCE_NAME,
+                INSURANCE.ADDRESS)
             .from(EMPLOYEE)
             .leftJoin(TAX)
             .on(TAX.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .leftJoin(INSURANCE)
             .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(TaxAndInsuranceResponse.class);
   }
 
@@ -201,11 +205,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .select(
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
-                EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+                EMPLOYEE.COMPANY_EMAIL,
                 (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
-                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactive"))
+                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactivate"))
                     .as(WORKING_STATUS),
-                EMPLOYEE.PHONE_NUMBER.as(PHONE),
+                EMPLOYEE.PHONE_NUMBER,
                 EMPLOYEE.MARITAL_STATUS,
                 EMPLOYEE.AVATAR,
                 EMPLOYEE.GENDER,
@@ -222,6 +226,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                     .concat(DAY)
                     .as(SENIORITY),
                 WORKING_CONTRACT.START_DATE,
+                WORKING_CONTRACT.CONTRACT_URL,
                 JOB.POSITION.as(POSITION_NAME),
                 WORKING_TYPE.NAME.as(WORKING_NAME))
             .from(EMPLOYEE)
@@ -235,7 +240,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-            .where(EMPLOYEE_ID, employeeID);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
     return query.fetchInto(EmployeeDetailResponse.class);
   }
