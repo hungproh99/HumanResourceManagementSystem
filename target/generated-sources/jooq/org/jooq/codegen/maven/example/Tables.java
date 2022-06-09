@@ -26,7 +26,6 @@ import org.jooq.codegen.maven.example.tables.Tax;
 import org.jooq.codegen.maven.example.tables.WorkingContract;
 import org.jooq.codegen.maven.example.tables.WorkingHistory;
 import org.jooq.codegen.maven.example.tables.WorkingInformation;
-import org.jooq.codegen.maven.example.tables.WorkingPlace;
 import org.jooq.codegen.maven.example.tables.WorkingType;
 
 
@@ -145,11 +144,6 @@ public class Tables {
      * The table <code>human_resource_management.working_information</code>.
      */
     public static final WorkingInformation WORKING_INFORMATION = WorkingInformation.WORKING_INFORMATION;
-
-    /**
-     * The table <code>human_resource_management.working_place</code>.
-     */
-    public static final WorkingPlace WORKING_PLACE = WorkingPlace.WORKING_PLACE;
 
     /**
      * The table <code>human_resource_management.working_type</code>.

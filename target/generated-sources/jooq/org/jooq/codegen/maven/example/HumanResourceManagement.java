@@ -31,7 +31,6 @@ import org.jooq.codegen.maven.example.tables.Tax;
 import org.jooq.codegen.maven.example.tables.WorkingContract;
 import org.jooq.codegen.maven.example.tables.WorkingHistory;
 import org.jooq.codegen.maven.example.tables.WorkingInformation;
-import org.jooq.codegen.maven.example.tables.WorkingPlace;
 import org.jooq.codegen.maven.example.tables.WorkingType;
 import org.jooq.impl.SchemaImpl;
 
@@ -160,11 +159,6 @@ public class HumanResourceManagement extends SchemaImpl {
     public final WorkingInformation WORKING_INFORMATION = WorkingInformation.WORKING_INFORMATION;
 
     /**
-     * The table <code>human_resource_management.working_place</code>.
-     */
-    public final WorkingPlace WORKING_PLACE = WorkingPlace.WORKING_PLACE;
-
-    /**
      * The table <code>human_resource_management.working_type</code>.
      */
     public final WorkingType WORKING_TYPE = WorkingType.WORKING_TYPE;
@@ -207,7 +201,6 @@ public class HumanResourceManagement extends SchemaImpl {
             WorkingContract.WORKING_CONTRACT,
             WorkingHistory.WORKING_HISTORY,
             WorkingInformation.WORKING_INFORMATION,
-            WorkingPlace.WORKING_PLACE,
             WorkingType.WORKING_TYPE
         );
     }

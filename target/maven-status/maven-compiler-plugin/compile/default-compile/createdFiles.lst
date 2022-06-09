@@ -43,6 +43,7 @@ com\csproject\hrm\services\impl\EmployeeDetailServiceImpl.class
 com\csproject\hrm\dto\response\JwtResponse$JwtResponseBuilder.class
 com\csproject\hrm\common\enums\EEmployeeType.class
 com\csproject\hrm\entities\EmployeeType$EmployeeTypeBuilder.class
+com\csproject\hrm\repositories\custom\impl\EmployeeDetailRepositoryImpl.class
 com\csproject\hrm\exception\errors\ErrorResponse.class
 com\csproject\hrm\entities\RelativeInformation.class
 com\csproject\hrm\repositories\custom\EmployeeRepositoryCustom.class
@@ -57,7 +58,6 @@ com\csproject\hrm\entities\ContractType$ContractTypeBuilder.class
 com\csproject\hrm\entities\Education$EducationBuilder.class
 org\jooq\codegen\maven\example\tables\Office.class
 com\csproject\hrm\entities\Office.class
-org\jooq\codegen\maven\example\tables\records\WorkingPlaceRecord.class
 com\csproject\hrm\repositories\custom\impl\ContractRepositoryImpl.class
 com\csproject\hrm\entities\Job$JobBuilder.class
 com\csproject\hrm\controllers\HrmController.class
@@ -66,7 +66,6 @@ org\jooq\codegen\maven\example\tables\WorkingHistory.class
 com\csproject\hrm\jooq\QueryFilter.class
 com\csproject\hrm\dto\request\HrmPojo$HrmPojoBuilder.class
 com\csproject\hrm\jooq\OrderByClause$OrderByClauseBuilder.class
-com\csproject\hrm\repositories\custom\EmployeeDetailCustom.class
 org\jooq\codegen\maven\example\tables\Job.class
 org\jooq\codegen\maven\example\tables\records\SalaryRecord.class
 com\csproject\hrm\exception\CustomParameterConstraintException.class
@@ -86,8 +85,8 @@ org\jooq\codegen\maven\example\tables\records\LaudatoryRecord.class
 org\jooq\codegen\maven\example\tables\records\TaxRecord.class
 com\csproject\hrm\controllers\LoginController.class
 com\csproject\hrm\dto\response\HrmResponseList$HrmResponseListBuilder.class
+com\csproject\hrm\repositories\custom\EmployeeDetailRepositoryCustom.class
 org\jooq\codegen\maven\example\tables\pojos\ContractType.class
-org\jooq\codegen\maven\example\tables\WorkingPlace.class
 com\csproject\hrm\jwt\config\WebSecurityConfig.class
 org\jooq\codegen\maven\example\tables\records\LaudatoryTypeRecord.class
 com\csproject\hrm\jwt\config\AuthEntryPointJwt.class
@@ -145,7 +144,6 @@ org\jooq\codegen\maven\example\tables\Salary.class
 com\csproject\hrm\jooq\OrderBy.class
 com\csproject\hrm\entities\EmployeeType.class
 org\jooq\codegen\maven\example\tables\pojos\IdentityCard.class
-com\csproject\hrm\repositories\custom\impl\EmployeeDetailCustomImpl.class
 org\jooq\codegen\maven\example\tables\Bank.class
 com\csproject\hrm\dto\request\HrmRequest$HrmRequestBuilder.class
 com\csproject\hrm\services\EmployeeDetailService.class
@@ -184,7 +182,6 @@ org\jooq\codegen\maven\example\tables\Discipline.class
 com\csproject\hrm\jooq\Context.class
 com\csproject\hrm\common\utils\DateUtils.class
 com\csproject\hrm\entities\Area.class
-org\jooq\codegen\maven\example\tables\pojos\WorkingPlace.class
 com\csproject\hrm\jwt\JwtUtils.class
 org\jooq\codegen\maven\example\tables\pojos\Tax.class
 com\csproject\hrm\dto\response\HrmResponse.class
