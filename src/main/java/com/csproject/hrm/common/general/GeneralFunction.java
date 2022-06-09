@@ -4,22 +4,23 @@ import com.csproject.hrm.repositories.EmployeeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.velocity.app.VelocityEngine;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.velocity.VelocityEngineUtils;
+import org.springframework.util.FileCopyUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.passay.DictionaryRule.ERROR_CODE;
@@ -30,7 +31,7 @@ import static org.passay.DictionaryRule.ERROR_CODE;
 @NoArgsConstructor
 public class GeneralFunction {
   @Autowired public JavaMailSender emailSender;
-  @Autowired private VelocityEngine engine;
+  @Autowired ResourceLoader resourceLoader;
   @Autowired EmployeeRepository employeeRepository;
 
   public String generateEmailEmployee(String id) {
@@ -77,26 +78,23 @@ public class GeneralFunction {
     return gen.generatePassword(10, splCharRule, lowerCaseRule, upperCaseRule, digitRule);
   }
 
-  public MimeMessage sendEmail(
-      String id, String password, String from, String to, String subject, String attachment) {
+  public void sendEmail(String id, String password, String from, String to, String subject) {
     MimeMessage message = emailSender.createMimeMessage();
-
+    Resource resource = resourceLoader.getResource("classpath:email-body.vm");
     boolean multipart = true;
     try {
-      Map<String, Object> model = new HashMap<>();
-      model.put("name", id);
-      model.put("code", password);
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
       MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      helper.setText(
-          VelocityEngineUtils.mergeTemplateIntoString(engine, "email-body.vm", "UTF-8", model),
-          "text/html");
-      FileSystemResource file = new FileSystemResource(attachment);
-      helper.addAttachment(file.getFilename(), file);
-      return message;
+      helper.setText(String.format(data, id, password), "text/html");
+      emailSender.send(message);
     } catch (MessagingException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

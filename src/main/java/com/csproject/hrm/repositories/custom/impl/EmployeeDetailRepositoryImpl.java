@@ -4,7 +4,7 @@ import com.csproject.hrm.dto.request.EmployeeDetailRequest;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.entities.*;
 import com.csproject.hrm.jooq.*;
-import com.csproject.hrm.repositories.custom.EmployeeDetailCustom;
+import com.csproject.hrm.repositories.custom.EmployeeDetailRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -14,17 +14,11 @@ import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
-import static org.jooq.codegen.maven.example.tables.Area.AREA;
-import static org.jooq.codegen.maven.example.tables.ContractType.CONTRACT_TYPE;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.Job.JOB;
-import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Tax.TAX;
-import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
-import static org.jooq.impl.DSL.*;
 
 @AllArgsConstructor
-public class EmployeeDetailCustomImpl implements EmployeeDetailCustom {
+public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCustom {
   private static final Map<String, Field<?>> field2Map;
 
   static {
@@ -244,47 +238,48 @@ public class EmployeeDetailCustomImpl implements EmployeeDetailCustom {
   }
 
   public List<EmployeeDetailResponse> findMainDetail(List<Condition> conditions) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
-        dslContext
-            .select(
-                EMPLOYEE.EMPLOYEE_ID,
-                EMPLOYEE.FULL_NAME,
-                EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-                EMPLOYEE.WORKING_STATUS,
-                EMPLOYEE.PHONE_NUMBER.as(PHONE),
-                EMPLOYEE.MARITAL_STATUS,
-                EMPLOYEE.AVATAR,
-                EMPLOYEE.GENDER,
-                EMPLOYEE.BIRTH_DATE,
-                JOB.TITLE,
-                OFFICE.NAME.as(OFFICE_NAME),
-                AREA.NAME.as(AREA_NAME),
-                CONTRACT_TYPE.NAME,
-                year(currentDate())
-                    .minus(year(WORKING_CONTRACT.START_DATE))
-                    .concat(YEAR)
-                    .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
-                    .concat(MONTH)
-                    .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
-                    .concat(DAY)
-                    .as(SENIORITY),
-                WORKING_CONTRACT.START_DATE)
-            .from(EMPLOYEE)
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(CONTRACT_TYPE)
-            .on(CONTRACT_TYPE.TYPE_ID.eq(WORKING_CONTRACT.TYPE_ID))
-            .leftJoin(WORKING_PLACE)
-            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(AREA)
-            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-            .leftJoin(OFFICE)
-            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
-            .leftJoin(JOB)
-            .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-            .where(conditions);
-
-    return query.fetchInto(EmployeeDetailResponse.class);
+//    final DSLContext dslContext = DSL.using(connection.getConnection());
+//    final var query =
+//        dslContext
+//            .select(
+//                EMPLOYEE.EMPLOYEE_ID,
+//                EMPLOYEE.FULL_NAME,
+//                EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+//                EMPLOYEE.WORKING_STATUS,
+//                EMPLOYEE.PHONE_NUMBER.as(PHONE),
+//                EMPLOYEE.MARITAL_STATUS,
+//                EMPLOYEE.AVATAR,
+//                EMPLOYEE.GENDER,
+//                EMPLOYEE.BIRTH_DATE,
+//                JOB.TITLE,
+//                OFFICE.NAME.as(OFFICE_NAME),
+//                AREA.NAME.as(AREA_NAME),
+//                CONTRACT_TYPE.NAME,
+//                year(currentDate())
+//                    .minus(year(WORKING_CONTRACT.START_DATE))
+//                    .concat(YEAR)
+//                    .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+//                    .concat(MONTH)
+//                    .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+//                    .concat(DAY)
+//                    .as(SENIORITY),
+//                WORKING_CONTRACT.START_DATE)
+//            .from(EMPLOYEE)
+//            .leftJoin(WORKING_CONTRACT)
+//            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+//            .leftJoin(CONTRACT_TYPE)
+//            .on(CONTRACT_TYPE.TYPE_ID.eq(WORKING_CONTRACT.TYPE_ID))
+//            .leftJoin(WORKING_PLACE)
+//            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+//            .leftJoin(AREA)
+//            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+//            .leftJoin(OFFICE)
+//            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+//            .leftJoin(JOB)
+//            .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+//            .where(conditions);
+//
+//    return query.fetchInto(EmployeeDetailResponse.class);
+    return null;
   }
 }

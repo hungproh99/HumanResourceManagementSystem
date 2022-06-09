@@ -1,6 +1,6 @@
-Hi, <strong>$name</strong>
+Hi, <strong>%s</strong>
 
-This is new reset password after you forgot: <strong>$code</strong>
+This is new reset password after you forgot: <strong>%s</strong>
 
 Please don't send it for anyone.
 

@@ -1,6 +1,7 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -76,5 +79,29 @@ public class HrmController {
   @GetMapping(URI_LIST_ROLE_TYPE)
   public ResponseEntity<?> getListRoleType() {
     return ResponseEntity.ok(humanManagementService.getListRoleType());
+  }
+
+  @PostMapping(URI_UPDATE_EMPLOYEE)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> updateEmployee(
+      @RequestBody UpdateHrmRequest updateHrmRequest,
+      @PathVariable("employee_id") String employeeId) {
+    humanManagementService.updateEmployeeById(updateHrmRequest, employeeId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @GetMapping(URI_DOWNLOAD_CSV_EMPLOYEE)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> downloadCsvEmployee(
+      HttpServletResponse servletResponse,
+      @RequestBody List<String> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    servletResponse.setContentType("text/csv");
+    servletResponse.addHeader("Content-Disposition", "attachment; filename=\"employees.csv\"");
+    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), queryParam, listId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

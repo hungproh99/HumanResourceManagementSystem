@@ -7,7 +7,7 @@ import com.csproject.hrm.jooq.QueryParam;
 
 import java.util.List;
 
-public interface EmployeeDetailCustom {
+public interface EmployeeDetailRepositoryCustom {
   List<EmployeeDetailResponse> findMainDetail(QueryParam queryParam);
 
   List<TaxAndInsuranceResponse> findTaxAndInsurance(QueryParam queryParam);

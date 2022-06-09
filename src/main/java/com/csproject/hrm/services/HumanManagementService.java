@@ -5,17 +5,23 @@ import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.ContractRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.impl.HumanManagementServiceImpl;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +135,39 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   @Override
   public List<JobDto> getListJob() {
     return contractRepository.getListJob();
+  }
+
+  @Override
+  public void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId) {
+    employeeRepository.updateEmployeeById(updateHrmRequest, employeeId);
+  }
+
+  @Override
+  public void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list) {
+    if (list.size() == 0) {
+      throw new CustomDataNotFoundException(NO_DATA);
+    } else {
+      List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
+      try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
+        for (HrmResponse hrmResponse : hrmResponses) {
+          csvPrinter.printRecord(
+              hrmResponse.getEmployee_id(),
+              hrmResponse.getFull_name(),
+              hrmResponse.getEmail(),
+              hrmResponse.getWorking_status(),
+              hrmResponse.getPhone(),
+              hrmResponse.getGender(),
+              hrmResponse.getBirth_date(),
+              hrmResponse.getGrade(),
+              hrmResponse.getOffice_name(),
+              hrmResponse.getArea_name(),
+              hrmResponse.getSeniority(),
+              hrmResponse.getPosition_name(),
+              hrmResponse.getWorking_name());
+        }
+      } catch (IOException e) {
+      }
+    }
   }
 
   private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
