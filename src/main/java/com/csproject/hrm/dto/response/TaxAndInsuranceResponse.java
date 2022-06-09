@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaxAndInsuranceResponse {
-  private Long tax_id;
+  private Long tax_code;
   private Long insurance_id;
   private String insurance_name;
   private String address;
