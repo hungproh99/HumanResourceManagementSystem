@@ -14,11 +14,12 @@ public class EmployeeDetailRequest {
   private LocalDate email;
   private LocalDate seniority;
   private LocalDate officialDate;
-  private String work_status;
+  private Boolean working_status;
   private String contract_url;
   private String phone;
   private String job;
   private LocalDate birth_date;
+  private LocalDate start_date;
   private String companyEmail;
   private String gender;
   private String maritalStatus;
