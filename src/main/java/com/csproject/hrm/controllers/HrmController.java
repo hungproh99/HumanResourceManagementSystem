@@ -12,17 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
+import static com.csproject.hrm.common.constant.Constants.*;
 import static com.csproject.hrm.common.uri.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -51,12 +50,19 @@ public class HrmController {
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> importCsvToEmployee(@RequestParam MultipartFile multipartFile) {
+    if (multipartFile.isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
+    }
     String extension = multipartFile.getContentType();
     if(!extension.equals("text/csv")){
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST,"Only upload csv file");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, ONLY_UPLOAD_CSV);
     }
-    String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-    humanManagementService.importCsvToEmployee(fileName);
+    try {
+      InputStream fileName = multipartFile.getInputStream();
+      humanManagementService.importCsvToEmployee(fileName);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
@@ -103,7 +109,7 @@ public class HrmController {
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadCsvEmployee(
       HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
-    servletResponse.setContentType("text/csv");
+    servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader("Content-Disposition", "attachment; filename=\"employees.csv\"");
     humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));

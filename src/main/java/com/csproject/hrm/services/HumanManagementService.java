@@ -25,11 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -166,15 +162,14 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   }
 
   @Override
-  public void importCsvToEmployee(String path) {
+  public void importCsvToEmployee(InputStream inputStream) {
     List<HrmRequest> hrmRequestList = new ArrayList<>();
-    try (Reader reader = Files.newBufferedReader(Paths.get(path).toAbsolutePath());
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         CSVParser csvParser =
             new CSVParser(
                 reader,
                 CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim()); ) {
       for (CSVRecord csvRecord : csvParser) {
-
         String fullName = csvRecord.get("Full Name");
         String role = csvRecord.get("Role");
         String phone = csvRecord.get("Phone");

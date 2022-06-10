@@ -6,6 +6,7 @@ import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 
@@ -30,5 +31,5 @@ public interface HumanManagementServiceImpl {
 
   void exportEmployeeToCsv(Writer writer, List<String> list);
 
-  void importCsvToEmployee(String path);
+  void importCsvToEmployee(InputStream inputStream);
 }

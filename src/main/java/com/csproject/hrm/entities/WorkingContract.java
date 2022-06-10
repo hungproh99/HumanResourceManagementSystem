@@ -31,7 +31,7 @@ public class WorkingContract {
   private String companyName;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "contract_type")
+  @JoinColumn(name = "contract_type_id")
   private ContractType contractType;
 
   @Column(name = "start_date")

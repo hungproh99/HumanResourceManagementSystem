@@ -76,4 +76,5 @@ public class Constants {
   public static final String NO_DATA = "Don't have any data";
   public static final String NO_EMPLOYEE_WITH_ID = "Don't have employee with ";
   public static final String CAN_NOT_WRITE_CSV = "Can't write csv ";
+  public static final String ONLY_UPLOAD_CSV = "Only upload csv file ";
 }
