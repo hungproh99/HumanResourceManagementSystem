@@ -4,6 +4,7 @@ import com.csproject.hrm.dto.dto.EmployeeTypeDto;
 import com.csproject.hrm.dto.dto.RoleDto;
 import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
+import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
@@ -27,4 +28,8 @@ public interface EmployeeRepositoryCustom {
   List<EmployeeTypeDto> getListEmployeeType();
 
   List<RoleDto> getListRoleType();
+
+  void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
+
+  List<HrmResponse> findEmployeeByListId(List<String> list);
 }

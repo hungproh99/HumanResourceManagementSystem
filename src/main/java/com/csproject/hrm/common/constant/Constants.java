@@ -67,9 +67,14 @@ public class Constants {
   public static final String OFFICE_INVALID = "Invalid Office";
   public static final String DOMAIN_EMAIL = "@fpt.edu.vn";
   public static final String FILL_NOT_FULL = "Please fill full in form";
+  public static final String CSV_NULL_DATA = "Field Csv null data";
   public static final String PHONE_VALIDATION = "^\\d{10,12}$";
   public static final String INVALID_PHONE_FORMAT = "Invalid phone format";
   public static final String INVALID_OFFSET = "Invalid offset";
   public static final String INVALID_LIMIT = "Invalid limit";
   public static final String WORK_STATUS_INVALID = "Invalid Work Status";
+  public static final String NO_DATA = "Don't have any data";
+  public static final String NO_EMPLOYEE_WITH_ID = "Don't have employee with ";
+  public static final String CAN_NOT_WRITE_CSV = "Can't write csv ";
+  public static final String ONLY_UPLOAD_CSV = "Only upload csv file ";
 }
