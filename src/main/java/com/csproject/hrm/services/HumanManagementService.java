@@ -17,14 +17,21 @@ import com.csproject.hrm.repositories.ContractRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.impl.HumanManagementServiceImpl;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,45 +80,6 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   }
 
   @Override
-  public void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
-    List<HrmPojo> hrmPojos = new ArrayList<>();
-    hrmRequestList.forEach(
-        hrmRequest -> {
-          if (hrmRequest.getFullName() == null
-              || hrmRequest.getRole() == null
-              || hrmRequest.getPhone() == null
-              || hrmRequest.getGender() == null
-              || hrmRequest.getBirthDate() == null
-              || hrmRequest.getGrade() == null
-              || hrmRequest.getPosition() == null
-              || hrmRequest.getOffice() == null
-              || hrmRequest.getArea() == null
-              || hrmRequest.getWorkingType() == null
-              || hrmRequest.getManagerId() == null
-              || hrmRequest.getEmployeeType() == null) {
-            throw new CustomParameterConstraintException(FILL_NOT_FULL);
-          } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
-            throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
-          }
-          HrmPojo hrmPojo = createHrmPojo(hrmRequest);
-          int countList = 0;
-          for (HrmPojo hrm : hrmPojos) {
-            if (hrmPojo.getFullName().equalsIgnoreCase(hrm.getFullName())) {
-              countList++;
-            }
-          }
-          String employeeId =
-              generalFunction.generateIdEmployee(hrmRequest.getFullName(), countList);
-          String companyEmail = generalFunction.generateEmailEmployee(employeeId);
-          hrmPojo.setEmployeeId(employeeId);
-          hrmPojo.setCompanyEmail(companyEmail);
-          hrmPojos.add(hrmPojo);
-        });
-
-    employeeRepository.insertMultiEmployee(hrmPojos);
-  }
-
-  @Override
   public List<WorkingTypeDto> getListWorkingType() {
     return employeeRepository.getListWorkingType();
   }
@@ -156,7 +124,24 @@ public class HumanManagementService implements HumanManagementServiceImpl {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(list);
-      try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
+      try (CSVPrinter csvPrinter =
+          new CSVPrinter(
+              writer,
+              CSVFormat.DEFAULT.withHeader(
+                  "Employee Id",
+                  "Full Name",
+                  "Company Email",
+                  "Working Status",
+                  "Phone",
+                  "Gender",
+                  "Birth Date",
+                  "Grade",
+                  "Office",
+                  "Area",
+                  "Seniority",
+                  "Position",
+                  "Working Name"))) {
+
         for (HrmResponse hrmResponse : hrmResponses) {
           csvPrinter.printRecord(
               hrmResponse.getEmployee_id(),
@@ -173,10 +158,94 @@ public class HumanManagementService implements HumanManagementServiceImpl {
               hrmResponse.getPosition_name(),
               hrmResponse.getWorking_name());
         }
+        csvPrinter.flush();
       } catch (IOException e) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, CAN_NOT_WRITE_CSV);
       }
     }
+  }
+
+  @Override
+  public void importCsvToEmployee(String path) {
+    List<HrmRequest> hrmRequestList = new ArrayList<>();
+    try (Reader reader = Files.newBufferedReader(Paths.get(path).toAbsolutePath());
+        CSVParser csvParser =
+            new CSVParser(
+                reader,
+                CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim()); ) {
+      for (CSVRecord csvRecord : csvParser) {
+
+        String fullName = csvRecord.get("Full Name");
+        String role = csvRecord.get("Role");
+        String phone = csvRecord.get("Phone");
+        String gender = csvRecord.get("Gender");
+        LocalDate birthDate =
+            LocalDate.parse(csvRecord.get("Birth Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String grade = csvRecord.get("Grade");
+        String position = csvRecord.get("Position");
+        String office = csvRecord.get("Office");
+        String area = csvRecord.get("Area");
+        String workingType = csvRecord.get("Working Type");
+        String managerId = csvRecord.get("Manager Id");
+        String employeeType = csvRecord.get("Employee Type");
+        hrmRequestList.add(
+            HrmRequest.builder()
+                .fullName(fullName)
+                .role(role)
+                .phone(phone)
+                .gender(gender)
+                .birthDate(birthDate)
+                .grade(grade)
+                .position(position)
+                .office(office)
+                .area(area)
+                .workingType(workingType)
+                .managerId(managerId)
+                .employeeType(employeeType)
+                .build());
+      }
+      insertMultiEmployee(hrmRequestList);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
+    List<HrmPojo> hrmPojos = new ArrayList<>();
+    hrmRequestList.forEach(
+        hrmRequest -> {
+          if (hrmRequest.getFullName() == null
+              || hrmRequest.getRole() == null
+              || hrmRequest.getPhone() == null
+              || hrmRequest.getGender() == null
+              || hrmRequest.getBirthDate() == null
+              || hrmRequest.getGrade() == null
+              || hrmRequest.getPosition() == null
+              || hrmRequest.getOffice() == null
+              || hrmRequest.getArea() == null
+              || hrmRequest.getWorkingType() == null
+              || hrmRequest.getManagerId() == null
+              || hrmRequest.getEmployeeType() == null) {
+            throw new CustomParameterConstraintException(CSV_NULL_DATA);
+          } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
+            throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+          }
+          HrmPojo hrmPojo = createHrmPojo(hrmRequest);
+          int countList = 0;
+          for (HrmPojo hrm : hrmPojos) {
+            if (hrmPojo.getFullName().equalsIgnoreCase(hrm.getFullName())) {
+              countList++;
+            }
+          }
+          String employeeId =
+              generalFunction.generateIdEmployee(hrmRequest.getFullName(), countList);
+          String companyEmail = generalFunction.generateEmailEmployee(employeeId);
+          hrmPojo.setEmployeeId(employeeId);
+          hrmPojo.setCompanyEmail(companyEmail);
+          hrmPojos.add(hrmPojo);
+        });
+
+    employeeRepository.insertMultiEmployee(hrmPojos);
   }
 
   private HrmPojo createHrmPojo(HrmRequest hrmRequest) {

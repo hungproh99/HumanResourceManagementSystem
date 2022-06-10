@@ -14,8 +14,6 @@ public interface HumanManagementServiceImpl {
 
   void insertEmployee(HrmRequest hrmRequest);
 
-  void insertMultiEmployee(List<HrmRequest> hrmRequestList);
-
   List<WorkingTypeDto> getListWorkingType();
 
   List<EmployeeTypeDto> getListEmployeeType();
@@ -31,4 +29,6 @@ public interface HumanManagementServiceImpl {
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
   void exportEmployeeToCsv(Writer writer, List<String> list);
+
+  void importCsvToEmployee(String path);
 }

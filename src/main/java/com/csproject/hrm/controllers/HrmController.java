@@ -3,6 +3,7 @@ package com.csproject.hrm.controllers;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
+import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
@@ -11,10 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -46,8 +50,13 @@ public class HrmController {
 
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> addMultiEmployee(@RequestBody List<HrmRequest> hrmRequestList) {
-    humanManagementService.insertMultiEmployee(hrmRequestList);
+  public ResponseEntity<?> importCsvToEmployee(@RequestParam MultipartFile multipartFile) {
+    String extension = multipartFile.getContentType();
+    if(!extension.equals("text/csv")){
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST,"Only upload csv file");
+    }
+    String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+    humanManagementService.importCsvToEmployee(fileName);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
