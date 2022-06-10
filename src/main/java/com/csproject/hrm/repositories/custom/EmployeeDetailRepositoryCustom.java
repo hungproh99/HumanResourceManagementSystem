@@ -1,26 +1,25 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.request.EmployeeDetailRequest;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.entities.*;
-import com.csproject.hrm.jooq.QueryParam;
 
 import java.util.List;
 
 public interface EmployeeDetailRepositoryCustom {
-  List<EmployeeDetailResponse> findMainDetail(QueryParam queryParam);
 
-  List<TaxAndInsuranceResponse> findTaxAndInsurance(QueryParam queryParam);
+  List<RelativeInformation> findRelativeByEmployeeID(String employeeID);
 
-  List<EmployeeAdditionalInfo> findAdditionalInfo(QueryParam queryParam);
+  void updateEmployee(Employee employee);
 
-  List<Bank> findBankByEmployeeID(QueryParam queryParam);
+  List<WorkingHistory> findWorkingHistoryByEmployeeID(String employeeID);
 
-  List<Education> findEducationByEmployeeID(QueryParam queryParam);
+  List<Education> findEducationByEmployeeID(String employeeID);
 
-  List<WorkingHistory> findWorkingHistoryByEmployeeID(QueryParam queryParam);
+  List<Bank> findBankByEmployeeID(String employeeID);
 
-  List<RelativeInformation> findRelativeByEmployeeID(QueryParam queryParam);
+  List<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID);
 
-  void updateMainDetail(EmployeeDetailRequest detailRequest);
+  List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
+
+  List<EmployeeDetailResponse> findMainDetail(String employeeID);
 }

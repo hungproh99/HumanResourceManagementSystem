@@ -1,3 +1,5 @@
 package com.csproject.hrm.services;
 
-public interface EmployeeDetailService {}
+public interface EmployeeDetailService {
+  //	void updateEmployee()
+}
