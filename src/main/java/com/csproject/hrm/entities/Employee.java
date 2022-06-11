@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -91,7 +88,7 @@ public class Employee {
   private List<RelativeInformation> relativeInformation;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<Education> educations;
+  private List<Education> education;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "bank_id")
