@@ -5,6 +5,7 @@ import com.csproject.hrm.dto.dto.EmployeeTypeDto;
 import com.csproject.hrm.dto.dto.RoleDto;
 import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
+import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -75,7 +76,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getBirthDate(),
                   EWorkingType.of(hrmPojo.getWorkingType()),
                   hrmPojo.getManagerId(),
-                  EEmployeeType.of(hrmPojo.getEmployeeType())));
+                  EEmployeeType.of(hrmPojo.getEmployeeType()),
+                  hrmPojo.getPersonalEmail()));
           queries.add(
               insertWorkingContractRecord(
                   configuration,
@@ -110,7 +112,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getBirthDate(),
                         EWorkingType.of(hrmPojo.getWorkingType()),
                         hrmPojo.getManagerId(),
-                        EEmployeeType.of(hrmPojo.getEmployeeType())));
+                        EEmployeeType.of(hrmPojo.getEmployeeType()),
+                        hrmPojo.getPersonalEmail()));
                 queries.add(
                     insertWorkingContractRecord(
                         configuration,
@@ -174,8 +177,193 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .fetchInto(RoleDto.class);
   }
 
+  @Override
+  public void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext.transaction(
+        configuration -> {
+          queries.add(
+              updateEmployeeById(
+                  configuration,
+                  employeeId,
+                  updateHrmRequest.getFullName(),
+                  updateHrmRequest.isWorkingStatus(),
+                  updateHrmRequest.getPhone(),
+                  updateHrmRequest.getGender(),
+                  updateHrmRequest.getBirthDate(),
+                  updateHrmRequest.getWorkingType()));
+          queries.add(
+              updateWorkingContractById(
+                  configuration,
+                  employeeId,
+                  updateHrmRequest.getAreaId(),
+                  updateHrmRequest.getJobId(),
+                  updateHrmRequest.getOfficeId(),
+                  updateHrmRequest.getStartDate()));
+          DSL.using(configuration).batch(queries).execute();
+        });
+  }
+
+  @Override
+  public List<HrmResponse> findEmployeeByListId(List<String> list) {
+    List<Condition> conditions = new ArrayList<>();
+    Condition condition = noCondition();
+    for (String id : list) {
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
+    }
+    conditions.add(condition);
+
+    return findEmployeeByListIdByCondition(conditions).fetchInto(HrmResponse.class);
+  }
+
   public Select<?> findAllEmployee(
       List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactive"))
+                .as(WORKING_STATUS),
+            EMPLOYEE.PHONE_NUMBER.as(PHONE),
+            EMPLOYEE.GENDER.as(GENDER),
+            EMPLOYEE.BIRTH_DATE,
+            JOB.GRADE.as(GRADE),
+            OFFICE.NAME.as(OFFICE_NAME),
+            AREA.NAME.as(AREA_NAME),
+            year(currentDate())
+                .minus(year(WORKING_CONTRACT.START_DATE))
+                .concat(YEAR)
+                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(MONTH)
+                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(DAY)
+                .as(SENIORITY),
+            JOB.POSITION.as(POSITION_NAME),
+            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions)
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
+  }
+
+  private Insert<?> insertEmployeeRecord(
+      Configuration config,
+      String employeeId,
+      String companyEmail,
+      String password,
+      boolean workStatus,
+      String fullName,
+      long role,
+      String phone,
+      String gender,
+      LocalDate birthDate,
+      long workingType,
+      String managerId,
+      long employeeType,
+      String personalEmail) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE,
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.COMPANY_EMAIL,
+            EMPLOYEE.PASSWORD,
+            EMPLOYEE.WORKING_STATUS,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.ROLE_TYPE,
+            EMPLOYEE.PHONE_NUMBER,
+            EMPLOYEE.GENDER,
+            EMPLOYEE.BIRTH_DATE,
+            EMPLOYEE.WORKING_TYPE_ID,
+            EMPLOYEE.MANAGER_ID,
+            EMPLOYEE.EMPLOYEE_TYPE_ID,
+            EMPLOYEE.PERSONAL_EMAIL)
+        .values(
+            employeeId,
+            companyEmail,
+            password,
+            workStatus,
+            fullName,
+            role,
+            phone,
+            gender,
+            birthDate,
+            workingType,
+            managerId,
+            employeeType,
+            personalEmail);
+  }
+
+  private Insert<?> insertWorkingContractRecord(
+      Configuration config,
+      String employeeId,
+      String companyName,
+      long area,
+      long job,
+      long office) {
+
+    return DSL.using(config)
+        .insertInto(
+            WORKING_CONTRACT,
+            WORKING_CONTRACT.EMPLOYEE_ID,
+            WORKING_CONTRACT.COMPANY_NAME,
+            WORKING_CONTRACT.AREA_ID,
+            WORKING_CONTRACT.OFFICE_ID,
+            WORKING_CONTRACT.JOB_ID)
+        .values(employeeId, companyName, area, job, office);
+  }
+
+  private Update<?> updateEmployeeById(
+      Configuration config,
+      String employeeId,
+      String fullName,
+      boolean workStatus,
+      String phoneNumber,
+      String gender,
+      LocalDate birthDate,
+      long workingType) {
+    return DSL.using(config)
+        .update(EMPLOYEE)
+        .set(EMPLOYEE.FULL_NAME, fullName)
+        .set(EMPLOYEE.WORKING_STATUS, workStatus)
+        .set(EMPLOYEE.PHONE_NUMBER, phoneNumber)
+        .set(EMPLOYEE.GENDER, gender)
+        .set(EMPLOYEE.BIRTH_DATE, birthDate)
+        .set(EMPLOYEE.WORKING_TYPE_ID, workingType)
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+  }
+
+  private Update<?> updateWorkingContractById(
+      Configuration config,
+      String employeeId,
+      long areaId,
+      long jobId,
+      long officeId,
+      LocalDate startDate) {
+    return DSL.using(config)
+        .update(WORKING_CONTRACT)
+        .set(WORKING_CONTRACT.AREA_ID, areaId)
+        .set(WORKING_CONTRACT.JOB_ID, jobId)
+        .set(WORKING_CONTRACT.OFFICE_ID, officeId)
+        .set(WORKING_CONTRACT.START_DATE, startDate)
+        .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId));
+  }
+
+  private Select<?> findEmployeeByListIdByCondition(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -212,72 +400,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-        .where(conditions)
-        .orderBy(sortFields)
-        .limit(pagination.limit)
-        .offset(pagination.offset);
-  }
-
-  private Insert<?> insertEmployeeRecord(
-      Configuration config,
-      String employeeId,
-      String companyEmail,
-      String password,
-      boolean workStatus,
-      String fullName,
-      long role,
-      String phone,
-      String gender,
-      LocalDate birthDate,
-      long workingType,
-      String managerId,
-      long employeeType) {
-    return DSL.using(config)
-        .insertInto(
-            EMPLOYEE,
-            EMPLOYEE.EMPLOYEE_ID,
-            EMPLOYEE.COMPANY_EMAIL,
-            EMPLOYEE.PASSWORD,
-            EMPLOYEE.WORKING_STATUS,
-            EMPLOYEE.FULL_NAME,
-            EMPLOYEE.ROLE_TYPE,
-            EMPLOYEE.PHONE_NUMBER,
-            EMPLOYEE.GENDER,
-            EMPLOYEE.BIRTH_DATE,
-            EMPLOYEE.WORKING_TYPE_ID,
-            EMPLOYEE.MANAGER_ID,
-            EMPLOYEE.EMPLOYEE_TYPE_ID)
-        .values(
-            employeeId,
-            companyEmail,
-            password,
-            workStatus,
-            fullName,
-            role,
-            phone,
-            gender,
-            birthDate,
-            workingType,
-            managerId,
-            employeeType);
-  }
-
-  private Insert<?> insertWorkingContractRecord(
-      Configuration config,
-      String employeeId,
-      String companyName,
-      long area,
-      long job,
-      long office) {
-
-    return DSL.using(config)
-        .insertInto(
-            WORKING_CONTRACT,
-            WORKING_CONTRACT.EMPLOYEE_ID,
-            WORKING_CONTRACT.COMPANY_NAME,
-            WORKING_CONTRACT.AREA_ID,
-            WORKING_CONTRACT.OFFICE_ID,
-            WORKING_CONTRACT.JOB_ID)
-        .values(employeeId, companyName, area, job, office);
+        .where(conditions);
   }
 }

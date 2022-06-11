@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.entities.*;
 
@@ -9,7 +10,17 @@ public interface EmployeeDetailRepositoryCustom {
 
   List<RelativeInformation> findRelativeByEmployeeID(String employeeID);
 
-  void updateEmployee(Employee employee);
+  void updateRelativeInfo(RelativeInformationRequest relativeInformation);
+
+  void updateWorkingHistory(WorkingHistoryRequest workingHistory);
+
+  void updateEducationInfo(EducationRequest education);
+
+  void updateBankInfo(BankRequest bank);
+
+  void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance);
+
+  void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest);
 
   List<WorkingHistory> findWorkingHistoryByEmployeeID(String employeeID);
 

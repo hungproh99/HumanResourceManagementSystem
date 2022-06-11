@@ -9,12 +9,20 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.passay.DictionaryRule.ERROR_CODE;
@@ -25,20 +33,23 @@ import static org.passay.DictionaryRule.ERROR_CODE;
 @NoArgsConstructor
 public class GeneralFunction {
   @Autowired public JavaMailSender emailSender;
+  @Autowired ResourceLoader resourceLoader;
   @Autowired EmployeeRepository employeeRepository;
 
   public String generateEmailEmployee(String id) {
     return id + DOMAIN_EMAIL;
   }
 
-  public String generateIdEmployee(String fullName) {
+  public String generateIdEmployee(String fullName, int countList) {
     String[] splitSpace = fullName.split("\\s+");
     StringBuilder standForName = new StringBuilder(splitSpace[splitSpace.length - 1]);
     for (int index = 0; index < splitSpace.length - 1; index++) {
       standForName.append(splitSpace[index].charAt(ZERO_NUMBER));
     }
-    int count = employeeRepository.countEmployeeSameStartName(standForName.toString());
-    return standForName.toString() + (count + 1);
+    int count = employeeRepository.countEmployeeSameStartName(standForName.toString()) + countList;
+    String temp = Normalizer.normalize(standForName.toString() + (count + 1), Normalizer.Form.NFD);
+    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    return pattern.matcher(temp).replaceAll("");
   }
 
   public String generateCommonLangPassword() {
@@ -71,19 +82,21 @@ public class GeneralFunction {
     return gen.generatePassword(10, splCharRule, lowerCaseRule, upperCaseRule, digitRule);
   }
 
-  public void sendEmail(String from, String to, String subject, String text) {
+  public void sendEmail(String id, String password, String from, String to, String subject) {
     MimeMessage message = emailSender.createMimeMessage();
-
+    Resource resource = resourceLoader.getResource("classpath:email-body.vm");
     boolean multipart = true;
-
     try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
       MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
-      message.setContent(text, "text/html");
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
+      message.setContent(String.format(data, id, password), "text/html");
       emailSender.send(message);
-    } catch (MessagingException e) {
+    } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
     }
   }
