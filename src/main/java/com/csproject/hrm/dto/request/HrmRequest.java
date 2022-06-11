@@ -24,4 +24,5 @@ public class HrmRequest {
   private String workingType;
   private String managerId;
   private String employeeType;
+  private String personalEmail;
 }

@@ -76,7 +76,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getBirthDate(),
                   EWorkingType.of(hrmPojo.getWorkingType()),
                   hrmPojo.getManagerId(),
-                  EEmployeeType.of(hrmPojo.getEmployeeType())));
+                  EEmployeeType.of(hrmPojo.getEmployeeType()),
+                  hrmPojo.getPersonalEmail()));
           queries.add(
               insertWorkingContractRecord(
                   configuration,
@@ -111,7 +112,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getBirthDate(),
                         EWorkingType.of(hrmPojo.getWorkingType()),
                         hrmPojo.getManagerId(),
-                        EEmployeeType.of(hrmPojo.getEmployeeType())));
+                        EEmployeeType.of(hrmPojo.getEmployeeType()),
+                        hrmPojo.getPersonalEmail()));
                 queries.add(
                     insertWorkingContractRecord(
                         configuration,
@@ -272,7 +274,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       LocalDate birthDate,
       long workingType,
       String managerId,
-      long employeeType) {
+      long employeeType,
+      String personalEmail) {
     return DSL.using(config)
         .insertInto(
             EMPLOYEE,
@@ -287,7 +290,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             EMPLOYEE.BIRTH_DATE,
             EMPLOYEE.WORKING_TYPE_ID,
             EMPLOYEE.MANAGER_ID,
-            EMPLOYEE.EMPLOYEE_TYPE_ID)
+            EMPLOYEE.EMPLOYEE_TYPE_ID,
+            EMPLOYEE.PERSONAL_EMAIL)
         .values(
             employeeId,
             companyEmail,
@@ -300,7 +304,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             birthDate,
             workingType,
             managerId,
-            employeeType);
+            employeeType,
+            personalEmail);
   }
 
   private Insert<?> insertWorkingContractRecord(
