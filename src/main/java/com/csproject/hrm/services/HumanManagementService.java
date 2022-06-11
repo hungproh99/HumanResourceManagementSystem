@@ -61,7 +61,8 @@ public class HumanManagementService implements HumanManagementServiceImpl {
         || hrmRequest.getArea() == null
         || hrmRequest.getWorkingType() == null
         || hrmRequest.getManagerId() == null
-        || hrmRequest.getEmployeeType() == null) {
+        || hrmRequest.getEmployeeType() == null
+        || hrmRequest.getPersonalEmail() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
       throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
@@ -183,6 +184,7 @@ public class HumanManagementService implements HumanManagementServiceImpl {
         String workingType = csvRecord.get("Working Type");
         String managerId = csvRecord.get("Manager Id");
         String employeeType = csvRecord.get("Employee Type");
+        String personalEmail = csvRecord.get("Personal Email");
         hrmRequestList.add(
             HrmRequest.builder()
                 .fullName(fullName)
@@ -197,6 +199,7 @@ public class HumanManagementService implements HumanManagementServiceImpl {
                 .workingType(workingType)
                 .managerId(managerId)
                 .employeeType(employeeType)
+                .personalEmail(personalEmail)
                 .build());
       }
       insertMultiEmployee(hrmRequestList);
@@ -220,7 +223,8 @@ public class HumanManagementService implements HumanManagementServiceImpl {
               || hrmRequest.getArea() == null
               || hrmRequest.getWorkingType() == null
               || hrmRequest.getManagerId() == null
-              || hrmRequest.getEmployeeType() == null) {
+              || hrmRequest.getEmployeeType() == null
+              || hrmRequest.getPersonalEmail() == null) {
             throw new CustomParameterConstraintException(CSV_NULL_DATA);
           } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
             throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
@@ -264,6 +268,7 @@ public class HumanManagementService implements HumanManagementServiceImpl {
             .workingType(hrmRequest.getWorkingType())
             .managerId(hrmRequest.getManagerId())
             .employeeType(hrmRequest.getEmployeeType())
+            .personalEmail(hrmRequest.getPersonalEmail())
             .build();
     //
     //    generalFunction.sendEmail(
