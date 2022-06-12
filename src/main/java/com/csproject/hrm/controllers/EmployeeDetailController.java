@@ -2,6 +2,7 @@ package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.entities.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;

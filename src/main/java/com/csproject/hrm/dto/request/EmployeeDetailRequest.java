@@ -41,5 +41,5 @@ public class EmployeeDetailRequest {
   private Boolean contract_status;
   private Long area_id;
   private Long office_id;
-  private Long job_id;
+  private Long grade_id;
 }

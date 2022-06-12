@@ -67,33 +67,53 @@ public class HrmController {
   }
 
   @GetMapping(URI_LIST_WORKING_TYPE)
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListWorkingType() {
     return ResponseEntity.ok(humanManagementService.getListWorkingType());
   }
 
   @GetMapping(URI_LIST_EMPLOYEE_TYPE)
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListEmployeeType() {
     return ResponseEntity.ok(humanManagementService.getListEmployeeType());
   }
 
   @GetMapping(URI_LIST_AREA)
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListArea() {
     return ResponseEntity.ok(humanManagementService.getListArea());
   }
 
   @GetMapping(URI_LIST_JOB)
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListJob() {
-    return ResponseEntity.ok(humanManagementService.getListJob());
+    return ResponseEntity.ok(humanManagementService.getListPosition());
+  }
+
+  @GetMapping(URI_LIST_GRADE)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> getListGrade(@PathVariable String job_id) {
+    return ResponseEntity.ok(humanManagementService.getListGradeByPosition(job_id));
   }
 
   @GetMapping(URI_LIST_OFFICE)
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListOffice() {
     return ResponseEntity.ok(humanManagementService.getListOffice());
   }
 
   @GetMapping(URI_LIST_ROLE_TYPE)
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListRoleType() {
     return ResponseEntity.ok(humanManagementService.getListRoleType());
+  }
+
+  @GetMapping(URI_GET_LIST_MANAGER)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> getListManager(@RequestParam Map<String, String> allRequestParams) {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    return ResponseEntity.ok(humanManagementService.getListManagerByName(queryParam));
   }
 
   @PutMapping(URI_UPDATE_EMPLOYEE)

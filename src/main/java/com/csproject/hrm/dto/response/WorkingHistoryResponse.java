@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class WorkingHistoryResponse {
   private Long working_history_id;
   private String company_name;
-  private ContractType type_id;
+  private Long type_id;
   private String position;
   private LocalDate start_date;
   private LocalDate end_date;

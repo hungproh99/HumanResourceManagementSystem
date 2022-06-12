@@ -1,8 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.AreaDto;
-import com.csproject.hrm.dto.dto.JobDto;
-import com.csproject.hrm.dto.dto.OfficeDto;
+import com.csproject.hrm.dto.dto.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +11,7 @@ public interface ContractRepositoryCustom {
 
   List<AreaDto> getListArea();
 
-  List<JobDto> getListJob();
+  List<JobDto> getListPosition();
+
+  List<GradeDto> getListGradeByPosition(long jodId);
 }
