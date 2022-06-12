@@ -12,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
+import com.csproject.hrm.common.constant.Constants;
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.Grade.GRADE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Tax.TAX;
@@ -214,7 +216,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 EMPLOYEE.AVATAR,
                 EMPLOYEE.GENDER,
                 EMPLOYEE.BIRTH_DATE,
-                JOB.GRADE.as(GRADE),
+                GRADE.NAME.as(Constants.GRADE),
                 OFFICE.NAME.as(OFFICE_NAME),
                 AREA.NAME.as(AREA_NAME),
                 year(currentDate())
@@ -238,6 +240,8 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
             .leftJoin(JOB)
             .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+            .leftJoin(GRADE)
+            .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));

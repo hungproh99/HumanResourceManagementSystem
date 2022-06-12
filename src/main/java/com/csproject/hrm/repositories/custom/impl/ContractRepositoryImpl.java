@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.dto.dto.AreaDto;
+import com.csproject.hrm.dto.dto.GradeDto;
 import com.csproject.hrm.dto.dto.JobDto;
 import com.csproject.hrm.dto.dto.OfficeDto;
 import com.csproject.hrm.jooq.DBConnection;
@@ -45,11 +46,21 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
   }
 
   @Override
-  public List<JobDto> getListJob() {
+  public List<JobDto> getListPosition() {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(JOB.JOB_ID, JOB.DESCRIPTION, JOB.GRADE, JOB.POSITION)
+        .select(JOB.JOB_ID, JOB.POSITION, JOB.DESCRIPTION)
         .from(JOB)
         .fetchInto(JobDto.class);
+  }
+
+  @Override
+  public List<GradeDto> getListGradeByPosition(long jodId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(GRADE.GRADE_ID, GRADE.NAME, GRADE.DESCRIPTION)
+        .from(GRADE)
+        .where(GRADE.JOB_ID.eq(jodId))
+        .fetchInto(GradeDto.class);
   }
 }
