@@ -88,7 +88,7 @@ public class Employee {
   private List<RelativeInformation> relativeInformation;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<Education> education;
+  private List<Education> educations;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "bank_id")
