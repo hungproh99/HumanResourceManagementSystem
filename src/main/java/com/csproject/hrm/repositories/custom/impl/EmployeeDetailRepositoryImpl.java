@@ -2,7 +2,6 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.entities.*;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.repositories.custom.EmployeeDetailRepositoryCustom;
 import lombok.AllArgsConstructor;
@@ -203,7 +202,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             WORKING_CONTRACT,
             WORKING_CONTRACT.WORKING_CONTRACT_ID,
             WORKING_CONTRACT.COMPANY_NAME,
-            WORKING_CONTRACT.CONTRACT_TYPE,
+            WORKING_CONTRACT.CONTRACT_TYPE_ID,
             WORKING_CONTRACT.START_DATE,
             WORKING_CONTRACT.END_DATE,
             WORKING_CONTRACT.BASE_SALARY,
@@ -216,7 +215,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .values(
             employeeDetailRequest.getWorking_contract_id(),
             employeeDetailRequest.getCompany_name(),
-            employeeDetailRequest.getContract_type(),
+            employeeDetailRequest.getContract_type_id(),
             employeeDetailRequest.getStart_date(),
             employeeDetailRequest.getEnd_date(),
             employeeDetailRequest.getBase_salary(),
@@ -229,7 +228,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .onDuplicateKeyUpdate()
         .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
         .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_name())
-        .set(WORKING_CONTRACT.CONTRACT_TYPE, employeeDetailRequest.getContract_type())
+        .set(WORKING_CONTRACT.CONTRACT_TYPE_ID, employeeDetailRequest.getContract_type_id())
         .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
         .set(WORKING_CONTRACT.END_DATE, employeeDetailRequest.getEnd_date())
         .set(WORKING_CONTRACT.BASE_SALARY, employeeDetailRequest.getBase_salary())
@@ -307,25 +306,35 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<RelativeInformation> findRelativeByEmployeeID(String employeeID) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
-        dslContext
-            .select(RELATIVE_INFORMATION.PARENT_NAME, RELATIVE_INFORMATION.CONTACT)
-            .from(RELATIVE_INFORMATION)
-            .rightJoin(EMPLOYEE)
-            .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(RelativeInformation.class);
-  }
-
-  @Override
-  public List<WorkingHistory> findWorkingHistoryByEmployeeID(String employeeID) {
+  public List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .select(
+                RELATIVE_INFORMATION.RELATIVE_ID,
+                RELATIVE_INFORMATION.PARENT_NAME,
+                RELATIVE_INFORMATION.BIRTH_DATE,
+                RELATIVE_TYPE.TYPE_ID,
+                RELATIVE_INFORMATION.STATUS,
+                RELATIVE_INFORMATION.CONTACT)
+            .from(RELATIVE_INFORMATION)
+            .leftJoin(RELATIVE_TYPE)
+            .on(RELATIVE_INFORMATION.RELATIVE_TYPE.eq(RELATIVE_TYPE.TYPE_ID))
+            .rightJoin(EMPLOYEE)
+            .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
+    return query.fetchInto(RelativeInformationResponse.class);
+  }
+
+  @Override
+  public List<WorkingHistoryResponse> findWorkingHistoryByEmployeeID(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .select(
+                WORKING_HISTORY.WORKING_HISTORY_ID,
                 WORKING_HISTORY.COMPANY_NAME,
+                WORKING_HISTORY.TYPE_ID,
                 WORKING_HISTORY.POSITION,
                 WORKING_HISTORY.START_DATE,
                 WORKING_HISTORY.END_DATE)
@@ -333,11 +342,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .rightJoin(EMPLOYEE)
             .on(WORKING_HISTORY.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(WorkingHistory.class);
+    return query.fetchInto(WorkingHistoryResponse.class);
   }
 
   @Override
-  public List<Education> findEducationByEmployeeID(String employeeID) {
+  public List<EducationResponse> findEducationByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -352,11 +361,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .rightJoin(EMPLOYEE)
             .on(EDUCATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(Education.class);
+    return query.fetchInto(EducationResponse.class);
   }
 
   @Override
-  public List<Bank> findBankByEmployeeID(String employeeID) {
+  public List<BankResponse> findBankByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -366,7 +375,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .rightJoin(EMPLOYEE)
             .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(Bank.class);
+    return query.fetchInto(BankResponse.class);
   }
 
   @Override
