@@ -2,7 +2,6 @@ package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.entities.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class EmployeeDetailController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("tax-and-insurance")
+  @GetMapping("tax_and_insurance")
   public ResponseEntity<?> findTaxAndInsurance(@RequestParam String employeeID) {
     List<TaxAndInsuranceResponse> taxAndInsurance =
         employeeDetailRepository.findTaxAndInsurance(employeeID);
@@ -40,7 +39,7 @@ public class EmployeeDetailController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("add-info")
+  @GetMapping("add_info")
   public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
     List<EmployeeAdditionalInfo> additionalInfo =
         employeeDetailRepository.findAdditionalInfo(employeeID);
@@ -50,21 +49,22 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping("bank")
   public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
-    List<Bank> bank = employeeDetailRepository.findBankByEmployeeID(employeeID);
+    List<BankResponse> bank = employeeDetailRepository.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping("edu")
   public ResponseEntity<?> findEducationInfo(@RequestParam String employeeID) {
-    List<Education> educations = employeeDetailRepository.findEducationByEmployeeID(employeeID);
+    List<EducationResponse> educations =
+        employeeDetailRepository.findEducationByEmployeeID(employeeID);
     return ResponseEntity.ok(educations);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("working-history")
+  @GetMapping("working_history")
   public ResponseEntity<?> findWorkingHistoryByEmployeeID(@RequestParam String employeeID) {
-    List<WorkingHistory> workingHistories =
+    List<WorkingHistoryResponse> workingHistories =
         employeeDetailRepository.findWorkingHistoryByEmployeeID(employeeID);
     return ResponseEntity.ok(workingHistories);
   }
@@ -72,7 +72,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping("relative")
   public ResponseEntity<?> findRelativeByEmployeeID(@RequestParam String employeeID) {
-    List<RelativeInformation> relatives =
+    List<RelativeInformationResponse> relatives =
         employeeDetailRepository.findRelativeByEmployeeID(employeeID);
     return ResponseEntity.ok(relatives);
   }
@@ -86,7 +86,7 @@ public class EmployeeDetailController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("tax-and-insurance/update")
+  @PostMapping("tax_and_insurance/update")
   public ResponseEntity<?> updateTaxAndInsurance(
       @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
     employeeDetailRepository.updateTaxAndInsurance(taxAndInsurance);
@@ -101,7 +101,7 @@ public class EmployeeDetailController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("working-history/update")
+  @PostMapping("working_history/update")
   public ResponseEntity<?> updateWorkingHistory(@RequestBody WorkingHistoryRequest workingHistory) {
     employeeDetailRepository.updateWorkingHistory(workingHistory);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));

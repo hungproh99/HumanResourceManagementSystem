@@ -33,7 +33,7 @@ public class EmployeeDetailRequest {
 
   private Long working_contract_id;
   private String company_name;
-  private Long contract_type;
+  private Long contract_type_id;
   private LocalDate start_date;
   private LocalDate end_date;
   private BigDecimal base_salary;

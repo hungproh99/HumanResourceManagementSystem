@@ -1,6 +1,5 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.EmployeeTypeDto;
 import com.csproject.hrm.dto.dto.RoleDto;
@@ -28,7 +27,6 @@ import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.Grade.GRADE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
@@ -86,7 +84,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getEmployeeId(),
                   hrmPojo.getCompanyName(),
                   EArea.of(hrmPojo.getArea()),
-                  EJob.of(hrmPojo.getPosition()),
+                  EJob.of(hrmPojo.getGrade(), hrmPojo.getPosition()),
                   EOffice.of(hrmPojo.getOffice())));
           DSL.using(configuration).batch(queries).execute();
         });
@@ -122,7 +120,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getEmployeeId(),
                         hrmPojo.getCompanyName(),
                         EArea.of(hrmPojo.getArea()),
-                        EJob.of(hrmPojo.getPosition()),
+                        EJob.of(hrmPojo.getGrade(), hrmPojo.getPosition()),
                         EOffice.of(hrmPojo.getOffice())));
               });
 
@@ -219,21 +217,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     return findEmployeeByListIdByCondition(conditions).fetchInto(HrmResponse.class);
   }
 
-  @Override
-  public List<String> getListManagerByName(QueryParam queryParam) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
-
-    return dslContext
-        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-        .from(EMPLOYEE)
-        .where(conditions)
-        .orderBy(sortFields)
-        .fetchInto(String.class);
-  }
-
   public Select<?> findAllEmployee(
       List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
@@ -248,7 +231,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             EMPLOYEE.PHONE_NUMBER.as(PHONE),
             EMPLOYEE.GENDER.as(GENDER),
             EMPLOYEE.BIRTH_DATE,
-            GRADE.NAME.as(Constants.GRADE),
+            JOB.GRADE.as(GRADE),
             OFFICE.NAME.as(OFFICE_NAME),
             AREA.NAME.as(AREA_NAME),
             year(currentDate())
@@ -270,8 +253,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
         .leftJoin(JOB)
         .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-        .leftJoin(GRADE)
-        .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
@@ -395,7 +376,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             EMPLOYEE.PHONE_NUMBER.as(PHONE),
             EMPLOYEE.GENDER.as(GENDER),
             EMPLOYEE.BIRTH_DATE,
-            GRADE.NAME.as(Constants.GRADE),
+            JOB.GRADE.as(GRADE),
             OFFICE.NAME.as(OFFICE_NAME),
             AREA.NAME.as(AREA_NAME),
             year(currentDate())
@@ -417,8 +398,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
         .leftJoin(JOB)
         .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-        .leftJoin(GRADE)
-        .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions);

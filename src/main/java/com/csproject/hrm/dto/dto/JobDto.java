@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JobDto {
   private Long job_id;
-  private String position;
   private String description;
+  private String grade;
+  private String position;
 }

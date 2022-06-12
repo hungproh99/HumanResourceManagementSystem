@@ -64,8 +64,4 @@ public class WorkingContract {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "job_id")
   private Job job;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "grade_id")
-  private Grade grade;
 }

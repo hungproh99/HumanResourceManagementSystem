@@ -25,15 +25,11 @@ public interface HumanManagementServiceImpl {
 
   List<AreaDto> getListArea();
 
-  List<JobDto> getListPosition();
-
-  List<GradeDto> getListGradeByPosition(String id);
+  List<JobDto> getListJob();
 
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
   void exportEmployeeToCsv(Writer writer, List<String> list);
 
   void importCsvToEmployee(InputStream inputStream);
-
-  List<String> getListManagerByName(QueryParam queryParam);
 }

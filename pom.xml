@@ -135,7 +135,6 @@
     </dependencies>
 
     <build>
-        <finalName>HumanResourceManagementSystem</finalName>
         <plugins>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
