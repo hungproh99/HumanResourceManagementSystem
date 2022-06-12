@@ -205,7 +205,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             WORKING_CONTRACT,
             WORKING_CONTRACT.WORKING_CONTRACT_ID,
             WORKING_CONTRACT.COMPANY_NAME,
-            WORKING_CONTRACT.CONTRACT_TYPE,
+            WORKING_CONTRACT.CONTRACT_TYPE_ID,
             WORKING_CONTRACT.START_DATE,
             WORKING_CONTRACT.END_DATE,
             WORKING_CONTRACT.BASE_SALARY,
@@ -231,7 +231,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .onDuplicateKeyUpdate()
         .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
         .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_name())
-        .set(WORKING_CONTRACT.CONTRACT_TYPE, employeeDetailRequest.getContract_type())
+        .set(WORKING_CONTRACT.CONTRACT_TYPE_ID, employeeDetailRequest.getContract_type())
         .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
         .set(WORKING_CONTRACT.END_DATE, employeeDetailRequest.getEnd_date())
         .set(WORKING_CONTRACT.BASE_SALARY, employeeDetailRequest.getBase_salary())
