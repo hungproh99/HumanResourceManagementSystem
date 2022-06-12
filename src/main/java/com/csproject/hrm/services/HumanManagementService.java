@@ -102,8 +102,21 @@ public class HumanManagementService implements HumanManagementServiceImpl {
   }
 
   @Override
-  public List<JobDto> getListJob() {
-    return contractRepository.getListJob();
+  public List<JobDto> getListPosition() {
+    return contractRepository.getListPosition();
+  }
+
+  @Override
+  public List<GradeDto> getListGradeByPosition(String id) {
+    if (id == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
+    }
+    try {
+      long jobId = Long.parseLong(id);
+      return contractRepository.getListGradeByPosition(jobId);
+    } catch (NumberFormatException e) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
+    }
   }
 
   @Override
@@ -206,6 +219,11 @@ public class HumanManagementService implements HumanManagementServiceImpl {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public List<String> getListManagerByName(QueryParam queryParam) {
+    return employeeRepository.getListManagerByName(queryParam);
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
