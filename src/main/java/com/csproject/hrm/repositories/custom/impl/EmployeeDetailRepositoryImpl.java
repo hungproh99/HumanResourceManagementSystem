@@ -479,4 +479,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
     return query.fetchInto(EmployeeDetailResponse.class);
   }
+  
+  @Override
+  public boolean checkEmployeeIDIsExists(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+            dslContext.selectFrom(EMPLOYEE).where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
+  }
 }
