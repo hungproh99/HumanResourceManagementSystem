@@ -5,6 +5,7 @@ import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.entities.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
+import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +21,15 @@ import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
 @RestController
 @RequestMapping(REQUEST_MAPPING + "/employee/detail")
 public class EmployeeDetailController {
-
-  @Autowired EmployeeDetailRepository employeeDetailRepository;
-
+  @Autowired
+  EmployeeDetailService employeeDetailService;
+  
+  
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping("main")
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
     List<EmployeeDetailResponse> employeeDetail =
-        employeeDetailRepository.findMainDetail(employeeID);
+            employeeDetailService.findMainDetail(employeeID);
     return ResponseEntity.ok(employeeDetail);
   }
 
@@ -35,7 +37,7 @@ public class EmployeeDetailController {
   @GetMapping("tax_and_insurance")
   public ResponseEntity<?> findTaxAndInsurance(@RequestParam String employeeID) {
     List<TaxAndInsuranceResponse> taxAndInsurance =
-        employeeDetailRepository.findTaxAndInsurance(employeeID);
+            employeeDetailService.findTaxAndInsurance(employeeID);
     return ResponseEntity.ok(taxAndInsurance);
   }
 
@@ -43,14 +45,14 @@ public class EmployeeDetailController {
   @GetMapping("add_info")
   public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
     List<EmployeeAdditionalInfo> additionalInfo =
-        employeeDetailRepository.findAdditionalInfo(employeeID);
+        employeeDetailService.findAdditionalInfo(employeeID);
     return ResponseEntity.ok(additionalInfo);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping("bank")
   public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
-    List<BankResponse> bank = employeeDetailRepository.findBankByEmployeeID(employeeID);
+    List<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 
@@ -58,7 +60,7 @@ public class EmployeeDetailController {
   @GetMapping("edu")
   public ResponseEntity<?> findEducationInfo(@RequestParam String employeeID) {
     List<EducationResponse> educations =
-        employeeDetailRepository.findEducationByEmployeeID(employeeID);
+        employeeDetailService.findEducationByEmployeeID(employeeID);
     return ResponseEntity.ok(educations);
   }
 
@@ -66,7 +68,7 @@ public class EmployeeDetailController {
   @GetMapping("working_history")
   public ResponseEntity<?> findWorkingHistoryByEmployeeID(@RequestParam String employeeID) {
     List<WorkingHistoryResponse> workingHistories =
-        employeeDetailRepository.findWorkingHistoryByEmployeeID(employeeID);
+        employeeDetailService.findWorkingHistoryByEmployeeID(employeeID);
     return ResponseEntity.ok(workingHistories);
   }
 
@@ -74,52 +76,52 @@ public class EmployeeDetailController {
   @GetMapping("relative")
   public ResponseEntity<?> findRelativeByEmployeeID(@RequestParam String employeeID) {
     List<RelativeInformationResponse> relatives =
-        employeeDetailRepository.findRelativeByEmployeeID(employeeID);
+        employeeDetailService.findRelativeByEmployeeID(employeeID);
     return ResponseEntity.ok(relatives);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("main/update")
+  @PutMapping("main/update")
   public ResponseEntity<?> updateEmployeeDetail(
       @RequestBody EmployeeDetailRequest employeeDetailRequest) {
-    employeeDetailRepository.updateEmployeeDetail(employeeDetailRequest);
+    employeeDetailService.updateEmployeeDetail(employeeDetailRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("tax_and_insurance/update")
+  @PutMapping("tax_and_insurance/update")
   public ResponseEntity<?> updateTaxAndInsurance(
       @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
-    employeeDetailRepository.updateTaxAndInsurance(taxAndInsurance);
+    employeeDetailService.updateTaxAndInsurance(taxAndInsurance);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("bank/update")
+  @PutMapping("bank/update")
   public ResponseEntity<?> updateBankInfo(@RequestBody BankRequest bank) {
-    employeeDetailRepository.updateBankInfo(bank);
+    employeeDetailService.updateBankInfo(bank);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("working_history/update")
+  @PutMapping("working_history/update")
   public ResponseEntity<?> updateWorkingHistory(@RequestBody WorkingHistoryRequest workingHistory) {
-    employeeDetailRepository.updateWorkingHistory(workingHistory);
+    employeeDetailService.updateWorkingHistory(workingHistory);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("relative/update")
+  @PutMapping("relative/update")
   public ResponseEntity<?> updateRelativeInfo(
       @RequestBody RelativeInformationRequest relativeInformation) {
-    employeeDetailRepository.updateRelativeInfo(relativeInformation);
+    employeeDetailService.updateRelativeInfo(relativeInformation);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("education/update")
+  @PutMapping("education/update")
   public ResponseEntity<?> updateEducationInfo(@RequestBody EducationRequest education) {
-    employeeDetailRepository.updateEducationInfo(education);
+    employeeDetailService.updateEducationInfo(education);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 }

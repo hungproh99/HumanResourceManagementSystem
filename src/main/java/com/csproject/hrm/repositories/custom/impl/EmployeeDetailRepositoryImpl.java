@@ -122,34 +122,37 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   @Override
   public void updateBankInfo(BankRequest bank) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    int bankID =
+    dslContext.transaction(
+      configuration -> {
+        int bankID =
+            dslContext
+                .insertInto(
+                    BANK,
+                    BANK.BANK_ID,
+                    BANK.NAME_BANK,
+                    BANK.ADDRESS,
+                    BANK.ACCOUNT_NUMBER,
+                    BANK.ACCOUNT_NAME)
+                .values(
+                    bank.getId(),
+                    bank.getNameBank(),
+                    bank.getAddress(),
+                    bank.getAccountNumber(),
+                    bank.getAccountName())
+                .onDuplicateKeyUpdate()
+                .set(BANK.NAME_BANK, bank.getNameBank())
+                .set(BANK.ADDRESS, bank.getAddress())
+                .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
+                .set(BANK.ACCOUNT_NAME, bank.getAccountName())
+                .returningResult(BANK.BANK_ID)
+                .execute();
+    
         dslContext
-            .insertInto(
-                BANK,
-                BANK.BANK_ID,
-                BANK.NAME_BANK,
-                BANK.ADDRESS,
-                BANK.ACCOUNT_NUMBER,
-                BANK.ACCOUNT_NAME)
-            .values(
-                bank.getId(),
-                bank.getNameBank(),
-                bank.getAddress(),
-                bank.getAccountNumber(),
-                bank.getAccountName())
-            .onDuplicateKeyUpdate()
-            .set(BANK.NAME_BANK, bank.getNameBank())
-            .set(BANK.ADDRESS, bank.getAddress())
-            .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
-            .set(BANK.ACCOUNT_NAME, bank.getAccountName())
-            .returningResult(BANK.BANK_ID)
+            .update(EMPLOYEE)
+            .set(EMPLOYEE.BANK_ID, Long.valueOf(bankID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
             .execute();
-
-    dslContext
-        .update(EMPLOYEE)
-        .set(EMPLOYEE.BANK_ID, Long.valueOf(bankID))
-        .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
-        .execute();
+      });
   }
 
   @Override
