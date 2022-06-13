@@ -101,4 +101,7 @@ public class Employee {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "working_type_id")
   private WorkingType workingType;
+
+  @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+  private Timekeeping timekeeping;
 }
