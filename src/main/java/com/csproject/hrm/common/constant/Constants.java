@@ -78,4 +78,12 @@ public class Constants {
   public static final String CAN_NOT_WRITE_CSV = "Can't write csv ";
   public static final String ONLY_UPLOAD_CSV = "Only upload csv file ";
   public static final String WRONG_NUMBER_FORMAT = "Wrong number format ";
+  public static final String POSITION = "position";
+  public static final String OFFICE = "office";
+  public static final String AREA = "area";
+  public static final String CURRENT_DATE = "current_date";
+  public static final String TIMEKEEPING_STATUS = "timekeeping_status";
+  public static final String FIRST_CHECK_IN = "first_check_in";
+  public static final String LAST_CHECK_OUT = "last_check_out";
+  public static final String TIMEKEEPING_STATUS_INVALID = "Invalid Timekeeping Status";
 }

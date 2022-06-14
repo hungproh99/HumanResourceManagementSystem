@@ -32,4 +32,5 @@ public class Uri {
   public static final String URI_UPDATE_EDUCATION_INFO = "/education/update";
   public static final String URI_UPDATE_WORKING_HISTORY_INFO = "/working_history/update";
   public static final String URI_UPDATE_RELATIVE_INFO = "/relative/update";
+  public static final String URI_GET_LIST_TIMEKEEPING = "/list_all_timekeeping";
 }
