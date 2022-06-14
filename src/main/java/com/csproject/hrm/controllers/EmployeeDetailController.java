@@ -79,12 +79,20 @@ public class EmployeeDetailController {
         employeeDetailService.findRelativeByEmployeeID(employeeID);
     return ResponseEntity.ok(relatives);
   }
-
+  
   @PreAuthorize(value = "hasRole('ADMIN')")
   @PutMapping(URI_UPDATE_MAIN_DETAIL)
   public ResponseEntity<?> updateEmployeeDetail(
-      @RequestBody EmployeeDetailRequest employeeDetailRequest) {
+          @RequestBody EmployeeDetailRequest employeeDetailRequest) {
     employeeDetailService.updateEmployeeDetail(employeeDetailRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  }
+  
+  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PutMapping("/add_info/update")
+  public ResponseEntity<?> updateAdditionalInfo(
+          @RequestBody EmployeeAdditionalInfoRequest employeeAdditionalInfoRequest) {
+    employeeDetailService.updateAdditionalInfo(employeeAdditionalInfoRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 

@@ -34,12 +34,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	@Override
 	public void updateRelativeInfo(RelativeInformationRequest relativeInformation) {
 		if (relativeInformation.getId() == null
-		    || relativeInformation.getRelativeTypeId() == null
-		    || relativeInformation.getEmployeeId() == null
-		    || relativeInformation.getContact() == null
-		    || relativeInformation.getParentName() == null
-		    || relativeInformation.getStatus() == null
-		    || relativeInformation.getBirthDate() == null) {
+		    || relativeInformation.getEmployeeId() == null) {
 			throw new NullPointerException("Had param is null!");
 		}
 		String employeeID=relativeInformation.getEmployeeId();
@@ -55,11 +50,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	@Override
 	public void updateWorkingHistory(WorkingHistoryRequest workingHistory) {
 		if (workingHistory.getId() == null
-		    || workingHistory.getCompanyName() == null
-		    || workingHistory.getEmployeeId() == null
-		    || workingHistory.getPosition() == null
-		    || workingHistory.getEndDate() == null
-		    || workingHistory.getStartDate() == null) {
+		    || workingHistory.getEmployeeId() == null) {
 			throw new NullPointerException("Had param is null!");
 		}
 		String employeeID=workingHistory.getEmployeeId();
@@ -72,12 +63,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	@Override
 	public void updateEducationInfo(EducationRequest education) {
 		if (education.getId() == null
-		    || education.getCertificate() == null
-		    || education.getStatus() == null
-		    || education.getEmployeeId() == null
-		    || education.getNameSchool() == null
-		    || education.getEndDate() == null
-		    || education.getStartDate() == null) {
+		    || education.getEmployeeId() == null) {
 			throw new NullPointerException("Had param is null!");
 		}
 		String employeeID=education.getEmployeeId();
@@ -89,12 +75,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateBankInfo(BankRequest bank) {
-		if (bank.getId() == null
-		    || bank.getNameBank() == null
-		    || bank.getEmployeeId() == null
-		    || bank.getAddress() == null
-		    || bank.getAccountName() == null
-		    || bank.getAccountNumber() == null) {
+		if (bank.getId() == null || bank.getEmployeeId() == null) {
 			throw new NullPointerException("Had param is null!");
 		}
 		String employeeID=bank.getEmployeeId();
@@ -106,14 +87,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance) {
-		if (taxAndInsurance.getTaxCode() == null
-		    || taxAndInsurance.getInsurancePercent() == null
-		    || taxAndInsurance.getEmployeeId() == null
-		    || taxAndInsurance.getInsuranceAddress() == null
-		    || taxAndInsurance.getInsuranceName() == null
-		    || taxAndInsurance.getInsuranceId() == null
-		    || taxAndInsurance.getInsuranceTitle() == null
-		    || taxAndInsurance.getInsuranceDescription() == null) {
+		if (taxAndInsurance.getEmployeeId() == null) {
 			throw new NullPointerException("Had param is null!");
 		}
 		String employeeID=taxAndInsurance.getEmployeeId();
@@ -124,37 +98,18 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	}
 	
 	@Override
+	public void updateAdditionalInfo(EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
+		
+		String employeeID=employeeAdditionalInfo.getEmployee_id();
+		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
+			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+		}
+		employeeDetailRepository.updateAdditionalInfo(employeeAdditionalInfo);
+	}
+	
+	@Override
 	public void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest) {
-		if (employeeDetailRequest.getEmployee_id() == null
-		    || employeeDetailRequest.getPersonal_email() == null
-		    || employeeDetailRequest.getCompany_email() == null
-		    || employeeDetailRequest.getFull_name() == null
-		    || employeeDetailRequest.getGender() == null
-		    || employeeDetailRequest.getAddress() == null
-		    || employeeDetailRequest.getPhone_number() == null
-		    || employeeDetailRequest.getBirth_date() == null
-		    || employeeDetailRequest.getMarital_status() == null
-		    || employeeDetailRequest.getWorking_status() == null
-		    || employeeDetailRequest.getRole_type() == null
-		    || employeeDetailRequest.getManager_id() == null
-		    || employeeDetailRequest.getAvatar() == null
-		    || employeeDetailRequest.getNick_name() == null
-		    || employeeDetailRequest.getFacebook() == null
-		    || employeeDetailRequest.getTax_code() == null
-		    || employeeDetailRequest.getCurrent_situation() == null
-		    || employeeDetailRequest.getEmployee_type_id() == null
-		    || employeeDetailRequest.getWorking_type_id() == null
-		    || employeeDetailRequest.getWorking_contract_id() == null
-		    || employeeDetailRequest.getCompany_name() == null
-		    || employeeDetailRequest.getContract_type_id() == null
-		    || employeeDetailRequest.getStart_date() == null
-		    || employeeDetailRequest.getEnd_date() == null
-		    || employeeDetailRequest.getBase_salary() == null
-		    || employeeDetailRequest.getContract_url() == null
-		    || employeeDetailRequest.getContract_status() == null
-		    || employeeDetailRequest.getArea_id() == null
-		    || employeeDetailRequest.getOffice_id() == null
-		    || employeeDetailRequest.getGrade_id() == null) {
+		if (employeeDetailRequest.getEmployee_id() == null) {
 			throw new NullPointerException("Had param is null!");
 		}
 		String employeeID=employeeDetailRequest.getEmployee_id();

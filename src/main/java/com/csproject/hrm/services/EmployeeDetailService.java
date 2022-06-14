@@ -6,7 +6,6 @@ import com.csproject.hrm.dto.response.*;
 import java.util.List;
 
 public interface EmployeeDetailService {
-	List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID);
 	
 	void updateRelativeInfo(RelativeInformationRequest relativeInformation);
 	
@@ -18,7 +17,11 @@ public interface EmployeeDetailService {
 	
 	void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance);
 	
+	void updateAdditionalInfo(EmployeeAdditionalInfoRequest employeeAdditionalInfo);
+	
 	void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest);
+	
+	List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID);
 	
 	List<WorkingHistoryResponse> findWorkingHistoryByEmployeeID(String employeeID);
 	

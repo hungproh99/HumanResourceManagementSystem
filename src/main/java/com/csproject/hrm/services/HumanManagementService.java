@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 
-@Service
 public interface HumanManagementService {
   HrmResponseList getListHumanResource(QueryParam queryParam);
 

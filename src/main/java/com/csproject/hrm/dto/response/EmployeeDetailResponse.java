@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class EmployeeDetailResponse {
   private String full_name;
   private String employee_id;
-  private String personal_email;
+  private String company_email;
   private LocalDate seniority;
   private LocalDate start_date;
   private String working_status;
@@ -19,7 +19,6 @@ public class EmployeeDetailResponse {
   private String phone_number;
   private String grade;
   private LocalDate birth_date;
-  private String company_email;
   private String gender;
   private String marital_status;
   private String office_name;
@@ -27,4 +26,5 @@ public class EmployeeDetailResponse {
   private String area_name;
   private String avatar;
   private String working_name;
+  private Long working_contract_id;
 }
