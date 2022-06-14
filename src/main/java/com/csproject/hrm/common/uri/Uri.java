@@ -18,4 +18,5 @@ public class Uri {
   public static final String URI_UPDATE_EMPLOYEE = "/update_employee/{employee_id}";
   public static final String URI_DOWNLOAD_CSV_EMPLOYEE = "/download_csv_employee";
   public static final String URI_GET_LIST_MANAGER = "/list_manager";
+  public static final String URI_GET_LIST_TIMEKEEPING = "/list_all_timekeeping";
 }

@@ -5,11 +5,13 @@ import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 
+@Service
 public interface HumanManagementService {
   HrmResponseList getListHumanResource(QueryParam queryParam);
 

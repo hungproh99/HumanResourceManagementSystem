@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -20,13 +20,13 @@ public class CheckInCheckOut {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Timekeeping.class)
   @JoinColumn(name = "timekeeping_id")
   private Timekeeping timekeeping;
 
   @Column(name = "checkin")
-  private LocalDate checkin;
+  private LocalTime checkin;
 
   @Column(name = "checkout")
-  private LocalDate checkout;
+  private LocalTime checkout;
 }
