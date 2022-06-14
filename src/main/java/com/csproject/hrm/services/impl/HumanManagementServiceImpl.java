@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
+@Service
 public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired EmployeeRepository employeeRepository;
   @Autowired ContractRepository contractRepository;

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface TimekeepingRepositoryCustom {
   List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam);
+
+  List<TimekeepingResponse> getListTimekeepingByEmployeeId(List<String> list);
 }

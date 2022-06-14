@@ -12,6 +12,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.codegen.maven.example.tables.TimekeepingStatus.TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
+import static org.jooq.impl.DSL.noCondition;
 
 @AllArgsConstructor
 public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
@@ -50,6 +52,17 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     return getListAllTimekeeping(conditions, sortFields, queryParam.pagination)
         .fetchInto(TimekeepingResponse.class);
+  }
+
+  @Override
+  public List<TimekeepingResponse> getListTimekeepingByEmployeeId(List<String> list) {
+    List<Condition> conditions = new ArrayList<>();
+    Condition condition = noCondition();
+    for (String id : list) {
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
+    }
+    conditions.add(condition);
+    return getTimekeepingByEmployeeId(conditions).fetchInto(TimekeepingResponse.class);
   }
 
   private Select<?> getListAllTimekeeping(
@@ -82,6 +95,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
         .leftJoin(TIMEKEEPING)
         .on(TIMEKEEPING.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(TIMEKEEPING_STATUS)
+        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(TIMEKEEPING.TIMEKEEPING_STATUS_ID))
         .leftJoin(firstTimeCheckIn)
         .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .leftJoin(lastTimeCheckOut)
@@ -90,5 +105,43 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
+  }
+
+  private Select<?> getTimekeepingByEmployeeId(List<Condition> conditions) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    TableLike<?> firstTimeCheckIn =
+        dslContext.select().from(CHECKIN_CHECKOUT).orderBy(CHECKIN_CHECKOUT.CHECKIN.asc()).limit(1);
+    TableLike<?> lastTimeCheckOut =
+        dslContext
+            .select()
+            .from(CHECKIN_CHECKOUT)
+            .orderBy(CHECKIN_CHECKOUT.CHECKIN.desc())
+            .limit(1);
+    return dslContext
+        .select(
+            EMPLOYEE.FULL_NAME,
+            JOB.POSITION,
+            GRADE.NAME.as(Constants.GRADE),
+            TIMEKEEPING.DATE.as(CURRENT_DATE),
+            TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
+            firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
+            lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
+        .select()
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+        .leftJoin(GRADE)
+        .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+        .leftJoin(TIMEKEEPING)
+        .on(TIMEKEEPING.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(TIMEKEEPING_STATUS)
+        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(TIMEKEEPING.TIMEKEEPING_STATUS_ID))
+        .leftJoin(firstTimeCheckIn)
+        .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
+        .leftJoin(lastTimeCheckOut)
+        .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
+        .where(conditions);
   }
 }

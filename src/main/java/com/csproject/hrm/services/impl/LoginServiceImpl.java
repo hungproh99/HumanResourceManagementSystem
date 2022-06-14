@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
+@Service
 public class LoginServiceImpl implements LoginService {
   @Autowired GeneralFunction generalFunction;
   @Autowired AuthenticationManager authenticationManager;
