@@ -18,4 +18,19 @@ public class Uri {
   public static final String URI_UPDATE_EMPLOYEE = "/update_employee/{employee_id}";
   public static final String URI_DOWNLOAD_CSV_EMPLOYEE = "/download_csv_employee";
   public static final String URI_GET_LIST_MANAGER = "/list_manager";
+  public static final String REQUEST_DETAIL_MAPPING = "/employee/detail";
+  public static final String URI_GET_MAIN_DETAIL = "/main";
+  public static final String URI_GET_TAX_AND_INSURANCE = "/tax_and_insurance";
+  public static final String URI_GET_ADDITIONAL_INFO = "/add_info";
+  public static final String URI_GET_BANK_INFO = "/bank";
+  public static final String URI_GET_EDU_INFO = "/edu";
+  public static final String URI_GET_WORKING_HISTORY_INFO = "/working_history";
+  public static final String URI_GET_RELATIVE_INFO = "/relative";
+  public static final String URI_UPDATE_MAIN_DETAIL = "/main/update";
+  public static final String URI_UPDATE_TAX_AND_INSURANCE = "/tax_and_insurance/update";
+  public static final String URI_UPDATE_BANK_INFO = "/bank/update";
+  public static final String URI_UPDATE_EDUCATION_INFO = "/education/update";
+  public static final String URI_UPDATE_WORKING_HISTORY_INFO = "/working_history/update";
+  public static final String URI_UPDATE_RELATIVE_INFO = "/relative/update";
+  public static final String URI_GET_LIST_TIMEKEEPING = "/list_all_timekeeping";
 }

@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.*;
@@ -42,7 +43,7 @@ public class EmployeeDetailControllerTest {
 				                .get("/hrm/api/employee/detail/main")
 				                .contentType(MediaType.APPLICATION_JSON))
 		       .andExpect(status().isOk())
-		       .andExpect(jsonPath("$", hasSize(1)));
-//		       .andExpect(jsonPath("$[2].name", is("Jane Doe")));
+		       .andExpect(jsonPath("$", hasSize(1)))
+		       .andExpect((ResultMatcher) jsonPath("$[1].name", is("Nguyen Thi An")));
 	}
 }

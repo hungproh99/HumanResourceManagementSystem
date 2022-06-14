@@ -191,7 +191,57 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(INSURANCE.TITLE, taxAndInsurance.getInsuranceTitle())
         .execute();
   }
-
+  
+  @Override
+  public void updateAdditionalInfo(EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext.transaction(
+            configuration -> {
+              queries.add(updateIdentityCard(configuration,employeeAdditionalInfo));
+              queries.add(updateEmployeeAdditional(configuration,employeeAdditionalInfo));
+              DSL.using(configuration).batch(queries).execute();
+            });
+  }public InsertOnDuplicateSetMoreStep<?> updateIdentityCard(
+          Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
+    return DSL.using(configuration)
+              .insertInto(
+                      IDENTITY_CARD,
+                      IDENTITY_CARD.PLACE_OF_RESIDENCE,
+                      IDENTITY_CARD.PLACE_OF_ORIGIN,
+                      IDENTITY_CARD.NATIONALITY,
+                      IDENTITY_CARD.CARD_ID,
+                      IDENTITY_CARD.PROVIDE_DATE,
+                      IDENTITY_CARD.PROVIDE_PLACE)
+              .values(
+                      employeeAdditionalInfo.getPlace_of_residence(),
+                      employeeAdditionalInfo.getPlace_of_origin(),
+                      employeeAdditionalInfo.getNationality(),
+                      employeeAdditionalInfo.getCard_id(),
+                      employeeAdditionalInfo.getProvideDate(),
+                      employeeAdditionalInfo.getProvidePlace())
+              .onDuplicateKeyUpdate()
+              .set(IDENTITY_CARD.PLACE_OF_RESIDENCE, employeeAdditionalInfo.getPlace_of_residence())
+              .set(IDENTITY_CARD.PLACE_OF_ORIGIN, employeeAdditionalInfo.getPlace_of_origin())
+              .set(IDENTITY_CARD.NATIONALITY, employeeAdditionalInfo.getNationality())
+              .set(IDENTITY_CARD.CARD_ID, employeeAdditionalInfo.getCard_id())
+              .set(IDENTITY_CARD.PROVIDE_DATE, employeeAdditionalInfo.getProvideDate())
+              .set(IDENTITY_CARD.PROVIDE_PLACE, employeeAdditionalInfo.getProvidePlace());
+  }
+  
+  public Update<?> updateEmployeeAdditional(
+          Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
+    return DSL.using(configuration)
+              .update(EMPLOYEE)
+              .set(EMPLOYEE.CARD_ID, employeeAdditionalInfo.getCard_id())
+              .set(EMPLOYEE.ADDRESS, employeeAdditionalInfo.getAddress())
+              .set(EMPLOYEE.PERSONAL_EMAIL, employeeAdditionalInfo.getPersonal_email())
+              .set(EMPLOYEE.PHONE_NUMBER, employeeAdditionalInfo.getPhone_number())
+              .set(EMPLOYEE.NICK_NAME, employeeAdditionalInfo.getNick_name())
+              .set(EMPLOYEE.FACEBOOK, employeeAdditionalInfo.getFacebook())
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeAdditionalInfo.getEmployee_id()));
+  }
+  
   @Override
   public void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest) {
     List<Query> queries = new ArrayList<>();
@@ -209,109 +259,44 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     return DSL.using(configuration)
         .insertInto(
             WORKING_CONTRACT,
-            WORKING_CONTRACT.WORKING_CONTRACT_ID,
-            WORKING_CONTRACT.COMPANY_NAME,
             WORKING_CONTRACT.CONTRACT_TYPE_ID,
             WORKING_CONTRACT.START_DATE,
-            WORKING_CONTRACT.END_DATE,
-            WORKING_CONTRACT.BASE_SALARY,
             WORKING_CONTRACT.CONTRACT_URL,
-            WORKING_CONTRACT.CONTRACT_STATUS,
             WORKING_CONTRACT.AREA_ID,
             WORKING_CONTRACT.JOB_ID,
             WORKING_CONTRACT.OFFICE_ID,
             WORKING_CONTRACT.EMPLOYEE_ID)
         .values(
             employeeDetailRequest.getWorking_contract_id(),
-            employeeDetailRequest.getCompany_name(),
-            employeeDetailRequest.getContract_type_id(),
             employeeDetailRequest.getStart_date(),
-            employeeDetailRequest.getEnd_date(),
-            employeeDetailRequest.getBase_salary(),
             employeeDetailRequest.getContract_url(),
-            employeeDetailRequest.getContract_status(),
             employeeDetailRequest.getArea_id(),
             employeeDetailRequest.getGrade_id(),
             employeeDetailRequest.getOffice_id(),
             employeeDetailRequest.getEmployee_id())
         .onDuplicateKeyUpdate()
         .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
-        .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_name())
-        .set(WORKING_CONTRACT.CONTRACT_TYPE_ID, employeeDetailRequest.getContract_type_id())
         .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
-        .set(WORKING_CONTRACT.END_DATE, employeeDetailRequest.getEnd_date())
-        .set(WORKING_CONTRACT.BASE_SALARY, employeeDetailRequest.getBase_salary())
         .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
-        .set(WORKING_CONTRACT.CONTRACT_STATUS, employeeDetailRequest.getContract_status())
         .set(WORKING_CONTRACT.AREA_ID, employeeDetailRequest.getArea_id())
         .set(WORKING_CONTRACT.JOB_ID, employeeDetailRequest.getGrade_id())
         .set(WORKING_CONTRACT.OFFICE_ID, employeeDetailRequest.getOffice_id())
         .set(WORKING_CONTRACT.EMPLOYEE_ID, employeeDetailRequest.getEmployee_id());
   }
 
-  public InsertOnDuplicateSetMoreStep<?> updateEmployee(
+  public Update<?> updateEmployee(
       Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
     return DSL.using(configuration)
-        .insertInto(
-            EMPLOYEE,
-            EMPLOYEE.EMPLOYEE_ID,
-            EMPLOYEE.FULL_NAME,
-            EMPLOYEE.WORKING_STATUS,
-            EMPLOYEE.PHONE_NUMBER,
-            EMPLOYEE.BIRTH_DATE,
-            EMPLOYEE.COMPANY_EMAIL,
-            EMPLOYEE.GENDER,
-            EMPLOYEE.EMPLOYEE_TYPE_ID,
-            EMPLOYEE.ADDRESS,
-            EMPLOYEE.AVATAR,
-            EMPLOYEE.CURRENT_SITUATION,
-            EMPLOYEE.FACEBOOK,
-            EMPLOYEE.MANAGER_ID,
-            EMPLOYEE.NICK_NAME,
-            EMPLOYEE.PERSONAL_EMAIL,
-            EMPLOYEE.ROLE_TYPE,
-            EMPLOYEE.TAX_CODE,
-            EMPLOYEE.WORKING_TYPE_ID,
-            EMPLOYEE.MARITAL_STATUS)
-        .values(
-            employeeDetailRequest.getEmployee_id(),
-            employeeDetailRequest.getFull_name(),
-            employeeDetailRequest.getWorking_status(),
-            employeeDetailRequest.getPhone_number(),
-            employeeDetailRequest.getBirth_date(),
-            employeeDetailRequest.getCompany_email(),
-            employeeDetailRequest.getGender(),
-            employeeDetailRequest.getEmployee_type_id(),
-            employeeDetailRequest.getAddress(),
-            employeeDetailRequest.getAvatar(),
-            employeeDetailRequest.getCurrent_situation(),
-            employeeDetailRequest.getFacebook(),
-            employeeDetailRequest.getManager_id(),
-            employeeDetailRequest.getNick_name(),
-            employeeDetailRequest.getPersonal_email(),
-            employeeDetailRequest.getRole_type(),
-            employeeDetailRequest.getTax_code(),
-            employeeDetailRequest.getWorking_type_id(),
-            employeeDetailRequest.getMarital_status())
-        .onDuplicateKeyUpdate()
+        .update(EMPLOYEE)
         .set(EMPLOYEE.FULL_NAME, employeeDetailRequest.getFull_name())
         .set(EMPLOYEE.WORKING_STATUS, employeeDetailRequest.getWorking_status())
         .set(EMPLOYEE.PHONE_NUMBER, employeeDetailRequest.getPhone_number())
         .set(EMPLOYEE.BIRTH_DATE, employeeDetailRequest.getBirth_date())
         .set(EMPLOYEE.COMPANY_EMAIL, employeeDetailRequest.getCompany_email())
         .set(EMPLOYEE.GENDER, employeeDetailRequest.getGender())
-        .set(EMPLOYEE.EMPLOYEE_TYPE_ID, employeeDetailRequest.getEmployee_type_id())
-        .set(EMPLOYEE.ADDRESS, employeeDetailRequest.getAddress())
         .set(EMPLOYEE.AVATAR, employeeDetailRequest.getAvatar())
-        .set(EMPLOYEE.CURRENT_SITUATION, employeeDetailRequest.getCurrent_situation())
-        .set(EMPLOYEE.FACEBOOK, employeeDetailRequest.getFacebook())
-        .set(EMPLOYEE.MANAGER_ID, employeeDetailRequest.getManager_id())
-        .set(EMPLOYEE.NICK_NAME, employeeDetailRequest.getNick_name())
-        .set(EMPLOYEE.PERSONAL_EMAIL, employeeDetailRequest.getPersonal_email())
-        .set(EMPLOYEE.ROLE_TYPE, employeeDetailRequest.getRole_type())
-        .set(EMPLOYEE.TAX_CODE, employeeDetailRequest.getTax_code())
-        .set(EMPLOYEE.WORKING_TYPE_ID, employeeDetailRequest.getWorking_type_id())
-        .set(EMPLOYEE.MARITAL_STATUS, employeeDetailRequest.getMarital_status());
+        .set(EMPLOYEE.MARITAL_STATUS, employeeDetailRequest.getMarital_status())
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeDetailRequest.getEmployee_id()));
   }
 
   @Override
@@ -460,6 +445,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                     .as(SENIORITY),
                 WORKING_CONTRACT.START_DATE,
                 WORKING_CONTRACT.CONTRACT_URL,
+                WORKING_CONTRACT.WORKING_CONTRACT_ID,
                 JOB.POSITION.as(POSITION_NAME),
                 WORKING_TYPE.NAME.as(WORKING_NAME))
             .from(EMPLOYEE)
@@ -478,5 +464,12 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
     return query.fetchInto(EmployeeDetailResponse.class);
+  }
+  
+  @Override
+  public boolean checkEmployeeIDIsExists(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+            dslContext.selectFrom(EMPLOYEE).where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
   }
 }
