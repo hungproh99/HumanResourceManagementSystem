@@ -54,7 +54,7 @@ public class HrmController {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
     String extension = multipartFile.getContentType();
-    if (!extension.equals("text/csv")) {
+    if(!extension.equals("text/csv")){
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, ONLY_UPLOAD_CSV);
     }
     try {

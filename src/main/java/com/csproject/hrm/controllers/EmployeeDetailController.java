@@ -5,6 +5,7 @@ import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.entities.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
+import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,112 +15,121 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
-import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
+import static com.csproject.hrm.common.uri.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping(REQUEST_MAPPING + "/employee/detail")
+@RequestMapping(REQUEST_MAPPING + REQUEST_DETAIL_MAPPING)
 public class EmployeeDetailController {
+  @Autowired
+  EmployeeDetailService employeeDetailService;
 
-  @Autowired EmployeeDetailRepository employeeDetailRepository;
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("main")
+  @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
     List<EmployeeDetailResponse> employeeDetail =
-        employeeDetailRepository.findMainDetail(employeeID);
+            employeeDetailService.findMainDetail(employeeID);
     return ResponseEntity.ok(employeeDetail);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("tax_and_insurance")
+  @GetMapping(URI_GET_TAX_AND_INSURANCE)
   public ResponseEntity<?> findTaxAndInsurance(@RequestParam String employeeID) {
     List<TaxAndInsuranceResponse> taxAndInsurance =
-        employeeDetailRepository.findTaxAndInsurance(employeeID);
+            employeeDetailService.findTaxAndInsurance(employeeID);
     return ResponseEntity.ok(taxAndInsurance);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("add_info")
+  @GetMapping(URI_GET_ADDITIONAL_INFO)
   public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
     List<EmployeeAdditionalInfo> additionalInfo =
-        employeeDetailRepository.findAdditionalInfo(employeeID);
+        employeeDetailService.findAdditionalInfo(employeeID);
     return ResponseEntity.ok(additionalInfo);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("bank")
+  @GetMapping(URI_GET_BANK_INFO)
   public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
-    List<BankResponse> bank = employeeDetailRepository.findBankByEmployeeID(employeeID);
+    List<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("edu")
+  @GetMapping(URI_GET_EDU_INFO)
   public ResponseEntity<?> findEducationInfo(@RequestParam String employeeID) {
     List<EducationResponse> educations =
-        employeeDetailRepository.findEducationByEmployeeID(employeeID);
+        employeeDetailService.findEducationByEmployeeID(employeeID);
     return ResponseEntity.ok(educations);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("working_history")
+  @GetMapping(URI_GET_WORKING_HISTORY_INFO)
   public ResponseEntity<?> findWorkingHistoryByEmployeeID(@RequestParam String employeeID) {
     List<WorkingHistoryResponse> workingHistories =
-        employeeDetailRepository.findWorkingHistoryByEmployeeID(employeeID);
+        employeeDetailService.findWorkingHistoryByEmployeeID(employeeID);
     return ResponseEntity.ok(workingHistories);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @GetMapping("relative")
+  @GetMapping(URI_GET_RELATIVE_INFO)
   public ResponseEntity<?> findRelativeByEmployeeID(@RequestParam String employeeID) {
     List<RelativeInformationResponse> relatives =
-        employeeDetailRepository.findRelativeByEmployeeID(employeeID);
+        employeeDetailService.findRelativeByEmployeeID(employeeID);
     return ResponseEntity.ok(relatives);
   }
-
+  
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("main/update")
+  @PutMapping(URI_UPDATE_MAIN_DETAIL)
   public ResponseEntity<?> updateEmployeeDetail(
-      @RequestBody EmployeeDetailRequest employeeDetailRequest) {
-    employeeDetailRepository.updateEmployeeDetail(employeeDetailRequest);
+          @RequestBody EmployeeDetailRequest employeeDetailRequest) {
+    employeeDetailService.updateEmployeeDetail(employeeDetailRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  }
+  
+  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PutMapping("/add_info/update")
+  public ResponseEntity<?> updateAdditionalInfo(
+          @RequestBody EmployeeAdditionalInfoRequest employeeAdditionalInfoRequest) {
+    employeeDetailService.updateAdditionalInfo(employeeAdditionalInfoRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("tax_and_insurance/update")
+  @PutMapping(URI_UPDATE_TAX_AND_INSURANCE)
   public ResponseEntity<?> updateTaxAndInsurance(
       @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
-    employeeDetailRepository.updateTaxAndInsurance(taxAndInsurance);
+    employeeDetailService.updateTaxAndInsurance(taxAndInsurance);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("bank/update")
+  @PutMapping(URI_UPDATE_BANK_INFO)
   public ResponseEntity<?> updateBankInfo(@RequestBody BankRequest bank) {
-    employeeDetailRepository.updateBankInfo(bank);
+    employeeDetailService.updateBankInfo(bank);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("working_history/update")
+  @PutMapping(URI_UPDATE_WORKING_HISTORY_INFO)
   public ResponseEntity<?> updateWorkingHistory(@RequestBody WorkingHistoryRequest workingHistory) {
-    employeeDetailRepository.updateWorkingHistory(workingHistory);
+    employeeDetailService.updateWorkingHistory(workingHistory);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("relative/update")
+  @PutMapping(URI_UPDATE_RELATIVE_INFO)
   public ResponseEntity<?> updateRelativeInfo(
       @RequestBody RelativeInformationRequest relativeInformation) {
-    employeeDetailRepository.updateRelativeInfo(relativeInformation);
+    employeeDetailService.updateRelativeInfo(relativeInformation);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN')")
-  @PostMapping("education/update")
+  @PutMapping(URI_UPDATE_EDUCATION_INFO)
   public ResponseEntity<?> updateEducationInfo(@RequestBody EducationRequest education) {
-    employeeDetailRepository.updateEducationInfo(education);
+    employeeDetailService.updateEducationInfo(education);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 }
