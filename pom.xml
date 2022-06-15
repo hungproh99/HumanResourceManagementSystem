@@ -212,7 +212,7 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/human_resource_management</url>
+                        <url>jdbc:mysql://localhost:3306/human_resource_management?allowMultiQueries=true</url>
                         <user>ndh4899</user>
                         <password>hungnd</password>
                     </jdbc>

@@ -1,5 +1,6 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -43,5 +45,13 @@ public class TimekeepingController {
     servletResponse.addHeader("Content-Disposition", "attachment; filename=\"timekeeping.csv\"");
     timekeepingService.exportTimekeepingToCsv(servletResponse.getWriter(), listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+  
+  @GetMapping(URI_GET_DETAIL_TIMEKEEPING)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> getListDetailTimekeeping(
+          @RequestParam String employeeID, String date) {
+    List<TimekeepingDetailResponse> timekeeping = timekeepingService.getTimekeepingByEmployeeIDAndDate(employeeID, date);
+    return ResponseEntity.ok(timekeeping);
   }
 }

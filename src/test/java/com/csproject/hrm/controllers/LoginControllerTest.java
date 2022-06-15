@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @SpringBootTest(classes = LoginController.class)
 @WebAppConfiguration
 public class LoginControllerTest {
-  @Autowired MockMvc mockMvc;
   @Autowired ObjectMapper mapper;
   @Autowired JwtUtils jwtUtils;
   @MockBean LoginService loginService;
