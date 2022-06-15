@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -12,6 +13,8 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +30,7 @@ import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.codegen.maven.example.tables.TimekeepingStatus.TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
-import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.*;
 
 @AllArgsConstructor
 public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
@@ -171,10 +174,16 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                     GRADE.NAME.as(Constants.GRADE),
                     TIMEKEEPING.DATE.as(CURRENT_DATE),
                     TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
+                    (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
+                    .add(minute(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT)).div(60)))
+                    .minus(hour(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKOUT))
+                    .add(minute(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKOUT)).div(60)))
+                    .as("total_working_time"),
                     firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
                     lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT),
                     multiset(
                        select(
+                           CHECKIN_CHECKOUT.TIMEKEEPING_ID,
                            CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID,
                            CHECKIN_CHECKOUT.CHECKIN,
                            CHECKIN_CHECKOUT.CHECKOUT)
