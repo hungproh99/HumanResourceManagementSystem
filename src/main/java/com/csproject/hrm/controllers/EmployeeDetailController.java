@@ -23,9 +23,9 @@ import static com.csproject.hrm.common.uri.Uri.*;
 public class EmployeeDetailController {
   @Autowired
   EmployeeDetailService employeeDetailService;
-  
-  
-  @PreAuthorize(value = "hasRole('ADMIN')")
+
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
     List<EmployeeDetailResponse> employeeDetail =
@@ -33,7 +33,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(employeeDetail);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_TAX_AND_INSURANCE)
   public ResponseEntity<?> findTaxAndInsurance(@RequestParam String employeeID) {
     List<TaxAndInsuranceResponse> taxAndInsurance =
@@ -41,7 +41,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(taxAndInsurance);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_ADDITIONAL_INFO)
   public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
     List<EmployeeAdditionalInfo> additionalInfo =
@@ -49,14 +49,14 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(additionalInfo);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_BANK_INFO)
   public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
     List<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_EDU_INFO)
   public ResponseEntity<?> findEducationInfo(@RequestParam String employeeID) {
     List<EducationResponse> educations =
@@ -64,7 +64,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(educations);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_WORKING_HISTORY_INFO)
   public ResponseEntity<?> findWorkingHistoryByEmployeeID(@RequestParam String employeeID) {
     List<WorkingHistoryResponse> workingHistories =
@@ -72,7 +72,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(workingHistories);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_RELATIVE_INFO)
   public ResponseEntity<?> findRelativeByEmployeeID(@RequestParam String employeeID) {
     List<RelativeInformationResponse> relatives =
@@ -80,7 +80,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(relatives);
   }
   
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PutMapping(URI_UPDATE_MAIN_DETAIL)
   public ResponseEntity<?> updateEmployeeDetail(
           @RequestBody EmployeeDetailRequest employeeDetailRequest) {
@@ -88,7 +88,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
   
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping("/add_info/update")
   public ResponseEntity<?> updateAdditionalInfo(
           @RequestBody EmployeeAdditionalInfoRequest employeeAdditionalInfoRequest) {
@@ -96,7 +96,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_TAX_AND_INSURANCE)
   public ResponseEntity<?> updateTaxAndInsurance(
       @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
@@ -104,21 +104,21 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_BANK_INFO)
   public ResponseEntity<?> updateBankInfo(@RequestBody BankRequest bank) {
     employeeDetailService.updateBankInfo(bank);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_WORKING_HISTORY_INFO)
   public ResponseEntity<?> updateWorkingHistory(@RequestBody WorkingHistoryRequest workingHistory) {
     employeeDetailService.updateWorkingHistory(workingHistory);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_RELATIVE_INFO)
   public ResponseEntity<?> updateRelativeInfo(
       @RequestBody RelativeInformationRequest relativeInformation) {
@@ -126,7 +126,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_EDUCATION_INFO)
   public ResponseEntity<?> updateEducationInfo(@RequestBody EducationRequest education) {
     employeeDetailService.updateEducationInfo(education);

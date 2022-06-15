@@ -87,7 +87,7 @@ public class LoginServiceImpl implements LoginService {
     }
     String generatePassword = generalFunction.generateCommonLangPassword();
     String encodePassword = passwordEncoder.encode(generatePassword);
-    generalFunction.sendEmail(id, generatePassword, FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+    generalFunction.sendEmailForgotPassword(id, generatePassword, FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
     return employeeRepository.updatePassword(encodePassword, id);
   }
 }
