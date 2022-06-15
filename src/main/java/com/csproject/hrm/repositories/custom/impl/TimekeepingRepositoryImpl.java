@@ -55,14 +55,14 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public List<TimekeepingResponse> getListTimekeepingByEmployeeId(List<String> list) {
+  public List<TimekeepingResponse> getListTimekeepingToExport(List<String> list) {
     List<Condition> conditions = new ArrayList<>();
     Condition condition = noCondition();
     for (String id : list) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
     }
     conditions.add(condition);
-    return getTimekeepingByEmployeeId(conditions).fetchInto(TimekeepingResponse.class);
+    return getTimekeepingToExport(conditions).fetchInto(TimekeepingResponse.class);
   }
 
   private Select<?> getListAllTimekeeping(
@@ -85,7 +85,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
             firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
             lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
-        .select()
         .from(EMPLOYEE)
         .leftJoin(WORKING_CONTRACT)
         .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -107,7 +106,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .offset(pagination.offset);
   }
 
-  private Select<?> getTimekeepingByEmployeeId(List<Condition> conditions) {
+  private Select<?> getTimekeepingToExport(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     TableLike<?> firstTimeCheckIn =
         dslContext.select().from(CHECKIN_CHECKOUT).orderBy(CHECKIN_CHECKOUT.CHECKIN.asc()).limit(1);
@@ -126,7 +125,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
             firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
             lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
-        .select()
         .from(EMPLOYEE)
         .leftJoin(WORKING_CONTRACT)
         .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))

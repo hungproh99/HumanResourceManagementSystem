@@ -10,5 +10,5 @@ import java.util.List;
 public interface TimekeepingRepositoryCustom {
   List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam);
 
-  List<TimekeepingResponse> getListTimekeepingByEmployeeId(List<String> list);
+  List<TimekeepingResponse> getListTimekeepingToExport(List<String> list);
 }

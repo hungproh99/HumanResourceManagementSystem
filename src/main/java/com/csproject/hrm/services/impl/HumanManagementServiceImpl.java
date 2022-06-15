@@ -73,6 +73,9 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     hrmPojo.setEmployeeId(employeeId);
     hrmPojo.setCompanyEmail(companyEmail);
 
+    generalFunction.sendEmailForNewEmployee(
+        List.of(hrmPojo), FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+    hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
     employeeRepository.insertEmployee(hrmPojo);
   }
 
@@ -261,12 +264,15 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           hrmPojo.setCompanyEmail(companyEmail);
           hrmPojos.add(hrmPojo);
         });
-
+    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+    for (HrmPojo hrmPojo : hrmPojos) {
+      hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
+    }
     employeeRepository.insertMultiEmployee(hrmPojos);
   }
 
   private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
-    String password = passwordEncoder.encode(generalFunction.generateCommonLangPassword());
+    String password = generalFunction.generateCommonLangPassword();
     String companyName = "HRM";
 
     HrmPojo hrmPojo =
@@ -288,12 +294,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
             .employeeType(hrmRequest.getEmployeeType())
             .personalEmail(hrmRequest.getPersonalEmail())
             .build();
-    //
-    //    generalFunction.sendEmail(
-    //        FROM_EMAIL,
-    //        TO_EMAIL,
-    //        SEND_PASSWORD_SUBJECT,
-    //        String.format(SEND_PASSWORD_TEXT, employeeId, password));
+
     return hrmPojo;
   }
 }

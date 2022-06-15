@@ -36,7 +36,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       List<TimekeepingResponse> timekeepingResponses =
-          timekeepingRepository.getListTimekeepingByEmployeeId(list);
+          timekeepingRepository.getListTimekeepingToExport(list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
               writer,
