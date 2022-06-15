@@ -1,5 +1,6 @@
 package com.csproject.hrm.common.general;
 
+import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -82,9 +84,9 @@ public class GeneralFunction {
     return gen.generatePassword(10, splCharRule, lowerCaseRule, upperCaseRule, digitRule);
   }
 
-  public void sendEmail(String id, String password, String from, String to, String subject) {
+  public void sendEmailForgotPassword(String id, String password, String from, String to, String subject) {
     MimeMessage message = emailSender.createMimeMessage();
-    Resource resource = resourceLoader.getResource("classpath:email-body.vm");
+    Resource resource = resourceLoader.getResource("classpath:email-forgot-password.vm");
     boolean multipart = true;
     try {
       InputStream inputStream = resource.getInputStream();
@@ -96,6 +98,34 @@ public class GeneralFunction {
       helper.setSubject(subject);
       message.setContent(String.format(data, id, password), "text/html");
       emailSender.send(message);
+    } catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void sendEmailForNewEmployee(List<HrmPojo> hrmPojos, String from, String to, String subject) {
+    int size = hrmPojos.size();
+    MimeMessage[] messages = new MimeMessage[size];
+    Resource resource = resourceLoader.getResource("classpath:email-add-employee.vm");
+    boolean multipart = true;
+    try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
+      for (int i = 0; i < size - 1; i++) {
+        MimeMessageHelper helper = new MimeMessageHelper(messages[i], multipart, "utf-8");
+        helper.setTo(to);
+        helper.setFrom(from);
+        helper.setSubject(subject);
+        messages[i].setContent(
+            String.format(
+                data,
+                hrmPojos.get(i).getFullName(),
+                hrmPojos.get(i).getCompanyName(),
+                hrmPojos.get(i).getPassword()),
+            "text/html");
+      }
+      emailSender.send(messages);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
     }

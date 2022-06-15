@@ -23,8 +23,8 @@ import static com.csproject.hrm.common.uri.Uri.*;
 public class EmployeeDetailController {
   @Autowired
   EmployeeDetailService employeeDetailService;
-  
-  
+
+
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
