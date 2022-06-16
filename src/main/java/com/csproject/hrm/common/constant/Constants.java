@@ -86,4 +86,5 @@ public class Constants {
   public static final String FIRST_CHECK_IN = "first_check_in";
   public static final String LAST_CHECK_OUT = "last_check_out";
   public static final String TIMEKEEPING_STATUS_INVALID = "Invalid Timekeeping Status";
+  public static final String CHECK_IN_CHECK_OUTS = "check_in_check_outs";
 }

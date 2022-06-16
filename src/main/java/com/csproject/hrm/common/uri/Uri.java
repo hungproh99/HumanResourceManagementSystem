@@ -34,4 +34,5 @@ public class Uri {
   public static final String URI_UPDATE_RELATIVE_INFO = "/relative/update";
   public static final String URI_GET_LIST_TIMEKEEPING = "/list_all_timekeeping";
   public static final String URI_DOWNLOAD_CSV_TIMEKEEPING = "/download_csv_timekeeping";
+  public static final String URI_GET_DETAIL_TIMEKEEPING = "/list_detail_timekeeping";
 }
