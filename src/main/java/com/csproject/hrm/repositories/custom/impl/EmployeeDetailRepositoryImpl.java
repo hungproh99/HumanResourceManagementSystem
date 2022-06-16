@@ -259,24 +259,29 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     return DSL.using(configuration)
         .insertInto(
             WORKING_CONTRACT,
-            WORKING_CONTRACT.CONTRACT_TYPE_ID,
+            WORKING_CONTRACT.WORKING_CONTRACT_ID,
+            WORKING_CONTRACT.COMPANY_NAME,
             WORKING_CONTRACT.START_DATE,
             WORKING_CONTRACT.CONTRACT_URL,
             WORKING_CONTRACT.AREA_ID,
             WORKING_CONTRACT.JOB_ID,
             WORKING_CONTRACT.OFFICE_ID,
+            WORKING_CONTRACT.GRADE_ID,
             WORKING_CONTRACT.EMPLOYEE_ID)
         .values(
-            employeeDetailRequest.getWorking_contract_id(),
+                employeeDetailRequest.getWorking_contract_id(),
+                employeeDetailRequest.getCompany_email(),
             employeeDetailRequest.getStart_date(),
             employeeDetailRequest.getContract_url(),
             employeeDetailRequest.getArea_id(),
             employeeDetailRequest.getGrade_id(),
-            employeeDetailRequest.getOffice_id(),
+                employeeDetailRequest.getOffice_id(),
+                employeeDetailRequest.getGrade_id(),
             employeeDetailRequest.getEmployee_id())
         .onDuplicateKeyUpdate()
-        .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
-        .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
+              .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_email())
+              .set(WORKING_CONTRACT.GRADE_ID, employeeDetailRequest.getGrade_id())
+              .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
         .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
         .set(WORKING_CONTRACT.AREA_ID, employeeDetailRequest.getArea_id())
         .set(WORKING_CONTRACT.JOB_ID, employeeDetailRequest.getGrade_id())
