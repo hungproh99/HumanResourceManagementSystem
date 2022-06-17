@@ -20,6 +20,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -84,7 +85,11 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       throw new CustomErrorException("Date must have format yyyy-MM-dd!");
     }
     if(employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
-      return timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeID,localDate);
+      List<TimekeepingDetailResponse> list = timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeID,localDate);
+      TimekeepingDetailResponse detailResponse = list.get(0);
+      detailResponse.setCheck_in_check_outs(timekeepingRepository.getCheckInCheckOutByTimekeepingID(detailResponse.getTimekeeping_id()));
+      
+      return list;
     }else{
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
