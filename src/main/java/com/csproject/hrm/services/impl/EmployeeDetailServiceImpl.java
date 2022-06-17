@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -33,10 +34,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateRelativeInfo(RelativeInformationRequest relativeInformation) {
-		if (relativeInformation.getId() == null
-		    || relativeInformation.getEmployeeId() == null) {
-			throw new NullPointerException("Had param is null!");
-		}
 		String employeeID=relativeInformation.getEmployeeId();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -49,10 +46,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateWorkingHistory(WorkingHistoryRequest workingHistory) {
-		if (workingHistory.getId() == null
-		    || workingHistory.getEmployeeId() == null) {
-			throw new NullPointerException("Had param is null!");
-		}
 		String employeeID=workingHistory.getEmployeeId();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -62,10 +55,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateEducationInfo(EducationRequest education) {
-		if (education.getId() == null
-		    || education.getEmployeeId() == null) {
-			throw new NullPointerException("Had param is null!");
-		}
 		String employeeID=education.getEmployeeId();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -75,9 +64,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateBankInfo(BankRequest bank) {
-		if (bank.getId() == null || bank.getEmployeeId() == null) {
-			throw new NullPointerException("Had param is null!");
-		}
 		String employeeID=bank.getEmployeeId();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -87,9 +73,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance) {
-		if (taxAndInsurance.getEmployeeId() == null) {
-			throw new NullPointerException("Had param is null!");
-		}
 		String employeeID=taxAndInsurance.getEmployeeId();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -99,7 +82,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateAdditionalInfo(EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
-		
 		String employeeID=employeeAdditionalInfo.getEmployee_id();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -109,9 +91,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	
 	@Override
 	public void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest) {
-		if (employeeDetailRequest.getEmployee_id() == null) {
-			throw new NullPointerException("Had param is null!");
-		}
 		String employeeID=employeeDetailRequest.getEmployee_id();
 		if(!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
 			throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -156,7 +135,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	}
 	
 	@Override
-	public List<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID) {
+	public Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID) {
 		if (employeeID == null) {
 			throw new NullPointerException("Param employeeID is null!");
 		}
