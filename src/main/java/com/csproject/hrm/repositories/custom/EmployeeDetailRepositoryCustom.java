@@ -17,9 +17,9 @@ public interface EmployeeDetailRepositoryCustom {
   List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID);
   List<WorkingHistoryResponse> findWorkingHistoryByEmployeeID(String employeeID);
   List<EducationResponse> findEducationByEmployeeID(String employeeID);
-  List<BankResponse> findBankByEmployeeID(String employeeID);
+  Optional<BankResponse> findBankByEmployeeID(String employeeID);
   Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID);
   List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
-  List<EmployeeDetailResponse> findMainDetail(String employeeID);
+  Optional<EmployeeDetailResponse> findMainDetail(String employeeID);
   boolean checkEmployeeIDIsExists(String employeeID);
 }

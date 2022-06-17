@@ -362,7 +362,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<BankResponse> findBankByEmployeeID(String employeeID) {
+  public Optional<BankResponse> findBankByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -372,7 +372,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .rightJoin(EMPLOYEE)
             .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(BankResponse.class);
+    return query.fetchOptionalInto(BankResponse.class);
   }
 
   @Override
@@ -419,7 +419,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<EmployeeDetailResponse> findMainDetail(String employeeID) {
+  public Optional<EmployeeDetailResponse> findMainDetail(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -466,7 +466,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
-    return query.fetchInto(EmployeeDetailResponse.class);
+    return query.fetchOptionalInto(EmployeeDetailResponse.class);
   }
   
   @Override
