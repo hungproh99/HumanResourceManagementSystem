@@ -29,7 +29,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
-    List<EmployeeDetailResponse> employeeDetail =
+    Optional<EmployeeDetailResponse> employeeDetail =
             employeeDetailService.findMainDetail(employeeID);
     return ResponseEntity.ok(employeeDetail);
   }
@@ -53,7 +53,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_BANK_INFO)
   public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
-    List<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
+    Optional<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 

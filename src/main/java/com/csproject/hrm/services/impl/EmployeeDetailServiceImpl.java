@@ -123,7 +123,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	}
 	
 	@Override
-	public List<BankResponse> findBankByEmployeeID(String employeeID) {
+	public Optional<BankResponse> findBankByEmployeeID(String employeeID) {
 		if (employeeID == null) {
 			throw new NullPointerException("Param employeeID is null!");
 		}
@@ -159,7 +159,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 	}
 	
 	@Override
-	public List<EmployeeDetailResponse> findMainDetail(String employeeID) {
+	public Optional<EmployeeDetailResponse> findMainDetail(String employeeID) {
 		if (employeeID == null) {
 			throw new NullPointerException("Param employeeID is null!");
 		}
