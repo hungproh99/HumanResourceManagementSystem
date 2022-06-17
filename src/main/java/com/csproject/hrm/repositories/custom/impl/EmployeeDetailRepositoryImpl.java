@@ -2,7 +2,6 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.entities.*;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.repositories.custom.EmployeeDetailRepositoryCustom;
 import lombok.AllArgsConstructor;
@@ -10,8 +9,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.csproject.hrm.common.constant.Constants;
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -364,7 +362,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<BankResponse> findBankByEmployeeID(String employeeID) {
+  public Optional<BankResponse> findBankByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -374,11 +372,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .rightJoin(EMPLOYEE)
             .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(BankResponse.class);
+    return query.fetchOptionalInto(BankResponse.class);
   }
 
   @Override
-  public List<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID) {
+  public Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -398,7 +396,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .leftJoin(IDENTITY_CARD)
             .on(IDENTITY_CARD.CARD_ID.eq(EMPLOYEE.CARD_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchInto(EmployeeAdditionalInfo.class);
+    return query.fetchOptionalInto(EmployeeAdditionalInfo.class);
   }
 
   @Override
@@ -421,7 +419,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<EmployeeDetailResponse> findMainDetail(String employeeID) {
+  public Optional<EmployeeDetailResponse> findMainDetail(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -468,7 +466,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
-    return query.fetchInto(EmployeeDetailResponse.class);
+    return query.fetchOptionalInto(EmployeeDetailResponse.class);
   }
   
   @Override

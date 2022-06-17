@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -28,7 +29,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
-    List<EmployeeDetailResponse> employeeDetail =
+    Optional<EmployeeDetailResponse> employeeDetail =
             employeeDetailService.findMainDetail(employeeID);
     return ResponseEntity.ok(employeeDetail);
   }
@@ -44,7 +45,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_ADDITIONAL_INFO)
   public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
-    List<EmployeeAdditionalInfo> additionalInfo =
+    Optional<EmployeeAdditionalInfo> additionalInfo =
         employeeDetailService.findAdditionalInfo(employeeID);
     return ResponseEntity.ok(additionalInfo);
   }
@@ -52,7 +53,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_BANK_INFO)
   public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
-    List<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
+    Optional<BankResponse> bank = employeeDetailService.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 
