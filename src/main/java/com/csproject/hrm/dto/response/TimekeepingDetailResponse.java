@@ -19,10 +19,10 @@ public class TimekeepingDetailResponse {
   private String position;
   private String grade;
   private Date current_date;
-  private String timekeeping_id;
+  private Long timekeeping_id;
   private String timekeeping_status;
   private String total_working_time;
   private LocalTime first_check_in;
   private LocalTime last_check_out;
-  private List<CheckInCheckOut> check_in_check_outs;
+  private List<CheckInCheckOutResponse> check_in_check_outs;
 }

@@ -2,10 +2,9 @@ package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.entities.RelativeInformation;
-import com.csproject.hrm.entities.WorkingHistory;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeDetailRepositoryCustom {
   void updateRelativeInfo(RelativeInformationRequest relativeInformation);
@@ -19,7 +18,7 @@ public interface EmployeeDetailRepositoryCustom {
   List<WorkingHistoryResponse> findWorkingHistoryByEmployeeID(String employeeID);
   List<EducationResponse> findEducationByEmployeeID(String employeeID);
   List<BankResponse> findBankByEmployeeID(String employeeID);
-  List<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID);
+  Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID);
   List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
   List<EmployeeDetailResponse> findMainDetail(String employeeID);
   boolean checkEmployeeIDIsExists(String employeeID);

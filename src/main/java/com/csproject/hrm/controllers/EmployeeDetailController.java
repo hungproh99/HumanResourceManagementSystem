@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -44,7 +45,7 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_ADDITIONAL_INFO)
   public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
-    List<EmployeeAdditionalInfo> additionalInfo =
+    Optional<EmployeeAdditionalInfo> additionalInfo =
         employeeDetailService.findAdditionalInfo(employeeID);
     return ResponseEntity.ok(additionalInfo);
   }
