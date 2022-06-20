@@ -1,6 +1,8 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
 import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
@@ -66,26 +68,30 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
               throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
             }
             if (filter.field.equals(Constants.OFFICE)) {
-              officeCondition =
-                  officeCondition.or(OFFICE.NAME.upper().eq(filter.condition.toUpperCase()));
+              officeCondition = officeCondition.or(queryHelper.condition(filter, field));
             } else if (filter.field.equals(Constants.AREA)) {
-              areaCondition =
-                  areaCondition.or(AREA.NAME.upper().eq(filter.condition.toUpperCase()));
+              areaCondition = areaCondition.or(queryHelper.condition(filter, field));
             } else if (filter.field.equals(POSITION)) {
-              positionCondition =
-                  positionCondition.or(JOB.POSITION.upper().eq(filter.condition.toUpperCase()));
+              positionCondition = positionCondition.or(queryHelper.condition(filter, field));
+            } else {
+              condition = condition.and(queryHelper.condition(filter, field));
             }
-
-            final var newCondition = queryHelper.condition(filter, field);
-            condition = condition.and(newCondition);
           }
           condition = condition.and(officeCondition).and(areaCondition).and(positionCondition);
           conditions.add(condition);
         });
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
-    return getListAllTimekeeping(conditions, sortFields, queryParam.pagination)
-        .fetchInto(TimekeepingResponse.class);
+    List<TimekeepingResponse> timekeepingResponses =
+        getListAllTimekeeping(conditions, sortFields, queryParam.pagination)
+            .fetchInto(TimekeepingResponse.class);
+
+    timekeepingResponses.forEach(
+        timekeepingResponse -> {
+          timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
+          timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
+        });
+    return timekeepingResponses;
   }
 
   @Override
@@ -96,7 +102,16 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
     }
     conditions.add(condition);
-    return getTimekeepingToExport(conditions).fetchInto(TimekeepingResponse.class);
+
+    List<TimekeepingResponse> timekeepingResponses =
+        getTimekeepingToExport(conditions).fetchInto(TimekeepingResponse.class);
+
+    timekeepingResponses.forEach(
+        timekeepingResponse -> {
+          timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
+          timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
+        });
+    return timekeepingResponses;
   }
 
   private Select<?> getListAllTimekeeping(
@@ -112,6 +127,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .limit(1);
     return dslContext
         .select(
+            EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             JOB.POSITION,
             GRADE_TYPE.NAME.as(GRADE),
@@ -156,6 +172,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .limit(1);
     return dslContext
         .select(
+            EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             JOB.POSITION,
             GRADE_TYPE.NAME.as(GRADE),
@@ -178,7 +195,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .leftJoin(lastTimeCheckOut)
         .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
-        .where(conditions);
+        .where(conditions)
+        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
   }
 
   @Override

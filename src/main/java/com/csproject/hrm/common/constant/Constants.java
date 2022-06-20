@@ -97,4 +97,6 @@ public class Constants {
   public static final String REQUEST_STATUS = "request_status";
   public static final String REQUEST_TYPE = "request_type";
   public static final String REQUEST_TITLE = "requestTitle";
+  public static final String ACTIVE = "Active";
+  public static final String DEACTIVE = "Deactive";
 }

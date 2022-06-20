@@ -93,7 +93,7 @@ public class HrmController {
 
   @GetMapping(URI_LIST_GRADE)
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getListGrade(@PathVariable String job_id) {
+  public ResponseEntity<?> getListGrade(@PathVariable Long job_id) {
     return ResponseEntity.ok(humanManagementService.getListGradeByPosition(job_id));
   }
 

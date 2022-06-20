@@ -1,6 +1,5 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EWorkStatus;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
@@ -110,16 +109,11 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<GradeDto> getListGradeByPosition(String id) {
+  public List<GradeDto> getListGradeByPosition(Long id) {
     if (id == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
-    try {
-      long jobId = Long.parseLong(id);
-      return contractRepository.getListGradeByPosition(jobId);
-    } catch (NumberFormatException e) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
-    }
+    return contractRepository.getListGradeByPosition(id);
   }
 
   @Override
@@ -187,36 +181,41 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 reader,
                 CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim()); ) {
       for (CSVRecord csvRecord : csvParser) {
-        String fullName = csvRecord.get("Full Name");
-        String role = csvRecord.get("Role");
-        String phone = csvRecord.get("Phone");
-        String gender = csvRecord.get("Gender");
-        LocalDate birthDate =
-            LocalDate.parse(csvRecord.get("Birth Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String grade = csvRecord.get("Grade");
-        String position = csvRecord.get("Position");
-        String office = csvRecord.get("Office");
-        String area = csvRecord.get("Area");
-        String workingType = csvRecord.get("Working Type");
-        String managerId = csvRecord.get("Manager Id");
-        String employeeType = csvRecord.get("Employee Type");
-        String personalEmail = csvRecord.get("Personal Email");
-        hrmRequestList.add(
-            HrmRequest.builder()
-                .fullName(fullName)
-                .role(role)
-                .phone(phone)
-                .gender(gender)
-                .birthDate(birthDate)
-                .grade(grade)
-                .position(position)
-                .office(office)
-                .area(area)
-                .workingType(workingType)
-                .managerId(managerId)
-                .employeeType(employeeType)
-                .personalEmail(personalEmail)
-                .build());
+        try {
+          String fullName = csvRecord.get("Full Name");
+          Long role = Long.parseLong(csvRecord.get("Role"));
+          String phone = csvRecord.get("Phone");
+          String gender = csvRecord.get("Gender");
+          LocalDate birthDate =
+              LocalDate.parse(
+                  csvRecord.get("Birth Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+          Long grade = Long.parseLong(csvRecord.get("Grade"));
+          Long position = Long.parseLong(csvRecord.get("Position"));
+          Long office = Long.parseLong(csvRecord.get("Office"));
+          Long area = Long.parseLong(csvRecord.get("Area"));
+          Long workingType = Long.parseLong(csvRecord.get("Working Type"));
+          String managerId = csvRecord.get("Manager Id");
+          Long employeeType = Long.parseLong(csvRecord.get("Employee Type"));
+          String personalEmail = csvRecord.get("Personal Email");
+          hrmRequestList.add(
+              HrmRequest.builder()
+                  .fullName(fullName)
+                  .role(role)
+                  .phone(phone)
+                  .gender(gender)
+                  .birthDate(birthDate)
+                  .grade(grade)
+                  .position(position)
+                  .office(office)
+                  .area(area)
+                  .workingType(workingType)
+                  .managerId(managerId)
+                  .employeeType(employeeType)
+                  .personalEmail(personalEmail)
+                  .build());
+        } catch (NumberFormatException e) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
+        }
       }
       insertMultiEmployee(hrmRequestList);
     } catch (IOException e) {
@@ -278,7 +277,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     HrmPojo hrmPojo =
         HrmPojo.builder()
             .password(password)
-            .workStatus(EWorkStatus.ACTIVE.name())
+            .workStatus(true)
             .companyName(companyName)
             .fullName(hrmRequest.getFullName())
             .role(hrmRequest.getRole())

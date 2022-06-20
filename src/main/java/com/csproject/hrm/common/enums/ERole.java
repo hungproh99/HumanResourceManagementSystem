@@ -20,10 +20,10 @@ public enum ERole {
     this.value = value;
   }
 
-  public static long of(String role) {
+  public static String getValue(String role) {
     for (ERole eRole : ERole.values()) {
-      if (eRole.label.equalsIgnoreCase(role)) {
-        return eRole.value;
+      if (eRole.name().equalsIgnoreCase(role)) {
+        return eRole.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, ROLE_INVALID);

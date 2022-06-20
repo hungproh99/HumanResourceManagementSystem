@@ -16,10 +16,10 @@ public enum ERequestStatus {
     this.value = value;
   }
 
-  public static long of(String status) {
+  public static String getValue(String status) {
     for (ERequestStatus eRequestStatus : ERequestStatus.values()) {
-      if (eRequestStatus.label.equalsIgnoreCase(status)) {
-        return eRequestStatus.value;
+      if (eRequestStatus.name().equalsIgnoreCase(status)) {
+        return eRequestStatus.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, REQUEST_STATUS_INVALID);

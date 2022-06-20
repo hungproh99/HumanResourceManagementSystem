@@ -28,7 +28,7 @@ public interface HumanManagementService {
 
   List<JobDto> getListPosition();
 
-  List<GradeDto> getListGradeByPosition(String id);
+  List<GradeDto> getListGradeByPosition(Long id);
 
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 

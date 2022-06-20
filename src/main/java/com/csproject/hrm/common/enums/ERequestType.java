@@ -16,10 +16,10 @@ public enum ERequestType {
     this.value = value;
   }
 
-  public static long of(String type) {
+  public static String getValue(String type) {
     for (ERequestType eRequestType : ERequestType.values()) {
-      if (eRequestType.label.equalsIgnoreCase(type)) {
-        return eRequestType.value;
+      if (eRequestType.name().equalsIgnoreCase(type)) {
+        return eRequestType.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, REQUEST_TYPE_INVALID);

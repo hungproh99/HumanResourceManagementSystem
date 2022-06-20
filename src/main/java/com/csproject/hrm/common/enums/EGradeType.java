@@ -17,10 +17,10 @@ public enum EGradeType {
     this.value = value;
   }
 
-  public static long of(String grade) {
+  public static String getLabel(String grade) {
     for (EGradeType eGradeType : EGradeType.values()) {
-      if (eGradeType.label.equalsIgnoreCase(grade)) {
-        return eGradeType.value;
+      if (eGradeType.name().equalsIgnoreCase(grade)) {
+        return eGradeType.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, GRADE_TYPE_INVALID);

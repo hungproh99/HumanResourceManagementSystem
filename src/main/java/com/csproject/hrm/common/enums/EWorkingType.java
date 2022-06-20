@@ -18,10 +18,10 @@ public enum EWorkingType {
     this.value = value;
   }
 
-  public static long of(String workingType) {
+  public static String getLabel(String workingType) {
     for (EWorkingType eWorkingType : EWorkingType.values()) {
-      if (eWorkingType.label.equalsIgnoreCase(workingType)) {
-        return eWorkingType.value;
+      if (eWorkingType.name().equalsIgnoreCase(workingType)) {
+        return eWorkingType.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, WORKING_TYPE_INVALID);

@@ -15,6 +15,6 @@ public class HrmPojo extends HrmRequest {
   private String employeeId;
   private String companyEmail;
   private String password;
-  private String workStatus;
+  private boolean workStatus;
   private String companyName;
 }

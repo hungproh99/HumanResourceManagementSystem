@@ -52,9 +52,17 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
-
-    return findAllEmployee(conditions, sortFields, queryParam.pagination)
-        .fetchInto(HrmResponse.class);
+    List<HrmResponse> hrmResponses =
+        findAllEmployee(conditions, sortFields, queryParam.pagination).fetchInto(HrmResponse.class);
+    hrmResponses.forEach(
+        hrmResponse -> {
+          hrmResponse.setArea_name(EArea.getLabel(hrmResponse.getArea_name()));
+          hrmResponse.setGrade(EGradeType.getLabel(hrmResponse.getGrade()));
+          hrmResponse.setPosition_name(EJob.getLabel(hrmResponse.getPosition_name()));
+          hrmResponse.setOffice_name(EOffice.getLabel(hrmResponse.getOffice_name()));
+          hrmResponse.setWorking_name(EWorkingType.getLabel(hrmResponse.getWorking_name()));
+        });
+    return hrmResponses;
   }
 
   @Override
@@ -69,25 +77,25 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getEmployeeId(),
                   hrmPojo.getCompanyEmail(),
                   hrmPojo.getPassword(),
-                  EWorkStatus.of(hrmPojo.getWorkStatus()),
+                  hrmPojo.isWorkStatus(),
                   hrmPojo.getFullName(),
-                  ERole.of(hrmPojo.getRole()),
+                  hrmPojo.getRole(),
                   hrmPojo.getPhone(),
                   hrmPojo.getGender(),
                   hrmPojo.getBirthDate(),
-                  EWorkingType.of(hrmPojo.getWorkingType()),
+                  hrmPojo.getWorkingType(),
                   hrmPojo.getManagerId(),
-                  EEmployeeType.of(hrmPojo.getEmployeeType()),
+                  hrmPojo.getEmployeeType(),
                   hrmPojo.getPersonalEmail()));
           queries.add(
               insertWorkingContractRecord(
                   configuration,
                   hrmPojo.getEmployeeId(),
                   hrmPojo.getCompanyName(),
-                  EArea.of(hrmPojo.getArea()),
-                  EJob.of(hrmPojo.getPosition()),
-                  EOffice.of(hrmPojo.getOffice()),
-                  EGradeType.of(hrmPojo.getGrade())));
+                  hrmPojo.getArea(),
+                  hrmPojo.getPosition(),
+                  hrmPojo.getOffice(),
+                  hrmPojo.getGrade()));
           DSL.using(configuration).batch(queries).execute();
         });
   }
@@ -106,25 +114,25 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getEmployeeId(),
                         hrmPojo.getCompanyEmail(),
                         hrmPojo.getPassword(),
-                        EWorkStatus.of(hrmPojo.getWorkStatus()),
+                        hrmPojo.isWorkStatus(),
                         hrmPojo.getFullName(),
-                        ERole.of(hrmPojo.getRole()),
+                        hrmPojo.getRole(),
                         hrmPojo.getPhone(),
                         hrmPojo.getGender(),
                         hrmPojo.getBirthDate(),
-                        EWorkingType.of(hrmPojo.getWorkingType()),
+                        hrmPojo.getWorkingType(),
                         hrmPojo.getManagerId(),
-                        EEmployeeType.of(hrmPojo.getEmployeeType()),
+                        hrmPojo.getEmployeeType(),
                         hrmPojo.getPersonalEmail()));
                 queries.add(
                     insertWorkingContractRecord(
                         configuration,
                         hrmPojo.getEmployeeId(),
                         hrmPojo.getCompanyName(),
-                        EArea.of(hrmPojo.getArea()),
-                        EJob.of(hrmPojo.getPosition()),
-                        EOffice.of(hrmPojo.getOffice()),
-                        EGradeType.of(hrmPojo.getGrade())));
+                        hrmPojo.getArea(),
+                        hrmPojo.getPosition(),
+                        hrmPojo.getOffice(),
+                        hrmPojo.getGrade()));
               });
 
           DSL.using(configuration).batch(queries).execute();
@@ -159,6 +167,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     return dslContext
         .select(WORKING_TYPE.TYPE_ID, WORKING_TYPE.NAME, WORKING_TYPE.DESCRIPTION)
         .from(WORKING_TYPE)
+        .orderBy(WORKING_TYPE.TYPE_ID.asc())
         .fetchInto(WorkingTypeDto.class);
   }
 
@@ -168,6 +177,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     return dslContext
         .select(EMPLOYEE_TYPE.TYPE_ID, EMPLOYEE_TYPE.NAME, EMPLOYEE_TYPE.DESCRIPTION)
         .from(EMPLOYEE_TYPE)
+        .orderBy(EMPLOYEE_TYPE.TYPE_ID.asc())
         .fetchInto(EmployeeTypeDto.class);
   }
 
@@ -182,6 +192,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .select(ROLE_TYPE.TYPE_ID, ROLE_TYPE.ROLE)
         .from(ROLE_TYPE)
         .where(conditions)
+        .orderBy(ROLE_TYPE.TYPE_ID.asc())
         .fetchInto(RoleDto.class);
   }
 
@@ -239,6 +250,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                 .upper()
                 .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
         .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
         .fetchInto(String.class);
   }
 
@@ -250,8 +262,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
-                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactive"))
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
                 .as(WORKING_STATUS),
             EMPLOYEE.PHONE_NUMBER.as(PHONE),
             EMPLOYEE.GENDER.as(GENDER),
@@ -295,13 +307,13 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       String password,
       boolean workStatus,
       String fullName,
-      long role,
+      Long role,
       String phone,
       String gender,
       LocalDate birthDate,
-      long workingType,
+      Long workingType,
       String managerId,
-      long employeeType,
+      Long employeeType,
       String personalEmail) {
     return DSL.using(config)
         .insertInto(
@@ -339,10 +351,10 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       Configuration config,
       String employeeId,
       String companyName,
-      long area,
-      long job,
-      long office,
-      long grade) {
+      Long area,
+      Long job,
+      Long office,
+      Long grade) {
 
     return DSL.using(config)
         .insertInto(
@@ -364,7 +376,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       String phoneNumber,
       String gender,
       LocalDate birthDate,
-      long workingType) {
+      Long workingType) {
     return DSL.using(config)
         .update(EMPLOYEE)
         .set(EMPLOYEE.FULL_NAME, fullName)
@@ -379,9 +391,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   private Update<?> updateWorkingContractById(
       Configuration config,
       String employeeId,
-      long areaId,
-      long jobId,
-      long officeId,
+      Long areaId,
+      Long jobId,
+      Long officeId,
       LocalDate startDate) {
     return DSL.using(config)
         .update(WORKING_CONTRACT)
@@ -431,6 +443,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-        .where(conditions);
+        .where(conditions)
+        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
   }
 }

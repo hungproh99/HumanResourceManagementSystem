@@ -16,10 +16,10 @@ public enum ERequestName {
     this.value = value;
   }
 
-  public static long of(String name) {
+  public static String getLabel(String name) {
     for (ERequestName eRequestName : ERequestName.values()) {
-      if (eRequestName.label.equalsIgnoreCase(name)) {
-        return eRequestName.value;
+      if (eRequestName.name().equalsIgnoreCase(name)) {
+        return eRequestName.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, REQUEST_NAME_INVALID);

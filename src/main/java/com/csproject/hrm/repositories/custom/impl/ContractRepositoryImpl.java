@@ -36,13 +36,18 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
     return dslContext
         .select(OFFICE.OFFICE_ID, OFFICE.NAME, OFFICE.ADDRESS)
         .from(OFFICE)
+        .orderBy(OFFICE.OFFICE_ID.asc())
         .fetchInto(OfficeDto.class);
   }
 
   @Override
   public List<AreaDto> getListArea() {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext.select(AREA.AREA_ID, AREA.NAME).from(AREA).fetchInto(AreaDto.class);
+    return dslContext
+        .select(AREA.AREA_ID, AREA.NAME)
+        .from(AREA)
+        .orderBy(AREA.AREA_ID.asc())
+        .fetchInto(AreaDto.class);
   }
 
   @Override
@@ -51,16 +56,18 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
     return dslContext
         .select(JOB.JOB_ID, JOB.POSITION, JOB.DESCRIPTION)
         .from(JOB)
+        .orderBy(JOB.JOB_ID.asc())
         .fetchInto(JobDto.class);
   }
 
   @Override
-  public List<GradeDto> getListGradeByPosition(long jodId) {
+  public List<GradeDto> getListGradeByPosition(Long jodId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(GRADE_TYPE.GRADE_ID, GRADE_TYPE.NAME, GRADE_TYPE.DESCRIPTION)
         .from(GRADE_TYPE)
         .where(GRADE_TYPE.JOB_ID.eq(jodId))
+        .orderBy(GRADE_TYPE.GRADE_ID.asc())
         .fetchInto(GradeDto.class);
   }
 }
