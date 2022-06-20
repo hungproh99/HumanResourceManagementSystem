@@ -1,6 +1,5 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.entities.ApplicationsRequest;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -17,10 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.jooq.codegen.maven.example.tables.Area.AREA;
-import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
-import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
+import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.impl.DSL.concat;
 
 @AllArgsConstructor

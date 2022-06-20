@@ -1,7 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.TimekeepingRepositoryCustom;
@@ -20,7 +22,7 @@ import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.CheckinCheckout.CHECKIN_CHECKOUT;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.Grade.GRADE;
+import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
@@ -55,6 +57,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           Condition condition = DSL.noCondition();
           Condition officeCondition = DSL.noCondition();
           Condition areaCondition = DSL.noCondition();
+          Condition positionCondition = DSL.noCondition();
           for (QueryFilter filter : values) {
 
             final Field<?> field = field2Map.get(filter.field);
@@ -68,12 +71,15 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             } else if (filter.field.equals(Constants.AREA)) {
               areaCondition =
                   areaCondition.or(AREA.NAME.upper().eq(filter.condition.toUpperCase()));
+            } else if (filter.field.equals(POSITION)) {
+              positionCondition =
+                  positionCondition.or(JOB.POSITION.upper().eq(filter.condition.toUpperCase()));
             }
 
             final var newCondition = queryHelper.condition(filter, field);
             condition = condition.and(newCondition);
           }
-          condition = condition.and(officeCondition).and(areaCondition);
+          condition = condition.and(officeCondition).and(areaCondition).and(positionCondition);
           conditions.add(condition);
         });
     List<OrderField<?>> sortFields =
@@ -108,7 +114,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .select(
             EMPLOYEE.FULL_NAME,
             JOB.POSITION,
-            GRADE.NAME.as(Constants.GRADE),
+            GRADE_TYPE.NAME.as(GRADE),
             TIMEKEEPING.DATE.as(CURRENT_DATE),
             TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
             firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
@@ -118,8 +124,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
         .leftJoin(JOB)
         .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-        .leftJoin(GRADE)
-        .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
         .leftJoin(AREA)
         .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
         .leftJoin(OFFICE)
@@ -152,7 +158,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .select(
             EMPLOYEE.FULL_NAME,
             JOB.POSITION,
-            GRADE.NAME.as(Constants.GRADE),
+            GRADE_TYPE.NAME.as(GRADE),
             TIMEKEEPING.DATE.as(CURRENT_DATE),
             TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
             firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
@@ -162,8 +168,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
         .leftJoin(JOB)
         .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-        .leftJoin(GRADE)
-        .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
         .leftJoin(TIMEKEEPING)
         .on(TIMEKEEPING.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
         .leftJoin(TIMEKEEPING_STATUS)
@@ -200,7 +206,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 EMPLOYEE.FULL_NAME,
                 EMPLOYEE.MANAGER_ID,
                 JOB.POSITION,
-                GRADE.NAME.as(Constants.GRADE),
+                GRADE_TYPE.NAME.as(GRADE),
                 TIMEKEEPING.DATE.as(CURRENT_DATE),
                 TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
                 (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
@@ -220,8 +226,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .leftJoin(JOB)
             .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-            .leftJoin(GRADE)
-            .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+            .leftJoin(GRADE_TYPE)
+            .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
             .leftJoin(TIMEKEEPING)
             .on(TIMEKEEPING.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .leftJoin(TIMEKEEPING_STATUS)

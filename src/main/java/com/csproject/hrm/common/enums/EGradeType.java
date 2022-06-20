@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.GRADE_TYPE_INVALID;
 
 public enum EGradeType {
-  DEVELOP_1("Develop 1", 1);
+  DEVELOP_1("Develop 1", 1),
+  DEVELOP_2("Develop 2", 2);
 
   private String label;
   private long value;

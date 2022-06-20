@@ -58,9 +58,9 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
   public List<GradeDto> getListGradeByPosition(long jodId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(GRADE.GRADE_ID, GRADE.NAME, GRADE.DESCRIPTION)
-        .from(GRADE)
-        .where(GRADE.JOB_ID.eq(jodId))
+        .select(GRADE_TYPE.GRADE_ID, GRADE_TYPE.NAME, GRADE_TYPE.DESCRIPTION)
+        .from(GRADE_TYPE)
+        .where(GRADE_TYPE.JOB_ID.eq(jodId))
         .fetchInto(GradeDto.class);
   }
 }

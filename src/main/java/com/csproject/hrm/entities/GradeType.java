@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "grade")
+@Table(name = "grade_type")
 public class GradeType {
   @Id
   @Column(name = "grade_id")

@@ -7,7 +7,8 @@ import static com.csproject.hrm.common.constant.Constants.WORKING_TYPE_INVALID;
 
 public enum EWorkingType {
   FULL_TIME("Full Time", 1),
-  PART_TIME("Part Time", 2);
+  PART_TIME("Part Time", 2),
+  FREELANCE("Freelance", 2);
 
   private String label;
   private long value;
