@@ -1,5 +1,6 @@
 package com.csproject.hrm.entities;
 
+import com.csproject.hrm.common.enums.EGradeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,14 +14,15 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "grade")
-public class Grade {
+public class GradeType {
   @Id
   @Column(name = "grade_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "name")
-  private String grade;
+  private EGradeType eGradeType;
 
   @Column(name = "description")
   private String description;

@@ -1,5 +1,6 @@
 package com.csproject.hrm.entities;
 
+import com.csproject.hrm.common.enums.EEmployeeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +20,9 @@ public class EmployeeType {
   @Column(name = "type_id")
   private Long id;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "name")
-  private String name;
+  private EEmployeeType eEmployeeType;
 
   @Column(name = "description")
   private String description;

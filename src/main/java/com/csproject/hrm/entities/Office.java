@@ -1,5 +1,7 @@
 package com.csproject.hrm.entities;
 
+import com.csproject.hrm.common.enums.EOffice;
+import com.csproject.hrm.common.enums.ERequestType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +21,9 @@ public class Office {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "name")
-  private String name;
+  private EOffice eOffice;
 
   @Column(name = "address")
   private String address;
