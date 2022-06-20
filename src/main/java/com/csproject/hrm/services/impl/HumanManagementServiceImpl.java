@@ -90,8 +90,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<RoleDto> getListRoleType() {
-    return employeeRepository.getListRoleType();
+  public List<RoleDto> getListRoleType(boolean isAdmin) {
+    return employeeRepository.getListRoleType(isAdmin);
   }
 
   @Override
@@ -225,8 +225,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<String> getListManagerByName(QueryParam queryParam) {
-    return employeeRepository.getListManagerByName(queryParam);
+  public List<String> getListManagerByName(String name) {
+    return employeeRepository.getListManagerByName(name);
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {

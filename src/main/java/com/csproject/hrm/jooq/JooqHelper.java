@@ -82,7 +82,7 @@ public class JooqHelper {
     return conditions;
   }
 
-  private Condition condition(QueryFilter filter, Field<?> field) {
+  public Condition condition(QueryFilter filter, Field<?> field) {
 
     if (StringUtils.length(filter.condition) < 3) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);

@@ -20,7 +20,7 @@ public interface HumanManagementService {
 
   List<EmployeeTypeDto> getListEmployeeType();
 
-  List<RoleDto> getListRoleType();
+  List<RoleDto> getListRoleType(boolean isAdmin);
 
   List<OfficeDto> getListOffice();
 
@@ -36,5 +36,5 @@ public interface HumanManagementService {
 
   void importCsvToEmployee(InputStream inputStream);
 
-  List<String> getListManagerByName(QueryParam queryParam);
+  List<String> getListManagerByName(String name);
 }

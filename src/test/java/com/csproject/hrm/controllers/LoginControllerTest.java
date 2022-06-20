@@ -1,6 +1,8 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.common.enums.EEmployeeType;
 import com.csproject.hrm.common.enums.ERole;
+import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.dto.response.JwtResponse;
 import com.csproject.hrm.entities.Employee;
@@ -35,15 +37,15 @@ public class LoginControllerTest {
   @MockBean LoginService loginService;
 
   EmployeeType employeeTypeRecord1 =
-      EmployeeType.builder().id(1L).name("Trainee").description("Trainee").build();
+      EmployeeType.builder().id(1L).eEmployeeType(EEmployeeType.TRAINEE).build();
   EmployeeType employeeTypeRecord2 =
-      EmployeeType.builder().id(2L).name("Official Employee").build();
+      EmployeeType.builder().id(2L).eEmployeeType(EEmployeeType.OFFICIAL_EMPLOYEE).build();
 
   RoleType roleTypeRecord1 = RoleType.builder().id(1L).ERole(ERole.ROLE_ADMIN).build();
   RoleType roleTypeRecord2 = RoleType.builder().id(2L).ERole(ERole.ROLE_MANAGER).build();
 
-  WorkingType workingTypeRecord1 = WorkingType.builder().id(1L).name("Full Time").build();
-  WorkingType workingTypeRecord2 = WorkingType.builder().id(1L).name("Full Time").build();
+  WorkingType workingTypeRecord1 = WorkingType.builder().id(1L).eWorkingType(EWorkingType.FULL_TIME).build();
+  WorkingType workingTypeRecord2 = WorkingType.builder().id(1L).eWorkingType(EWorkingType.FULL_TIME).build();
 
   Employee record1 =
       Employee.builder()

@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +55,7 @@ public class HrmController {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
     String extension = multipartFile.getContentType();
-    if(!extension.equals("text/csv")){
+    if (!extension.equals("text/csv")) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, ONLY_UPLOAD_CSV);
     }
     try {
@@ -103,17 +104,19 @@ public class HrmController {
   }
 
   @GetMapping(URI_LIST_ROLE_TYPE)
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getListRoleType() {
-    return ResponseEntity.ok(humanManagementService.getListRoleType());
+  @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+  public ResponseEntity<?> getListRoleType(HttpServletRequest request) {
+    boolean isAdmin = false;
+    if (request.isUserInRole("ADMIN")) {
+      isAdmin = true;
+    }
+    return ResponseEntity.ok(humanManagementService.getListRoleType(isAdmin));
   }
 
   @GetMapping(URI_GET_LIST_MANAGER)
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getListManager(@RequestParam Map<String, String> allRequestParams) {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
-    return ResponseEntity.ok(humanManagementService.getListManagerByName(queryParam));
+  public ResponseEntity<?> getListManager(@RequestParam String name) {
+    return ResponseEntity.ok(humanManagementService.getListManagerByName(name));
   }
 
   @PutMapping(URI_UPDATE_EMPLOYEE)

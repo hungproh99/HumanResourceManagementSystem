@@ -171,11 +171,16 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public List<RoleDto> getListRoleType() {
+  public List<RoleDto> getListRoleType(boolean isAdmin) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Condition> conditions = new ArrayList<>();
+    if (!isAdmin) {
+      conditions.add(ROLE_TYPE.ROLE.notLike(ERole.ROLE_ADMIN.name()));
+    }
     return dslContext
         .select(ROLE_TYPE.TYPE_ID, ROLE_TYPE.ROLE)
         .from(ROLE_TYPE)
+        .where(conditions)
         .fetchInto(RoleDto.class);
   }
 
@@ -220,17 +225,19 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public List<String> getListManagerByName(QueryParam queryParam) {
+  public List<String> getListManagerByName(String name) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
-
     return dslContext
         .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
         .from(EMPLOYEE)
-        .where(conditions)
-        .orderBy(sortFields)
+        .leftJoin(ROLE_TYPE)
+        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+        .where(
+            EMPLOYEE
+                .FULL_NAME
+                .upper()
+                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
+        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
         .fetchInto(String.class);
   }
 

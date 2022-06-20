@@ -104,4 +104,7 @@ public class Employee {
 
   @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
   private Timekeeping timekeeping;
+
+  @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+  private ApplicationsRequest applicationsRequest;
 }

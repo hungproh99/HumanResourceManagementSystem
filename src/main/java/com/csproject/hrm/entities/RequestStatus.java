@@ -1,7 +1,6 @@
 package com.csproject.hrm.entities;
 
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.common.enums.ERequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +13,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "timekeeping_status")
-public class TimekeepingStatus {
+@Table(name = "request_status")
+public class RequestStatus {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "type_id")
@@ -23,8 +22,8 @@ public class TimekeepingStatus {
 
   @Enumerated(value = EnumType.STRING)
   @Column(name = "name")
-  private ETimekeepingStatus eTimekeepingStatus;
+  private ERequestStatus eRequestStatus;
 
-  @OneToOne(mappedBy = "timekeepingStatus", fetch = FetchType.LAZY)
-  private Timekeeping timekeeping;
+  @OneToOne(mappedBy = "requestStatus", fetch = FetchType.LAZY)
+  private ApplicationsRequest applicationsRequest;
 }

@@ -67,5 +67,5 @@ public class WorkingContract {
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "grade_id")
-  private Grade grade;
+  private GradeType grade;
 }
