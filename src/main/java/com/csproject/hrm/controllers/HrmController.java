@@ -161,22 +161,32 @@ public class HrmController {
   @PostMapping(value = URI_DOWNLOAD_CSV_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadCsvEmployee(
-      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
+      HttpServletResponse servletResponse,
+      @RequestBody List<String> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader("Content-Disposition", "attachment; filename=\"employees.csv\"");
-    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), listId);
+    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadExcelEmployee(
-      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
+      HttpServletResponse servletResponse,
+      @RequestBody List<String> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
         "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
-    humanManagementService.exportEmployeeToExcel(servletResponse, listId);
+    humanManagementService.exportEmployeeToExcel(servletResponse, queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

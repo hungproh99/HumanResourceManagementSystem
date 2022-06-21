@@ -96,8 +96,11 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public List<TimekeepingResponse> getListTimekeepingToExport(List<String> list) {
-    List<Condition> conditions = new ArrayList<>();
+  public List<TimekeepingResponse> getListTimekeepingToExport(
+      QueryParam queryParam, List<String> list) {
+    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    List<OrderField<?>> sortFields =
+        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     Condition condition = noCondition();
     for (String id : list) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
@@ -105,7 +108,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     conditions.add(condition);
 
     List<TimekeepingResponse> timekeepingResponses =
-        getTimekeepingToExport(conditions).fetchInto(TimekeepingResponse.class);
+        getTimekeepingToExport(conditions, sortFields, queryParam.pagination)
+            .fetchInto(TimekeepingResponse.class);
 
     timekeepingResponses.forEach(
         timekeepingResponse -> {
@@ -161,7 +165,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .offset(pagination.offset);
   }
 
-  private Select<?> getTimekeepingToExport(List<Condition> conditions) {
+  private Select<?> getTimekeepingToExport(
+      List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     TableLike<?> firstTimeCheckIn =
         dslContext.select().from(CHECKIN_CHECKOUT).orderBy(CHECKIN_CHECKOUT.CHECKIN.asc()).limit(1);
@@ -197,7 +202,9 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .leftJoin(lastTimeCheckOut)
         .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .where(conditions)
-        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
   }
 
   @Override

@@ -40,22 +40,32 @@ public class TimekeepingController {
   @PostMapping(value = URI_DOWNLOAD_CSV_TIMEKEEPING)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadCsvTimekeeping(
-      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
+      HttpServletResponse servletResponse,
+      @RequestBody List<String> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader("Content-Disposition", "attachment; filename=\"timekeeping.csv\"");
-    timekeepingService.exportTimekeepingToCsv(servletResponse.getWriter(), listId);
+    timekeepingService.exportTimekeepingToCsv(servletResponse.getWriter(), queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_TIMEKEEPING)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadExcelTimekeeping(
-      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
+      HttpServletResponse servletResponse,
+      @RequestBody List<String> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
         "Content-Disposition", "attachment; filename=timekeeping_" + timestamp.getTime() + ".xlsx");
-    timekeepingService.exportTimekeepingToExcel(servletResponse, listId);
+    timekeepingService.exportTimekeepingToExcel(servletResponse, queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 

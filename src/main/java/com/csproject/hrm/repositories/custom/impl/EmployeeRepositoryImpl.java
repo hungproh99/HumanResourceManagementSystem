@@ -225,15 +225,18 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public List<HrmResponse> findEmployeeByListId(List<String> list) {
-    List<Condition> conditions = new ArrayList<>();
+  public List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list) {
+    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    List<OrderField<?>> sortFields =
+        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     Condition condition = noCondition();
     for (String id : list) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
     }
     conditions.add(condition);
 
-    return findEmployeeByListIdByCondition(conditions).fetchInto(HrmResponse.class);
+    return findEmployeeByListIdByCondition(conditions, sortFields, queryParam.pagination)
+        .fetchInto(HrmResponse.class);
   }
 
   @Override
@@ -404,7 +407,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId));
   }
 
-  private Select<?> findEmployeeByListIdByCondition(List<Condition> conditions) {
+  private Select<?> findEmployeeByListIdByCondition(
+      List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -444,6 +448,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
-        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
   }
 }

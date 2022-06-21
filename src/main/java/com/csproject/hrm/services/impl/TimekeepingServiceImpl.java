@@ -38,12 +38,12 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   }
 
   @Override
-  public void exportTimekeepingToCsv(Writer writer, List<String> list) {
+  public void exportTimekeepingToCsv(Writer writer, QueryParam queryParam, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       List<TimekeepingResponse> timekeepingResponses =
-          timekeepingRepository.getListTimekeepingToExport(list);
+          timekeepingRepository.getListTimekeepingToExport(queryParam, list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
               writer,
@@ -74,13 +74,14 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   }
 
   @Override
-  public void exportTimekeepingToExcel(HttpServletResponse response, List<String> list) {
+  public void exportTimekeepingToExcel(
+      HttpServletResponse response, QueryParam queryParam, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       try {
         List<TimekeepingResponse> timekeepingResponses =
-            timekeepingRepository.getListTimekeepingToExport(list);
+            timekeepingRepository.getListTimekeepingToExport(queryParam, list);
         ExcelExportTimekeeping excelExportTimekeeping =
             new ExcelExportTimekeeping(timekeepingResponses);
         excelExportTimekeeping.export(response);

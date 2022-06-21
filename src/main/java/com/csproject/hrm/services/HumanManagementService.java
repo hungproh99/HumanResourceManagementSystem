@@ -33,13 +33,14 @@ public interface HumanManagementService {
 
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
-  void exportEmployeeToCsv(Writer writer, List<String> list);
+  void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list);
 
   void importCsvToEmployee(InputStream inputStream);
 
   List<String> getListManagerByName(String name);
 
-  void exportEmployeeToExcel(HttpServletResponse response, List<String> list);
+  void exportEmployeeToExcel(
+      HttpServletResponse response, QueryParam queryParam, List<String> list);
 
   void importExcelToEmployee(Workbook workBook);
 }

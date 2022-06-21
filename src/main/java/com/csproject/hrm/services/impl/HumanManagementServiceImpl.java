@@ -129,11 +129,11 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public void exportEmployeeToCsv(Writer writer, List<String> list) {
+  public void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
-      List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(list);
+      List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
               writer,
@@ -316,12 +316,13 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public void exportEmployeeToExcel(HttpServletResponse response, List<String> list) {
+  public void exportEmployeeToExcel(
+      HttpServletResponse response, QueryParam queryParam, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       try {
-        List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(list);
+        List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
         ExcelExportEmployee excelExportEmployee = new ExcelExportEmployee(hrmResponses);
         excelExportEmployee.export(response);
       } catch (IOException e) {

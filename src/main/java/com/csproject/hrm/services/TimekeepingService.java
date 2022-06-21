@@ -11,9 +11,10 @@ import java.util.List;
 public interface TimekeepingService {
   List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam);
 
-  void exportTimekeepingToCsv(Writer writer, List<String> list);
+  void exportTimekeepingToCsv(Writer writer, QueryParam queryParam, List<String> list);
 
-  void exportTimekeepingToExcel(HttpServletResponse response, List<String> list);
+  void exportTimekeepingToExcel(
+      HttpServletResponse response, QueryParam queryParam, List<String> list);
 
    List<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(String employeeID, String date);
 }
