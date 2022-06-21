@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -175,6 +178,14 @@ public class JooqHelper {
       return field
           .cast(Timestamp.class)
           .between(new Timestamp(Long.valueOf(less)), new Timestamp(Long.valueOf(greater)));
+    } else if (field.getDataType().isDate()) {
+      return field
+          .cast(LocalDate.class)
+          .between(
+              Instant.ofEpochMilli(Long.valueOf(less)).atZone(ZoneId.systemDefault()).toLocalDate(),
+              Instant.ofEpochMilli(Long.valueOf(greater))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate());
     } else if (field.getDataType().isNumeric()) {
       return field.cast(Long.class).between(Long.valueOf(less), Long.valueOf(greater));
     }

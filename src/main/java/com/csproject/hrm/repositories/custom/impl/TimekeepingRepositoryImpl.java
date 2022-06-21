@@ -43,6 +43,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     field2Map.put(POSITION, JOB.POSITION);
     field2Map.put(Constants.OFFICE, OFFICE.NAME);
     field2Map.put(Constants.AREA, AREA.NAME);
+    field2Map.put(DATE, TIMEKEEPING.DATE);
   }
 
   @Autowired private final JooqHelper queryHelper;

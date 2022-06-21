@@ -99,6 +99,6 @@ public class Constants {
   public static final String REQUEST_TITLE = "requestTitle";
   public static final String ACTIVE = "Active";
   public static final String DEACTIVE = "Deactive";
-
   public static final String ONLY_UPLOAD_EXCEL = "Only upload excel file ";
+  public static final String DATE = "date";
 }
