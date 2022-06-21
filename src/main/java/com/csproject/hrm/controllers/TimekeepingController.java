@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class TimekeepingController {
     return ResponseEntity.ok(timekeeping);
   }
 
-  @GetMapping(value = URI_DOWNLOAD_CSV_TIMEKEEPING)
+  @PostMapping(value = URI_DOWNLOAD_CSV_TIMEKEEPING)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> downloadCsvTimekeeping(
       HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
@@ -46,7 +46,19 @@ public class TimekeepingController {
     timekeepingService.exportTimekeepingToCsv(servletResponse.getWriter(), listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
-  
+
+  @PostMapping(value = URI_DOWNLOAD_EXCEL_TIMEKEEPING)
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> downloadExcelTimekeeping(
+      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    servletResponse.setContentType("application/octet-stream");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=timekeeping_" + timestamp.getTime() + ".xlsx");
+    timekeepingService.exportTimekeepingToExcel(servletResponse, listId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
   @GetMapping(URI_GET_DETAIL_TIMEKEEPING)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListDetailTimekeeping(

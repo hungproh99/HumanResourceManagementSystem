@@ -5,8 +5,9 @@ import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
-import org.springframework.stereotype.Service;
+import org.apache.poi.ss.usermodel.Workbook;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
@@ -37,4 +38,8 @@ public interface HumanManagementService {
   void importCsvToEmployee(InputStream inputStream);
 
   List<String> getListManagerByName(String name);
+
+  void exportEmployeeToExcel(HttpServletResponse response, List<String> list);
+
+  void importExcelToEmployee(Workbook workBook);
 }

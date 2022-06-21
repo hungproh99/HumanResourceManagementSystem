@@ -1,6 +1,8 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.common.excel.ExcelExportTimekeeping;
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponse;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.QueryParam;
@@ -10,17 +12,15 @@ import com.csproject.hrm.services.TimekeepingService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -72,7 +72,24 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       }
     }
   }
-  
+
+  @Override
+  public void exportTimekeepingToExcel(HttpServletResponse response, List<String> list) {
+    if (list.size() == 0) {
+      throw new CustomDataNotFoundException(NO_DATA);
+    } else {
+      try {
+        List<TimekeepingResponse> timekeepingResponses =
+            timekeepingRepository.getListTimekeepingToExport(list);
+        ExcelExportTimekeeping excelExportTimekeeping =
+            new ExcelExportTimekeeping(timekeepingResponses);
+        excelExportTimekeeping.export(response);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
   @Override
   public List<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(String employeeID, String date) {
     if (employeeID == null||date==null){
