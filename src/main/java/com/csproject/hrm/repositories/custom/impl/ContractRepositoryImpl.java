@@ -1,9 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.AreaDto;
-import com.csproject.hrm.dto.dto.GradeDto;
-import com.csproject.hrm.dto.dto.JobDto;
-import com.csproject.hrm.dto.dto.OfficeDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.repositories.custom.ContractRepositoryCustom;
@@ -13,9 +10,7 @@ import org.jooq.Field;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.jooq.codegen.maven.example.Tables.*;
 

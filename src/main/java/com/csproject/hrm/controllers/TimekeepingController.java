@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -62,8 +61,9 @@ public class TimekeepingController {
   @GetMapping(URI_GET_DETAIL_TIMEKEEPING)
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListDetailTimekeeping(
-          @RequestParam String employeeID, String date) {
-    List<TimekeepingDetailResponse> timekeeping = timekeepingService.getTimekeepingByEmployeeIDAndDate(employeeID, date);
+      @RequestParam String employeeID, @RequestParam String date) {
+    Optional<TimekeepingDetailResponse> timekeeping =
+        timekeepingService.getTimekeepingByEmployeeIDAndDate(employeeID, date);
     return ResponseEntity.ok(timekeeping);
   }
 }

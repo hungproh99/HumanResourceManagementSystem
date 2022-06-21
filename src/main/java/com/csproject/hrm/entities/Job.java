@@ -1,10 +1,7 @@
 package com.csproject.hrm.entities;
 
 import com.csproject.hrm.common.enums.EJob;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;

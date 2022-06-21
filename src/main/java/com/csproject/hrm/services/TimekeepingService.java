@@ -7,6 +7,7 @@ import com.csproject.hrm.jooq.QueryParam;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
 import java.util.List;
+import java.util.Optional;
 
 public interface TimekeepingService {
   List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam);
@@ -15,5 +16,6 @@ public interface TimekeepingService {
 
   void exportTimekeepingToExcel(HttpServletResponse response, List<String> list);
 
-   List<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(String employeeID, String date);
+  Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
+      String employeeID, String date);
 }

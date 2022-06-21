@@ -1,16 +1,11 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.*;
-import com.csproject.hrm.dto.dto.EmployeeTypeDto;
-import com.csproject.hrm.dto.dto.RoleDto;
-import com.csproject.hrm.dto.dto.WorkingTypeDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
-import com.csproject.hrm.jooq.DBConnection;
-import com.csproject.hrm.jooq.JooqHelper;
-import com.csproject.hrm.jooq.Pagination;
-import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.EmployeeRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
@@ -18,11 +13,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static com.csproject.hrm.common.constant.Constants.GRADE;
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
