@@ -22,16 +22,16 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
 @Service
 public class TimekeepingServiceImpl implements TimekeepingService {
   @Autowired TimekeepingRepository timekeepingRepository;
-  
-  @Autowired
-  EmployeeDetailRepository employeeDetailRepository;
-  
+
+  @Autowired EmployeeDetailRepository employeeDetailRepository;
+
   @Override
   public List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam) {
     return timekeepingRepository.getListAllTimekeeping(queryParam);
@@ -92,23 +92,27 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   }
 
   @Override
-  public List<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(String employeeID, String date) {
-    if (employeeID == null||date==null){
+  public Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
+      String employeeID, String date) {
+    if (employeeID == null || date == null) {
       throw new NullPointerException("Had param is null!");
     }
     LocalDate localDate;
     try {
-      localDate=LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+      localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     } catch (DateTimeParseException e) {
       throw new CustomErrorException("Date must have format yyyy-MM-dd!");
     }
-    if(employeeDetailRepository.checkEmployeeIDIsExists(employeeID)){
-      List<TimekeepingDetailResponse> list = timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeID,localDate);
-      TimekeepingDetailResponse detailResponse = list.get(0);
-      detailResponse.setCheck_in_check_outs(timekeepingRepository.getCheckInCheckOutByTimekeepingID(detailResponse.getTimekeeping_id()));
-      
+    if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+      Optional<TimekeepingDetailResponse> list =
+          timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeID, localDate);
+      Long timekeepingID = list.get().getTimekeeping_id();
+      list.get()
+          .setCheck_in_check_outs(
+              timekeepingRepository.getCheckInCheckOutByTimekeepingID(timekeepingID));
+
       return list;
-    }else{
+    } else {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
   }

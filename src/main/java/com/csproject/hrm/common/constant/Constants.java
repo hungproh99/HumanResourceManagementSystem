@@ -81,6 +81,8 @@ public class Constants {
   public static final String POSITION = "position";
   public static final String OFFICE = "office";
   public static final String AREA = "area";
+
+  public static final String DATE = "date";
   public static final String CURRENT_DATE = "current_date";
   public static final String TIMEKEEPING_STATUS = "timekeeping_status";
   public static final String FIRST_CHECK_IN = "first_check_in";
@@ -100,7 +102,7 @@ public class Constants {
   public static final String ACTIVE = "Active";
   public static final String DEACTIVE = "Deactive";
   public static final String ONLY_UPLOAD_EXCEL = "Only upload excel file ";
-  public static final String DATE = "date";
+  public static final String TOTAL_WORKING_TIME = "total_working_time";
   public static final String REQUEST_TYPE_PARAM = "requestType";
   public static final String IS_BOOKMARK_PARAM = "isBookmark";
   public static final String CHANGE_STATUS_TIME = "change_status_time";

@@ -3,9 +3,7 @@ package com.csproject.hrm.repositories.custom.impl;
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.EGradeType;
 import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
-import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.TimekeepingRepositoryCustom;
@@ -208,7 +206,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public List<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
+  public Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
       String employeeID, LocalDate date) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     List<Condition> conditions = new ArrayList<>();
@@ -244,7 +242,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                                 .add(minute(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN)))))
                     .divide(60)
                     .cast(SQLDataType.DECIMAL(4, 2))
-                    .as("total_working_time"),
+                    .as(TOTAL_WORKING_TIME),
                 firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
                 lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
             .from(EMPLOYEE)
@@ -269,7 +267,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                     .field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
                     .eq(TIMEKEEPING.TIMEKEEPING_ID))
             .where(conditions);
-    return query.fetchInto(TimekeepingDetailResponse.class);
+    return query.fetchOptionalInto(TimekeepingDetailResponse.class);
   }
 
   @Override
