@@ -80,8 +80,8 @@ public class ExcelExportTimekeeping {
         createCell(row, columnCount++, timekeepingResponses.getGrade(), style);
         createCell(row, columnCount++, timekeepingResponse.getCurrent_date(), style);
         createCell(row, columnCount++, timekeepingResponse.getTimekeeping_status(), style);
-        createCell(row, columnCount++, timekeepingResponse.getFirst_check_in(), style);
-        createCell(row, columnCount++, timekeepingResponse.getLast_check_out(), style);
+        createCell(row, columnCount++, timekeepingResponse.getFirst_check_in().toString(), style);
+        createCell(row, columnCount++, timekeepingResponse.getLast_check_out().toString(), style);
       }
     }
   }

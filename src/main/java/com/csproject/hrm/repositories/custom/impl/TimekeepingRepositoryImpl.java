@@ -3,6 +3,7 @@ package com.csproject.hrm.repositories.custom.impl;
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.EGradeType;
 import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
@@ -92,9 +93,15 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         timekeepingResponse -> {
           timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
           timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
-          timekeepingResponse.setTimekeepingResponses(
+          List<TimekeepingResponse> timekeepingList =
               getAllTimekeepingByEmployeeId(timekeepingResponse.getEmployee_id())
-                  .fetchInto(TimekeepingResponse.class));
+                  .fetchInto(TimekeepingResponse.class);
+          timekeepingList.forEach(
+              timekeeping -> {
+                timekeeping.setTimekeeping_status(
+                    ETimekeepingStatus.getValue(timekeeping.getTimekeeping_status()));
+              });
+          timekeepingResponse.setTimekeepingResponses(timekeepingList);
         });
     return timekeepingResponses;
   }
@@ -118,9 +125,15 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         timekeepingResponse -> {
           timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
           timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
-          timekeepingResponse.setTimekeepingResponses(
+          List<TimekeepingResponse> timekeepingList =
               getAllTimekeepingByEmployeeId(timekeepingResponse.getEmployee_id())
-                  .fetchInto(TimekeepingResponse.class));
+                  .fetchInto(TimekeepingResponse.class);
+          timekeepingList.forEach(
+              timekeeping -> {
+                timekeeping.setTimekeeping_status(
+                    ETimekeepingStatus.getValue(timekeeping.getTimekeeping_status()));
+              });
+          timekeepingResponse.setTimekeepingResponses(timekeepingList);
         });
     return timekeepingResponses;
   }
@@ -230,14 +243,38 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
 
   private Select<?> getAllTimekeepingByEmployeeId(String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    TableLike<?> rowNumberAsc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    TableLike<?> rowNumberDesc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
     TableLike<?> firstTimeCheckIn =
-        dslContext.select().from(CHECKIN_CHECKOUT).orderBy(CHECKIN_CHECKOUT.CHECKIN.asc()).limit(1);
+        dslContext
+            .select()
+            .from(rowNumberAsc)
+            .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1));
     TableLike<?> lastTimeCheckOut =
         dslContext
             .select()
-            .from(CHECKIN_CHECKOUT)
-            .orderBy(CHECKIN_CHECKOUT.CHECKIN.desc())
-            .limit(1);
+            .from(rowNumberDesc)
+            .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
     return dslContext
         .select(
             TIMEKEEPING.DATE.as(CURRENT_DATE),
