@@ -1,10 +1,8 @@
 package com.csproject.hrm.dto.response;
 
-import com.csproject.hrm.entities.CheckInCheckOut;
 import lombok.*;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -18,7 +16,7 @@ public class TimekeepingDetailResponse {
   private String manager_id;
   private String position;
   private String grade;
-  private Date current_date;
+  private LocalDate current_date;
   private Long timekeeping_id;
   private String timekeeping_status;
   private String total_working_time;
