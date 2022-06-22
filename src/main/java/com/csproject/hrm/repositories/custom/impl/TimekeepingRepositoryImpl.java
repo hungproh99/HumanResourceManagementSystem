@@ -88,8 +88,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           conditions.add(condition);
           conditionsTimekeeping.add(timekeepingCondition);
         });
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
 
     List<TimekeepingResponseList> timekeepingResponses =
         getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination)
@@ -100,7 +100,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
           List<TimekeepingResponse> timekeepingList =
               getAllTimekeepingByEmployeeId(
-                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping)
+                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping, sortFields)
                   .fetchInto(TimekeepingResponse.class);
           timekeepingList.forEach(
               timekeeping -> {
@@ -151,8 +151,9 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           conditionsTimekeeping.add(timekeepingCondition);
         });
 
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
+    
     Condition condition = noCondition();
     for (String id : list) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
@@ -168,7 +169,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
           List<TimekeepingResponse> timekeepingList =
               getAllTimekeepingByEmployeeId(
-                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping)
+                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping, sortFields)
                   .fetchInto(TimekeepingResponse.class);
           timekeepingList.forEach(
               timekeeping -> {
@@ -283,9 +284,11 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .offset(pagination.offset);
   }
 
-  private Select<?> getAllTimekeepingByEmployeeId(String employeeId, List<Condition> conditions) {
+  private Select<?> getAllTimekeepingByEmployeeId(
+      String employeeId, List<Condition> conditions, List<OrderField<?>> sortFields) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+    sortFields.add(TIMEKEEPING.DATE.asc());
     TableLike<?> rowNumberAsc =
         dslContext
             .select(
@@ -334,6 +337,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .leftJoin(lastTimeCheckOut)
         .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .where(conditions)
-        .orderBy(TIMEKEEPING.DATE.asc());
+        .orderBy(sortFields);
   }
 }

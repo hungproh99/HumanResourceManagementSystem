@@ -71,6 +71,13 @@ public class ExcelExportTimekeeping {
     style.setFont(font);
 
     for (TimekeepingResponseList timekeepingResponses : timekeepingResponseList) {
+      if (timekeepingResponses.getTimekeepingResponses().size() == 0) {
+        Row row = sheet.createRow(rowCount++);
+        int columnCount = 0;
+        createCell(row, columnCount++, timekeepingResponses.getFull_name(), style);
+        createCell(row, columnCount++, timekeepingResponses.getPosition(), style);
+        createCell(row, columnCount++, timekeepingResponses.getGrade(), style);
+      }
       for (TimekeepingResponse timekeepingResponse :
           timekeepingResponses.getTimekeepingResponses()) {
         Row row = sheet.createRow(rowCount++);
