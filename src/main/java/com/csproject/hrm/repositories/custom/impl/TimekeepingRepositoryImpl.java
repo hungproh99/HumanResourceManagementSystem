@@ -54,6 +54,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   @Override
   public List<TimekeepingResponseList> getListAllTimekeeping(QueryParam queryParam) {
     final List<Condition> conditions = new ArrayList<>();
+    final List<Condition> conditionsTimekeeping = new ArrayList<>();
     final var mergeFilters =
         queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
 
@@ -63,6 +64,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           Condition officeCondition = DSL.noCondition();
           Condition areaCondition = DSL.noCondition();
           Condition positionCondition = DSL.noCondition();
+          Condition timekeepingCondition = DSL.noCondition();
           for (QueryFilter filter : values) {
 
             final Field<?> field = field2Map.get(filter.field);
@@ -76,12 +78,15 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
               areaCondition = areaCondition.or(queryHelper.condition(filter, field));
             } else if (filter.field.equals(POSITION)) {
               positionCondition = positionCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(DATE)) {
+              timekeepingCondition = timekeepingCondition.and(queryHelper.condition(filter, field));
             } else {
               condition = condition.and(queryHelper.condition(filter, field));
             }
           }
           condition = condition.and(officeCondition).and(areaCondition).and(positionCondition);
           conditions.add(condition);
+          conditionsTimekeeping.add(timekeepingCondition);
         });
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
@@ -94,7 +99,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
           timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
           List<TimekeepingResponse> timekeepingList =
-              getAllTimekeepingByEmployeeId(timekeepingResponse.getEmployee_id())
+              getAllTimekeepingByEmployeeId(
+                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping)
                   .fetchInto(TimekeepingResponse.class);
           timekeepingList.forEach(
               timekeeping -> {
@@ -109,7 +115,42 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   @Override
   public List<TimekeepingResponseList> getListTimekeepingToExport(
       QueryParam queryParam, List<String> list) {
-    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    final List<Condition> conditions = new ArrayList<>();
+    final List<Condition> conditionsTimekeeping = new ArrayList<>();
+    final var mergeFilters =
+        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+
+    mergeFilters.forEach(
+        (key, values) -> {
+          Condition condition = DSL.noCondition();
+          Condition officeCondition = DSL.noCondition();
+          Condition areaCondition = DSL.noCondition();
+          Condition positionCondition = DSL.noCondition();
+          Condition timekeepingCondition = DSL.noCondition();
+          for (QueryFilter filter : values) {
+
+            final Field<?> field = field2Map.get(filter.field);
+
+            if (Objects.isNull(field)) {
+              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
+            }
+            if (filter.field.equals(Constants.OFFICE)) {
+              officeCondition = officeCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(Constants.AREA)) {
+              areaCondition = areaCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(POSITION)) {
+              positionCondition = positionCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(DATE)) {
+              timekeepingCondition = timekeepingCondition.and(queryHelper.condition(filter, field));
+            } else {
+              condition = condition.and(queryHelper.condition(filter, field));
+            }
+          }
+          condition = condition.and(officeCondition).and(areaCondition).and(positionCondition);
+          conditions.add(condition);
+          conditionsTimekeeping.add(timekeepingCondition);
+        });
+
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     Condition condition = noCondition();
@@ -126,7 +167,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
           timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
           List<TimekeepingResponse> timekeepingList =
-              getAllTimekeepingByEmployeeId(timekeepingResponse.getEmployee_id())
+              getAllTimekeepingByEmployeeId(
+                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping)
                   .fetchInto(TimekeepingResponse.class);
           timekeepingList.forEach(
               timekeeping -> {
@@ -241,8 +283,9 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .offset(pagination.offset);
   }
 
-  private Select<?> getAllTimekeepingByEmployeeId(String employeeId) {
+  private Select<?> getAllTimekeepingByEmployeeId(String employeeId, List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
     TableLike<?> rowNumberAsc =
         dslContext
             .select(
@@ -290,7 +333,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .leftJoin(lastTimeCheckOut)
         .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
-        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .where(conditions)
         .orderBy(TIMEKEEPING.DATE.asc());
   }
 }
