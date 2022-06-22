@@ -102,8 +102,8 @@ public class Employee {
   @JoinColumn(name = "working_type_id")
   private WorkingType workingType;
 
-  @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
-  private Timekeeping timekeeping;
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<Timekeeping> timekeepings;
 
   @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
   private ApplicationsRequest applicationsRequest;
