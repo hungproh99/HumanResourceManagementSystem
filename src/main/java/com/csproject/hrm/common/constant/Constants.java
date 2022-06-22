@@ -2,9 +2,9 @@ package com.csproject.hrm.common.constant;
 
 public class Constants {
   public static final String EMAIL_VALIDATION =
-      "^[a-z][a-z0-9_\\.]{5,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
+      "^[a-z][a-z0-9_\\.]{3,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
   public static final String FROM_EMAIL = "huynq08120@gmail.com";
-  public static final String TO_EMAIL = "hihihd37@gmail.com";
+  public static final String TO_EMAIL = "huynb0812@gmail.com";
   public static final String NOT_EMPTY_EMAIL = "Email can't not empty";
   public static final String INVALID_EMAIL_FORMAT = "Invalid email format";
   public static final String NOT_EMPTY_PASSWORD = "Password can't not empty";
@@ -68,7 +68,7 @@ public class Constants {
   public static final String DOMAIN_EMAIL = "@fpt.edu.vn";
   public static final String FILL_NOT_FULL = "Please fill full in form";
   public static final String CSV_NULL_DATA = "Field Csv null data";
-  public static final String PHONE_VALIDATION = "^\\d{10,12}$";
+  public static final String PHONE_VALIDATION = "^\\d{9,10}$";
   public static final String INVALID_PHONE_FORMAT = "Invalid phone format";
   public static final String INVALID_OFFSET = "Invalid offset";
   public static final String INVALID_LIMIT = "Invalid limit";
@@ -81,10 +81,28 @@ public class Constants {
   public static final String POSITION = "position";
   public static final String OFFICE = "office";
   public static final String AREA = "area";
+
+  public static final String DATE = "date";
   public static final String CURRENT_DATE = "current_date";
   public static final String TIMEKEEPING_STATUS = "timekeeping_status";
   public static final String FIRST_CHECK_IN = "first_check_in";
   public static final String LAST_CHECK_OUT = "last_check_out";
   public static final String TIMEKEEPING_STATUS_INVALID = "Invalid Timekeeping Status";
   public static final String CHECK_IN_CHECK_OUTS = "check_in_check_outs";
+
+  public static final String REQUEST_TYPE_INVALID = "Invalid Request Type";
+  public static final String REQUEST_STATUS_INVALID = "Invalid Request Status";
+  public static final String REQUEST_NAME_INVALID = "Invalid Request Name";
+  public static final String GRADE_TYPE_INVALID = "Invalid Grade Type";
+  public static final String CREATE_DATE = "create_date";
+  public static final String IS_BOOKMARK = "is_bookmark";
+  public static final String REQUEST_STATUS = "request_status";
+  public static final String REQUEST_TYPE = "request_type";
+  public static final String REQUEST_TITLE = "requestTitle";
+  public static final String ACTIVE = "Active";
+  public static final String DEACTIVE = "Deactive";
+
+  public static final String ONLY_UPLOAD_EXCEL = "Only upload excel file ";
+
+  public static final String TOTAL_WORKING_TIME = "total_working_time";
 }

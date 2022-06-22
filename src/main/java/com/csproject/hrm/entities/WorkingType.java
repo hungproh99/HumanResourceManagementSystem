@@ -1,5 +1,7 @@
 package com.csproject.hrm.entities;
 
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EWorkingType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +21,9 @@ public class WorkingType {
   @Column(name = "type_id")
   private Long id;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "name")
-  private String name;
+  private EWorkingType eWorkingType;
 
   @Column(name = "description")
   private String description;

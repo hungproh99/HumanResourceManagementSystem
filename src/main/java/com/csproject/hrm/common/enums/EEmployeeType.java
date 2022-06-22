@@ -18,10 +18,10 @@ public enum EEmployeeType {
     this.value = value;
   }
 
-  public static long of(String employeeType) {
+  public static String getLabel(String employeeType) {
     for (EEmployeeType eEmployeeType : EEmployeeType.values()) {
-      if (eEmployeeType.label.equalsIgnoreCase(employeeType)) {
-        return eEmployeeType.value;
+      if (eEmployeeType.name().equalsIgnoreCase(employeeType)) {
+        return eEmployeeType.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, EMPLOYEE_TYPE_INVALID);

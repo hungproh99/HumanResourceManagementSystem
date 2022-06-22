@@ -13,6 +13,7 @@ import java.sql.Time;
 @NoArgsConstructor
 @Builder
 public class TimekeepingResponse {
+  private String employee_id;
   private String full_name;
   private String position;
   private String grade;

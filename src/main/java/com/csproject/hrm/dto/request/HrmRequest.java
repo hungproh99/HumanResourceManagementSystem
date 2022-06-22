@@ -13,16 +13,16 @@ import java.time.LocalDate;
 @SuperBuilder
 public class HrmRequest {
   private String fullName;
-  private String role;
+  private Long role;
   private String phone;
   private String gender;
   private LocalDate birthDate;
-  private String grade;
-  private String position;
-  private String office;
-  private String area;
-  private String workingType;
+  private Long grade;
+  private Long position;
+  private Long office;
+  private Long area;
+  private Long workingType;
   private String managerId;
-  private String employeeType;
+  private Long employeeType;
   private String personalEmail;
 }

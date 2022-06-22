@@ -112,18 +112,19 @@ public class GeneralFunction {
       InputStream inputStream = resource.getInputStream();
       byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
       String data = new String(bdata, StandardCharsets.UTF_8);
-      for (int i = 0; i < size - 1; i++) {
+      for (int i = 0; i < size; i++) {
+        messages[i] = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(messages[i], multipart, "utf-8");
         helper.setTo(to);
         helper.setFrom(from);
         helper.setSubject(subject);
         messages[i].setContent(
-            String.format(
-                data,
-                hrmPojos.get(i).getFullName(),
-                hrmPojos.get(i).getCompanyName(),
-                hrmPojos.get(i).getPassword()),
-            "text/html");
+                String.format(
+                        data,
+                        hrmPojos.get(i).getFullName(),
+                        hrmPojos.get(i).getCompanyName(),
+                        hrmPojos.get(i).getPassword()),
+                "text/html");
       }
       emailSender.send(messages);
     } catch (MessagingException | IOException e) {

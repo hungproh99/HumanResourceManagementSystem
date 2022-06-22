@@ -13,5 +13,5 @@ public interface ContractRepositoryCustom {
 
   List<JobDto> getListPosition();
 
-  List<GradeDto> getListGradeByPosition(long jodId);
+  List<GradeDto> getListGradeByPosition(Long jodId);
 }

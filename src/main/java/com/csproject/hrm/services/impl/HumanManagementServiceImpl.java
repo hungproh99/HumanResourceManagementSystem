@@ -1,6 +1,6 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EWorkStatus;
+import com.csproject.hrm.common.excel.ExcelExportEmployee;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
@@ -20,11 +20,13 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -90,8 +92,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<RoleDto> getListRoleType() {
-    return employeeRepository.getListRoleType();
+  public List<RoleDto> getListRoleType(boolean isAdmin) {
+    return employeeRepository.getListRoleType(isAdmin);
   }
 
   @Override
@@ -110,16 +112,11 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<GradeDto> getListGradeByPosition(String id) {
+  public List<GradeDto> getListGradeByPosition(Long id) {
     if (id == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
-    try {
-      long jobId = Long.parseLong(id);
-      return contractRepository.getListGradeByPosition(jobId);
-    } catch (NumberFormatException e) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
-    }
+    return contractRepository.getListGradeByPosition(id);
   }
 
   @Override
@@ -187,36 +184,41 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 reader,
                 CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim()); ) {
       for (CSVRecord csvRecord : csvParser) {
-        String fullName = csvRecord.get("Full Name");
-        String role = csvRecord.get("Role");
-        String phone = csvRecord.get("Phone");
-        String gender = csvRecord.get("Gender");
-        LocalDate birthDate =
-            LocalDate.parse(csvRecord.get("Birth Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String grade = csvRecord.get("Grade");
-        String position = csvRecord.get("Position");
-        String office = csvRecord.get("Office");
-        String area = csvRecord.get("Area");
-        String workingType = csvRecord.get("Working Type");
-        String managerId = csvRecord.get("Manager Id");
-        String employeeType = csvRecord.get("Employee Type");
-        String personalEmail = csvRecord.get("Personal Email");
-        hrmRequestList.add(
-            HrmRequest.builder()
-                .fullName(fullName)
-                .role(role)
-                .phone(phone)
-                .gender(gender)
-                .birthDate(birthDate)
-                .grade(grade)
-                .position(position)
-                .office(office)
-                .area(area)
-                .workingType(workingType)
-                .managerId(managerId)
-                .employeeType(employeeType)
-                .personalEmail(personalEmail)
-                .build());
+        try {
+          String fullName = csvRecord.get("Full Name");
+          Long role = Long.parseLong(csvRecord.get("Role"));
+          String phone = csvRecord.get("Phone");
+          String gender = csvRecord.get("Gender");
+          LocalDate birthDate =
+              LocalDate.parse(
+                  csvRecord.get("Birth Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+          Long grade = Long.parseLong(csvRecord.get("Grade"));
+          Long position = Long.parseLong(csvRecord.get("Position"));
+          Long office = Long.parseLong(csvRecord.get("Office"));
+          Long area = Long.parseLong(csvRecord.get("Area"));
+          Long workingType = Long.parseLong(csvRecord.get("Working Type"));
+          String managerId = csvRecord.get("Manager Id");
+          Long employeeType = Long.parseLong(csvRecord.get("Employee Type"));
+          String personalEmail = csvRecord.get("Personal Email");
+          hrmRequestList.add(
+              HrmRequest.builder()
+                  .fullName(fullName)
+                  .role(role)
+                  .phone(phone)
+                  .gender(gender)
+                  .birthDate(birthDate)
+                  .grade(grade)
+                  .position(position)
+                  .office(office)
+                  .area(area)
+                  .workingType(workingType)
+                  .managerId(managerId)
+                  .employeeType(employeeType)
+                  .personalEmail(personalEmail)
+                  .build());
+        } catch (NumberFormatException e) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
+        }
       }
       insertMultiEmployee(hrmRequestList);
     } catch (IOException e) {
@@ -225,8 +227,22 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<String> getListManagerByName(QueryParam queryParam) {
-    return employeeRepository.getListManagerByName(queryParam);
+  public List<String> getListManagerByName(String name) {
+    return employeeRepository.getListManagerByName(name);
+  }
+
+  private static int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
+    int numOfNonEmptyCells = 0;
+    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      if (row != null) {
+        Cell cell = row.getCell(columnIndex);
+        if (cell != null && cell.getCellType() != CellType.BLANK) {
+          numOfNonEmptyCells++;
+        }
+      }
+    }
+    return numOfNonEmptyCells;
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
@@ -264,7 +280,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           hrmPojo.setCompanyEmail(companyEmail);
           hrmPojos.add(hrmPojo);
         });
-    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+    //    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL,
+    // SEND_PASSWORD_SUBJECT);
     for (HrmPojo hrmPojo : hrmPojos) {
       hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
     }
@@ -278,7 +295,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     HrmPojo hrmPojo =
         HrmPojo.builder()
             .password(password)
-            .workStatus(EWorkStatus.ACTIVE.name())
+            .workStatus(true)
             .companyName(companyName)
             .fullName(hrmRequest.getFullName())
             .role(hrmRequest.getRole())
@@ -296,5 +313,88 @@ public class HumanManagementServiceImpl implements HumanManagementService {
             .build();
 
     return hrmPojo;
+  }
+
+  @Override
+  public void exportEmployeeToExcel(HttpServletResponse response, List<String> list) {
+    if (list.size() == 0) {
+      throw new CustomDataNotFoundException(NO_DATA);
+    } else {
+      try {
+        List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(list);
+        ExcelExportEmployee excelExportEmployee = new ExcelExportEmployee(hrmResponses);
+        excelExportEmployee.export(response);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  @Override
+  public void importExcelToEmployee(Workbook workBook) {
+    List<HrmRequest> hrmRequestList = new ArrayList<>();
+    Sheet sheet = workBook.getSheetAt(0);
+    for (int rowIndex = 0; rowIndex < getNumberOfNonEmptyCells(sheet, 0) - 1; rowIndex++) {
+      Row row = sheet.getRow(rowIndex);
+      if (rowIndex == 0) {
+        continue;
+      }
+      try {
+        String fullName = row.getCell(0).toString();
+        Long role = Long.parseLong(getValue(row.getCell(1)).toString());
+        String phone = "0" + (int) row.getCell(2).getNumericCellValue();
+        String gender = row.getCell(3).toString();
+        LocalDate birthDate = row.getCell(4).getLocalDateTimeCellValue().toLocalDate();
+        Long grade = Long.parseLong(getValue(row.getCell(5)).toString());
+        Long position = Long.parseLong(getValue(row.getCell(6)).toString());
+        Long office = Long.parseLong(getValue(row.getCell(7)).toString());
+        Long area = Long.parseLong(getValue(row.getCell(8)).toString());
+        Long workingType = Long.parseLong(getValue(row.getCell(9)).toString());
+        String managerId = row.getCell(10).toString();
+        Long employeeType = Long.parseLong(getValue(row.getCell(11)).toString());
+        String personalEmail = row.getCell(12).toString();
+        hrmRequestList.add(
+            HrmRequest.builder()
+                .fullName(fullName)
+                .role(role)
+                .phone(phone)
+                .gender(gender)
+                .birthDate(birthDate)
+                .grade(grade)
+                .position(position)
+                .office(office)
+                .area(area)
+                .workingType(workingType)
+                .managerId(managerId)
+                .employeeType(employeeType)
+                .personalEmail(personalEmail)
+                .build());
+      } catch (NumberFormatException e) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
+      }
+    }
+    insertMultiEmployee(hrmRequestList);
+  }
+
+  private Object getValue(Cell cell) {
+    switch (cell.getCellType()) {
+      case STRING:
+        return cell.getStringCellValue();
+      case NUMERIC:
+        return String.valueOf((int) cell.getNumericCellValue());
+      case BOOLEAN:
+        return cell.getBooleanCellValue();
+      case ERROR:
+        return cell.getErrorCellValue();
+      case FORMULA:
+        return cell.getCellFormula();
+      case BLANK:
+        return null;
+      case _NONE:
+        return null;
+      default:
+        break;
+    }
+    return null;
   }
 }

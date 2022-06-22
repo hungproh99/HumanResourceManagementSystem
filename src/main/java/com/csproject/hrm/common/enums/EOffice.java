@@ -16,10 +16,10 @@ public enum EOffice {
     this.value = value;
   }
 
-  public static long of(String office) {
+  public static String getLabel(String office) {
     for (EOffice eOffice : EOffice.values()) {
-      if (eOffice.label.equalsIgnoreCase(office)) {
-        return eOffice.value;
+      if (eOffice.name().equalsIgnoreCase(office)) {
+        return eOffice.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, OFFICE_INVALID);

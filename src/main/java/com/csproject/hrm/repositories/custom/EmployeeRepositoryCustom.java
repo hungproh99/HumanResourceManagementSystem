@@ -27,11 +27,11 @@ public interface EmployeeRepositoryCustom {
 
   List<EmployeeTypeDto> getListEmployeeType();
 
-  List<RoleDto> getListRoleType();
+  List<RoleDto> getListRoleType(boolean isAdmin);
 
   void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
   List<HrmResponse> findEmployeeByListId(List<String> list);
 
-  List<String> getListManagerByName(QueryParam queryParam);
+  List<String> getListManagerByName(String name);
 }

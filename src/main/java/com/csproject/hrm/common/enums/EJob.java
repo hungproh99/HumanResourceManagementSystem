@@ -15,10 +15,10 @@ public enum EJob {
     this.value = value;
   }
 
-  public static long of(String position) {
+  public static String getLabel(String position) {
     for (EJob eJob : EJob.values()) {
-      if (eJob.position.equalsIgnoreCase(position)) {
-        return eJob.value;
+      if (eJob.name().equalsIgnoreCase(position)) {
+        return eJob.position;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, JOB_INVALID);

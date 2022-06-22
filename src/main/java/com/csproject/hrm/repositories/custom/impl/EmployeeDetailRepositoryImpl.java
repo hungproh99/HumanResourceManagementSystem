@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
-import com.csproject.hrm.common.constant.Constants;
+import static com.csproject.hrm.common.constant.Constants.GRADE;
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.Grade.GRADE;
+import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Tax.TAX;
@@ -121,36 +121,36 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   public void updateBankInfo(BankRequest bank) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext.transaction(
-      configuration -> {
-        int bankID =
-            dslContext
-                .insertInto(
-                    BANK,
-                    BANK.BANK_ID,
-                    BANK.NAME_BANK,
-                    BANK.ADDRESS,
-                    BANK.ACCOUNT_NUMBER,
-                    BANK.ACCOUNT_NAME)
-                .values(
-                    bank.getId(),
-                    bank.getNameBank(),
-                    bank.getAddress(),
-                    bank.getAccountNumber(),
-                    bank.getAccountName())
-                .onDuplicateKeyUpdate()
-                .set(BANK.NAME_BANK, bank.getNameBank())
-                .set(BANK.ADDRESS, bank.getAddress())
-                .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
-                .set(BANK.ACCOUNT_NAME, bank.getAccountName())
-                .returningResult(BANK.BANK_ID)
-                .execute();
-    
-        dslContext
-            .update(EMPLOYEE)
-            .set(EMPLOYEE.BANK_ID, Long.valueOf(bankID))
-            .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
-            .execute();
-      });
+        configuration -> {
+          int bankID =
+              dslContext
+                  .insertInto(
+                      BANK,
+                      BANK.BANK_ID,
+                      BANK.NAME_BANK,
+                      BANK.ADDRESS,
+                      BANK.ACCOUNT_NUMBER,
+                      BANK.ACCOUNT_NAME)
+                  .values(
+                      bank.getId(),
+                      bank.getNameBank(),
+                      bank.getAddress(),
+                      bank.getAccountNumber(),
+                      bank.getAccountName())
+                  .onDuplicateKeyUpdate()
+                  .set(BANK.NAME_BANK, bank.getNameBank())
+                  .set(BANK.ADDRESS, bank.getAddress())
+                  .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
+                  .set(BANK.ACCOUNT_NAME, bank.getAccountName())
+                  .returningResult(BANK.BANK_ID)
+                  .execute();
+
+          dslContext
+              .update(EMPLOYEE)
+              .set(EMPLOYEE.BANK_ID, Long.valueOf(bankID))
+              .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
+              .execute();
+        });
   }
 
   @Override
@@ -189,57 +189,59 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(INSURANCE.TITLE, taxAndInsurance.getInsuranceTitle())
         .execute();
   }
-  
+
   @Override
   public void updateAdditionalInfo(EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
     List<Query> queries = new ArrayList<>();
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext.transaction(
-            configuration -> {
-              queries.add(updateIdentityCard(configuration,employeeAdditionalInfo));
-              queries.add(updateEmployeeAdditional(configuration,employeeAdditionalInfo));
-              DSL.using(configuration).batch(queries).execute();
-            });
-  }public InsertOnDuplicateSetMoreStep<?> updateIdentityCard(
-          Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
-    return DSL.using(configuration)
-              .insertInto(
-                      IDENTITY_CARD,
-                      IDENTITY_CARD.PLACE_OF_RESIDENCE,
-                      IDENTITY_CARD.PLACE_OF_ORIGIN,
-                      IDENTITY_CARD.NATIONALITY,
-                      IDENTITY_CARD.CARD_ID,
-                      IDENTITY_CARD.PROVIDE_DATE,
-                      IDENTITY_CARD.PROVIDE_PLACE)
-              .values(
-                      employeeAdditionalInfo.getPlace_of_residence(),
-                      employeeAdditionalInfo.getPlace_of_origin(),
-                      employeeAdditionalInfo.getNationality(),
-                      employeeAdditionalInfo.getCard_id(),
-                      employeeAdditionalInfo.getProvideDate(),
-                      employeeAdditionalInfo.getProvidePlace())
-              .onDuplicateKeyUpdate()
-              .set(IDENTITY_CARD.PLACE_OF_RESIDENCE, employeeAdditionalInfo.getPlace_of_residence())
-              .set(IDENTITY_CARD.PLACE_OF_ORIGIN, employeeAdditionalInfo.getPlace_of_origin())
-              .set(IDENTITY_CARD.NATIONALITY, employeeAdditionalInfo.getNationality())
-              .set(IDENTITY_CARD.CARD_ID, employeeAdditionalInfo.getCard_id())
-              .set(IDENTITY_CARD.PROVIDE_DATE, employeeAdditionalInfo.getProvideDate())
-              .set(IDENTITY_CARD.PROVIDE_PLACE, employeeAdditionalInfo.getProvidePlace());
+        configuration -> {
+          queries.add(updateIdentityCard(configuration, employeeAdditionalInfo));
+          queries.add(updateEmployeeAdditional(configuration, employeeAdditionalInfo));
+          DSL.using(configuration).batch(queries).execute();
+        });
   }
-  
+
+  public InsertOnDuplicateSetMoreStep<?> updateIdentityCard(
+      Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
+    return DSL.using(configuration)
+        .insertInto(
+            IDENTITY_CARD,
+            IDENTITY_CARD.PLACE_OF_RESIDENCE,
+            IDENTITY_CARD.PLACE_OF_ORIGIN,
+            IDENTITY_CARD.NATIONALITY,
+            IDENTITY_CARD.CARD_ID,
+            IDENTITY_CARD.PROVIDE_DATE,
+            IDENTITY_CARD.PROVIDE_PLACE)
+        .values(
+            employeeAdditionalInfo.getPlace_of_residence(),
+            employeeAdditionalInfo.getPlace_of_origin(),
+            employeeAdditionalInfo.getNationality(),
+            employeeAdditionalInfo.getCard_id(),
+            employeeAdditionalInfo.getProvideDate(),
+            employeeAdditionalInfo.getProvidePlace())
+        .onDuplicateKeyUpdate()
+        .set(IDENTITY_CARD.PLACE_OF_RESIDENCE, employeeAdditionalInfo.getPlace_of_residence())
+        .set(IDENTITY_CARD.PLACE_OF_ORIGIN, employeeAdditionalInfo.getPlace_of_origin())
+        .set(IDENTITY_CARD.NATIONALITY, employeeAdditionalInfo.getNationality())
+        .set(IDENTITY_CARD.CARD_ID, employeeAdditionalInfo.getCard_id())
+        .set(IDENTITY_CARD.PROVIDE_DATE, employeeAdditionalInfo.getProvideDate())
+        .set(IDENTITY_CARD.PROVIDE_PLACE, employeeAdditionalInfo.getProvidePlace());
+  }
+
   public Update<?> updateEmployeeAdditional(
-          Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
+      Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
     return DSL.using(configuration)
-              .update(EMPLOYEE)
-              .set(EMPLOYEE.CARD_ID, employeeAdditionalInfo.getCard_id())
-              .set(EMPLOYEE.ADDRESS, employeeAdditionalInfo.getAddress())
-              .set(EMPLOYEE.PERSONAL_EMAIL, employeeAdditionalInfo.getPersonal_email())
-              .set(EMPLOYEE.PHONE_NUMBER, employeeAdditionalInfo.getPhone_number())
-              .set(EMPLOYEE.NICK_NAME, employeeAdditionalInfo.getNick_name())
-              .set(EMPLOYEE.FACEBOOK, employeeAdditionalInfo.getFacebook())
-            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeAdditionalInfo.getEmployee_id()));
+        .update(EMPLOYEE)
+        .set(EMPLOYEE.CARD_ID, employeeAdditionalInfo.getCard_id())
+        .set(EMPLOYEE.ADDRESS, employeeAdditionalInfo.getAddress())
+        .set(EMPLOYEE.PERSONAL_EMAIL, employeeAdditionalInfo.getPersonal_email())
+        .set(EMPLOYEE.PHONE_NUMBER, employeeAdditionalInfo.getPhone_number())
+        .set(EMPLOYEE.NICK_NAME, employeeAdditionalInfo.getNick_name())
+        .set(EMPLOYEE.FACEBOOK, employeeAdditionalInfo.getFacebook())
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeAdditionalInfo.getEmployee_id()));
   }
-  
+
   @Override
   public void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest) {
     List<Query> queries = new ArrayList<>();
@@ -267,19 +269,19 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             WORKING_CONTRACT.GRADE_ID,
             WORKING_CONTRACT.EMPLOYEE_ID)
         .values(
-                employeeDetailRequest.getWorking_contract_id(),
-                employeeDetailRequest.getCompany_email(),
+            employeeDetailRequest.getWorking_contract_id(),
+            employeeDetailRequest.getCompany_email(),
             employeeDetailRequest.getStart_date(),
             employeeDetailRequest.getContract_url(),
             employeeDetailRequest.getArea_id(),
             employeeDetailRequest.getGrade_id(),
-                employeeDetailRequest.getOffice_id(),
-                employeeDetailRequest.getGrade_id(),
+            employeeDetailRequest.getOffice_id(),
+            employeeDetailRequest.getGrade_id(),
             employeeDetailRequest.getEmployee_id())
         .onDuplicateKeyUpdate()
-              .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_email())
-              .set(WORKING_CONTRACT.GRADE_ID, employeeDetailRequest.getGrade_id())
-              .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
+        .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_email())
+        .set(WORKING_CONTRACT.GRADE_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
         .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
         .set(WORKING_CONTRACT.AREA_ID, employeeDetailRequest.getArea_id())
         .set(WORKING_CONTRACT.JOB_ID, employeeDetailRequest.getGrade_id())
@@ -435,7 +437,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 EMPLOYEE.AVATAR,
                 EMPLOYEE.GENDER,
                 EMPLOYEE.BIRTH_DATE,
-                GRADE.NAME.as(Constants.GRADE),
+                GRADE_TYPE.NAME.as(GRADE),
                 OFFICE.NAME.as(OFFICE_NAME),
                 AREA.NAME.as(AREA_NAME),
                 year(currentDate())
@@ -460,19 +462,19 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
             .leftJoin(JOB)
             .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-            .leftJoin(GRADE)
-            .on(GRADE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+            .leftJoin(GRADE_TYPE)
+            .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
     return query.fetchOptionalInto(EmployeeDetailResponse.class);
   }
-  
+
   @Override
   public boolean checkEmployeeIDIsExists(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchExists(
-            dslContext.selectFrom(EMPLOYEE).where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
+        dslContext.selectFrom(EMPLOYEE).where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
   }
 }

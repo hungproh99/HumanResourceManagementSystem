@@ -16,10 +16,10 @@ public enum EArea {
     this.value = value;
   }
 
-  public static long of(String area) {
+  public static String getLabel(String area) {
     for (EArea eArea : EArea.values()) {
-      if (eArea.label.equalsIgnoreCase(area)) {
-        return eArea.value;
+      if (eArea.name().equalsIgnoreCase(area)) {
+        return eArea.label;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, AREA_INVALID);

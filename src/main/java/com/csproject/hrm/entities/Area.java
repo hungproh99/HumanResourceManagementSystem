@@ -1,5 +1,6 @@
 package com.csproject.hrm.entities;
 
+import com.csproject.hrm.common.enums.EArea;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +20,9 @@ public class Area {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "name")
-  private String name;
+  private EArea eArea;
 
   @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
   private WorkingContract workingContract;

@@ -1,9 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.AreaDto;
-import com.csproject.hrm.dto.dto.GradeDto;
-import com.csproject.hrm.dto.dto.JobDto;
-import com.csproject.hrm.dto.dto.OfficeDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.repositories.custom.ContractRepositoryCustom;
@@ -13,9 +10,7 @@ import org.jooq.Field;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.jooq.codegen.maven.example.Tables.*;
 
@@ -36,13 +31,18 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
     return dslContext
         .select(OFFICE.OFFICE_ID, OFFICE.NAME, OFFICE.ADDRESS)
         .from(OFFICE)
+        .orderBy(OFFICE.OFFICE_ID.asc())
         .fetchInto(OfficeDto.class);
   }
 
   @Override
   public List<AreaDto> getListArea() {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext.select(AREA.AREA_ID, AREA.NAME).from(AREA).fetchInto(AreaDto.class);
+    return dslContext
+        .select(AREA.AREA_ID, AREA.NAME)
+        .from(AREA)
+        .orderBy(AREA.AREA_ID.asc())
+        .fetchInto(AreaDto.class);
   }
 
   @Override
@@ -51,16 +51,18 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
     return dslContext
         .select(JOB.JOB_ID, JOB.POSITION, JOB.DESCRIPTION)
         .from(JOB)
+        .orderBy(JOB.JOB_ID.asc())
         .fetchInto(JobDto.class);
   }
 
   @Override
-  public List<GradeDto> getListGradeByPosition(long jodId) {
+  public List<GradeDto> getListGradeByPosition(Long jodId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(GRADE.GRADE_ID, GRADE.NAME, GRADE.DESCRIPTION)
-        .from(GRADE)
-        .where(GRADE.JOB_ID.eq(jodId))
+        .select(GRADE_TYPE.GRADE_ID, GRADE_TYPE.NAME, GRADE_TYPE.DESCRIPTION)
+        .from(GRADE_TYPE)
+        .where(GRADE_TYPE.JOB_ID.eq(jodId))
+        .orderBy(GRADE_TYPE.GRADE_ID.asc())
         .fetchInto(GradeDto.class);
   }
 }

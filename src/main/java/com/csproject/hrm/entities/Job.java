@@ -1,9 +1,7 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.csproject.hrm.common.enums.EJob;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -20,8 +18,9 @@ public class Job {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "position")
-  private String position;
+  private EJob eJob;
 
   @Column(name = "description")
   private String description;
@@ -30,5 +29,5 @@ public class Job {
   private WorkingContract workingContract;
 
   @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
-  private List<Grade> grades;
+  private List<GradeType> grades;
 }
