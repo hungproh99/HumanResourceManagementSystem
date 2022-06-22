@@ -1,19 +1,14 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.entities.ApplicationsRequest;
-import com.csproject.hrm.jooq.DBConnection;
-import com.csproject.hrm.jooq.JooqHelper;
-import com.csproject.hrm.jooq.Pagination;
-import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;

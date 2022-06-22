@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -24,7 +21,7 @@ public class Timekeeping {
   @OneToMany(mappedBy = "timekeeping", fetch = FetchType.LAZY)
   private List<CheckInCheckOut> checkInCheckOut;
 
-  @OneToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")
   private Employee employee;
 

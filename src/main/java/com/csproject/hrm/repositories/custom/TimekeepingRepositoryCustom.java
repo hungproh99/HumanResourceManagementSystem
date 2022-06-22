@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TimekeepingRepositoryCustom {
@@ -15,7 +16,8 @@ public interface TimekeepingRepositoryCustom {
 
   List<TimekeepingResponse> getListTimekeepingToExport(QueryParam queryParam, List<String> list);
 
-  List<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(String employeeID, LocalDate date);
-  
+  Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
+      String employeeID, LocalDate date);
+
   List<CheckInCheckOutResponse> getCheckInCheckOutByTimekeepingID(Long timekeepingID);
 }
