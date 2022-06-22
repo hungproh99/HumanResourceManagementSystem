@@ -1,7 +1,7 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponseList;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -32,7 +34,8 @@ public class TimekeepingController {
       @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
-    List<TimekeepingResponse> timekeeping = timekeepingService.getListAllTimekeeping(queryParam);
+    List<TimekeepingResponseList> timekeeping =
+        timekeepingService.getListAllTimekeeping(queryParam);
     return ResponseEntity.ok(timekeeping);
   }
 

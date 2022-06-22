@@ -2,6 +2,7 @@ package com.csproject.hrm.services;
 
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TimekeepingService {
-  List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam);
+  List<TimekeepingResponseList> getListAllTimekeeping(QueryParam queryParam);
 
   void exportTimekeepingToCsv(Writer writer, QueryParam queryParam, List<String> list);
 

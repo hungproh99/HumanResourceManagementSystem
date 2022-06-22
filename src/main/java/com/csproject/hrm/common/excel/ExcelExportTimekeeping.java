@@ -1,6 +1,7 @@
 package com.csproject.hrm.common.excel;
 
 import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponseList;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,9 +19,9 @@ import java.util.List;
 public class ExcelExportTimekeeping {
   private XSSFWorkbook workbook;
   private XSSFSheet sheet;
-  private List<TimekeepingResponse> timekeepingResponseList;
+  private List<TimekeepingResponseList> timekeepingResponseList;
 
-  public ExcelExportTimekeeping(List<TimekeepingResponse> timekeepingResponseList) {
+  public ExcelExportTimekeeping(List<TimekeepingResponseList> timekeepingResponseList) {
     this.timekeepingResponseList = timekeepingResponseList;
     workbook = new XSSFWorkbook();
   }
@@ -69,17 +70,19 @@ public class ExcelExportTimekeeping {
     font.setFontHeight(14);
     style.setFont(font);
 
-    for (TimekeepingResponse timekeepingResponse : timekeepingResponseList) {
-      Row row = sheet.createRow(rowCount++);
-      int columnCount = 0;
-
-      createCell(row, columnCount++, timekeepingResponse.getFull_name(), style);
-      createCell(row, columnCount++, timekeepingResponse.getPosition(), style);
-      createCell(row, columnCount++, timekeepingResponse.getGrade(), style);
-      createCell(row, columnCount++, timekeepingResponse.getCurrent_date(), style);
-      createCell(row, columnCount++, timekeepingResponse.getTimekeeping_status(), style);
-      createCell(row, columnCount++, timekeepingResponse.getFirst_check_in(), style);
-      createCell(row, columnCount++, timekeepingResponse.getLast_check_out(), style);
+    for (TimekeepingResponseList timekeepingResponses : timekeepingResponseList) {
+      for (TimekeepingResponse timekeepingResponse :
+          timekeepingResponses.getTimekeepingResponses()) {
+        Row row = sheet.createRow(rowCount++);
+        int columnCount = 0;
+        createCell(row, columnCount++, timekeepingResponses.getFull_name(), style);
+        createCell(row, columnCount++, timekeepingResponses.getPosition(), style);
+        createCell(row, columnCount++, timekeepingResponses.getGrade(), style);
+        createCell(row, columnCount++, timekeepingResponse.getCurrent_date(), style);
+        createCell(row, columnCount++, timekeepingResponse.getTimekeeping_status(), style);
+        createCell(row, columnCount++, timekeepingResponse.getFirst_check_in(), style);
+        createCell(row, columnCount++, timekeepingResponse.getLast_check_out(), style);
+      }
     }
   }
 

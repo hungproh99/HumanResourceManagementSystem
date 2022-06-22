@@ -2,7 +2,7 @@ package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -12,9 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface TimekeepingRepositoryCustom {
-  List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam);
+  List<TimekeepingResponseList> getListAllTimekeeping(QueryParam queryParam);
 
-  List<TimekeepingResponse> getListTimekeepingToExport(QueryParam queryParam, List<String> list);
+  List<TimekeepingResponseList> getListTimekeepingToExport(
+      QueryParam queryParam, List<String> list);
 
   Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
       String employeeID, LocalDate date);

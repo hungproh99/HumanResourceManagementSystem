@@ -3,6 +3,7 @@ package com.csproject.hrm.services.impl;
 import com.csproject.hrm.common.excel.ExcelExportTimekeeping;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponseList;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.QueryParam;
@@ -33,7 +34,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   @Autowired EmployeeDetailRepository employeeDetailRepository;
 
   @Override
-  public List<TimekeepingResponse> getListAllTimekeeping(QueryParam queryParam) {
+  public List<TimekeepingResponseList> getListAllTimekeeping(QueryParam queryParam) {
     return timekeepingRepository.getListAllTimekeeping(queryParam);
   }
 
@@ -42,7 +43,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
-      List<TimekeepingResponse> timekeepingResponses =
+      List<TimekeepingResponseList> timekeepingResponses =
           timekeepingRepository.getListTimekeepingToExport(queryParam, list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
@@ -56,15 +57,18 @@ public class TimekeepingServiceImpl implements TimekeepingService {
                   "First Check In",
                   "Last Check Out"))) {
 
-        for (TimekeepingResponse timekeepingResponse : timekeepingResponses) {
-          csvPrinter.printRecord(
-              timekeepingResponse.getFull_name(),
-              timekeepingResponse.getPosition(),
-              timekeepingResponse.getGrade(),
-              timekeepingResponse.getCurrent_date(),
-              timekeepingResponse.getTimekeeping_status(),
-              timekeepingResponse.getFirst_check_in(),
-              timekeepingResponse.getLast_check_out());
+        for (TimekeepingResponseList timekeepingResponseList : timekeepingResponses) {
+          for (TimekeepingResponse timekeepingResponse :
+              timekeepingResponseList.getTimekeepingResponses()) {
+            csvPrinter.printRecord(
+                timekeepingResponseList.getFull_name(),
+                timekeepingResponseList.getPosition(),
+                timekeepingResponseList.getGrade(),
+                timekeepingResponse.getCurrent_date(),
+                timekeepingResponse.getTimekeeping_status(),
+                timekeepingResponse.getFirst_check_in(),
+                timekeepingResponse.getLast_check_out());
+          }
         }
         csvPrinter.flush();
       } catch (IOException e) {
@@ -80,7 +84,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       try {
-        List<TimekeepingResponse> timekeepingResponses =
+        List<TimekeepingResponseList> timekeepingResponses =
             timekeepingRepository.getListTimekeepingToExport(queryParam, list);
         ExcelExportTimekeeping excelExportTimekeeping =
             new ExcelExportTimekeeping(timekeepingResponses);
