@@ -96,9 +96,12 @@ public class Constants {
   public static final String IS_BOOKMARK = "is_bookmark";
   public static final String REQUEST_STATUS = "request_status";
   public static final String REQUEST_TYPE = "request_type";
-  public static final String REQUEST_TITLE = "requestTitle";
+  public static final String REQUEST_TITLE = "request_title";
   public static final String ACTIVE = "Active";
   public static final String DEACTIVE = "Deactive";
   public static final String ONLY_UPLOAD_EXCEL = "Only upload excel file ";
   public static final String DATE = "date";
+  public static final String REQUEST_TYPE_PARAM = "requestType";
+  public static final String IS_BOOKMARK_PARAM = "isBookmark";
+  public static final String CHANGE_STATUS_TIME = "change_status_time";
 }
