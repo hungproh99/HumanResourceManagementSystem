@@ -13,6 +13,7 @@ public class RelativeInformationResponse {
   private String parent_name;
   private LocalDate birth_date;
   private Long type_id;
+  private String relative_type_name;
   private String status;
   private String contact;
 }

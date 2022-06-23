@@ -116,6 +116,9 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       Optional<TimekeepingDetailResponse> list =
           timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeID, localDate);
+      if (list.isEmpty()) {
+        return null;
+      }
       Long timekeepingID = list.get().getTimekeeping_id();
       list.get()
           .setCheck_in_check_outs(

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
-import static com.csproject.hrm.common.constant.Constants.GRADE;
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
@@ -260,7 +259,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .insertInto(
             WORKING_CONTRACT,
             WORKING_CONTRACT.WORKING_CONTRACT_ID,
-            WORKING_CONTRACT.COMPANY_NAME,
             WORKING_CONTRACT.START_DATE,
             WORKING_CONTRACT.CONTRACT_URL,
             WORKING_CONTRACT.AREA_ID,
@@ -270,7 +268,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             WORKING_CONTRACT.EMPLOYEE_ID)
         .values(
             employeeDetailRequest.getWorking_contract_id(),
-            employeeDetailRequest.getCompany_email(),
             employeeDetailRequest.getStart_date(),
             employeeDetailRequest.getContract_url(),
             employeeDetailRequest.getArea_id(),
@@ -279,7 +276,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             employeeDetailRequest.getGrade_id(),
             employeeDetailRequest.getEmployee_id())
         .onDuplicateKeyUpdate()
-        .set(WORKING_CONTRACT.COMPANY_NAME, employeeDetailRequest.getCompany_email())
         .set(WORKING_CONTRACT.GRADE_ID, employeeDetailRequest.getGrade_id())
         .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
         .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
@@ -314,6 +310,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 RELATIVE_INFORMATION.PARENT_NAME,
                 RELATIVE_INFORMATION.BIRTH_DATE,
                 RELATIVE_TYPE.TYPE_ID,
+                RELATIVE_TYPE.NAME.as("relative_type_name"),
                 RELATIVE_INFORMATION.STATUS,
                 RELATIVE_INFORMATION.CONTACT)
             .from(RELATIVE_INFORMATION)
