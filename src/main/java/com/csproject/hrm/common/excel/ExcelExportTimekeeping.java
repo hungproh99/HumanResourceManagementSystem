@@ -1,7 +1,7 @@
 package com.csproject.hrm.common.excel;
 
 import com.csproject.hrm.dto.response.TimekeepingResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponseList;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,10 +19,10 @@ import java.util.List;
 public class ExcelExportTimekeeping {
   private XSSFWorkbook workbook;
   private XSSFSheet sheet;
-  private List<TimekeepingResponseList> timekeepingResponseList;
+  private List<TimekeepingResponses> timekeepingResponses;
 
-  public ExcelExportTimekeeping(List<TimekeepingResponseList> timekeepingResponseList) {
-    this.timekeepingResponseList = timekeepingResponseList;
+  public ExcelExportTimekeeping(List<TimekeepingResponses> timekeepingResponses) {
+    this.timekeepingResponses = timekeepingResponses;
     workbook = new XSSFWorkbook();
   }
 
@@ -70,7 +70,7 @@ public class ExcelExportTimekeeping {
     font.setFontHeight(14);
     style.setFont(font);
 
-    for (TimekeepingResponseList timekeepingResponses : timekeepingResponseList) {
+    for (TimekeepingResponses timekeepingResponses : timekeepingResponses) {
       if (timekeepingResponses.getTimekeepingResponses().size() == 0) {
         Row row = sheet.createRow(rowCount++);
         int columnCount = 0;

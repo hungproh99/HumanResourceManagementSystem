@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.OFFICE_INVALID;
 
 public enum EOffice {
-  HN_OFFICE("Ha Noi Office", 1);
+  HN_OFFICE("Hà Nội Office", 1),
+  DN_OFFICE("Đà Nẵng Office", 2),
+  HCM_OFFICE("Hồ Chí Minh Office", 3);
 
   private String label;
   private long value;

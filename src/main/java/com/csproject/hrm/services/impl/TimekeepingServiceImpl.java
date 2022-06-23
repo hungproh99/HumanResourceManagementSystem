@@ -3,7 +3,8 @@ package com.csproject.hrm.services.impl;
 import com.csproject.hrm.common.excel.ExcelExportTimekeeping;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponseList;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
+import com.csproject.hrm.dto.response.TimekeepingResponsesList;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.QueryParam;
@@ -34,8 +35,15 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   @Autowired EmployeeDetailRepository employeeDetailRepository;
 
   @Override
-  public List<TimekeepingResponseList> getListAllTimekeeping(QueryParam queryParam) {
-    return timekeepingRepository.getListAllTimekeeping(queryParam);
+  public TimekeepingResponsesList getListAllTimekeeping(QueryParam queryParam) {
+    List<TimekeepingResponses> timekeepingResponsesList =
+        timekeepingRepository.getListAllTimekeeping(queryParam);
+    int total = timekeepingRepository.countListAllTimekeeping(queryParam);
+
+    return TimekeepingResponsesList.builder()
+        .timekeepingResponsesList(timekeepingResponsesList)
+        .total(total)
+        .build();
   }
 
   @Override
@@ -43,7 +51,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
-      List<TimekeepingResponseList> timekeepingResponses =
+      List<TimekeepingResponses> timekeepingResponses =
           timekeepingRepository.getListTimekeepingToExport(queryParam, list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
@@ -57,7 +65,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
                   "First Check In",
                   "Last Check Out"))) {
 
-        for (TimekeepingResponseList timekeepingResponseList : timekeepingResponses) {
+        for (TimekeepingResponses timekeepingResponseList : timekeepingResponses) {
           for (TimekeepingResponse timekeepingResponse :
               timekeepingResponseList.getTimekeepingResponses()) {
             csvPrinter.printRecord(
@@ -84,7 +92,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
       try {
-        List<TimekeepingResponseList> timekeepingResponses =
+        List<TimekeepingResponses> timekeepingResponses =
             timekeepingRepository.getListTimekeepingToExport(queryParam, list);
         ExcelExportTimekeeping excelExportTimekeeping =
             new ExcelExportTimekeeping(timekeepingResponses);

@@ -8,9 +8,9 @@ import static com.csproject.hrm.common.constant.Constants.ROLE_INVALID;
 
 @NoArgsConstructor
 public enum ERole {
-  ROLE_ADMIN("ADMIN", 1),
-  ROLE_MANAGER("MANAGER", 2),
-  ROLE_USER("USER", 3);
+  ROLE_ADMIN("Admin", 1),
+  ROLE_MANAGER("Manager", 2),
+  ROLE_USER("User", 3);
 
   private String label;
   private long value;
@@ -20,7 +20,7 @@ public enum ERole {
     this.value = value;
   }
 
-  public static String getValue(String role) {
+  public static String getLabel(String role) {
     for (ERole eRole : ERole.values()) {
       if (eRole.name().equalsIgnoreCase(role)) {
         return eRole.label;

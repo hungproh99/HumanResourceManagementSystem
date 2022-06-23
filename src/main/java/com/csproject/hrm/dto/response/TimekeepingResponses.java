@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TimekeepingResponseList {
+public class TimekeepingResponses {
   private String employee_id;
   private String full_name;
   private String position;

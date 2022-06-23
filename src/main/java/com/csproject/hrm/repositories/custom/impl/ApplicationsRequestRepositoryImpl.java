@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -17,6 +18,9 @@ import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
+import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
+import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.impl.DSL.concat;
 import static org.jooq.impl.DSL.when;
 
@@ -30,8 +34,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     field2Map.put(FULL_NAME, EMPLOYEE.FULL_NAME);
     field2Map.put(CREATE_DATE, APPLICATIONS_REQUEST.CREATE_DATE);
     field2Map.put(IS_BOOKMARK, APPLICATIONS_REQUEST.IS_BOOKMARK);
-    field2Map.put(REQUEST_STATUS, APPLICATIONS_REQUEST.REQUEST_STATUS);
-    field2Map.put(REQUEST_TYPE, APPLICATIONS_REQUEST.REQUEST_TYPE);
+    field2Map.put(Constants.REQUEST_STATUS, APPLICATIONS_REQUEST.REQUEST_STATUS);
+    field2Map.put(Constants.REQUEST_TYPE, APPLICATIONS_REQUEST.REQUEST_TYPE);
   }
 
   @Autowired private final JooqHelper queryHelper;
@@ -61,8 +65,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               condition = condition.and(queryHelper.condition(filter, field));
             }
           }
-          condition =
-              condition.and(requestTypeCondition).and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId));
+          condition = condition.and(requestTypeCondition);
           conditions.add(condition);
         });
 
@@ -95,24 +98,24 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       }
     }
 
-    return getListApplicationRequest(conditions, orderByList, queryParam.pagination)
+    return getListApplicationRequest(conditions, orderByList, queryParam.pagination, employeeId)
         .fetchInto(ApplicationsRequestRespone.class);
   }
 
   private Select<?> getListApplicationRequest(
-      List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
+      List<Condition> conditions,
+      List<OrderField<?>> sortFields,
+      Pagination pagination,
+      String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
-            concat(APPLICATIONS_REQUEST.REQUEST_NAME)
-                .concat(" ")
-                .concat(APPLICATIONS_REQUEST.REQUEST_TYPE)
-                .as(REQUEST_TITLE),
+            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
             APPLICATIONS_REQUEST.DESCRIPTION,
-            APPLICATIONS_REQUEST.REQUEST_STATUS,
+            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
             (when(EMPLOYEE.WORKING_STATUS.isTrue(), "True"))
                 .when(EMPLOYEE.WORKING_STATUS.isFalse(), "False")
@@ -120,7 +123,14 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(REQUEST_STATUS)
+        .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+        .leftJoin(REQUEST_NAME)
+        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+        .leftJoin(REQUEST_TYPE)
+        .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
         .where(conditions)
+        .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);

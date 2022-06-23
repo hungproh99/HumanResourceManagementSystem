@@ -1,7 +1,8 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponseList;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
+import com.csproject.hrm.dto.response.TimekeepingResponsesList;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
@@ -34,8 +35,7 @@ public class TimekeepingController {
       @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
-    List<TimekeepingResponseList> timekeeping =
-        timekeepingService.getListAllTimekeeping(queryParam);
+    TimekeepingResponsesList timekeeping = timekeepingService.getListAllTimekeeping(queryParam);
     return ResponseEntity.ok(timekeeping);
   }
 

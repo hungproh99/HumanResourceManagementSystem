@@ -7,7 +7,7 @@ import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponseList;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.TimekeepingRepositoryCustom;
@@ -52,7 +52,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   @Autowired private final DBConnection connection;
 
   @Override
-  public List<TimekeepingResponseList> getListAllTimekeeping(QueryParam queryParam) {
+  public List<TimekeepingResponses> getListAllTimekeeping(QueryParam queryParam) {
     final List<Condition> conditions = new ArrayList<>();
     final List<Condition> conditionsTimekeeping = new ArrayList<>();
     final var mergeFilters =
@@ -91,9 +91,9 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     List<OrderField<?>> sortFields = new ArrayList<>();
     sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
 
-    List<TimekeepingResponseList> timekeepingResponses =
+    List<TimekeepingResponses> timekeepingResponses =
         getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination)
-            .fetchInto(TimekeepingResponseList.class);
+            .fetchInto(TimekeepingResponses.class);
     timekeepingResponses.forEach(
         timekeepingResponse -> {
           timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
@@ -113,7 +113,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public List<TimekeepingResponseList> getListTimekeepingToExport(
+  public List<TimekeepingResponses> getListTimekeepingToExport(
       QueryParam queryParam, List<String> list) {
     final List<Condition> conditions = new ArrayList<>();
     final List<Condition> conditionsTimekeeping = new ArrayList<>();
@@ -153,16 +153,16 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
 
     List<OrderField<?>> sortFields = new ArrayList<>();
     sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
-    
+
     Condition condition = noCondition();
     for (String id : list) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(id));
     }
     conditions.add(condition);
 
-    List<TimekeepingResponseList> timekeepingResponses =
+    List<TimekeepingResponses> timekeepingResponses =
         getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination)
-            .fetchInto(TimekeepingResponseList.class);
+            .fetchInto(TimekeepingResponses.class);
     timekeepingResponses.forEach(
         timekeepingResponse -> {
           timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
@@ -190,14 +190,38 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     conditions.add(condition.and(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
     conditions.add(condition.and(TIMEKEEPING.DATE.eq(date)));
 
+    TableLike<?> rowNumberAsc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    TableLike<?> rowNumberDesc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
     TableLike<?> firstTimeCheckIn =
-        dslContext.select().from(CHECKIN_CHECKOUT).orderBy(CHECKIN_CHECKOUT.CHECKIN.asc()).limit(1);
+        dslContext
+            .select()
+            .from(rowNumberAsc)
+            .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1));
     TableLike<?> lastTimeCheckOut =
         dslContext
             .select()
-            .from(CHECKIN_CHECKOUT)
-            .orderBy(CHECKIN_CHECKOUT.CHECKIN.desc())
-            .limit(1);
+            .from(rowNumberDesc)
+            .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
     final var query =
         dslContext
             .select(
@@ -259,6 +283,51 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .from(CHECKIN_CHECKOUT)
             .where(CHECKIN_CHECKOUT.TIMEKEEPING_ID.eq(timekeepingID));
     return query.fetchInto(CheckInCheckOutResponse.class);
+  }
+
+  @Override
+  public int countListAllTimekeeping(QueryParam queryParam) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final List<Condition> conditions = new ArrayList<>();
+    final List<Condition> conditionsTimekeeping = new ArrayList<>();
+    final var mergeFilters =
+        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+
+    mergeFilters.forEach(
+        (key, values) -> {
+          Condition condition = DSL.noCondition();
+          Condition officeCondition = DSL.noCondition();
+          Condition areaCondition = DSL.noCondition();
+          Condition positionCondition = DSL.noCondition();
+          Condition timekeepingCondition = DSL.noCondition();
+          for (QueryFilter filter : values) {
+
+            final Field<?> field = field2Map.get(filter.field);
+
+            if (Objects.isNull(field)) {
+              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
+            }
+            if (filter.field.equals(Constants.OFFICE)) {
+              officeCondition = officeCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(Constants.AREA)) {
+              areaCondition = areaCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(POSITION)) {
+              positionCondition = positionCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(DATE)) {
+              timekeepingCondition = timekeepingCondition.and(queryHelper.condition(filter, field));
+            } else {
+              condition = condition.and(queryHelper.condition(filter, field));
+            }
+          }
+          condition = condition.and(officeCondition).and(areaCondition).and(positionCondition);
+          conditions.add(condition);
+          conditionsTimekeeping.add(timekeepingCondition);
+        });
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
+
+    return dslContext.fetchCount(
+        getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination));
   }
 
   private Select<?> getAllEmployeeForTimekeeping(

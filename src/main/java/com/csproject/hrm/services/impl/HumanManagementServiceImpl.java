@@ -1,5 +1,6 @@
 package com.csproject.hrm.services.impl;
 
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.common.excel.ExcelExportEmployee;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
@@ -83,32 +84,64 @@ public class HumanManagementServiceImpl implements HumanManagementService {
 
   @Override
   public List<WorkingTypeDto> getListWorkingType() {
-    return employeeRepository.getListWorkingType();
+    List<WorkingTypeDto> workingTypeDto = employeeRepository.getListWorkingType();
+    workingTypeDto.forEach(
+        workingType -> {
+          workingType.setName(EWorkingType.getLabel(workingType.getName()));
+        });
+    return workingTypeDto;
   }
 
   @Override
   public List<EmployeeTypeDto> getListEmployeeType() {
-    return employeeRepository.getListEmployeeType();
+    List<EmployeeTypeDto> employeeTypeDto = employeeRepository.getListEmployeeType();
+    employeeTypeDto.forEach(
+        employeeType -> {
+          employeeType.setName(EEmployeeType.getLabel(employeeType.getName()));
+        });
+    return employeeTypeDto;
   }
 
   @Override
   public List<RoleDto> getListRoleType(boolean isAdmin) {
-    return employeeRepository.getListRoleType(isAdmin);
+    List<RoleDto> roleDto = employeeRepository.getListRoleType(isAdmin);
+    roleDto.forEach(
+        role -> {
+          role.setRole(ERole.getLabel(role.getRole()));
+        });
+
+    return roleDto;
   }
 
   @Override
   public List<OfficeDto> getListOffice() {
-    return contractRepository.getListOffice();
+    List<OfficeDto> officeDto = contractRepository.getListOffice();
+    officeDto.forEach(
+        office -> {
+          office.setName(EOffice.getLabel(office.getName()));
+        });
+
+    return officeDto;
   }
 
   @Override
   public List<AreaDto> getListArea() {
-    return contractRepository.getListArea();
+    List<AreaDto> areaDto = contractRepository.getListArea();
+    areaDto.forEach(
+        area -> {
+          area.setName(EArea.getLabel(area.getName()));
+        });
+    return areaDto;
   }
 
   @Override
   public List<JobDto> getListPosition() {
-    return contractRepository.getListPosition();
+    List<JobDto> jobDto = contractRepository.getListPosition();
+    jobDto.forEach(
+        job -> {
+          job.setPosition(EArea.getLabel(job.getPosition()));
+        });
+    return jobDto;
   }
 
   @Override
@@ -116,7 +149,12 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     if (id == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
-    return contractRepository.getListGradeByPosition(id);
+    List<GradeDto> gradeDto = contractRepository.getListGradeByPosition(id);
+    gradeDto.forEach(
+        grade -> {
+          grade.setName(EArea.getLabel(grade.getName()));
+        });
+    return gradeDto;
   }
 
   @Override
