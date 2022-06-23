@@ -1,10 +1,8 @@
 package com.csproject.hrm.services.impl;
 
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.common.excel.ExcelExportTimekeeping;
-import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
-import com.csproject.hrm.dto.response.TimekeepingResponsesList;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.QueryParam;
@@ -122,7 +120,8 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       list.get()
           .setCheck_in_check_outs(
               timekeepingRepository.getCheckInCheckOutByTimekeepingID(timekeepingID));
-
+      list.get()
+          .setTimekeeping_status(ETimekeepingStatus.getValue(list.get().getTimekeeping_status()));
       return list;
     } else {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
