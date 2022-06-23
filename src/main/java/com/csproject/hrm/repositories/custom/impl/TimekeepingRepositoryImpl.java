@@ -287,7 +287,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   private Select<?> getAllTimekeepingByEmployeeId(
       String employeeId, List<Condition> conditions, List<OrderField<?>> sortFields) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
     sortFields.add(TIMEKEEPING.DATE.asc());
     TableLike<?> rowNumberAsc =
         dslContext
@@ -337,6 +336,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .leftJoin(lastTimeCheckOut)
         .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .where(conditions)
+        .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
         .orderBy(sortFields);
   }
 }
