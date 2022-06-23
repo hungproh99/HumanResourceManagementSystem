@@ -222,10 +222,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .select(
                 TIMEKEEPING.TIMEKEEPING_ID,
                 EMPLOYEE.EMPLOYEE_ID,
-                EMPLOYEE.FULL_NAME,
-                EMPLOYEE.MANAGER_ID,
-                JOB.POSITION,
-                GRADE_TYPE.NAME.as(GRADE),
                 TIMEKEEPING.DATE.as(CURRENT_DATE),
                 TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
                 floor(
@@ -257,12 +253,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
                 lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
             .from(EMPLOYEE)
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(JOB)
-            .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-            .leftJoin(GRADE_TYPE)
-            .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
             .leftJoin(TIMEKEEPING)
             .on(TIMEKEEPING.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .leftJoin(TIMEKEEPING_STATUS)
