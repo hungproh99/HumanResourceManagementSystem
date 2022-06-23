@@ -6,14 +6,14 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.TIMEKEEPING_STATUS_INVALID;
 
 public enum ETimekeepingStatus {
-  WORK_LATE("Late", 1),
-  LEAVE_SOON("Soon", 2),
-  DAY_OFF("Off", 3),
+  WORK_LATE("late", 1),
+  LEAVE_SOON("soon", 2),
+  DAY_OFF("off", 3),
   PAID_LEAVE("PL", 4),
-  NORMAL("Normal", 5),
-  HAFT_DAY("Haft", 6),
-  HOLIDAY("Holiday", 7),
-  OVERTIME("Overtime", 8);
+  NORMAL("normal", 5),
+  HAFT_DAY("haft", 6),
+  HOLIDAY("holiday", 7),
+  OVERTIME("overtime", 8);
 
   private String label;
   private long value;

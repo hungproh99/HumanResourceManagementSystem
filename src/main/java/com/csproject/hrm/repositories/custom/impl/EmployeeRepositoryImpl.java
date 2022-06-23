@@ -1,11 +1,16 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.*;
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.EmployeeTypeDto;
+import com.csproject.hrm.dto.dto.RoleDto;
+import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
-import com.csproject.hrm.jooq.*;
+import com.csproject.hrm.jooq.DBConnection;
+import com.csproject.hrm.jooq.JooqHelper;
+import com.csproject.hrm.jooq.Pagination;
+import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.custom.EmployeeRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
@@ -13,9 +18,11 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.csproject.hrm.common.constant.Constants.GRADE;
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
@@ -149,9 +156,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   public int countAllEmployeeByCondition(QueryParam queryParam) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
-    return dslContext.fetchCount(findAllEmployee(conditions, sortFields, queryParam.pagination));
+    return dslContext.fetchCount(countAllEmployee(conditions));
   }
 
   @Override
@@ -248,6 +253,48 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
         .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
         .fetchInto(String.class);
+  }
+
+  public Select<?> countAllEmployee(List<Condition> conditions) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
+                .as(WORKING_STATUS),
+            EMPLOYEE.PHONE_NUMBER.as(PHONE),
+            EMPLOYEE.GENDER.as(GENDER),
+            EMPLOYEE.BIRTH_DATE,
+            GRADE_TYPE.NAME.as(GRADE),
+            OFFICE.NAME.as(OFFICE_NAME),
+            AREA.NAME.as(AREA_NAME),
+            year(currentDate())
+                .minus(year(WORKING_CONTRACT.START_DATE))
+                .concat(YEAR)
+                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(MONTH)
+                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(DAY)
+                .as(SENIORITY),
+            JOB.POSITION.as(POSITION_NAME),
+            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions);
   }
 
   public Select<?> findAllEmployee(

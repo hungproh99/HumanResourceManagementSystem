@@ -323,11 +323,28 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           conditions.add(condition);
           conditionsTimekeeping.add(timekeepingCondition);
         });
-    List<OrderField<?>> sortFields = new ArrayList<>();
-    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
 
-    return dslContext.fetchCount(
-        getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination));
+    return dslContext.fetchCount(getCountAllEmployeeForTimekeeping(conditions));
+  }
+
+  private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
+        .where(conditions)
+        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
   }
 
   private Select<?> getAllEmployeeForTimekeeping(
