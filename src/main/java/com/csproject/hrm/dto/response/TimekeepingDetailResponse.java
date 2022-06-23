@@ -12,10 +12,6 @@ import java.util.List;
 @Builder
 public class TimekeepingDetailResponse {
   private String employee_id;
-  private String full_name;
-  private String manager_id;
-  private String position;
-  private String grade;
   private LocalDate current_date;
   private Long timekeeping_id;
   private String timekeeping_status;

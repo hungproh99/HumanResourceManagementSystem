@@ -1,13 +1,8 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
-import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
-import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
+import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.TimekeepingRepositoryCustom;
@@ -233,15 +228,31 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 GRADE_TYPE.NAME.as(GRADE),
                 TIMEKEEPING.DATE.as(CURRENT_DATE),
                 TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
-                (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
-                        .multiply(60)
-                        .add(minute(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT)))
-                        .minus(
-                            hour(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN))
+                floor(
+                        (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
                                 .multiply(60)
-                                .add(minute(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN)))))
-                    .divide(60)
-                    .cast(SQLDataType.DECIMAL(4, 2))
+                                .add(minute(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT)))
+                                .minus(
+                                    hour(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN))
+                                        .multiply(60)
+                                        .add(
+                                            minute(
+                                                firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN)))))
+                            .divide(60))
+                    .cast(SQLDataType.INTEGER)
+                    .concat(".")
+                    .concat(
+                        (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
+                                .multiply(60)
+                                .add(minute(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT)))
+                                .minus(
+                                    hour(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN))
+                                        .multiply(60)
+                                        .add(
+                                            minute(
+                                                firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN)))))
+                            .modulo(60)
+                            .cast(SQLDataType.INTEGER))
                     .as(TOTAL_WORKING_TIME),
                 firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
                 lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
