@@ -38,7 +38,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   @Autowired private final DBConnection connection;
 
   @Override
-  public List<ApplicationsRequestRespone> getListApplicationRequest(QueryParam queryParam) {
+  public List<ApplicationsRequestRespone> getListApplicationRequestByEmployeeId(
+      QueryParam queryParam, String employeeId) {
     final List<Condition> conditions = new ArrayList<>();
     final var mergeFilters =
         queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
@@ -60,7 +61,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               condition = condition.and(queryHelper.condition(filter, field));
             }
           }
-          condition = condition.and(requestTypeCondition);
+          condition =
+              condition.and(requestTypeCondition).and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId));
           conditions.add(condition);
         });
 

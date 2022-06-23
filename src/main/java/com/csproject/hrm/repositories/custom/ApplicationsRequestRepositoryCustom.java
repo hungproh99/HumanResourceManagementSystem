@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ApplicationsRequestRepositoryCustom {
-  List<ApplicationsRequestRespone> getListApplicationRequest(QueryParam queryParam);
+  List<ApplicationsRequestRespone> getListApplicationRequestByEmployeeId(
+      QueryParam queryParam, String employeeId);
 }

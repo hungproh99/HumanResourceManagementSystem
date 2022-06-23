@@ -106,4 +106,5 @@ public class Constants {
   public static final String REQUEST_TYPE_PARAM = "requestType";
   public static final String IS_BOOKMARK_PARAM = "isBookmark";
   public static final String CHANGE_STATUS_TIME = "change_status_time";
+  public static final String UNAUTHORIZED_ERROR = "Unauthorized error";
 }
