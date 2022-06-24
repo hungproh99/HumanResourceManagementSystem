@@ -1,13 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -44,6 +40,9 @@ public class ApplicationsRequest {
   @Column(name = "create_date")
   private LocalDateTime createDate;
 
+  @Column(name = "duration")
+  private LocalDateTime duration;
+
   @Column(name = "latest_date")
   private LocalDateTime latestDate;
 
@@ -56,4 +55,8 @@ public class ApplicationsRequest {
   @Column(name = "is_bookmark")
   @Type(type = "boolean")
   private Boolean isBookmark;
+
+  @Column(name = "is_remind")
+  @Type(type = "boolean")
+  private Boolean isRemind;
 }

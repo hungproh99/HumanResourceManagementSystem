@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -11,6 +12,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,9 +20,9 @@ import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
-import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.impl.DSL.concat;
 import static org.jooq.impl.DSL.when;
 
@@ -134,5 +136,37 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
+  }
+
+  @Override
+  public void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .insertInto(
+            APPLICATIONS_REQUEST,
+            APPLICATIONS_REQUEST.EMPLOYEE_ID,
+            APPLICATIONS_REQUEST.REQUEST_TYPE,
+            APPLICATIONS_REQUEST.REQUEST_STATUS,
+            APPLICATIONS_REQUEST.REQUEST_NAME,
+            APPLICATIONS_REQUEST.CREATE_DATE,
+            APPLICATIONS_REQUEST.DURATION,
+            APPLICATIONS_REQUEST.LATEST_DATE,
+            APPLICATIONS_REQUEST.DESCRIPTION,
+            APPLICATIONS_REQUEST.APPROVER,
+            APPLICATIONS_REQUEST.IS_BOOKMARK,
+            APPLICATIONS_REQUEST.IS_REMIND)
+        .values(
+            applicationsRequest.getEmployee_id(),
+            applicationsRequest.getRequest_type_id(),
+            Long.valueOf("1"),
+            applicationsRequest.getRequest_name_id(),
+            LocalDateTime.now(),
+            LocalDateTime.now().plusDays(7),
+            LocalDateTime.now(),
+            applicationsRequest.getDescription(),
+            applicationsRequest.getApprover(),
+            Boolean.FALSE,
+            Boolean.FALSE)
+        .execute();
   }
 }
