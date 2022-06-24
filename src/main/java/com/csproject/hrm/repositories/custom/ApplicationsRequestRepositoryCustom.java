@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,6 @@ import java.util.List;
 public interface ApplicationsRequestRepositoryCustom {
   List<ApplicationsRequestRespone> getListApplicationRequestByEmployeeId(
       QueryParam queryParam, String employeeId);
+	
+	void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
 }
