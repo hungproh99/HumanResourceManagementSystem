@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -47,13 +47,20 @@ public class ApplicationsRequest {
   @Column(name = "latest_date")
   private LocalDateTime latestDate;
 
+  @Column(name = "duration")
+  private LocalDateTime duration;
+
   @Column(name = "approver")
   private String approver;
 
-  @Column(name = "forward")
-  private String forward;
+  @OneToMany(mappedBy = "applicationsRequest", fetch = FetchType.LAZY)
+  private List<Forwards> forwards;
 
   @Column(name = "is_bookmark")
   @Type(type = "boolean")
   private Boolean isBookmark;
+
+  @Column(name = "is_remind")
+  @Type(type = "boolean")
+  private Boolean isRemind;
 }

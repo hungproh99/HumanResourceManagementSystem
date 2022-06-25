@@ -94,7 +94,7 @@ public class Constants {
   public static final String REQUEST_STATUS_INVALID = "Invalid Request Status";
   public static final String REQUEST_NAME_INVALID = "Invalid Request Name";
   public static final String GRADE_TYPE_INVALID = "Invalid Grade Type";
-  public static final String CREATE_DATE = "create_date";
+  public static final String CREATE_DATE = "createDate";
   public static final String IS_BOOKMARK = "is_bookmark";
   public static final String REQUEST_STATUS = "request_status";
   public static final String REQUEST_TYPE = "request_type";
@@ -107,4 +107,6 @@ public class Constants {
   public static final String IS_BOOKMARK_PARAM = "isBookmark";
   public static final String CHANGE_STATUS_TIME = "change_status_time";
   public static final String UNAUTHORIZED_ERROR = "Unauthorized error";
+
+  public static final String REQUEST_STATUS_PARAM = "requestStatus";
 }

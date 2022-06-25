@@ -19,5 +19,7 @@ public class ApplicationsRequestRespone {
   private String description;
   private String request_status;
   private LocalDateTime change_status_time;
+  private LocalDateTime duration;
+  private String approver;
   private String is_bookmark;
 }

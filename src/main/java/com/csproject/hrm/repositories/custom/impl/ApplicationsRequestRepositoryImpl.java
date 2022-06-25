@@ -18,9 +18,10 @@ import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
+import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
-import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.impl.DSL.concat;
 import static org.jooq.impl.DSL.when;
 
@@ -33,9 +34,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     field2Map.put(EMPLOYEE_ID, EMPLOYEE.EMPLOYEE_ID);
     field2Map.put(FULL_NAME, EMPLOYEE.FULL_NAME);
     field2Map.put(CREATE_DATE, APPLICATIONS_REQUEST.CREATE_DATE);
-    field2Map.put(IS_BOOKMARK, APPLICATIONS_REQUEST.IS_BOOKMARK);
-    field2Map.put(Constants.REQUEST_STATUS, APPLICATIONS_REQUEST.REQUEST_STATUS);
-    field2Map.put(Constants.REQUEST_TYPE, APPLICATIONS_REQUEST.REQUEST_TYPE);
+    field2Map.put(IS_BOOKMARK_PARAM, APPLICATIONS_REQUEST.IS_BOOKMARK);
+    field2Map.put(REQUEST_STATUS_PARAM, REQUEST_STATUS.NAME);
+    field2Map.put(REQUEST_TYPE_PARAM, REQUEST_TYPE.NAME);
   }
 
   @Autowired private final JooqHelper queryHelper;
@@ -72,7 +73,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final List<OrderField<?>> orderByList = new ArrayList<>();
 
     if (null == queryParam || isEmpty(queryParam.orderByList)) {
-      orderByList.add(EMPLOYEE.EMPLOYEE_ID.desc());
+      orderByList.add(APPLICATIONS_REQUEST.LATEST_DATE.desc());
     }
 
     for (OrderByClause clause : queryParam.orderByList) {
@@ -84,21 +85,21 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       }
       if (clause.field.equals(IS_BOOKMARK_PARAM)) {
         if (clause.orderBy.equals(OrderBy.ASC)) {
-          orderByList.add(
-              when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).asc().nullsLast());
+          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).asc());
         } else {
-          orderByList.add(
-              when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).desc().nullsLast());
+          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).desc());
         }
-      }
-      if (clause.orderBy.equals(OrderBy.ASC)) {
-        orderByList.add(field.asc().nullsLast());
       } else {
-        orderByList.add(field.desc().nullsLast());
+        if (clause.orderBy.equals(OrderBy.ASC)) {
+          orderByList.add(field.asc().nullsLast());
+        } else {
+          orderByList.add(field.desc().nullsLast());
+        }
       }
     }
 
-    return getListApplicationRequest(conditions, orderByList, queryParam.pagination, employeeId)
+    return getListApplicationRequest(
+            conditions, orderByList, queryParam.pagination, employeeId)
         .fetchInto(ApplicationsRequestRespone.class);
   }
 
@@ -108,6 +109,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       Pagination pagination,
       String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    TableLike<?> selectForward =
+            dslContext.select(FORWARDS.APPLICATIONS_REQUEST_ID, FORWARDS.EMPLOYEE_ID).from(FORWARDS);
+
     return dslContext
         .select(
             EMPLOYEE.EMPLOYEE_ID,
@@ -117,8 +122,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.DESCRIPTION,
             REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-            (when(EMPLOYEE.WORKING_STATUS.isTrue(), "True"))
-                .when(EMPLOYEE.WORKING_STATUS.isFalse(), "False")
+            APPLICATIONS_REQUEST.DURATION,
+            APPLICATIONS_REQUEST.APPROVER,
+            (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                    .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
                 .as(IS_BOOKMARK))
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
@@ -133,6 +140,39 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
         .orderBy(sortFields)
         .limit(pagination.limit)
-        .offset(pagination.offset);
+        .offset(pagination.offset)
+            .unionAll(dslContext
+                    .select(
+                            EMPLOYEE.EMPLOYEE_ID,
+                            EMPLOYEE.FULL_NAME,
+                            APPLICATIONS_REQUEST.CREATE_DATE,
+                            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+                            APPLICATIONS_REQUEST.DESCRIPTION,
+                            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                            APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                            APPLICATIONS_REQUEST.DURATION,
+                            APPLICATIONS_REQUEST.APPROVER,
+                            (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                                    .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                                    .as(IS_BOOKMARK))
+                    .from(EMPLOYEE)
+                    .leftJoin(APPLICATIONS_REQUEST)
+                    .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+                    .leftJoin(REQUEST_STATUS)
+                    .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+                    .leftJoin(REQUEST_NAME)
+                    .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+                    .leftJoin(REQUEST_TYPE)
+                    .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+                    .leftJoin(selectForward)
+                    .on(
+                            selectForward
+                                    .field(FORWARDS.APPLICATIONS_REQUEST_ID)
+                                    .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
+                    .where(conditions)
+                    .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
+                    .orderBy(sortFields)
+                    .limit(pagination.limit)
+                    .offset(pagination.offset));
   }
 }
