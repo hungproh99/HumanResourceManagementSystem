@@ -38,5 +38,6 @@ public class Uri {
   public static final String URI_DOWNLOAD_EXCEL_EMPLOYEE = "/download_excel_employee";
   public static final String URI_DOWNLOAD_EXCEL_TIMEKEEPING = "/download_excel_timekeeping";
   public static final String URI_INSERT_MULTI_EMPLOYEE_BY_EXCEL = "/import_excel_employee";
-  public static final String URI_GET_LIST_APPLICATION_REQUEST = "/list_all_application_request";
+  public static final String URI_GET_LIST_APPLICATION_REQUEST_SEND = "/list_all_application_request_send";
+  public static final String URI_GET_LIST_APPLICATION_REQUEST_RECEIVE = "/list_all_application_request_receive";
 }

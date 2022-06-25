@@ -22,7 +22,7 @@ public class ApplicationsRequest {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @OneToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")
   private Employee employee;
 

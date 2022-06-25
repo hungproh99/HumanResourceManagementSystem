@@ -9,8 +9,11 @@ import java.util.List;
 
 @Repository
 public interface ApplicationsRequestRepositoryCustom {
-  List<ApplicationsRequestRespone> getListApplicationRequestByEmployeeId(
+  List<ApplicationsRequestRespone> getListApplicationRequestReceive(
       QueryParam queryParam, String employeeId);
+
+    List<ApplicationsRequestRespone> getListApplicationRequestSend(
+            QueryParam queryParam, String employeeId);
 	
 	void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
 }

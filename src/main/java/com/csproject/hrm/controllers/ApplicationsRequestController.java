@@ -18,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
-import static com.csproject.hrm.common.uri.Uri.URI_GET_LIST_APPLICATION_REQUEST;
+import static com.csproject.hrm.common.uri.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -29,8 +28,8 @@ public class ApplicationsRequestController {
   @Autowired JwtUtils jwtUtils;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping(URI_GET_LIST_APPLICATION_REQUEST)
-  public ResponseEntity<?> getListApplicationsRequestByEmployeeId(
+  @GetMapping(URI_GET_LIST_APPLICATION_REQUEST_RECEIVE)
+  public ResponseEntity<?> getListApplicationsRequestReceive(
       HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -39,7 +38,23 @@ public class ApplicationsRequestController {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       return ResponseEntity.ok(
-          applicationsRequestService.getAllApplicationRequestForEmployeeId(queryParam, employeeId));
+          applicationsRequestService.getAllApplicationRequestReceive(queryParam, employeeId));
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping(URI_GET_LIST_APPLICATION_REQUEST_SEND)
+  public ResponseEntity<?> getListApplicationsRequestSend(
+      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      return ResponseEntity.ok(
+          applicationsRequestService.getAllApplicationRequestSend(queryParam, employeeId));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
   }

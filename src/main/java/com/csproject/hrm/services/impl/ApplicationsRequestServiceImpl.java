@@ -2,9 +2,13 @@ package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
-import com.csproject.hrm.repositories.*;
+import com.csproject.hrm.repositories.ApplicationsRequestRepository;
+import com.csproject.hrm.repositories.EmployeeDetailRepository;
+import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.ApplicationsRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,13 +26,21 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Autowired EmployeeDetailRepository employeeDetailRepository;
 
   @Override
-  public List<ApplicationsRequestRespone> getAllApplicationRequestForEmployeeId(
+  public List<ApplicationsRequestRespone> getAllApplicationRequestReceive(
       QueryParam queryParam, String employeeId) {
     if (employeeRepository.findById(employeeId).isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
     }
-    return applicationsRequestRepository.getListApplicationRequestByEmployeeId(
-        queryParam, employeeId);
+    return applicationsRequestRepository.getListApplicationRequestReceive(queryParam, employeeId);
+  }
+
+  @Override
+  public List<ApplicationsRequestRespone> getAllApplicationRequestSend(
+      QueryParam queryParam, String employeeId) {
+    if (employeeRepository.findById(employeeId).isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
+    }
+    return applicationsRequestRepository.getListApplicationRequestSend(queryParam, employeeId);
   }
 
   @Override

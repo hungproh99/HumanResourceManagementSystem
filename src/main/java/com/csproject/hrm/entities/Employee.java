@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -105,6 +108,6 @@ public class Employee {
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<Timekeeping> timekeepings;
 
-  @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
-  private ApplicationsRequest applicationsRequest;
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<ApplicationsRequest> applicationsRequest;
 }

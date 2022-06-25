@@ -7,8 +7,11 @@ import com.csproject.hrm.jooq.QueryParam;
 import java.util.List;
 
 public interface ApplicationsRequestService {
-  List<ApplicationsRequestRespone> getAllApplicationRequestForEmployeeId(
+  List<ApplicationsRequestRespone> getAllApplicationRequestReceive(
       QueryParam queryParam, String employeeId);
-	
+
+  List<ApplicationsRequestRespone> getAllApplicationRequestSend(
+      QueryParam queryParam, String employeeId);
+
 	void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
 }
