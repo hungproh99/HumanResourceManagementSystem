@@ -1,6 +1,8 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.jwt.JwtUtils;
@@ -16,7 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static com.csproject.hrm.common.uri.Uri.*;
+import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
+import static com.csproject.hrm.common.uri.Uri.URI_GET_LIST_APPLICATION_REQUEST;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -33,11 +36,19 @@ public class ApplicationsRequestController {
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7, headerAuth.length());
+      String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       return ResponseEntity.ok(
           applicationsRequestService.getAllApplicationRequestForEmployeeId(queryParam, employeeId));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PostMapping("create_application_request")
+  public ResponseEntity<?> insertApplicationRequest(
+      @RequestBody ApplicationsRequestRequest applicationsRequest) {
+    applicationsRequestService.insertApplicationRequest(applicationsRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }
