@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +27,7 @@ public class RequestType {
 
   @OneToOne(mappedBy = "requestType", fetch = FetchType.LAZY)
   private ApplicationsRequest applicationsRequest;
+
+  @OneToMany(mappedBy = "requestType", fetch = FetchType.LAZY)
+  private List<RequestName> requestNames;
 }

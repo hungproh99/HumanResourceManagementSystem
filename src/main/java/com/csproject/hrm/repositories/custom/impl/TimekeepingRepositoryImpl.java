@@ -255,8 +255,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .from(EMPLOYEE)
             .leftJoin(TIMEKEEPING)
             .on(TIMEKEEPING.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(TIMEKEEPING_STATUS)
-            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(TIMEKEEPING.TIMEKEEPING_STATUS_ID))
             .leftJoin(firstTimeCheckIn)
             .on(
                 firstTimeCheckIn
@@ -416,8 +414,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .from(TIMEKEEPING)
         .leftJoin(EMPLOYEE)
         .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
-        .leftJoin(TIMEKEEPING_STATUS)
-        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(TIMEKEEPING.TIMEKEEPING_STATUS_ID))
         .leftJoin(firstTimeCheckIn)
         .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .leftJoin(lastTimeCheckOut)

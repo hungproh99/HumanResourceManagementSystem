@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,12 +19,12 @@ import java.time.LocalDate;
 public class Salary {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "laudatory_id")
+  @Column(name = "salary_id")
   private Long id;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingInformation.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingContract.class)
   @JoinColumn(name = "working_information_id")
-  private WorkingInformation workingInformation;
+  private WorkingContract workingContract;
 
   @Column(name = "final_salary")
   private BigDecimal finalSalary;
@@ -36,4 +37,7 @@ public class Salary {
 
   @Column(name = "end_date")
   private LocalDate endDate;
+
+  @OneToMany(mappedBy = "salary", fetch = FetchType.LAZY)
+  private List<BonusSalary> bonusSalaries;
 }

@@ -26,9 +26,6 @@ public class Tax {
   @Column(name = "percent")
   private String percent;
 
-  @Column(name = "title")
-  private String title;
-
   @Column(name = "description")
   private String description;
 }

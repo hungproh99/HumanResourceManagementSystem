@@ -1,6 +1,7 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -64,6 +65,14 @@ public class ApplicationsRequestController {
   public ResponseEntity<?> insertApplicationRequest(
       @RequestBody ApplicationsRequestRequest applicationsRequest) {
     applicationsRequestService.insertApplicationRequest(applicationsRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PostMapping(URI_UPDATE_STATUS_APPLICATION_QUEST)
+  public ResponseEntity<?> updateApplicationRequest(
+      @RequestBody UpdateApplicationRequestRequest updateApplicationRequestRequest) {
+    applicationsRequestService.updateStatusApplicationRequest(updateApplicationRequestRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

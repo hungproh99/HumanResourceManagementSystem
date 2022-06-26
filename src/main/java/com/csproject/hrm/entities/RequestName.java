@@ -26,4 +26,8 @@ public class RequestName {
 
   @OneToOne(mappedBy = "requestName", fetch = FetchType.LAZY)
   private ApplicationsRequest applicationsRequest;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = RequestType.class)
+  @JoinColumn(name = "request_type_id")
+  private RequestType requestType;
 }

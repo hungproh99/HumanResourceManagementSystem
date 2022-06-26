@@ -2,7 +2,8 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
@@ -45,124 +46,26 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   @Autowired private final DBConnection connection;
 
   @Override
-  public List<ApplicationsRequestRespone> getListApplicationRequestReceive(
+  public List<ApplicationsRequestResponse> getListApplicationRequestReceive(
       QueryParam queryParam, String employeeId) {
-    final List<Condition> conditions = new ArrayList<>();
-    final var mergeFilters =
-        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+    final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
 
-    mergeFilters.forEach(
-        (key, values) -> {
-          Condition condition = DSL.noCondition();
-          Condition requestTypeCondition = DSL.noCondition();
-          for (QueryFilter filter : values) {
-
-            final Field<?> field = field2Map.get(filter.field);
-
-            if (Objects.isNull(field)) {
-              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
-            }
-            if (filter.field.equals(REQUEST_TYPE_PARAM)) {
-              requestTypeCondition = requestTypeCondition.or(queryHelper.condition(filter, field));
-            } else {
-              condition = condition.and(queryHelper.condition(filter, field));
-            }
-          }
-          condition = condition.and(requestTypeCondition);
-          conditions.add(condition);
-        });
-
-    final List<OrderField<?>> orderByList = new ArrayList<>();
-
-    if (null == queryParam || isEmpty(queryParam.orderByList)) {
-      orderByList.add(APPLICATIONS_REQUEST.LATEST_DATE.desc());
-    }
-
-    for (OrderByClause clause : queryParam.orderByList) {
-
-      final Field<?> field = field2Map.get(clause.field);
-
-      if (Objects.isNull(field)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, ORDER_BY_INVALID);
-      }
-      if (clause.field.equals(IS_BOOKMARK_PARAM)) {
-        if (clause.orderBy.equals(OrderBy.ASC)) {
-          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).asc());
-        } else {
-          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).desc());
-        }
-      } else {
-        if (clause.orderBy.equals(OrderBy.ASC)) {
-          orderByList.add(field.asc().nullsLast());
-        } else {
-          orderByList.add(field.desc().nullsLast());
-        }
-      }
-    }
+    final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
 
     return getListApplicationRequestReceive(
             conditions, orderByList, queryParam.pagination, employeeId)
-        .fetchInto(ApplicationsRequestRespone.class);
+        .fetchInto(ApplicationsRequestResponse.class);
   }
 
   @Override
-  public List<ApplicationsRequestRespone> getListApplicationRequestSend(
+  public List<ApplicationsRequestResponse> getListApplicationRequestSend(
       QueryParam queryParam, String employeeId) {
-    final List<Condition> conditions = new ArrayList<>();
-    final var mergeFilters =
-        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+    final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
 
-    mergeFilters.forEach(
-        (key, values) -> {
-          Condition condition = DSL.noCondition();
-          Condition requestTypeCondition = DSL.noCondition();
-          for (QueryFilter filter : values) {
-
-            final Field<?> field = field2Map.get(filter.field);
-
-            if (Objects.isNull(field)) {
-              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
-            }
-            if (filter.field.equals(REQUEST_TYPE_PARAM)) {
-              requestTypeCondition = requestTypeCondition.or(queryHelper.condition(filter, field));
-            } else {
-              condition = condition.and(queryHelper.condition(filter, field));
-            }
-          }
-          condition = condition.and(requestTypeCondition);
-          conditions.add(condition);
-        });
-
-    final List<OrderField<?>> orderByList = new ArrayList<>();
-
-    if (null == queryParam || isEmpty(queryParam.orderByList)) {
-      orderByList.add(APPLICATIONS_REQUEST.LATEST_DATE.desc());
-    }
-
-    for (OrderByClause clause : queryParam.orderByList) {
-
-      final Field<?> field = field2Map.get(clause.field);
-
-      if (Objects.isNull(field)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, ORDER_BY_INVALID);
-      }
-      if (clause.field.equals(IS_BOOKMARK_PARAM)) {
-        if (clause.orderBy.equals(OrderBy.ASC)) {
-          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).asc());
-        } else {
-          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).desc());
-        }
-      } else {
-        if (clause.orderBy.equals(OrderBy.ASC)) {
-          orderByList.add(field.asc().nullsLast());
-        } else {
-          orderByList.add(field.desc().nullsLast());
-        }
-      }
-    }
+    final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
 
     return getListApplicationRequestSend(conditions, orderByList, queryParam.pagination, employeeId)
-        .fetchInto(ApplicationsRequestRespone.class);
+        .fetchInto(ApplicationsRequestResponse.class);
   }
 
   private Select<?> getListApplicationRequestReceive(
@@ -276,7 +179,11 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
-  public void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest) {
+  public void insertApplicationRequest(
+      ApplicationsRequestRequest applicationsRequest,
+      LocalDateTime createdDate,
+      LocalDateTime latestDate,
+      LocalDateTime duration) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext
         .insertInto(
@@ -293,17 +200,201 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.IS_BOOKMARK,
             APPLICATIONS_REQUEST.IS_REMIND)
         .values(
-            applicationsRequest.getEmployee_id(),
-            applicationsRequest.getRequest_type_id(),
-            Long.valueOf("1"),
-            applicationsRequest.getRequest_name_id(),
-            LocalDateTime.now(),
-            LocalDateTime.now().plusDays(7),
-            LocalDateTime.now(),
+            applicationsRequest.getEmployeeId(),
+            applicationsRequest.getRequestTypeId(),
+            applicationsRequest.getRequestStatusId(),
+            applicationsRequest.getRequestNameId(),
+            createdDate,
+            duration,
+            latestDate,
             applicationsRequest.getDescription(),
             applicationsRequest.getApprover(),
-            Boolean.FALSE,
+            applicationsRequest.getIsBookmark(),
             Boolean.FALSE)
         .execute();
+  }
+
+  @Override
+  public void updateStatusApplicationRequest(
+      UpdateApplicationRequestRequest updateApplicationRequestRequest, LocalDateTime latestDate) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .update(APPLICATIONS_REQUEST)
+        .set(
+            APPLICATIONS_REQUEST.REQUEST_STATUS, updateApplicationRequestRequest.getRequestStatus())
+        .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
+        .set(APPLICATIONS_REQUEST.APPROVER, updateApplicationRequestRequest.getApproverId())
+        .where(
+            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(
+                updateApplicationRequestRequest.getApplicationRequestId()))
+        .execute();
+  }
+
+  @Override
+  public int countListApplicationRequestReceive(QueryParam queryParam, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
+    final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
+    TableLike<?> selectForward =
+        dslContext.select(FORWARDS.APPLICATIONS_REQUEST_ID, FORWARDS.EMPLOYEE_ID).from(FORWARDS);
+
+    final var query =
+        dslContext
+            .select(
+                EMPLOYEE.EMPLOYEE_ID,
+                EMPLOYEE.FULL_NAME,
+                APPLICATIONS_REQUEST.CREATE_DATE,
+                concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+                APPLICATIONS_REQUEST.DESCRIPTION,
+                REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                APPLICATIONS_REQUEST.DURATION,
+                APPLICATIONS_REQUEST.APPROVER,
+                (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                        .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                    .as(IS_BOOKMARK))
+            .from(EMPLOYEE)
+            .leftJoin(APPLICATIONS_REQUEST)
+            .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(REQUEST_STATUS)
+            .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+            .leftJoin(REQUEST_NAME)
+            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+            .leftJoin(REQUEST_TYPE)
+            .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+            .where(conditions)
+            .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
+            .orderBy(orderByList)
+            .unionAll(
+                dslContext
+                    .select(
+                        EMPLOYEE.EMPLOYEE_ID,
+                        EMPLOYEE.FULL_NAME,
+                        APPLICATIONS_REQUEST.CREATE_DATE,
+                        concat(REQUEST_NAME.NAME)
+                            .concat(" ")
+                            .concat(REQUEST_TYPE.NAME)
+                            .as(REQUEST_TITLE),
+                        APPLICATIONS_REQUEST.DESCRIPTION,
+                        REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                        APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                        APPLICATIONS_REQUEST.DURATION,
+                        APPLICATIONS_REQUEST.APPROVER,
+                        (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                                .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                            .as(IS_BOOKMARK))
+                    .from(EMPLOYEE)
+                    .leftJoin(APPLICATIONS_REQUEST)
+                    .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+                    .leftJoin(REQUEST_STATUS)
+                    .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+                    .leftJoin(REQUEST_NAME)
+                    .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+                    .leftJoin(REQUEST_TYPE)
+                    .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+                    .leftJoin(selectForward)
+                    .on(
+                        selectForward
+                            .field(FORWARDS.APPLICATIONS_REQUEST_ID)
+                            .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
+                    .where(conditions)
+                    .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
+                    .orderBy(orderByList));
+    return dslContext.fetchCount(query);
+  }
+
+  @Override
+  public int countListApplicationRequestSend(QueryParam queryParam, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
+    final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
+
+    final var query =
+        dslContext
+            .select(
+                EMPLOYEE.EMPLOYEE_ID,
+                EMPLOYEE.FULL_NAME,
+                APPLICATIONS_REQUEST.CREATE_DATE,
+                concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+                APPLICATIONS_REQUEST.DESCRIPTION,
+                REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                APPLICATIONS_REQUEST.DURATION,
+                APPLICATIONS_REQUEST.APPROVER,
+                (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                        .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                    .as(IS_BOOKMARK))
+            .from(EMPLOYEE)
+            .leftJoin(APPLICATIONS_REQUEST)
+            .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(REQUEST_STATUS)
+            .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+            .leftJoin(REQUEST_NAME)
+            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+            .leftJoin(REQUEST_TYPE)
+            .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+            .where(conditions)
+            .and(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(employeeId))
+            .orderBy(orderByList);
+    return dslContext.fetchCount(query);
+  }
+
+  private List<Condition> getListConditionApplicationRequest(QueryParam queryParam) {
+    final List<Condition> conditions = new ArrayList<>();
+    final var mergeFilters =
+        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+
+    mergeFilters.forEach(
+        (key, values) -> {
+          Condition condition = DSL.noCondition();
+          Condition requestTypeCondition = DSL.noCondition();
+          for (QueryFilter filter : values) {
+
+            final Field<?> field = field2Map.get(filter.field);
+
+            if (Objects.isNull(field)) {
+              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
+            }
+            if (filter.field.equals(REQUEST_TYPE_PARAM)) {
+              requestTypeCondition = requestTypeCondition.or(queryHelper.condition(filter, field));
+            } else {
+              condition = condition.and(queryHelper.condition(filter, field));
+            }
+          }
+          condition = condition.and(requestTypeCondition);
+          conditions.add(condition);
+        });
+    return conditions;
+  }
+
+  private List<OrderField<?>> getOrderFieldApplicationRequest(QueryParam queryParam) {
+    final List<OrderField<?>> orderByList = new ArrayList<>();
+
+    if (null == queryParam || isEmpty(queryParam.orderByList)) {
+      orderByList.add(APPLICATIONS_REQUEST.LATEST_DATE.desc());
+    }
+
+    for (OrderByClause clause : queryParam.orderByList) {
+
+      final Field<?> field = field2Map.get(clause.field);
+
+      if (Objects.isNull(field)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, ORDER_BY_INVALID);
+      }
+      if (clause.field.equals(IS_BOOKMARK_PARAM)) {
+        if (clause.orderBy.equals(OrderBy.ASC)) {
+          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).asc());
+        } else {
+          orderByList.add(when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), 1).otherwise(2).desc());
+        }
+      } else {
+        if (clause.orderBy.equals(OrderBy.ASC)) {
+          orderByList.add(field.asc().nullsLast());
+        } else {
+          orderByList.add(field.desc().nullsLast());
+        }
+      }
+    }
+    return orderByList;
   }
 }

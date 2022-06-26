@@ -9,7 +9,9 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -169,23 +171,20 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             INSURANCE.ADDRESS,
             INSURANCE.INSURANCE_NAME,
             INSURANCE.PERCENT,
-            INSURANCE.DESCRIPTION,
-            INSURANCE.TITLE)
+            INSURANCE.DESCRIPTION)
         .values(
             taxAndInsurance.getInsuranceId(),
             taxAndInsurance.getEmployeeId(),
             taxAndInsurance.getInsuranceAddress(),
             taxAndInsurance.getInsuranceName(),
             taxAndInsurance.getInsurancePercent(),
-            taxAndInsurance.getInsuranceDescription(),
-            taxAndInsurance.getInsuranceTitle())
+            taxAndInsurance.getInsuranceDescription())
         .onDuplicateKeyUpdate()
         .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
         .set(INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
         .set(INSURANCE.INSURANCE_NAME, taxAndInsurance.getInsuranceName())
         .set(INSURANCE.PERCENT, taxAndInsurance.getInsurancePercent())
         .set(INSURANCE.DESCRIPTION, taxAndInsurance.getInsurancePercent())
-        .set(INSURANCE.TITLE, taxAndInsurance.getInsuranceTitle())
         .execute();
   }
 

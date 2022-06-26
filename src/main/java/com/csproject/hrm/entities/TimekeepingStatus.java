@@ -26,5 +26,5 @@ public class TimekeepingStatus {
   private ETimekeepingStatus eTimekeepingStatus;
 
   @OneToOne(mappedBy = "timekeepingStatus", fetch = FetchType.LAZY)
-  private Timekeeping timekeeping;
+  private ListTimekeepingStatus listTimekeepingStatus;
 }

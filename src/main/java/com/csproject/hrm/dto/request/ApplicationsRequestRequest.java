@@ -1,6 +1,9 @@
 package com.csproject.hrm.dto.request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -9,14 +12,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class ApplicationsRequestRequest {
-  private String employee_id;
-  private Long request_type_id;
-  private Long request_name_id;
-  private String full_name;
-  private LocalDateTime created_date;
-  private LocalDateTime latest_date;
-  private LocalDateTime duration;
+  private Long applicationRequestId;
+  private String employeeId;
+  private Long requestTypeId;
+  private Long requestNameId;
+  private Long requestStatusId;
+  private String fullName;
   private String description;
-  private LocalDateTime change_status_time;
   private String approver;
+  private Boolean isBookmark;
 }
