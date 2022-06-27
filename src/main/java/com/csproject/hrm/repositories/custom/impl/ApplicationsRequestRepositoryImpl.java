@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -173,7 +174,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
     TableLike<?> selectForward =
-            dslContext.select(FORWARDS.APPLICATIONS_REQUEST_ID, FORWARDS.EMPLOYEE_ID).from(FORWARDS);
+        dslContext.select(FORWARDS.APPLICATIONS_REQUEST_ID, FORWARDS.EMPLOYEE_ID).from(FORWARDS);
 
     return dslContext
         .select(
@@ -203,39 +204,43 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset)
-            .unionAll(dslContext
-                    .select(
-                            EMPLOYEE.EMPLOYEE_ID,
-                            EMPLOYEE.FULL_NAME,
-                            APPLICATIONS_REQUEST.CREATE_DATE,
-                            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
-                            APPLICATIONS_REQUEST.DESCRIPTION,
-                            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
-                            APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-                            APPLICATIONS_REQUEST.DURATION,
-                            APPLICATIONS_REQUEST.APPROVER,
-                            (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
-                                    .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                                    .as(IS_BOOKMARK))
-                    .from(EMPLOYEE)
-                    .leftJoin(APPLICATIONS_REQUEST)
-                    .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-                    .leftJoin(REQUEST_STATUS)
-                    .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
-                    .leftJoin(REQUEST_NAME)
-                    .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
-                    .leftJoin(REQUEST_TYPE)
-                    .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
-                    .leftJoin(selectForward)
-                    .on(
-                            selectForward
-                                    .field(FORWARDS.APPLICATIONS_REQUEST_ID)
-                                    .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
-                    .where(conditions)
-                    .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
-                    .orderBy(sortFields)
-                    .limit(pagination.limit)
-                    .offset(pagination.offset));
+        .unionAll(
+            dslContext
+                .select(
+                    EMPLOYEE.EMPLOYEE_ID,
+                    EMPLOYEE.FULL_NAME,
+                    APPLICATIONS_REQUEST.CREATE_DATE,
+                    concat(REQUEST_NAME.NAME)
+                        .concat(" ")
+                        .concat(REQUEST_TYPE.NAME)
+                        .as(REQUEST_TITLE),
+                    APPLICATIONS_REQUEST.DESCRIPTION,
+                    REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                    APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                    APPLICATIONS_REQUEST.DURATION,
+                    APPLICATIONS_REQUEST.APPROVER,
+                    (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                            .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                        .as(IS_BOOKMARK))
+                .from(EMPLOYEE)
+                .leftJoin(APPLICATIONS_REQUEST)
+                .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+                .leftJoin(REQUEST_STATUS)
+                .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+                .leftJoin(REQUEST_NAME)
+                .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+                .leftJoin(REQUEST_TYPE)
+                .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+                .leftJoin(selectForward)
+                .on(
+                    selectForward
+                        .field(FORWARDS.APPLICATIONS_REQUEST_ID)
+                        .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
+                .where(conditions)
+                .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
+                .orderBy(sortFields)
+                .limit(pagination.limit)
+                .offset(pagination.offset));
   }
 
   private Select<?> getListApplicationRequestSend(
@@ -305,5 +310,37 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             Boolean.FALSE,
             Boolean.FALSE)
         .execute();
+  }
+
+  @Override
+  public List<RequestStatusDto> getAllRequestStatus() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            REQUEST_STATUS.TYPE_ID.as("request_status_id"),
+            REQUEST_STATUS.NAME.as("request_status_name"))
+        .from(REQUEST_STATUS)
+        .fetchInto(RequestStatusDto.class);
+  }
+
+  @Override
+  public List<RequestTypeDto> getAllRequestType() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            REQUEST_TYPE.TYPE_ID.as("request_type_id"), REQUEST_TYPE.NAME.as("request_type_name"))
+        .from(REQUEST_TYPE)
+        .fetchInto(RequestTypeDto.class);
+  }
+
+  @Override
+  public List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            REQUEST_NAME.TYPE_ID.as("request_name_id"), REQUEST_NAME.NAME.as("request_name_name"))
+        .from(REQUEST_NAME)
+        .where(REQUEST_NAME.REQUEST_TYPE_ID.eq(requestTypeID))
+        .fetchInto(RequestNameDto.class);
   }
 }
