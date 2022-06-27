@@ -12,7 +12,7 @@ public class EmployeeDetailResponse {
   private String full_name;
   private String employee_id;
   private String company_email;
-  private LocalDate seniority;
+  private String seniority;
   private LocalDate start_date;
   private String working_status;
   private String contract_url;
