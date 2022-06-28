@@ -1,6 +1,10 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import com.csproject.hrm.common.enums.ETax;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -16,12 +20,9 @@ public class Tax {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
-  @JoinColumn(name = "employee_id")
-  private Employee employee;
-
+  @Enumerated(value = EnumType.STRING)
   @Column(name = "tax_name")
-  private String name;
+  private ETax tax;
 
   @Column(name = "percent")
   private String percent;

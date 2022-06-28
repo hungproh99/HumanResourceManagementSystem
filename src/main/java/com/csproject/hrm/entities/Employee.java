@@ -110,4 +110,10 @@ public class Employee {
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<ApplicationsRequest> applicationsRequest;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<Tax> taxList;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<Insurance> insuranceList;
 }

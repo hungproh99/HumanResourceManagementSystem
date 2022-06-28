@@ -23,14 +23,14 @@ public class Salary {
   private Long id;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingContract.class)
-  @JoinColumn(name = "working_information_id")
+  @JoinColumn(name = "working_contract_id")
   private WorkingContract workingContract;
+
+  @Column(name = "base_salary")
+  private BigDecimal baseSalary;
 
   @Column(name = "final_salary")
   private BigDecimal finalSalary;
-
-  @Column(name = "subsidize")
-  private BigDecimal subsidize;
 
   @Column(name = "start_date")
   private LocalDate startDate;

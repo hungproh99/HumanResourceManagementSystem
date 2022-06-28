@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,9 +38,6 @@ public class WorkingContract {
 
   @Column(name = "end_date")
   private LocalDate endDate;
-
-  @Column(name = "base_salary")
-  private BigDecimal baseSalary;
 
   @Column(name = "contract_url")
   private String contractUrl;

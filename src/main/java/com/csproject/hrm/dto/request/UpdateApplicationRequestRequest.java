@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class UpdateApplicationRequestRequest {
   private Long applicationRequestId;
   private String approverId;
-  private Long requestStatus;
+  private String requestStatus;
 }

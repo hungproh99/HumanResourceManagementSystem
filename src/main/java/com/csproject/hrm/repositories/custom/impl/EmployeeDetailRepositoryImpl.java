@@ -167,20 +167,20 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .insertInto(
             INSURANCE,
             INSURANCE.INSURANCE_ID,
-            INSURANCE.EMPLOYEE_ID,
+//            INSURANCE.EMPLOYEE_ID,
             INSURANCE.ADDRESS,
             INSURANCE.INSURANCE_NAME,
             INSURANCE.PERCENT,
             INSURANCE.DESCRIPTION)
         .values(
             taxAndInsurance.getInsuranceId(),
-            taxAndInsurance.getEmployeeId(),
+//            taxAndInsurance.getEmployeeId(),
             taxAndInsurance.getInsuranceAddress(),
             taxAndInsurance.getInsuranceName(),
             taxAndInsurance.getInsurancePercent(),
             taxAndInsurance.getInsuranceDescription())
         .onDuplicateKeyUpdate()
-        .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
+//        .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
         .set(INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
         .set(INSURANCE.INSURANCE_NAME, taxAndInsurance.getInsuranceName())
         .set(INSURANCE.PERCENT, taxAndInsurance.getInsurancePercent())
@@ -408,10 +408,10 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 INSURANCE.INSURANCE_NAME,
                 INSURANCE.ADDRESS)
             .from(EMPLOYEE)
-            .leftJoin(TAX)
-            .on(TAX.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(INSURANCE)
-            .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+//            .leftJoin(TAX)
+//            .on(TAX.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+//            .leftJoin(INSURANCE)
+//            .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(TaxAndInsuranceResponse.class);
   }

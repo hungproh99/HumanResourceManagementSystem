@@ -240,6 +240,27 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   @Override
   public List<String> getListManagerByName(String name) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    if (name.contains("-")) {
+      String split[] = name.split("-");
+      return dslContext
+          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+          .from(EMPLOYEE)
+          .leftJoin(ROLE_TYPE)
+          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+          .where(
+              EMPLOYEE
+                  .FULL_NAME
+                  .upper()
+                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
+          .and(
+              EMPLOYEE
+                  .EMPLOYEE_ID
+                  .upper()
+                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
+          .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+          .fetchInto(String.class);
+    }
     return dslContext
         .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
         .from(EMPLOYEE)

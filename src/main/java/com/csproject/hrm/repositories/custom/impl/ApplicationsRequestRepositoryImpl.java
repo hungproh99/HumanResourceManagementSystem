@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.common.enums.ERequestStatus;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -13,6 +14,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -221,7 +224,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     dslContext
         .update(APPLICATIONS_REQUEST)
         .set(
-            APPLICATIONS_REQUEST.REQUEST_STATUS, updateApplicationRequestRequest.getRequestStatus())
+            APPLICATIONS_REQUEST.REQUEST_STATUS,
+            ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))
         .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
         .set(APPLICATIONS_REQUEST.APPROVER, updateApplicationRequestRequest.getApproverId())
         .where(
@@ -338,6 +342,18 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .orderBy(orderByList);
     return dslContext.fetchCount(query);
   }
+
+  @Override
+  public void updateBonusSalaryByApplicationRequest(String employeeId, BigDecimal bonus) {
+
+  }
+
+  @Override
+  public void updateDayWorkByApplicationRequest(
+      String employeeId, LocalDate startDate, LocalDate endDate) {}
+
+  @Override
+  public void updateTaxEnrollmentByApplicationRequest(String employeeId, Long taxType) {}
 
   private List<Condition> getListConditionApplicationRequest(QueryParam queryParam) {
     final List<Condition> conditions = new ArrayList<>();

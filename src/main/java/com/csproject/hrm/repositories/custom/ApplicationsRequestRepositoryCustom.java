@@ -6,6 +6,8 @@ import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,4 +31,10 @@ public interface ApplicationsRequestRepositoryCustom {
   int countListApplicationRequestReceive(QueryParam queryParam, String employeeId);
 
   int countListApplicationRequestSend(QueryParam queryParam, String employeeId);
+
+  void updateBonusSalaryByApplicationRequest(String employeeId, BigDecimal bonus);
+
+  void updateDayWorkByApplicationRequest(String employeeId, LocalDate startDate, LocalDate endDate);
+
+  void updateTaxEnrollmentByApplicationRequest(String employeeId, Long taxType);
 }
