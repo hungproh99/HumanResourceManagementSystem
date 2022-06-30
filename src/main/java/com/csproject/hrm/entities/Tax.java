@@ -29,4 +29,7 @@ public class Tax {
 
   @Column(name = "description")
   private String description;
+
+  @OneToOne(mappedBy = "tax", fetch = FetchType.LAZY)
+  private EmployeeTax employeeTax;
 }

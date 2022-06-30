@@ -32,4 +32,7 @@ public class Insurance {
 
   @Column(name = "description")
   private String description;
+
+  @OneToOne(mappedBy = "insurance", fetch = FetchType.LAZY)
+  private EmployeeInsurance employeeInsurance;
 }

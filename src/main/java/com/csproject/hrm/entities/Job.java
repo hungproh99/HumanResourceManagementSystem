@@ -29,7 +29,7 @@ public class Job {
   private String description;
 
   @OneToOne(mappedBy = "job", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  private WorkingPlace workingPlace;
 
   @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
   private List<GradeType> grades;

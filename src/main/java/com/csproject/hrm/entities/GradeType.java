@@ -28,7 +28,7 @@ public class GradeType {
   private String description;
 
   @OneToOne(mappedBy = "grade", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  private WorkingPlace workingPlace;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Job.class)
   @JoinColumn(name = "job_id")

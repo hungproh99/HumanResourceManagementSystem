@@ -48,20 +48,4 @@ public class WorkingContract {
   @Column(name = "contract_status")
   @Type(type = "boolean")
   private Boolean contractStatus;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "area_id")
-  private Area area;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "office_id")
-  private Office office;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "job_id")
-  private Job job;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "grade_id")
-  private GradeType grade;
 }

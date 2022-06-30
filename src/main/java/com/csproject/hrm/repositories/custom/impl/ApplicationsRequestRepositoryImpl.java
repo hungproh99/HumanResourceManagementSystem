@@ -23,11 +23,17 @@ import java.util.stream.Collectors;
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
+import static org.jooq.codegen.maven.example.tables.BonusSalary.BONUS_SALARY;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.EmployeeTax.EMPLOYEE_TAX;
 import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
+import static org.jooq.codegen.maven.example.tables.ListTimekeepingStatus.LIST_TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
+import static org.jooq.codegen.maven.example.tables.Salary.SALARY;
+import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
+import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.concat;
 import static org.jooq.impl.DSL.when;
 
@@ -344,16 +350,132 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
-  public void updateBonusSalaryByApplicationRequest(String employeeId, BigDecimal bonus) {
-
+  public void updateBonusSalaryByApplicationRequest(
+      String employeeId, String description, BigDecimal bonus) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    TableLike<?> contractTable =
+        dslContext
+            .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
+            .from(WORKING_CONTRACT)
+            .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue());
+    Long salaryId =
+        dslContext
+            .select(SALARY.SALARY_ID)
+            .from(SALARY)
+            .where(
+                SALARY.WORKING_CONTRACT_ID.eq(
+                    contractTable.field(WORKING_CONTRACT.WORKING_CONTRACT_ID)))
+            .and(SALARY.SALARY_STATUS.isTrue())
+            .fetchOneInto(Long.class);
+    final var query =
+        dslContext
+            .insertInto(
+                BONUS_SALARY, BONUS_SALARY.DESCRIPTION, BONUS_SALARY.VALUE, BONUS_SALARY.SALARY_ID)
+            .values(description, bonus, salaryId)
+            .execute();
   }
 
   @Override
   public void updateDayWorkByApplicationRequest(
-      String employeeId, LocalDate startDate, LocalDate endDate) {}
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      long oldTimekeepingStatus,
+      long newTimekeepingStatus) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Long> timekeepingIdList =
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .fetchInto(Long.class);
+
+    dslContext.transaction(
+        configuration -> {
+          timekeepingIdList.forEach(
+              timekeepingId -> {
+                queries.add(
+                    dslContext
+                        .update(LIST_TIMEKEEPING_STATUS)
+                        .set(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID, newTimekeepingStatus)
+                        .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
+                        .and(
+                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
+                                oldTimekeepingStatus)));
+              });
+          DSL.using(configuration).batch(queries).execute();
+        });
+  }
 
   @Override
-  public void updateTaxEnrollmentByApplicationRequest(String employeeId, Long taxType) {}
+  public void insertDayWorkByApplicationRequest(
+      String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Long> timekeepingIdList =
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .fetchInto(Long.class);
+
+    dslContext.transaction(
+        configuration -> {
+          timekeepingIdList.forEach(
+              timekeepingId -> {
+                queries.add(
+                    dslContext
+                        .insertInto(
+                            LIST_TIMEKEEPING_STATUS,
+                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
+                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID)
+                        .values(timekeepingId, timekeepingStatus));
+              });
+          DSL.using(configuration).batch(queries).execute();
+        });
+  }
+
+  @Override
+  public void updateTaxEnrollmentByApplicationRequest(
+      String employeeId, Long taxType, boolean status) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final boolean isExist =
+        dslContext.fetchExists(
+            dslContext
+                .select(EMPLOYEE_TAX.TAX_ID)
+                .from(EMPLOYEE_TAX)
+                .where(EMPLOYEE_TAX.EMPLOYEE_ID.eq(employeeId))
+                .and(EMPLOYEE_TAX.TAX_ID.eq(taxType)));
+    if (isExist) {
+      final var query =
+          dslContext
+              .update(EMPLOYEE_TAX)
+              .set(EMPLOYEE_TAX.TAX_STATUS, status)
+              .where(EMPLOYEE_TAX.EMPLOYEE_ID.eq(employeeId))
+              .and(EMPLOYEE_TAX.TAX_ID.eq(taxType));
+    } else {
+      final var query =
+          dslContext
+              .insertInto(
+                  EMPLOYEE_TAX,
+                  EMPLOYEE_TAX.EMPLOYEE_ID,
+                  EMPLOYEE_TAX.TAX_ID,
+                  EMPLOYEE_TAX.TAX_STATUS)
+              .values(employeeId, taxType, status)
+              .execute();
+    }
+  }
+
+  @Override
+  public void insertAdvancePaymentByApplicationRequest(
+      String employeeId, LocalDate date, BigDecimal value) {}
+
+  @Override
+  public void insertUpdateCompanyAssetsByApplicationRequest(String employeeId, LocalDate date) {}
 
   private List<Condition> getListConditionApplicationRequest(QueryParam queryParam) {
     final List<Condition> conditions = new ArrayList<>();

@@ -21,8 +21,14 @@ public class RequestName {
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "name")
+  @Column(name = "request_code")
   private ERequestName eRequestName;
+
+  @Column(name = "request_name")
+  private String requestName;
+
+  @Column(name = "description")
+  private String description;
 
   @OneToOne(mappedBy = "requestName", fetch = FetchType.LAZY)
   private ApplicationsRequest applicationsRequest;

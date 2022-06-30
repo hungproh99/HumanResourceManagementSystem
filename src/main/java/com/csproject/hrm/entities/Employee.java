@@ -111,9 +111,12 @@ public class Employee {
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<ApplicationsRequest> applicationsRequest;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  private List<Tax> taxList;
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<EmployeeTax> taxList;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  private List<Insurance> insuranceList;
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<EmployeeInsurance> insuranceList;
+
+  @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+  private Area area;
 }

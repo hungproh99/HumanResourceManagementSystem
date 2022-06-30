@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -25,6 +26,10 @@ public class Salary {
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingContract.class)
   @JoinColumn(name = "working_contract_id")
   private WorkingContract workingContract;
+
+  @Column(name = "salary_status")
+  @Type(type = "boolean")
+  private Boolean salaryStatus;
 
   @Column(name = "base_salary")
   private BigDecimal baseSalary;

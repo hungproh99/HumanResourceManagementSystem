@@ -25,5 +25,9 @@ public class Area {
   private EArea eArea;
 
   @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  private WorkingPlace workingPlace;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "manager_id")
+  private Employee employee;
 }

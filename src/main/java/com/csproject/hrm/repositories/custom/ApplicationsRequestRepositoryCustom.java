@@ -32,9 +32,24 @@ public interface ApplicationsRequestRepositoryCustom {
 
   int countListApplicationRequestSend(QueryParam queryParam, String employeeId);
 
-  void updateBonusSalaryByApplicationRequest(String employeeId, BigDecimal bonus);
+  void updateBonusSalaryByApplicationRequest(
+      String employeeId, String description, BigDecimal bonus);
 
-  void updateDayWorkByApplicationRequest(String employeeId, LocalDate startDate, LocalDate endDate);
+  void updateDayWorkByApplicationRequest(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      long oldTimekeepingStatus,
+      long newTimekeepingStatus);
 
-  void updateTaxEnrollmentByApplicationRequest(String employeeId, Long taxType);
+  void insertDayWorkByApplicationRequest(
+      String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus);
+
+  void updateTaxEnrollmentByApplicationRequest(String employeeId, Long taxType, boolean status);
+
+
+  void insertAdvancePaymentByApplicationRequest(
+      String employeeId, LocalDate date, BigDecimal value);
+
+  void insertUpdateCompanyAssetsByApplicationRequest(String employeeId, LocalDate date);
 }
