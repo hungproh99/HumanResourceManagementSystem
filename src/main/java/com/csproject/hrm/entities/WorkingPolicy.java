@@ -6,19 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "policy")
-public class Policy {
+@Table(name = "working_policy")
+public class WorkingPolicy {
   @Id
-  @Column(name = "policy_id")
+  @Column(name = "working_policy_id")
   private String id;
 
-  @OneToMany(mappedBy = "policy", fetch = FetchType.LAZY)
-  private List<PolicyType> policyTypes;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "working_policy_type_id")
+  private WorkingPolicyType workingPolicyType;
 }
