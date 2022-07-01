@@ -329,44 +329,46 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-    return dslContext
-        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
-        .from(EMPLOYEE)
-        .leftJoin(WORKING_CONTRACT)
-        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-        .leftJoin(JOB)
-        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-        .leftJoin(GRADE_TYPE)
-        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-        .leftJoin(AREA)
-        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-        .leftJoin(OFFICE)
-        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-        .where(conditions)
-        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
+//    return dslContext
+//        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+//        .from(EMPLOYEE)
+//        .leftJoin(WORKING_CONTRACT)
+//        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+//        .leftJoin(JOB)
+//        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+//        .leftJoin(GRADE_TYPE)
+//        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+//        .leftJoin(AREA)
+//        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+//        .leftJoin(OFFICE)
+//        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
+//        .where(conditions)
+//        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
+      return null;
   }
 
   private Select<?> getAllEmployeeForTimekeeping(
       List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-    return dslContext
-        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
-        .from(EMPLOYEE)
-        .leftJoin(WORKING_CONTRACT)
-        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-        .leftJoin(JOB)
-        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-        .leftJoin(GRADE_TYPE)
-        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-        .leftJoin(AREA)
-        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-        .leftJoin(OFFICE)
-        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-        .where(conditions)
-        .orderBy(sortFields)
-        .limit(pagination.limit)
-        .offset(pagination.offset);
+//    return dslContext
+//        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+//        .from(EMPLOYEE)
+//        .leftJoin(WORKING_CONTRACT)
+//        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+//        .leftJoin(JOB)
+//        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
+//        .leftJoin(GRADE_TYPE)
+//        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+//        .leftJoin(AREA)
+//        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+//        .leftJoin(OFFICE)
+//        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
+//        .where(conditions)
+//        .orderBy(sortFields)
+//        .limit(pagination.limit)
+//        .offset(pagination.offset);
+      return null;
   }
 
   private Select<?> getAllTimekeepingByEmployeeId(

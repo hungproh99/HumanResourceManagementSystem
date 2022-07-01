@@ -24,7 +24,7 @@ public class RequestName {
   @Column(name = "request_code")
   private ERequestName eRequestName;
 
-  @Column(name = "request_name")
+  @Column(name = "name")
   private String requestName;
 
   @Column(name = "description")
