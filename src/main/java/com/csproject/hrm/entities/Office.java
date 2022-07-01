@@ -29,5 +29,5 @@ public class Office {
   private String address;
 
   @OneToOne(mappedBy = "office", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  private WorkingPlace workingPlace;
 }

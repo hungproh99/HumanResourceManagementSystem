@@ -107,6 +107,11 @@ public class Constants {
   public static final String IS_BOOKMARK_PARAM = "isBookmark";
   public static final String CHANGE_STATUS_TIME = "change_status_time";
   public static final String UNAUTHORIZED_ERROR = "Unauthorized error";
-
   public static final String REQUEST_STATUS_PARAM = "requestStatus";
+  public static final String TAX_INVALID = "Invalid Tax";
+  public static final String INSURANCE_INVALID = "Invalid Insurance";
+  public static final String WORKING_POLICY_TYPE_INVALID = "Invalid Working Policy Type";
+  public static final String COMPENSATION_BENEFIT_POLICY_TYPE_INVALID =
+      "Invalid Compensation Benefit Policy Type";
+  public static final String LEAVE_POLICY_TYPE_INVALID = "Invalid Leave Policy Type";
 }

@@ -14,6 +14,5 @@ public class TaxAndInsuranceRequest {
   private String insuranceName;
   private String insuranceAddress;
   private String insurancePercent;
-  private String insuranceTitle;
   private String insuranceDescription;
 }

@@ -1,6 +1,5 @@
 package com.csproject.hrm.entities;
 
-import com.csproject.hrm.common.enums.EArea;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,21 +12,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "area")
-public class Area {
+@Table(name = "list_timekeeping_status")
+public class ListTimekeepingStatus {
   @Id
-  @Column(name = "area_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "list_id")
   private Long id;
 
-  @Enumerated(value = EnumType.STRING)
-  @Column(name = "name")
-  private EArea eArea;
-
-  @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Timekeeping.class)
+  @JoinColumn(name = "timekeeping_id")
+  private Timekeeping timekeeping;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "manager_id")
-  private Employee employee;
+  @JoinColumn(name = "timekeeping_status_id")
+  private TimekeepingStatus timekeepingStatus;
 }

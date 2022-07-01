@@ -1,6 +1,5 @@
 package com.csproject.hrm.entities;
 
-import com.csproject.hrm.common.enums.EGradeType;
 import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +25,5 @@ public class TimekeepingStatus {
   private ETimekeepingStatus eTimekeepingStatus;
 
   @OneToOne(mappedBy = "timekeepingStatus", fetch = FetchType.LAZY)
-  private Timekeeping timekeeping;
+  private ListTimekeepingStatus listTimekeepingStatus;
 }

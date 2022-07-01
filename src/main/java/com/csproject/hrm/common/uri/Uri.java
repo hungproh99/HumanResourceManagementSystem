@@ -40,4 +40,5 @@ public class Uri {
   public static final String URI_INSERT_MULTI_EMPLOYEE_BY_EXCEL = "/import_excel_employee";
   public static final String URI_GET_LIST_APPLICATION_REQUEST_SEND = "/list_all_application_request_send";
   public static final String URI_GET_LIST_APPLICATION_REQUEST_RECEIVE = "/list_all_application_request_receive";
+  public static final String URI_UPDATE_STATUS_APPLICATION_QUEST = "/update_status_application_request";
 }
