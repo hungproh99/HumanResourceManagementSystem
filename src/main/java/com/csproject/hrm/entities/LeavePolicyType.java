@@ -13,23 +13,23 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "working_policy_type")
-public class WorkingPolicyType {
+@Table(name = "leave_policy_type")
+public class LeavePolicyType {
   @Id
-  @Column(name = "working_policy_type_id")
+  @Column(name = "leave_policy_type_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "working_policy_type")
+  @Column(name = "leave_policy_type")
   private EWorkingPolicyType workingPolicyType;
 
-  @Column(name = "working_policy_name")
+  @Column(name = "leave_policy_name")
   private String workingPolicyName;
 
   @Column(name = "description")
   private String description;
 
-  @OneToOne(mappedBy = "workingPolicyType", fetch = FetchType.LAZY)
-  private WorkingPolicy workingPolicy;
+  @OneToOne(mappedBy = "leavePolicyType", fetch = FetchType.LAZY)
+  private LeavePolicy leavePolicy;
 }

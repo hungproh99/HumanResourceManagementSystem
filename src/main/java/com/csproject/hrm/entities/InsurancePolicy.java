@@ -14,10 +14,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "working_policy")
-public class WorkingPolicy {
+@Table(name = "insurance_policy")
+public class InsurancePolicy {
   @Id
-  @Column(name = "working_policy_id")
+  @Column(name = "insurance_policy_id")
   private String id;
 
   @Column(name = "created_date")
@@ -26,11 +26,11 @@ public class WorkingPolicy {
   @Column(name = "effective_date")
   private LocalDate endDate;
 
-  @Column(name = "working_policy_status")
+  @Column(name = "insurance_policy_status")
   @Type(type = "boolean")
-  private Boolean workingPolicyStatus;
+  private Boolean insurancePolicyStatus;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "working_policy_type_id")
-  private WorkingPolicyType workingPolicyType;
+  @JoinColumn(name = "insurance_policy_type_id")
+  private InsurancePolicyType insurancePolicyType;
 }

@@ -13,23 +13,29 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "tax")
-public class Tax {
+@Table(name = "tax_policy_type")
+public class TaxPolicyType {
   @Id
-  @Column(name = "tax_id")
+  @Column(name = "tax_policy_type_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "tax_name")
-  private ETax tax;
+  @Column(name = "tax_policy_type")
+  private ETax taxPolicyType;
 
-  @Column(name = "percent")
-  private String percent;
+  @Column(name = "tax_policy_name")
+  private String taxPolicyName;
+
+  @Column(name = "percentage")
+  private int percentage;
 
   @Column(name = "description")
   private String description;
 
-  @OneToOne(mappedBy = "tax", fetch = FetchType.LAZY)
+  @OneToOne(mappedBy = "taxPolicyType", fetch = FetchType.LAZY)
+  private TaxPolicy taxPolicy;
+
+  @OneToOne(mappedBy = "taxPolicyType", fetch = FetchType.LAZY)
   private EmployeeTax employeeTax;
 }

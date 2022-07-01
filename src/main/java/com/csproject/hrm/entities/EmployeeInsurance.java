@@ -25,8 +25,8 @@ public class EmployeeInsurance {
   private Employee employee;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "insurance_id")
-  private Insurance insurance;
+  @JoinColumn(name = "insurance_type_id")
+  private InsurancePolicyType insurancePolicyType;
 
   @Column(name = "insurance_status")
   @Type(type = "boolean")
