@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -27,8 +28,8 @@ public class GradeType {
   @Column(name = "description")
   private String description;
 
-  @OneToOne(mappedBy = "grade", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  @OneToMany(mappedBy = "grade", fetch = FetchType.LAZY)
+  private List<WorkingPlace> workingPlace;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Job.class)
   @JoinColumn(name = "job_id")

@@ -1,7 +1,6 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.HrmRequest;
-import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
@@ -147,15 +146,6 @@ public class HrmController {
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getListManager(@RequestParam String name) {
     return ResponseEntity.ok(humanManagementService.getListManagerByName(name));
-  }
-
-  @PutMapping(URI_UPDATE_EMPLOYEE)
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> updateEmployee(
-      @RequestBody UpdateHrmRequest updateHrmRequest,
-      @PathVariable("employee_id") String employeeId) {
-    humanManagementService.updateEmployeeById(updateHrmRequest, employeeId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_EMPLOYEE)

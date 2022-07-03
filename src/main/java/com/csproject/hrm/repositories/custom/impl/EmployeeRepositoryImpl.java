@@ -5,7 +5,6 @@ import com.csproject.hrm.dto.dto.EmployeeTypeDto;
 import com.csproject.hrm.dto.dto.RoleDto;
 import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
-import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -25,7 +24,9 @@ import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
+import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.impl.DSL.*;
 
 @AllArgsConstructor
@@ -66,8 +67,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext.transaction(
         configuration -> {
-          queries.add(
-              insertEmployeeRecord(
+          insertEmployeeRecord(
                   configuration,
                   hrmPojo.getEmployeeId(),
                   hrmPojo.getCompanyEmail(),
@@ -81,16 +81,21 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getWorkingType(),
                   hrmPojo.getManagerId(),
                   hrmPojo.getEmployeeType(),
-                  hrmPojo.getPersonalEmail()));
+                  hrmPojo.getPersonalEmail())
+              .execute();
           queries.add(
-              insertWorkingContractRecord(
+              insertWorkingContractAndWorkingPlaceRecord(
                   configuration,
                   hrmPojo.getEmployeeId(),
                   hrmPojo.getCompanyName(),
+                  hrmPojo.isContractStatus(),
+                  hrmPojo.isPlaceStatus(),
                   hrmPojo.getArea(),
                   hrmPojo.getPosition(),
                   hrmPojo.getOffice(),
-                  hrmPojo.getGrade()));
+                  hrmPojo.getGrade(),
+                  hrmPojo.getStartDate(),
+                  hrmPojo.getEndDate()));
           DSL.using(configuration).batch(queries).execute();
         });
   }
@@ -103,8 +108,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         configuration -> {
           hrmPojos.forEach(
               hrmPojo -> {
-                queries.add(
-                    insertEmployeeRecord(
+                insertEmployeeRecord(
                         configuration,
                         hrmPojo.getEmployeeId(),
                         hrmPojo.getCompanyEmail(),
@@ -118,16 +122,21 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getWorkingType(),
                         hrmPojo.getManagerId(),
                         hrmPojo.getEmployeeType(),
-                        hrmPojo.getPersonalEmail()));
+                        hrmPojo.getPersonalEmail())
+                    .execute();
                 queries.add(
-                    insertWorkingContractRecord(
+                    insertWorkingContractAndWorkingPlaceRecord(
                         configuration,
                         hrmPojo.getEmployeeId(),
                         hrmPojo.getCompanyName(),
+                        hrmPojo.isContractStatus(),
+                        hrmPojo.isPlaceStatus(),
                         hrmPojo.getArea(),
                         hrmPojo.getPosition(),
                         hrmPojo.getOffice(),
-                        hrmPojo.getGrade()));
+                        hrmPojo.getGrade(),
+                        hrmPojo.getStartDate(),
+                        hrmPojo.getEndDate()));
               });
 
           DSL.using(configuration).batch(queries).execute();
@@ -190,34 +199,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId) {
-    List<Query> queries = new ArrayList<>();
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    dslContext.transaction(
-        configuration -> {
-          queries.add(
-              updateEmployeeById(
-                  configuration,
-                  employeeId,
-                  updateHrmRequest.getFullName(),
-                  updateHrmRequest.isWorkingStatus(),
-                  updateHrmRequest.getPhone(),
-                  updateHrmRequest.getGender(),
-                  updateHrmRequest.getBirthDate(),
-                  updateHrmRequest.getWorkingType()));
-          queries.add(
-              updateWorkingContractById(
-                  configuration,
-                  employeeId,
-                  updateHrmRequest.getAreaId(),
-                  updateHrmRequest.getJobId(),
-                  updateHrmRequest.getOfficeId(),
-                  updateHrmRequest.getStartDate()));
-          DSL.using(configuration).batch(queries).execute();
-        });
-  }
-
-  @Override
   public List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
     List<OrderField<?>> sortFields =
@@ -228,7 +209,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     }
     conditions.add(condition);
 
-    return findEmployeeByListIdByCondition(conditions, sortFields, queryParam.pagination)
+    return findAllEmployee(conditions, sortFields, queryParam.pagination)
         .fetchInto(HrmResponse.class);
   }
 
@@ -273,92 +254,94 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 
   public Select<?> countAllEmployee(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    //    return dslContext
-    //        .select(
-    //            EMPLOYEE.EMPLOYEE_ID,
-    //            EMPLOYEE.FULL_NAME,
-    //            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-    //            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
-    //                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
-    //                .as(WORKING_STATUS),
-    //            EMPLOYEE.PHONE_NUMBER.as(PHONE),
-    //            EMPLOYEE.GENDER.as(GENDER),
-    //            EMPLOYEE.BIRTH_DATE,
-    //            GRADE_TYPE.NAME.as(GRADE),
-    //            OFFICE.NAME.as(OFFICE_NAME),
-    //            AREA.NAME.as(AREA_NAME),
-    //            year(currentDate())
-    //                .minus(year(WORKING_CONTRACT.START_DATE))
-    //                .concat(YEAR)
-    //                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
-    //                .concat(MONTH)
-    //                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
-    //                .concat(DAY)
-    //                .as(SENIORITY),
-    //            JOB.POSITION.as(POSITION_NAME),
-    //            WORKING_TYPE.NAME.as(WORKING_NAME))
-    //        .from(EMPLOYEE)
-    //        .leftJoin(WORKING_CONTRACT)
-    //        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-    //        .leftJoin(AREA)
-    //        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-    //        .leftJoin(OFFICE)
-    //        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-    //        .leftJoin(JOB)
-    //        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-    //        .leftJoin(GRADE_TYPE)
-    //        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-    //        .leftJoin(WORKING_TYPE)
-    //        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-    //        .where(conditions);
-    return null;
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
+                .as(WORKING_STATUS),
+            EMPLOYEE.PHONE_NUMBER.as(PHONE),
+            EMPLOYEE.GENDER.as(GENDER),
+            EMPLOYEE.BIRTH_DATE,
+            GRADE_TYPE.NAME.as(GRADE),
+            OFFICE.NAME.as(OFFICE_NAME),
+            AREA.NAME.as(AREA_NAME),
+            year(currentDate())
+                .minus(year(WORKING_CONTRACT.START_DATE))
+                .concat(YEAR)
+                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(MONTH)
+                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(DAY)
+                .as(SENIORITY),
+            JOB.POSITION.as(POSITION_NAME),
+            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions);
   }
 
   public Select<?> findAllEmployee(
       List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    //    return dslContext
-    //        .select(
-    //            EMPLOYEE.EMPLOYEE_ID,
-    //            EMPLOYEE.FULL_NAME,
-    //            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-    //            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
-    //                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
-    //                .as(WORKING_STATUS),
-    //            EMPLOYEE.PHONE_NUMBER.as(PHONE),
-    //            EMPLOYEE.GENDER.as(GENDER),
-    //            EMPLOYEE.BIRTH_DATE,
-    //            GRADE_TYPE.NAME.as(GRADE),
-    //            OFFICE.NAME.as(OFFICE_NAME),
-    //            AREA.NAME.as(AREA_NAME),
-    //            year(currentDate())
-    //                .minus(year(WORKING_CONTRACT.START_DATE))
-    //                .concat(YEAR)
-    //                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
-    //                .concat(MONTH)
-    //                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
-    //                .concat(DAY)
-    //                .as(SENIORITY),
-    //            JOB.POSITION.as(POSITION_NAME),
-    //            WORKING_TYPE.NAME.as(WORKING_NAME))
-    //        .from(EMPLOYEE)
-    //        .leftJoin(WORKING_CONTRACT)
-    //        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-    //        .leftJoin(AREA)
-    //        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-    //        .leftJoin(OFFICE)
-    //        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-    //        .leftJoin(JOB)
-    //        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-    //        .leftJoin(GRADE_TYPE)
-    //        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-    //        .leftJoin(WORKING_TYPE)
-    //        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-    //        .where(conditions)
-    //        .orderBy(sortFields)
-    //        .limit(pagination.limit)
-    //        .offset(pagination.offset);
-    return null;
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
+                .as(WORKING_STATUS),
+            EMPLOYEE.PHONE_NUMBER.as(PHONE),
+            EMPLOYEE.GENDER.as(GENDER),
+            EMPLOYEE.BIRTH_DATE,
+            GRADE_TYPE.NAME.as(GRADE),
+            OFFICE.NAME.as(OFFICE_NAME),
+            AREA.NAME.as(AREA_NAME),
+            year(currentDate())
+                .minus(year(WORKING_CONTRACT.START_DATE))
+                .concat(YEAR)
+                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(MONTH)
+                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(DAY)
+                .as(SENIORITY),
+            JOB.POSITION.as(POSITION_NAME),
+            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions)
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
   }
 
   private Insert<?> insertEmployeeRecord(
@@ -408,109 +391,47 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             personalEmail);
   }
 
-  private Insert<?> insertWorkingContractRecord(
+  private Insert<?> insertWorkingContractAndWorkingPlaceRecord(
       Configuration config,
       String employeeId,
       String companyName,
+      boolean contractStatus,
+      boolean placeStatus,
       Long area,
       Long job,
       Long office,
-      Long grade) {
+      Long grade,
+      LocalDate startDate,
+      LocalDate endDate) {
 
-    //    return DSL.using(config)
-    //        .insertInto(
-    //            WORKING_CONTRACT,
-    //            WORKING_CONTRACT.EMPLOYEE_ID,
-    //            WORKING_CONTRACT.COMPANY_NAME,
-    //            WORKING_CONTRACT.AREA_ID,
-    //            WORKING_CONTRACT.OFFICE_ID,
-    //            WORKING_CONTRACT.JOB_ID,
-    //            WORKING_CONTRACT.GRADE_ID)
-    //        .values(employeeId, companyName, area, office, job, grade);
-    return null;
-  }
+    final var query =
+        DSL.using(config)
+            .insertInto(
+                WORKING_CONTRACT,
+                WORKING_CONTRACT.EMPLOYEE_ID,
+                WORKING_CONTRACT.COMPANY_NAME,
+                WORKING_CONTRACT.CONTRACT_STATUS,
+                WORKING_CONTRACT.START_DATE,
+                WORKING_CONTRACT.END_DATE)
+            .values(employeeId, companyName, contractStatus, startDate, endDate)
+            .returningResult(WORKING_CONTRACT.WORKING_CONTRACT_ID)
+            .fetchOne();
 
-  private Update<?> updateEmployeeById(
-      Configuration config,
-      String employeeId,
-      String fullName,
-      boolean workStatus,
-      String phoneNumber,
-      String gender,
-      LocalDate birthDate,
-      Long workingType) {
     return DSL.using(config)
-        .update(EMPLOYEE)
-        .set(EMPLOYEE.FULL_NAME, fullName)
-        .set(EMPLOYEE.WORKING_STATUS, workStatus)
-        .set(EMPLOYEE.PHONE_NUMBER, phoneNumber)
-        .set(EMPLOYEE.GENDER, gender)
-        .set(EMPLOYEE.BIRTH_DATE, birthDate)
-        .set(EMPLOYEE.WORKING_TYPE_ID, workingType)
-        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
-  }
-
-  private Update<?> updateWorkingContractById(
-      Configuration config,
-      String employeeId,
-      Long areaId,
-      Long jobId,
-      Long officeId,
-      LocalDate startDate) {
-    //    return DSL.using(config)
-    //        .update(WORKING_CONTRACT)
-    //        .set(WORKING_CONTRACT.AREA_ID, areaId)
-    //        .set(WORKING_CONTRACT.JOB_ID, jobId)
-    //        .set(WORKING_CONTRACT.OFFICE_ID, officeId)
-    //        .set(WORKING_CONTRACT.START_DATE, startDate)
-    //        .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId));
-    return null;
-  }
-
-  private Select<?> findEmployeeByListIdByCondition(
-      List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    //    return dslContext
-    //        .select(
-    //            EMPLOYEE.EMPLOYEE_ID,
-    //            EMPLOYEE.FULL_NAME,
-    //            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-    //            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
-    //                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactive"))
-    //                .as(WORKING_STATUS),
-    //            EMPLOYEE.PHONE_NUMBER.as(PHONE),
-    //            EMPLOYEE.GENDER.as(GENDER),
-    //            EMPLOYEE.BIRTH_DATE,
-    //            GRADE_TYPE.NAME.as(GRADE),
-    //            OFFICE.NAME.as(OFFICE_NAME),
-    //            AREA.NAME.as(AREA_NAME),
-    //            year(currentDate())
-    //                .minus(year(WORKING_CONTRACT.START_DATE))
-    //                .concat(YEAR)
-    //                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
-    //                .concat(MONTH)
-    //                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
-    //                .concat(DAY)
-    //                .as(SENIORITY),
-    //            JOB.POSITION.as(POSITION_NAME),
-    //            WORKING_TYPE.NAME.as(WORKING_NAME))
-    //        .from(EMPLOYEE)
-    //        .leftJoin(WORKING_CONTRACT)
-    //        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-    //        .leftJoin(AREA)
-    //        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-    //        .leftJoin(OFFICE)
-    //        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-    //        .leftJoin(JOB)
-    //        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-    //        .leftJoin(GRADE_TYPE)
-    //        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-    //        .leftJoin(WORKING_TYPE)
-    //        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-    //        .where(conditions)
-    //        .orderBy(sortFields)
-    //        .limit(pagination.limit)
-    //        .offset(pagination.offset);
-    return null;
+        .insertInto(
+            WORKING_PLACE,
+            WORKING_PLACE.WORKING_PLACE_STATUS,
+            WORKING_PLACE.AREA_ID,
+            WORKING_PLACE.OFFICE_ID,
+            WORKING_PLACE.JOB_ID,
+            WORKING_PLACE.GRADE_ID,
+            WORKING_PLACE.WORKING_CONTRACT_ID)
+        .values(
+            placeStatus,
+            area,
+            office,
+            job,
+            grade,
+            query.getValue(WORKING_CONTRACT.WORKING_CONTRACT_ID));
   }
 }

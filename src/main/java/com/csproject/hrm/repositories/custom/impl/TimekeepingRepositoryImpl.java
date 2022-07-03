@@ -1,8 +1,13 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.TimekeepingRepositoryCustom;
@@ -18,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
+import static org.jooq.codegen.maven.example.tables.WorkingPlace.WORKING_PLACE;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.CheckinCheckout.CHECKIN_CHECKOUT;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
@@ -329,46 +335,48 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-//    return dslContext
-//        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
-//        .from(EMPLOYEE)
-//        .leftJoin(WORKING_CONTRACT)
-//        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-//        .leftJoin(JOB)
-//        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-//        .leftJoin(GRADE_TYPE)
-//        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-//        .leftJoin(AREA)
-//        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-//        .leftJoin(OFFICE)
-//        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-//        .where(conditions)
-//        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
-      return null;
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .where(conditions)
+        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
   }
 
   private Select<?> getAllEmployeeForTimekeeping(
       List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-//    return dslContext
-//        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
-//        .from(EMPLOYEE)
-//        .leftJoin(WORKING_CONTRACT)
-//        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-//        .leftJoin(JOB)
-//        .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-//        .leftJoin(GRADE_TYPE)
-//        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-//        .leftJoin(AREA)
-//        .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-//        .leftJoin(OFFICE)
-//        .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-//        .where(conditions)
-//        .orderBy(sortFields)
-//        .limit(pagination.limit)
-//        .offset(pagination.offset);
-      return null;
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .where(conditions)
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
   }
 
   private Select<?> getAllTimekeepingByEmployeeId(

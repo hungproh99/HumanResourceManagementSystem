@@ -1,13 +1,13 @@
 package com.csproject.hrm.entities;
 
 import com.csproject.hrm.common.enums.EOffice;
-import com.csproject.hrm.common.enums.ERequestType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +28,6 @@ public class Office {
   @Column(name = "address")
   private String address;
 
-  @OneToOne(mappedBy = "office", fetch = FetchType.LAZY)
-  private WorkingPlace workingPlace;
+  @OneToMany(mappedBy = "office", fetch = FetchType.LAZY)
+  private List<WorkingPlace> workingPlace;
 }

@@ -15,7 +15,6 @@ public class Uri {
   public static final String URI_LIST_JOB = "/list_job";
   public static final String URI_LIST_GRADE = "/list_grade/{job_id}";
   public static final String URI_LIST_ROLE_TYPE = "/list_role_type";
-  public static final String URI_UPDATE_EMPLOYEE = "/update_employee/{employee_id}";
   public static final String URI_DOWNLOAD_CSV_EMPLOYEE = "/download_csv_employee";
   public static final String URI_GET_LIST_MANAGER = "/list_manager";
   public static final String REQUEST_DETAIL_MAPPING = "/employee/detail";
@@ -38,7 +37,10 @@ public class Uri {
   public static final String URI_DOWNLOAD_EXCEL_EMPLOYEE = "/download_excel_employee";
   public static final String URI_DOWNLOAD_EXCEL_TIMEKEEPING = "/download_excel_timekeeping";
   public static final String URI_INSERT_MULTI_EMPLOYEE_BY_EXCEL = "/import_excel_employee";
-  public static final String URI_GET_LIST_APPLICATION_REQUEST_SEND = "/list_all_application_request_send";
-  public static final String URI_GET_LIST_APPLICATION_REQUEST_RECEIVE = "/list_all_application_request_receive";
-  public static final String URI_UPDATE_STATUS_APPLICATION_QUEST = "/update_status_application_request";
+  public static final String URI_GET_LIST_APPLICATION_REQUEST_SEND =
+      "/list_all_application_request_send";
+  public static final String URI_GET_LIST_APPLICATION_REQUEST_RECEIVE =
+      "/list_all_application_request_receive";
+  public static final String URI_UPDATE_STATUS_APPLICATION_QUEST =
+      "/update_status_application_request";
 }

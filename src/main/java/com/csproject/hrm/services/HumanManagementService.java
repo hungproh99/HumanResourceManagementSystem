@@ -2,7 +2,6 @@ package com.csproject.hrm.services;
 
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmRequest;
-import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -30,8 +29,6 @@ public interface HumanManagementService {
   List<JobDto> getListPosition();
 
   List<GradeDto> getListGradeByPosition(Long id);
-
-  void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId);
 
   void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list);
 
