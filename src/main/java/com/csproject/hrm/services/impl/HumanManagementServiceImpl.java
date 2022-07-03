@@ -6,10 +6,8 @@ import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
-import com.csproject.hrm.dto.request.UpdateHrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
-import com.csproject.hrm.entities.Employee;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
@@ -33,7 +31,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -155,15 +152,6 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           grade.setName(EArea.getLabel(grade.getName()));
         });
     return gradeDto;
-  }
-
-  @Override
-  public void updateEmployeeById(UpdateHrmRequest updateHrmRequest, String employeeId) {
-    Optional<Employee> employee = employeeRepository.findById(employeeId);
-    if (employee.isEmpty()) {
-      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
-    }
-    employeeRepository.updateEmployeeById(updateHrmRequest, employeeId);
   }
 
   @Override
@@ -334,6 +322,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         HrmPojo.builder()
             .password(password)
             .workStatus(true)
+            .contractStatus(true)
+            .placeStatus(true)
             .companyName(companyName)
             .fullName(hrmRequest.getFullName())
             .role(hrmRequest.getRole())
@@ -348,6 +338,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
             .managerId(hrmRequest.getManagerId())
             .employeeType(hrmRequest.getEmployeeType())
             .personalEmail(hrmRequest.getPersonalEmail())
+            .startDate(hrmRequest.getStartDate())
+            .endDate(hrmRequest.getEndDate())
             .build();
 
     return hrmPojo;

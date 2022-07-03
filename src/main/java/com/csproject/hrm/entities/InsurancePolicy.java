@@ -30,7 +30,19 @@ public class InsurancePolicy {
   @Type(type = "boolean")
   private Boolean insurancePolicyStatus;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Column(name = "insurance_policy_name")
+  private String insurancePolicyName;
+
+  @Column(name = "percentage")
+  private int percentage;
+
+  @Column(name = "address")
+  private String address;
+
+  @Column(name = "description")
+  private String description;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = InsurancePolicyType.class)
   @JoinColumn(name = "insurance_policy_type_id")
   private InsurancePolicyType insurancePolicyType;
 }

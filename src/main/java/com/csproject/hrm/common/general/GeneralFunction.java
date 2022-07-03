@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.passay.DictionaryRule.ERROR_CODE;
@@ -48,10 +47,11 @@ public class GeneralFunction {
     for (int index = 0; index < splitSpace.length - 1; index++) {
       standForName.append(splitSpace[index].charAt(ZERO_NUMBER));
     }
-    int count = employeeRepository.countEmployeeSameStartName(standForName.toString()) + countList;
-    String temp = Normalizer.normalize(standForName.toString() + (count + 1), Normalizer.Form.NFD);
-    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-    return pattern.matcher(temp).replaceAll("");
+    String temp =
+        Normalizer.normalize(standForName.toString(), Normalizer.Form.NFD)
+            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+    int count = employeeRepository.countEmployeeSameStartName(temp) + countList;
+    return temp + (count + 1);
   }
 
   public String generateCommonLangPassword() {
@@ -84,7 +84,8 @@ public class GeneralFunction {
     return gen.generatePassword(10, splCharRule, lowerCaseRule, upperCaseRule, digitRule);
   }
 
-  public void sendEmailForgotPassword(String id, String password, String from, String to, String subject) {
+  public void sendEmailForgotPassword(
+      String id, String password, String from, String to, String subject) {
     MimeMessage message = emailSender.createMimeMessage();
     Resource resource = resourceLoader.getResource("classpath:email-forgot-password.vm");
     boolean multipart = true;
@@ -103,7 +104,8 @@ public class GeneralFunction {
     }
   }
 
-  public void sendEmailForNewEmployee(List<HrmPojo> hrmPojos, String from, String to, String subject) {
+  public void sendEmailForNewEmployee(
+      List<HrmPojo> hrmPojos, String from, String to, String subject) {
     int size = hrmPojos.size();
     MimeMessage[] messages = new MimeMessage[size];
     Resource resource = resourceLoader.getResource("classpath:email-add-employee.vm");
@@ -119,12 +121,12 @@ public class GeneralFunction {
         helper.setFrom(from);
         helper.setSubject(subject);
         messages[i].setContent(
-                String.format(
-                        data,
-                        hrmPojos.get(i).getFullName(),
-                        hrmPojos.get(i).getCompanyName(),
-                        hrmPojos.get(i).getPassword()),
-                "text/html");
+            String.format(
+                data,
+                hrmPojos.get(i).getFullName(),
+                hrmPojos.get(i).getCompanyName(),
+                hrmPojos.get(i).getPassword()),
+            "text/html");
       }
       emailSender.send(messages);
     } catch (MessagingException | IOException e) {

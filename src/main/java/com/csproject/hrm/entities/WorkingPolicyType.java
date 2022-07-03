@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,12 +25,6 @@ public class WorkingPolicyType {
   @Column(name = "working_policy_type")
   private EWorkingPolicyType workingPolicyType;
 
-  @Column(name = "working_policy_name")
-  private String workingPolicyName;
-
-  @Column(name = "description")
-  private String description;
-
-  @OneToOne(mappedBy = "workingPolicyType", fetch = FetchType.LAZY)
-  private WorkingPolicy workingPolicy;
+  @OneToMany(mappedBy = "workingPolicyType", fetch = FetchType.LAZY)
+  private List<WorkingPolicy> workingPolicy;
 }

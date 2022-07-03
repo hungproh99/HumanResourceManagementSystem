@@ -48,4 +48,7 @@ public class WorkingContract {
   @Column(name = "contract_status")
   @Type(type = "boolean")
   private Boolean contractStatus;
+
+  @OneToMany(mappedBy = "workingContract", fetch = FetchType.LAZY)
+  private List<WorkingPlace> workingPlace;
 }

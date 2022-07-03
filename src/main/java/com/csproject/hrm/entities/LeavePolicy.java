@@ -28,9 +28,15 @@ public class LeavePolicy {
 
   @Column(name = "leave_policy_status")
   @Type(type = "boolean")
-  private Boolean taxPolicyStatus;
+  private Boolean leavePolicyStatus;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Column(name = "leave_policy_name")
+  private String workingPolicyName;
+
+  @Column(name = "description")
+  private String description;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = LeavePolicyType.class)
   @JoinColumn(name = "leave_policy_type_id")
   private LeavePolicyType leavePolicyType;
 }
