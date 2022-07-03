@@ -32,6 +32,7 @@ import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.codegen.maven.example.tables.TimekeepingStatus.TIMEKEEPING_STATUS;
+import static org.jooq.codegen.maven.example.tables.ListTimekeepingStatus.LIST_TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.*;
 
@@ -105,8 +106,15 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                   .fetchInto(TimekeepingResponse.class);
           timekeepingList.forEach(
               timekeeping -> {
-                timekeeping.setTimekeeping_status(
-                    ETimekeepingStatus.getValue(timekeeping.getTimekeeping_status()));
+                List<String> timekeepingStatusList =
+                    getAllTimekeepingStatusByTimekeepingId(
+                            timekeeping.getTimekeeping_id(), conditionsTimekeeping, sortFields)
+                        .fetchInto(String.class);
+                timekeepingStatusList.forEach(
+                    timekeepingStatus -> {
+                      timekeepingStatus = ETimekeepingStatus.getValue(timekeepingStatus);
+                    });
+                timekeeping.setTimekeeping_status(timekeepingStatusList);
               });
           timekeepingResponse.setTimekeepingResponses(timekeepingList);
         });
@@ -174,8 +182,15 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                   .fetchInto(TimekeepingResponse.class);
           timekeepingList.forEach(
               timekeeping -> {
-                timekeeping.setTimekeeping_status(
-                    ETimekeepingStatus.getValue(timekeeping.getTimekeeping_status()));
+                List<String> timekeepingStatusList =
+                    getAllTimekeepingStatusByTimekeepingId(
+                            timekeeping.getTimekeeping_id(), conditionsTimekeeping, sortFields)
+                        .fetchInto(String.class);
+                timekeepingStatusList.forEach(
+                    timekeepingStatus -> {
+                      timekeepingStatus = ETimekeepingStatus.getValue(timekeepingStatus);
+                    });
+                timekeeping.setTimekeeping_status(timekeepingStatusList);
               });
           timekeepingResponse.setTimekeepingResponses(timekeepingList);
         });
@@ -351,6 +366,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .leftJoin(GRADE_TYPE)
         .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
         .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
   }
 
@@ -374,6 +391,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .leftJoin(GRADE_TYPE)
         .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
         .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
@@ -417,8 +436,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
     return dslContext
         .select(
+            TIMEKEEPING.TIMEKEEPING_ID,
             TIMEKEEPING.DATE.as(CURRENT_DATE),
-            TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
             firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
             lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
         .from(TIMEKEEPING)
@@ -430,6 +449,23 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
         .where(conditions)
         .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .orderBy(sortFields);
+  }
+
+  private Select<?> getAllTimekeepingStatusByTimekeepingId(
+      long timekeepingId, List<Condition> conditions, List<OrderField<?>> sortFields) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS))
+        .from(LIST_TIMEKEEPING_STATUS)
+        .leftJoin(TIMEKEEPING_STATUS)
+        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+        .leftJoin(TIMEKEEPING)
+        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
+        .leftJoin(EMPLOYEE)
+        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
+        .where(conditions)
+        .and(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
         .orderBy(sortFields);
   }
 }

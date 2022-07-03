@@ -30,7 +30,13 @@ public class CompensationBenefitPolicy {
   @Type(type = "boolean")
   private Boolean compensationBenefitStatus;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Column(name = "compensation_benefit_policy_name")
+  private String compensationBenefitPolicyName;
+
+  @Column(name = "description")
+  private String description;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = CompensationBenefitPolicyType.class)
   @JoinColumn(name = "compensation_benefit_policy_type_id")
   private CompensationBenefitPolicyType compensationBenefitPolicyType;
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,20 +25,8 @@ public class InsurancePolicyType {
   @Column(name = "insurance_policy_type")
   private EInsurance insurancePolicyType;
 
-  @Column(name = "insurance_policy_name")
-  private String insurancePolicyName;
-
-  @Column(name = "percentage")
-  private int percentage;
-
-  @Column(name = "address")
-  private String address;
-
-  @Column(name = "description")
-  private String description;
-
-  @OneToOne(mappedBy = "insurancePolicyType", fetch = FetchType.LAZY)
-  private InsurancePolicy insurancePolicy;
+  @OneToMany(mappedBy = "insurancePolicyType", fetch = FetchType.LAZY)
+  private List<InsurancePolicy> insurancePolicy;
 
   @OneToOne(mappedBy = "insurancePolicyType", fetch = FetchType.LAZY)
   private EmployeeInsurance employeeInsurance;

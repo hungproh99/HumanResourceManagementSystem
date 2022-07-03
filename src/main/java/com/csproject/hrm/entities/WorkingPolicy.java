@@ -30,7 +30,13 @@ public class WorkingPolicy {
   @Type(type = "boolean")
   private Boolean workingPolicyStatus;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Column(name = "working_policy_name")
+  private String workingPolicyName;
+
+  @Column(name = "description")
+  private String description;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingPolicyType.class)
   @JoinColumn(name = "working_policy_type_id")
   private WorkingPolicyType workingPolicyType;
 }

@@ -30,7 +30,16 @@ public class TaxPolicy {
   @Type(type = "boolean")
   private Boolean taxPolicyStatus;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Column(name = "tax_policy_name")
+  private String taxPolicyName;
+
+  @Column(name = "percentage")
+  private int percentage;
+
+  @Column(name = "description")
+  private String description;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = TaxPolicyType.class)
   @JoinColumn(name = "tax_policy_type_id")
   private TaxPolicyType taxPolicyType;
 }
