@@ -1,13 +1,8 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
-import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
-import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
+import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.TimekeepingRepositoryCustom;
@@ -23,17 +18,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.jooq.codegen.maven.example.tables.WorkingPlace.WORKING_PLACE;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.CheckinCheckout.CHECKIN_CHECKOUT;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
+import static org.jooq.codegen.maven.example.tables.ListTimekeepingStatus.LIST_TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.codegen.maven.example.tables.TimekeepingStatus.TIMEKEEPING_STATUS;
-import static org.jooq.codegen.maven.example.tables.ListTimekeepingStatus.LIST_TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
+import static org.jooq.codegen.maven.example.tables.WorkingPlace.WORKING_PLACE;
 import static org.jooq.impl.DSL.*;
 
 @AllArgsConstructor
@@ -244,7 +239,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 TIMEKEEPING.TIMEKEEPING_ID,
                 EMPLOYEE.EMPLOYEE_ID,
                 TIMEKEEPING.DATE.as(CURRENT_DATE),
-                TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS),
                 floor(
                         (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
                                 .multiply(60)
@@ -288,6 +282,22 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                     .eq(TIMEKEEPING.TIMEKEEPING_ID))
             .where(conditions);
     return query.fetchOptionalInto(TimekeepingDetailResponse.class);
+  }
+
+  @Override
+  public List<ListTimekeepingStatusResponse> getListTimekeepingStatus(Long timekeepingID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .select(
+                LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
+                LIST_TIMEKEEPING_STATUS.LIST_ID,
+                TIMEKEEPING_STATUS.NAME.as("timekeeping_status_name"))
+            .from(LIST_TIMEKEEPING_STATUS)
+            .leftJoin(TIMEKEEPING_STATUS)
+            .on(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(TIMEKEEPING_STATUS.TYPE_ID))
+            .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingID));
+    return query.fetchInto(ListTimekeepingStatusResponse.class);
   }
 
   @Override

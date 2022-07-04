@@ -14,7 +14,7 @@ public class TimekeepingDetailResponse {
   private String employee_id;
   private LocalDate current_date;
   private Long timekeeping_id;
-  private String timekeeping_status;
+  private List<ListTimekeepingStatusResponse> timekeeping_status;
   private String total_working_time;
   private LocalTime first_check_in;
   private LocalTime last_check_out;
