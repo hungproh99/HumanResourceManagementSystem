@@ -1,7 +1,10 @@
 package com.csproject.hrm.entities;
 
 import com.csproject.hrm.common.enums.ERequestName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -18,13 +21,19 @@ public class RequestName {
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "name")
+  @Column(name = "request_code")
   private ERequestName eRequestName;
+
+  @Column(name = "name")
+  private String requestName;
+
+  @Column(name = "description")
+  private String description;
+
+  @OneToOne(mappedBy = "requestName", fetch = FetchType.LAZY)
+  private ApplicationsRequest applicationsRequest;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = RequestType.class)
   @JoinColumn(name = "request_type_id")
   private RequestType requestType;
-
-  @OneToOne(mappedBy = "requestName", fetch = FetchType.LAZY)
-  private ApplicationsRequest applicationsRequest;
 }

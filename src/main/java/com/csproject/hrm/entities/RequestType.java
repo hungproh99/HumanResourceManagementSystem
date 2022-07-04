@@ -1,7 +1,10 @@
 package com.csproject.hrm.entities;
 
 import com.csproject.hrm.common.enums.ERequestType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -22,9 +25,9 @@ public class RequestType {
   @Column(name = "name")
   private ERequestType eRequestType;
 
-  @OneToMany(mappedBy = "requestType", fetch = FetchType.LAZY)
-  private List<RequestName> requestNames;
-
   @OneToOne(mappedBy = "requestType", fetch = FetchType.LAZY)
   private ApplicationsRequest applicationsRequest;
+
+  @OneToMany(mappedBy = "requestType", fetch = FetchType.LAZY)
+  private List<RequestName> requestNames;
 }

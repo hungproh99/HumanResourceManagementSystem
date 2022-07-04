@@ -6,6 +6,7 @@ import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.repositories.custom.EmployeeDetailRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
+import org.jooq.codegen.maven.example.Tables;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,10 +16,7 @@ import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
-import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
-import static org.jooq.codegen.maven.example.tables.Tax.TAX;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.*;
 
@@ -169,23 +167,20 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             INSURANCE.ADDRESS,
             INSURANCE.INSURANCE_NAME,
             INSURANCE.PERCENT,
-            INSURANCE.DESCRIPTION,
-            INSURANCE.TITLE)
+            INSURANCE.DESCRIPTION)
         .values(
             taxAndInsurance.getInsuranceId(),
             taxAndInsurance.getEmployeeId(),
             taxAndInsurance.getInsuranceAddress(),
             taxAndInsurance.getInsuranceName(),
             taxAndInsurance.getInsurancePercent(),
-            taxAndInsurance.getInsuranceDescription(),
-            taxAndInsurance.getInsuranceTitle())
+            taxAndInsurance.getInsuranceDescription())
         .onDuplicateKeyUpdate()
         .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
         .set(INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
         .set(INSURANCE.INSURANCE_NAME, taxAndInsurance.getInsuranceName())
         .set(INSURANCE.PERCENT, taxAndInsurance.getInsurancePercent())
         .set(INSURANCE.DESCRIPTION, taxAndInsurance.getInsurancePercent())
-        .set(INSURANCE.TITLE, taxAndInsurance.getInsuranceTitle())
         .execute();
   }
 
@@ -248,9 +243,40 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext.transaction(
         configuration -> {
           queries.add(updateEmployee(configuration, employeeDetailRequest));
+          queries.add(updateWorkingPlace(configuration, employeeDetailRequest));
           queries.add(updateWorkingContract(configuration, employeeDetailRequest));
           DSL.using(configuration).batch(queries).execute();
         });
+  }
+
+  public InsertOnDuplicateSetMoreStep<?> updateWorkingPlace(
+      Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
+    return DSL.using(configuration)
+        .insertInto(
+            WORKING_PLACE,
+            WORKING_PLACE.WORKING_PLACE_ID,
+            WORKING_PLACE.WORKING_CONTRACT_ID,
+            WORKING_PLACE.AREA_ID,
+            WORKING_PLACE.JOB_ID,
+            WORKING_PLACE.OFFICE_ID,
+            WORKING_PLACE.GRADE_ID,
+            WORKING_PLACE.WORKING_PLACE_STATUS)
+        .values(
+            employeeDetailRequest.getWorking_place_id(),
+            employeeDetailRequest.getWorking_contract_id(),
+            employeeDetailRequest.getArea_id(),
+            employeeDetailRequest.getGrade_id(),
+            employeeDetailRequest.getOffice_id(),
+            employeeDetailRequest.getGrade_id(),
+            employeeDetailRequest.getWorking_place_status())
+        .onDuplicateKeyUpdate()
+        .set(WORKING_PLACE.WORKING_PLACE_ID, employeeDetailRequest.getWorking_place_id())
+        .set(WORKING_PLACE.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
+        .set(WORKING_PLACE.GRADE_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_PLACE.AREA_ID, employeeDetailRequest.getArea_id())
+        .set(WORKING_PLACE.JOB_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_PLACE.OFFICE_ID, employeeDetailRequest.getOffice_id())
+        .set(WORKING_PLACE.WORKING_PLACE_STATUS, employeeDetailRequest.getWorking_place_status());
   }
 
   public InsertOnDuplicateSetMoreStep<?> updateWorkingContract(
@@ -260,28 +286,20 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             WORKING_CONTRACT,
             WORKING_CONTRACT.WORKING_CONTRACT_ID,
             WORKING_CONTRACT.START_DATE,
+            WORKING_CONTRACT.END_DATE,
             WORKING_CONTRACT.CONTRACT_URL,
-            WORKING_CONTRACT.AREA_ID,
-            WORKING_CONTRACT.JOB_ID,
-            WORKING_CONTRACT.OFFICE_ID,
-            WORKING_CONTRACT.GRADE_ID,
             WORKING_CONTRACT.EMPLOYEE_ID)
         .values(
             employeeDetailRequest.getWorking_contract_id(),
             employeeDetailRequest.getStart_date(),
+            employeeDetailRequest.getEnd_date(),
             employeeDetailRequest.getContract_url(),
-            employeeDetailRequest.getArea_id(),
-            employeeDetailRequest.getGrade_id(),
-            employeeDetailRequest.getOffice_id(),
-            employeeDetailRequest.getGrade_id(),
             employeeDetailRequest.getEmployee_id())
         .onDuplicateKeyUpdate()
-        .set(WORKING_CONTRACT.GRADE_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
         .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
+        .set(WORKING_CONTRACT.END_DATE, employeeDetailRequest.getEnd_date())
         .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
-        .set(WORKING_CONTRACT.AREA_ID, employeeDetailRequest.getArea_id())
-        .set(WORKING_CONTRACT.JOB_ID, employeeDetailRequest.getGrade_id())
-        .set(WORKING_CONTRACT.OFFICE_ID, employeeDetailRequest.getOffice_id())
         .set(WORKING_CONTRACT.EMPLOYEE_ID, employeeDetailRequest.getEmployee_id());
   }
 
@@ -320,6 +338,12 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(RelativeInformationResponse.class);
+  }
+
+  @Override
+  public Optional<CareerHistoryResponse> findCareerHistoryByEmployeeID(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return null;
   }
 
   @Override
@@ -409,8 +433,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 INSURANCE.INSURANCE_NAME,
                 INSURANCE.ADDRESS)
             .from(EMPLOYEE)
-            .leftJoin(TAX)
-            .on(TAX.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .leftJoin(INSURANCE)
             .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
@@ -426,41 +448,45 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
                 EMPLOYEE.COMPANY_EMAIL,
-                (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
-                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactivate"))
+                (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
                     .as(WORKING_STATUS),
                 EMPLOYEE.PHONE_NUMBER,
-                EMPLOYEE.MARITAL_STATUS,
-                EMPLOYEE.AVATAR,
                 EMPLOYEE.GENDER,
                 EMPLOYEE.BIRTH_DATE,
+                EMPLOYEE.MARITAL_STATUS,
+                EMPLOYEE.AVATAR,
                 GRADE_TYPE.NAME.as(GRADE),
                 OFFICE.NAME.as(OFFICE_NAME),
                 AREA.NAME.as(AREA_NAME),
                 year(currentDate())
                     .minus(year(WORKING_CONTRACT.START_DATE))
                     .concat(YEAR)
-                    .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+                    .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
                     .concat(MONTH)
-                    .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+                    .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
                     .concat(DAY)
                     .as(SENIORITY),
-                WORKING_CONTRACT.START_DATE,
-                WORKING_CONTRACT.CONTRACT_URL,
-                WORKING_CONTRACT.WORKING_CONTRACT_ID,
                 JOB.POSITION.as(POSITION_NAME),
-                WORKING_TYPE.NAME.as(WORKING_NAME))
+                WORKING_TYPE.NAME.as(WORKING_NAME),
+                WORKING_CONTRACT.CONTRACT_URL,
+                WORKING_CONTRACT.START_DATE,
+                WORKING_CONTRACT.END_DATE,
+                WORKING_CONTRACT.WORKING_CONTRACT_ID,
+                WORKING_PLACE.WORKING_PLACE_ID)
             .from(EMPLOYEE)
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(Tables.WORKING_CONTRACT)
+            .on(Tables.WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
             .leftJoin(AREA)
-            .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
             .leftJoin(OFFICE)
-            .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-            .leftJoin(JOB)
-            .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-            .leftJoin(GRADE_TYPE)
-            .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
+            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+            .leftJoin(Tables.JOB)
+            .on(Tables.JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+            .leftJoin(Tables.GRADE_TYPE)
+            .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));

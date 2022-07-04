@@ -7,14 +7,16 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class TimekeepingResponse {
+  private long timekeeping_id;
   private Date current_date;
-  private String timekeeping_status;
+  private List<String> timekeeping_status;
   private Time first_check_in;
   private Time last_check_out;
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +25,10 @@ public class Area {
   @Column(name = "name")
   private EArea eArea;
 
-  @OneToOne(mappedBy = "area", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
+  private List<WorkingPlace> workingPlace;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "manager_id")
+  private Employee employee;
 }

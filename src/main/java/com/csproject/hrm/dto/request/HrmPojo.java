@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,4 +15,6 @@ public class HrmPojo extends HrmRequest {
   private String password;
   private boolean workStatus;
   private String companyName;
+  private boolean contractStatus;
+  private boolean placeStatus;
 }

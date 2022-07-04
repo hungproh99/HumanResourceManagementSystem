@@ -1,19 +1,23 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationsRequestRespone;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 
 import java.util.List;
 
 public interface ApplicationsRequestService {
-  List<ApplicationsRequestRespone> getAllApplicationRequestReceive(
+  ListApplicationsRequestResponse getAllApplicationRequestReceive(
       QueryParam queryParam, String employeeId);
 
-  List<ApplicationsRequestRespone> getAllApplicationRequestSend(
+  ListApplicationsRequestResponse getAllApplicationRequestSend(
       QueryParam queryParam, String employeeId);
 
+  void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
+
+  void updateStatusApplicationRequest(UpdateApplicationRequestRequest updateApplicationRequestRequest);
+  
   void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
 
   List<RequestStatusDto> getAllRequestStatus();

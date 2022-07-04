@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -28,9 +31,8 @@ public class Timekeeping {
   @Column(name = "date")
   private LocalDate date;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "timekeeping_status_id")
-  private TimekeepingStatus timekeepingStatus;
+  @OneToMany(mappedBy = "timekeeping", fetch = FetchType.LAZY)
+  private List<ListTimekeepingStatus> listTimekeepingStatuses;
 
   @Column(name = "amount_work_per_day")
   private String amountWorkPerDay;

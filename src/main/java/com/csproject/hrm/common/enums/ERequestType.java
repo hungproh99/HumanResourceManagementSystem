@@ -16,7 +16,7 @@ public enum ERequestType {
     this.value = value;
   }
 
-  public static String getValue(String type) {
+  public static String getLabel(String type) {
     for (ERequestType eRequestType : ERequestType.values()) {
       if (eRequestType.name().equalsIgnoreCase(type)) {
         return eRequestType.label;

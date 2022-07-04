@@ -123,8 +123,15 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       list.get()
           .setCheck_in_check_outs(
               timekeepingRepository.getCheckInCheckOutByTimekeepingID(timekeepingID));
-      list.get()
-          .setTimekeeping_status(ETimekeepingStatus.getValue(list.get().getTimekeeping_status()));
+      List<ListTimekeepingStatusResponse> listTimekeepingStatusResponse =
+          timekeepingRepository.getListTimekeepingStatus(timekeepingID);
+      listTimekeepingStatusResponse.stream()
+          .forEach(
+              listTimekeepingStatusResponse1 ->
+                  listTimekeepingStatusResponse1.setTimekeeping_status_name(
+                      ETimekeepingStatus.getValue(
+                          listTimekeepingStatusResponse1.getTimekeeping_status_name())));
+      list.get().setTimekeeping_status(listTimekeepingStatusResponse);
       return list;
     } else {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);

@@ -28,8 +28,8 @@ public class Job {
   @Column(name = "description")
   private String description;
 
-  @OneToOne(mappedBy = "job", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
+  private List<WorkingPlace> workingPlace;
 
   @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
   private List<GradeType> grades;

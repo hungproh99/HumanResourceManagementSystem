@@ -25,4 +25,6 @@ public class HrmRequest {
   private String managerId;
   private Long employeeType;
   private String personalEmail;
+  private LocalDate startDate;
+  private LocalDate endDate;
 }

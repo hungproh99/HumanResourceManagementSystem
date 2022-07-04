@@ -14,6 +14,7 @@ public class EmployeeDetailResponse {
   private String company_email;
   private String seniority;
   private LocalDate start_date;
+  private LocalDate end_date;
   private String working_status;
   private String contract_url;
   private String phone_number;
@@ -27,4 +28,5 @@ public class EmployeeDetailResponse {
   private String avatar;
   private String working_name;
   private Long working_contract_id;
+  private Long working_place_id;
 }
