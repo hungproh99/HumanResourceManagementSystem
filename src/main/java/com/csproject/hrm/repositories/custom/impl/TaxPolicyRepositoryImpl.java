@@ -50,6 +50,7 @@ public class TaxPolicyRepositoryImpl implements TaxPolicyRepositoryCustom {
             TAX_POLICY_TYPE.TAX_POLICY_TYPE_,
             TAX_POLICY.TAX_POLICY_NAME,
             TAX_POLICY.DESCRIPTION,
+            TAX_POLICY.PERCENTAGE,
             (when(TAX_POLICY.TAX_POLICY_STATUS.isTrue(), "true")
                     .when(TAX_POLICY.TAX_POLICY_STATUS.isFalse(), "false"))
                 .as(TAX_POLICY.TAX_POLICY_STATUS))

@@ -50,6 +50,7 @@ public class InsurancePolicyRepositoryImpl implements InsurancePolicyRepositoryC
             INSURANCE_POLICY_TYPE.INSURANCE_POLICY_TYPE_,
             INSURANCE_POLICY.INSURANCE_POLICY_NAME,
             INSURANCE_POLICY.DESCRIPTION,
+            INSURANCE_POLICY.PERCENTAGE,
             (when(INSURANCE_POLICY.INSURANCE_POLICY_STATUS.isTrue(), "true")
                     .when(INSURANCE_POLICY.INSURANCE_POLICY_STATUS.isFalse(), "false"))
                 .as(INSURANCE_POLICY.INSURANCE_POLICY_STATUS))
