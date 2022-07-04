@@ -2,7 +2,7 @@ package com.csproject.hrm.common.constant;
 
 public class Constants {
   public static final String EMAIL_VALIDATION =
-      "^[a-z][a-z0-9_\\.]{3,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
+      "^[A-Za-z][A-Za-z0-9_\\.]{3,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
   public static final String FROM_EMAIL = "huynq08120@gmail.com";
   public static final String TO_EMAIL = "huynb0812@gmail.com";
   public static final String NOT_EMPTY_EMAIL = "Email can't not empty";
@@ -108,10 +108,6 @@ public class Constants {
   public static final String CHANGE_STATUS_TIME = "change_status_time";
   public static final String UNAUTHORIZED_ERROR = "Unauthorized error";
   public static final String REQUEST_STATUS_PARAM = "requestStatus";
-  public static final String TAX_INVALID = "Invalid Tax";
-  public static final String INSURANCE_INVALID = "Invalid Insurance";
-  public static final String WORKING_POLICY_TYPE_INVALID = "Invalid Working Policy Type";
-  public static final String COMPENSATION_BENEFIT_POLICY_TYPE_INVALID =
-      "Invalid Compensation Benefit Policy Type";
-  public static final String LEAVE_POLICY_TYPE_INVALID = "Invalid Leave Policy Type";
+  public static final String POLICY_TYPE_INVALID = "Invalid Policy Type";
+  public static final String POLICY_CATEGORY_INVALID = "Invalid Category Type";
 }

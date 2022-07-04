@@ -14,10 +14,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "leave_policy")
-public class LeavePolicy {
+@Table(name = "policy")
+public class Policy {
   @Id
-  @Column(name = "leave_policy_id")
+  @Column(name = "policy_id")
   private String id;
 
   @Column(name = "created_date")
@@ -26,17 +26,14 @@ public class LeavePolicy {
   @Column(name = "effective_date")
   private LocalDate endDate;
 
-  @Column(name = "leave_policy_status")
+  @Column(name = "policy_status")
   @Type(type = "boolean")
-  private Boolean leavePolicyStatus;
-
-  @Column(name = "leave_policy_name")
-  private String workingPolicyName;
+  private Boolean policyStatus;
 
   @Column(name = "description")
   private String description;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = LeavePolicyType.class)
-  @JoinColumn(name = "leave_policy_type_id")
-  private LeavePolicyType leavePolicyType;
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = PolicyType.class)
+  @JoinColumn(name = "policy_type_id")
+  private PolicyType policyType;
 }

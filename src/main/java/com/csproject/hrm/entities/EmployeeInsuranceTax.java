@@ -13,22 +13,25 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "employee_insurance")
-public class EmployeeInsurance {
+@Table(name = "employee_insurance_tax")
+public class EmployeeInsuranceTax {
   @Id
-  @Column(name = "employee_insurance_id")
+  @Column(name = "employee_insurance_tax_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @Column(name = "address")
+  private String address;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")
   private Employee employee;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "insurance_type_id")
-  private InsurancePolicyType insurancePolicyType;
+  @JoinColumn(name = "policy_type_id")
+  private PolicyType policyType;
 
-  @Column(name = "insurance_status")
+  @Column(name = "status")
   @Type(type = "boolean")
-  private Boolean insurance_status;
+  private Boolean status;
 }
