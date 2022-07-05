@@ -20,44 +20,11 @@ public class PolicyController {
   @Autowired PolicyService policyService;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("get_list_working_policy")
-  public ResponseEntity<?> getListWorkingPolicy(
+  @GetMapping("get_list_policy")
+  public ResponseEntity<?> getListPolicyByCategoryID(
       @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
-    return ResponseEntity.ok(policyService.getListWorkingPolicy(queryParam));
-  }
-
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("get_list_a_and_b_policy")
-  public ResponseEntity<?> getListCAndBPolicy(@RequestParam Map<String, String> allRequestParams) {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
-    return ResponseEntity.ok(policyService.getListCAndBPolicy(queryParam));
-  }
-
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("get_list_insurance_policy")
-  public ResponseEntity<?> getListInsurancePolicy(
-      @RequestParam Map<String, String> allRequestParams) {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
-    return ResponseEntity.ok(policyService.getListInsurancePolicy(queryParam));
-  }
-
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("get_list_leave_policy")
-  public ResponseEntity<?> getListLeavePolicy(@RequestParam Map<String, String> allRequestParams) {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
-    return ResponseEntity.ok(policyService.getListLeavePolicy(queryParam));
-  }
-
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("get_list_tax_policy")
-  public ResponseEntity<?> getListTaxPolicy(@RequestParam Map<String, String> allRequestParams) {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
-    return ResponseEntity.ok(policyService.getListTaxPolicy(queryParam));
+    return ResponseEntity.ok(policyService.getListPolicyByCategoryID(queryParam));
   }
 }

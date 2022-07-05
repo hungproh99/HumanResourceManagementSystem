@@ -112,10 +112,7 @@ public class Employee {
   private List<ApplicationsRequest> applicationsRequest;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<EmployeeTax> taxList;
-
-  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<EmployeeInsurance> insuranceList;
+  private List<EmployeeInsuranceTax> insuranceTaxList;
 
   @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
   private Area area;

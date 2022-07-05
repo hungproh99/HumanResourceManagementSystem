@@ -8,7 +8,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ListLeavePolicyResponse {
-  private List<LeavePolicyResponse> leavePolicyResponseList;
+public class ListPolicyResponse {
+  private List<PolicyResponse> policyResponseList;
   private int total;
 }
