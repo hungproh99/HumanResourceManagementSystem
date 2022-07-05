@@ -1,5 +1,6 @@
 package com.csproject.hrm.services;
 
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
@@ -16,9 +17,8 @@ public interface ApplicationsRequestService {
 
   void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
 
-  void updateStatusApplicationRequest(UpdateApplicationRequestRequest updateApplicationRequestRequest);
-  
-  void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
+  void updateStatusApplicationRequest(
+      UpdateApplicationRequestRequest updateApplicationRequestRequest);
 
   List<RequestStatusDto> getAllRequestStatus();
 
