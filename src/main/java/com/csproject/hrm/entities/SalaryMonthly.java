@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -16,23 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "salary")
-public class Salary {
+@Table(name = "salary_monthly")
+public class SalaryMonthly {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "salary_id")
   private Long id;
-
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingContract.class)
-  @JoinColumn(name = "working_contract_id")
-  private WorkingContract workingContract;
-
-  @Column(name = "salary_status")
-  @Type(type = "boolean")
-  private Boolean salaryStatus;
-
-  @Column(name = "base_salary")
-  private BigDecimal baseSalary;
 
   @Column(name = "final_salary")
   private BigDecimal finalSalary;
@@ -43,6 +31,10 @@ public class Salary {
   @Column(name = "end_date")
   private LocalDate endDate;
 
-  @OneToMany(mappedBy = "salary", fetch = FetchType.LAZY)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
+  @JoinColumn(name = "salary_contract_id")
+  private SalaryContract salaryContract;
+
+  @OneToMany(mappedBy = "salaryMonthly", fetch = FetchType.LAZY)
   private List<BonusSalary> bonusSalaries;
 }

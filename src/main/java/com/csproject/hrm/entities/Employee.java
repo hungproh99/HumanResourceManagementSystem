@@ -77,6 +77,9 @@ public class Employee {
   @Column(name = "current_situation")
   private String currentSituation;
 
+  @Column(name = "level")
+  private int level;
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "card_id")
   private IdentityCard identityCard;
@@ -112,7 +115,10 @@ public class Employee {
   private List<ApplicationsRequest> applicationsRequest;
 
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-  private List<EmployeeInsuranceTax> insuranceTaxList;
+  private List<EmployeeInsurance> employeeInsuranceList;
+
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<EmployeeTax> employeeTaxList;
 
   @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
   private Area area;

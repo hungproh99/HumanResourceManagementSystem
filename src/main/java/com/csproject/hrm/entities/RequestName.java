@@ -36,4 +36,8 @@ public class RequestName {
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = RequestType.class)
   @JoinColumn(name = "request_type_id")
   private RequestType requestType;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "policy_id")
+  private Policy policy;
 }

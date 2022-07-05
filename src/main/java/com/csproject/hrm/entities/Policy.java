@@ -33,7 +33,13 @@ public class Policy {
   @Column(name = "description")
   private String description;
 
+  @Column(name = "minimum_level_accept")
+  private int minimumLevelAccept;
+
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = PolicyType.class)
   @JoinColumn(name = "policy_type_id")
   private PolicyType policyType;
+
+  @OneToOne(mappedBy = "policy", fetch = FetchType.LAZY)
+  private RequestName requestName;
 }

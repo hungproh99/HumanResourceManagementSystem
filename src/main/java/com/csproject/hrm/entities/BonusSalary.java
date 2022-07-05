@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -26,7 +27,10 @@ public class BonusSalary {
   @Column(name = "description")
   private String description;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Salary.class)
+  @Column(name = "date")
+  private LocalDate date;
+
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
   @JoinColumn(name = "salary_id")
-  private Salary salary;
+  private SalaryMonthly salaryMonthly;
 }

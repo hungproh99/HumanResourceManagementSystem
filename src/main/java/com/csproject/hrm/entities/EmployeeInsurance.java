@@ -13,10 +13,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "employee_insurance_tax")
-public class EmployeeInsuranceTax {
+@Table(name = "employee_insurance")
+public class EmployeeInsurance {
   @Id
-  @Column(name = "employee_insurance_tax_id")
+  @Column(name = "employee_insurance_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
@@ -31,7 +31,7 @@ public class EmployeeInsuranceTax {
   @JoinColumn(name = "policy_type_id")
   private PolicyType policyType;
 
-  @Column(name = "status")
+  @Column(name = "insurance_status")
   @Type(type = "boolean")
-  private Boolean status;
+  private Boolean insurance_status;
 }

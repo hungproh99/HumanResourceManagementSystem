@@ -136,7 +136,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     List<JobDto> jobDto = contractRepository.getListPosition();
     jobDto.forEach(
         job -> {
-          job.setPosition(EArea.getLabel(job.getPosition()));
+          job.setPosition(EJob.getLabel(job.getPosition()));
         });
     return jobDto;
   }
@@ -149,7 +149,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     List<GradeDto> gradeDto = contractRepository.getListGradeByPosition(id);
     gradeDto.forEach(
         grade -> {
-          grade.setName(EArea.getLabel(grade.getName()));
+          grade.setName(EGradeType.getLabel(grade.getName()));
         });
     return gradeDto;
   }

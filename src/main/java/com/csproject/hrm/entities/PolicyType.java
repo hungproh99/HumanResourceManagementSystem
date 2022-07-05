@@ -36,5 +36,8 @@ public class PolicyType {
   private List<Policy> policy;
 
   @OneToOne(mappedBy = "policyType", fetch = FetchType.LAZY)
-  private EmployeeInsuranceTax employeeInsuranceTax;
+  private EmployeeInsurance employeeInsurance;
+
+  @OneToOne(mappedBy = "policyType", fetch = FetchType.LAZY)
+  private EmployeeTax employeeTax;
 }

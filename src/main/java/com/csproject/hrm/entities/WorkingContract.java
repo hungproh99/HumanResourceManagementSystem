@@ -43,7 +43,7 @@ public class WorkingContract {
   private String contractUrl;
 
   @OneToMany(mappedBy = "workingContract", fetch = FetchType.LAZY)
-  private List<Salary> salaries;
+  private List<SalaryContract> salaries;
 
   @Column(name = "contract_status")
   @Type(type = "boolean")

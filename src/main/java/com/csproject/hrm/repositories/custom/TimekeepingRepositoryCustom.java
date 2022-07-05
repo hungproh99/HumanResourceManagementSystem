@@ -22,4 +22,16 @@ public interface TimekeepingRepositoryCustom {
   List<CheckInCheckOutResponse> getCheckInCheckOutByTimekeepingID(Long timekeepingID);
 
   int countListAllTimekeeping(QueryParam queryParam);
+
+  void insertTimekeepingByEmployeeId(String employeeId, LocalDate date);
+
+  void insertTimekeepingStatusByEmployeeIdAndRangeDate(
+      String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus);
+
+  void updateTimekeepingStatusByEmployeeIdAndRangeDate(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      long oldTimekeepingStatus,
+      long newTimekeepingStatus);
 }

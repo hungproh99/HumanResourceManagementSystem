@@ -16,7 +16,7 @@ import java.util.List;
 public class TimekeepingResponse {
   private long timekeeping_id;
   private Date current_date;
-  private List<String> timekeeping_status;
+  private List<ListTimekeepingStatusResponse> timekeeping_status;
   private Time first_check_in;
   private Time last_check_out;
 }
