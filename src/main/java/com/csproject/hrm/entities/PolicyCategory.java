@@ -1,6 +1,6 @@
 package com.csproject.hrm.entities;
 
-import com.csproject.hrm.common.enums.EWorkingPolicyType;
+import com.csproject.hrm.common.enums.EPolicyCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,17 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "leave_policy_type")
-public class LeavePolicyType {
+@Table(name = "policy_category")
+public class PolicyCategory {
   @Id
-  @Column(name = "leave_policy_type_id")
+  @Column(name = "policy_category_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "leave_policy_type")
-  private EWorkingPolicyType workingPolicyType;
+  @Column(name = "policy_category")
+  private EPolicyCategory ePolicyCategory;
 
-  @OneToMany(mappedBy = "leavePolicyType", fetch = FetchType.LAZY)
-  private List<LeavePolicy> leavePolicy;
+  @OneToMany(mappedBy = "policyCategory", fetch = FetchType.LAZY)
+  private List<PolicyType> policy;
 }
