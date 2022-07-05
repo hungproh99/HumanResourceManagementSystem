@@ -8,13 +8,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LeavePolicyResponse {
-  private Long leave_policy_type_id;
-  private String leave_policy_id;
-  private String leave_policy_type;
-  private String leave_policy_name;
+public class PolicyResponse {
+  private Long policy_type_id;
+  private String policy_id;
+  private String policy_type;
+  private String policy_name;
   private LocalDate created_date;
   private LocalDate effective_date;
   private String description;
-  private Boolean leave_policy_status;
+  private Boolean policy_status;
+  private String policy_category;
 }

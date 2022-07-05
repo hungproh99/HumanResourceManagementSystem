@@ -4,9 +4,7 @@ import com.csproject.hrm.common.enums.ComparisonOperator;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jwt.config.AuthEntryPointJwt;
 import org.apache.commons.lang3.StringUtils;
-import org.jooq.Condition;
-import org.jooq.Field;
-import org.jooq.OrderField;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +29,7 @@ public class JooqHelper {
     final List<OrderField<?>> orderByList = new ArrayList<>();
 
     if (null == queryParam || isEmpty(queryParam.orderByList)) {
-      orderByList.add(defaultField.desc());
+      orderByList.add(defaultField.asc());
       return orderByList;
     }
 

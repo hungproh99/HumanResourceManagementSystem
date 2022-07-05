@@ -110,18 +110,8 @@ public class Constants {
   public static final String REQUEST_STATUS_PARAM = "requestStatus";
   public static final String TAX_INVALID = "Invalid Tax";
   public static final String INSURANCE_INVALID = "Invalid Insurance";
-  public static final String WORKING_POLICY_TYPE_INVALID = "Invalid Working Policy Type";
-  public static final String COMPENSATION_BENEFIT_POLICY_TYPE_INVALID =
-      "Invalid Compensation Benefit Policy Type";
-  public static final String LEAVE_POLICY_TYPE_INVALID = "Invalid Leave Policy Type";
-  public static final String WORKING_POLICY_ID = "workingPolicyId";
-  public static final String WORKING_POLICY_STATUS = "workingPolicyStatus";
-  public static final String WORKING_POLICY_NAME = "workingPolicyName";
-  public static final String WORKING_POLICY_TYPE = "workingPolicyType";
-  public static final String C_AND_B_POLICY_TYPE = "cAndBPolicyType";
-  public static final String INSURANCE_POLICY_TYPE = "insurancePolicyType";
-  public static final String LEAVE_POLICY_TYPE = "leavePolicyType";
-  public static final String TAX_POLICY_TYPE = "taxPolicyType";
+  public static final String CATEGORY_ID = "categoryID";
+  public static final String POLICY_ID = "policyID";
   public static final String POLICY_TYPE_INVALID = "Invalid Policy Type";
   public static final String POLICY_CATEGORY_INVALID = "Invalid Category Type";
 }
