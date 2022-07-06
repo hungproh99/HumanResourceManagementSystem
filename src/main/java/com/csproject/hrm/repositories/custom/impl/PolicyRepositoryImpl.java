@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.dto.response.PolicyCategoryResponse;
 import com.csproject.hrm.dto.response.PolicyResponse;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.PolicyRepositoryCustom;
@@ -80,5 +81,15 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
             .on(POLICY_CATEGORY.POLICY_CATEGORY_ID.eq(POLICY_TYPE.POLICY_CATEGORY_ID))
             .where(conditions);
     return dslContext.fetchCount(query);
+  }
+
+  @Override
+  public List<PolicyCategoryResponse> getAllPolicyCategory() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select(POLICY_CATEGORY.POLICY_CATEGORY_ID, POLICY_CATEGORY.POLICY_CATEGORY_)
+        .from(POLICY_CATEGORY)
+        .fetchInto(PolicyCategoryResponse.class);
   }
 }

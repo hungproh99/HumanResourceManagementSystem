@@ -27,4 +27,10 @@ public class PolicyController {
     QueryParam queryParam = context.queryParam(allRequestParams);
     return ResponseEntity.ok(policyService.getListPolicyByCategoryID(queryParam));
   }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping("get_list_category")
+  public ResponseEntity<?> getAllPolicyCategory() {
+    return ResponseEntity.ok(policyService.getAllPolicyCategory());
+  }
 }

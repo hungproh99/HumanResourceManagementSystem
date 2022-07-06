@@ -2,9 +2,7 @@ package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.entities.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
-import com.csproject.hrm.repositories.EmployeeDetailRepository;
 import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,23 +20,21 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @RestController
 @RequestMapping(REQUEST_MAPPING + REQUEST_DETAIL_MAPPING)
 public class EmployeeDetailController {
-  @Autowired
-  EmployeeDetailService employeeDetailService;
-
+  @Autowired EmployeeDetailService employeeDetailService;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(@RequestParam String employeeID) {
     Optional<EmployeeDetailResponse> employeeDetail =
-            employeeDetailService.findMainDetail(employeeID);
+        employeeDetailService.findMainDetail(employeeID);
     return ResponseEntity.ok(employeeDetail);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_TAX_AND_INSURANCE)
   public ResponseEntity<?> findTaxAndInsurance(@RequestParam String employeeID) {
-    List<TaxAndInsuranceResponse> taxAndInsurance =
-            employeeDetailService.findTaxAndInsurance(employeeID);
+    Optional<TaxAndInsuranceResponse> taxAndInsurance =
+        employeeDetailService.findTaxAndInsurance(employeeID);
     return ResponseEntity.ok(taxAndInsurance);
   }
 
@@ -80,19 +76,19 @@ public class EmployeeDetailController {
         employeeDetailService.findRelativeByEmployeeID(employeeID);
     return ResponseEntity.ok(relatives);
   }
-  
+
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PutMapping(URI_UPDATE_MAIN_DETAIL)
   public ResponseEntity<?> updateEmployeeDetail(
-          @RequestBody EmployeeDetailRequest employeeDetailRequest) {
+      @RequestBody EmployeeDetailRequest employeeDetailRequest) {
     employeeDetailService.updateEmployeeDetail(employeeDetailRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
-  
+
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping("/add_info/update")
   public ResponseEntity<?> updateAdditionalInfo(
-          @RequestBody EmployeeAdditionalInfoRequest employeeAdditionalInfoRequest) {
+      @RequestBody EmployeeAdditionalInfoRequest employeeAdditionalInfoRequest) {
     employeeDetailService.updateAdditionalInfo(employeeAdditionalInfoRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
