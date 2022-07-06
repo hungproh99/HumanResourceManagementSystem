@@ -75,4 +75,17 @@ public class ApplicationsRequestController {
     applicationsRequestService.updateStatusApplicationRequest(updateApplicationRequestRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping("get_all_request_type")
+  public ResponseEntity<?> getAllRequestType() {
+    return ResponseEntity.ok(applicationsRequestService.getAllRequestType());
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping("get_all_request_name_by_id")
+  public ResponseEntity<?> getAllRequestNameByRequestTypeID(@RequestParam Long requestTypeID) {
+    return ResponseEntity.ok(
+        applicationsRequestService.getAllRequestNameByRequestTypeID(requestTypeID));
+  }
 }

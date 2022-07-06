@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -34,4 +35,10 @@ public interface ApplicationsRequestRepositoryCustom {
   void updateTaxEnrollmentByApplicationRequest(String employeeId, Long taxType, boolean status);
 
   void insertUpdateCompanyAssetsByApplicationRequest(String employeeId, LocalDate date);
+
+  List<RequestStatusDto> getAllRequestStatus();
+
+  List<RequestTypeDto> getAllRequestType();
+
+  List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 }

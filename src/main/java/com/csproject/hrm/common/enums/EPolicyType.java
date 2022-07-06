@@ -9,7 +9,7 @@ public enum EPolicyType {
   WORKING_TIME("Working Time", 1),
   INTEGRITY("Integrity", 2),
   COMPANY_ASSET("Company asset", 3),
-  BEHAVIOUR("Company asset", 4),
+  BEHAVIOUR("Behaviour", 4),
   REWARD("Reward", 5),
   ALLOWANCE("Allowance", 6),
   PAID_LEAVE("Paid Leave", 7),
@@ -21,8 +21,8 @@ public enum EPolicyType {
   UI("UI", 13),
   PI("PI", 14);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   EPolicyType(String label, long value) {
     this.label = label;

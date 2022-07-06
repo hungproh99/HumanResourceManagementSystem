@@ -2,6 +2,7 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.ERequestStatus;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -27,6 +28,7 @@ import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
 import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
+import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.impl.DSL.concat;
 import static org.jooq.impl.DSL.when;
 
@@ -435,5 +437,37 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       }
     }
     return orderByList;
+  }
+
+  @Override
+  public List<RequestStatusDto> getAllRequestStatus() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            REQUEST_STATUS.TYPE_ID.as("request_status_id"),
+            REQUEST_STATUS.NAME.as("request_status_name"))
+        .from(REQUEST_STATUS)
+        .fetchInto(RequestStatusDto.class);
+  }
+
+  @Override
+  public List<RequestTypeDto> getAllRequestType() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            REQUEST_TYPE.TYPE_ID.as("request_type_id"), REQUEST_TYPE.NAME.as("request_type_name"))
+        .from(REQUEST_TYPE)
+        .fetchInto(RequestTypeDto.class);
+  }
+
+  @Override
+  public List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            REQUEST_NAME.TYPE_ID.as("request_name_id"), REQUEST_NAME.NAME.as("request_name_name"))
+        .from(REQUEST_NAME)
+        .where(REQUEST_NAME.REQUEST_TYPE_ID.eq(requestTypeID))
+        .fetchInto(RequestNameDto.class);
   }
 }

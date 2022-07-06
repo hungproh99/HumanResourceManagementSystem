@@ -1,5 +1,7 @@
 package com.csproject.hrm.services.impl;
 
+import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -7,8 +9,7 @@ import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
-import com.csproject.hrm.repositories.ApplicationsRequestRepository;
-import com.csproject.hrm.repositories.EmployeeRepository;
+import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Autowired EmployeeRepository employeeRepository;
   @Autowired ApplicationsRequestRepository applicationsRequestRepository;
+  @Autowired EmployeeDetailRepository employeeDetailRepository;
 
   @Override
   public ListApplicationsRequestResponse getAllApplicationRequestReceive(
@@ -97,5 +99,43 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     LocalDateTime latestDate = LocalDateTime.now();
     applicationsRequestRepository.updateStatusApplicationRequest(
         updateApplicationRequestRequest, latestDate);
+  }
+
+  @Override
+  public List<RequestStatusDto> getAllRequestStatus() {
+    List<RequestStatusDto> requestStatusDtoList =
+        applicationsRequestRepository.getAllRequestStatus();
+    requestStatusDtoList.forEach(
+        requestStatus -> {
+          requestStatus.setRequest_status_name(
+              ERequestStatus.getLabel(requestStatus.getRequest_status_name()));
+        });
+
+    return requestStatusDtoList;
+  }
+
+  @Override
+  public List<RequestTypeDto> getAllRequestType() {
+    List<RequestTypeDto> requestTypeDtoList = applicationsRequestRepository.getAllRequestType();
+    requestTypeDtoList.forEach(
+        requestTypeDto -> {
+          requestTypeDto.setRequest_type_name(
+              ERequestType.getLabel(requestTypeDto.getRequest_type_name()));
+        });
+
+    return requestTypeDtoList;
+  }
+
+  @Override
+  public List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID) {
+    List<RequestNameDto> requestNameDtoList =
+        applicationsRequestRepository.getAllRequestNameByRequestTypeID(requestTypeID);
+    requestNameDtoList.forEach(
+        requestNameDto -> {
+          requestNameDto.setRequest_name_name(
+              ERequestName.getLabel(requestNameDto.getRequest_name_name()));
+        });
+
+    return requestNameDtoList;
   }
 }

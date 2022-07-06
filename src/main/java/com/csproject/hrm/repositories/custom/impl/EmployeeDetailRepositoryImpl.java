@@ -6,19 +6,16 @@ import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.repositories.custom.EmployeeDetailRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
+import org.jooq.codegen.maven.example.Tables;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
-import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.*;
@@ -155,36 +152,36 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
   @Override
   public void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    dslContext
-        .update(EMPLOYEE)
-        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
-        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
-        .execute();
-
-//    dslContext
-//        .insertInto(
-//            INSURANCE,
-//            INSURANCE.INSURANCE_ID,
-//            INSURANCE.EMPLOYEE_ID,
-//            INSURANCE.ADDRESS,
-//            INSURANCE.INSURANCE_NAME,
-//            INSURANCE.PERCENT,
-//            INSURANCE.DESCRIPTION)
-//        .values(
-//            taxAndInsurance.getInsuranceId(),
-////            taxAndInsurance.getEmployeeId(),
-//            taxAndInsurance.getInsuranceAddress(),
-//            taxAndInsurance.getInsuranceName(),
-//            taxAndInsurance.getInsurancePercent(),
-//            taxAndInsurance.getInsuranceDescription())
-//        .onDuplicateKeyUpdate()
-//        .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
-//        .set(INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-//        .set(INSURANCE.INSURANCE_NAME, taxAndInsurance.getInsuranceName())
-//        .set(INSURANCE.PERCENT, taxAndInsurance.getInsurancePercent())
-//        .set(INSURANCE.DESCRIPTION, taxAndInsurance.getInsurancePercent())
-//        .execute();
+    //    final DSLContext dslContext = DSL.using(connection.getConnection());
+    //    dslContext
+    //        .update(EMPLOYEE)
+    //        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
+    //        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
+    //        .execute();
+    //
+    //    dslContext
+    //        .insertInto(
+    //            EMPLOYEE_INSURANCE_TAX,
+    //            INSURANCE.INSURANCE_ID,
+    //            INSURANCE.EMPLOYEE_ID,
+    //            INSURANCE.ADDRESS,
+    //            INSURANCE.INSURANCE_NAME,
+    //            INSURANCE.PERCENT,
+    //            INSURANCE.DESCRIPTION)
+    //        .values(
+    //            taxAndInsurance.getInsuranceId(),
+    //            taxAndInsurance.getEmployeeId(),
+    //            taxAndInsurance.getInsuranceAddress(),
+    //            taxAndInsurance.getInsuranceName(),
+    //            taxAndInsurance.getInsurancePercent(),
+    //            taxAndInsurance.getInsuranceDescription())
+    //        .onDuplicateKeyUpdate()
+    //        .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
+    //        .set(INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
+    //        .set(INSURANCE.INSURANCE_NAME, taxAndInsurance.getInsuranceName())
+    //        .set(INSURANCE.PERCENT, taxAndInsurance.getInsurancePercent())
+    //        .set(INSURANCE.DESCRIPTION, taxAndInsurance.getInsurancePercent())
+    //        .execute();
   }
 
   @Override
@@ -246,42 +243,64 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext.transaction(
         configuration -> {
           queries.add(updateEmployee(configuration, employeeDetailRequest));
+          queries.add(updateWorkingPlace(configuration, employeeDetailRequest));
           queries.add(updateWorkingContract(configuration, employeeDetailRequest));
           DSL.using(configuration).batch(queries).execute();
         });
   }
 
+  public InsertOnDuplicateSetMoreStep<?> updateWorkingPlace(
+      Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
+    return DSL.using(configuration)
+        .insertInto(
+            WORKING_PLACE,
+            WORKING_PLACE.WORKING_PLACE_ID,
+            WORKING_PLACE.WORKING_CONTRACT_ID,
+            WORKING_PLACE.AREA_ID,
+            WORKING_PLACE.JOB_ID,
+            WORKING_PLACE.OFFICE_ID,
+            WORKING_PLACE.GRADE_ID,
+            WORKING_PLACE.WORKING_PLACE_STATUS)
+        .values(
+            employeeDetailRequest.getWorking_place_id(),
+            employeeDetailRequest.getWorking_contract_id(),
+            employeeDetailRequest.getArea_id(),
+            employeeDetailRequest.getGrade_id(),
+            employeeDetailRequest.getOffice_id(),
+            employeeDetailRequest.getGrade_id(),
+            employeeDetailRequest.getWorking_place_status())
+        .onDuplicateKeyUpdate()
+        .set(WORKING_PLACE.WORKING_PLACE_ID, employeeDetailRequest.getWorking_place_id())
+        .set(WORKING_PLACE.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
+        .set(WORKING_PLACE.GRADE_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_PLACE.AREA_ID, employeeDetailRequest.getArea_id())
+        .set(WORKING_PLACE.JOB_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_PLACE.OFFICE_ID, employeeDetailRequest.getOffice_id())
+        .set(WORKING_PLACE.WORKING_PLACE_STATUS, employeeDetailRequest.getWorking_place_status());
+  }
+
   public InsertOnDuplicateSetMoreStep<?> updateWorkingContract(
       Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
-//    return DSL.using(configuration)
-//        .insertInto(
-//            WORKING_CONTRACT,
-//            WORKING_CONTRACT.WORKING_CONTRACT_ID,
-//            WORKING_CONTRACT.START_DATE,
-//            WORKING_CONTRACT.CONTRACT_URL,
-//            WORKING_CONTRACT.AREA_ID,
-//            WORKING_CONTRACT.JOB_ID,
-//            WORKING_CONTRACT.OFFICE_ID,
-//            WORKING_CONTRACT.GRADE_ID,
-//            WORKING_CONTRACT.EMPLOYEE_ID)
-//        .values(
-//            employeeDetailRequest.getWorking_contract_id(),
-//            employeeDetailRequest.getStart_date(),
-//            employeeDetailRequest.getContract_url(),
-//            employeeDetailRequest.getArea_id(),
-//            employeeDetailRequest.getGrade_id(),
-//            employeeDetailRequest.getOffice_id(),
-//            employeeDetailRequest.getGrade_id(),
-//            employeeDetailRequest.getEmployee_id())
-//        .onDuplicateKeyUpdate()
-//        .set(WORKING_CONTRACT.GRADE_ID, employeeDetailRequest.getGrade_id())
-//        .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
-//        .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
-//        .set(WORKING_CONTRACT.AREA_ID, employeeDetailRequest.getArea_id())
-//        .set(WORKING_CONTRACT.JOB_ID, employeeDetailRequest.getGrade_id())
-//        .set(WORKING_CONTRACT.OFFICE_ID, employeeDetailRequest.getOffice_id())
-//        .set(WORKING_CONTRACT.EMPLOYEE_ID, employeeDetailRequest.getEmployee_id());
-    return null;
+    return DSL.using(configuration)
+        .insertInto(
+            WORKING_CONTRACT,
+            WORKING_CONTRACT.WORKING_CONTRACT_ID,
+            WORKING_CONTRACT.START_DATE,
+            WORKING_CONTRACT.END_DATE,
+            WORKING_CONTRACT.CONTRACT_URL,
+            WORKING_CONTRACT.EMPLOYEE_ID)
+        .values(
+            employeeDetailRequest.getWorking_contract_id(),
+            employeeDetailRequest.getStart_date(),
+            employeeDetailRequest.getEnd_date(),
+            employeeDetailRequest.getContract_url(),
+            employeeDetailRequest.getEmployee_id())
+        .onDuplicateKeyUpdate()
+        .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
+        .set(WORKING_CONTRACT.START_DATE, employeeDetailRequest.getStart_date())
+        .set(WORKING_CONTRACT.END_DATE, employeeDetailRequest.getEnd_date())
+        .set(WORKING_CONTRACT.CONTRACT_URL, employeeDetailRequest.getContract_url())
+        .set(WORKING_CONTRACT.EMPLOYEE_ID, employeeDetailRequest.getEmployee_id());
   }
 
   public Update<?> updateEmployee(
@@ -319,6 +338,12 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(RelativeInformationResponse.class);
+  }
+
+  @Override
+  public Optional<CareerHistoryResponse> findCareerHistoryByEmployeeID(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return null;
   }
 
   @Override
@@ -399,74 +424,75 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
   @Override
   public List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-//    final var query =
-//        dslContext
-//            .select(
-//                EMPLOYEE.TAX_CODE,
-//                INSURANCE.INSURANCE_ID,
-//                INSURANCE.INSURANCE_NAME,
-//                INSURANCE.ADDRESS)
-//            .from(EMPLOYEE)
-//            .leftJoin(TAX)
-//            .on(TAX.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-//            .leftJoin(INSURANCE)
-//            .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-//            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-//    return query.fetchInto(TaxAndInsuranceResponse.class);
     return null;
+    //    final DSLContext dslContext = DSL.using(connection.getConnection());
+    //    final var query =
+    //        dslContext
+    //            .select(
+    //                EMPLOYEE.TAX_CODE,
+    //                INSURANCE.INSURANCE_ID,
+    //                INSURANCE.INSURANCE_NAME,
+    //                INSURANCE.ADDRESS)
+    //            .from(EMPLOYEE)
+    //            .leftJoin(INSURANCE)
+    //            .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+    //            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
+    //    return query.fetchInto(TaxAndInsuranceResponse.class);
   }
 
   @Override
   public Optional<EmployeeDetailResponse> findMainDetail(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-//    final var query =
-//        dslContext
-//            .select(
-//                EMPLOYEE.EMPLOYEE_ID,
-//                EMPLOYEE.FULL_NAME,
-//                EMPLOYEE.COMPANY_EMAIL,
-//                (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), "Active")
-//                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), "Deactivate"))
-//                    .as(WORKING_STATUS),
-//                EMPLOYEE.PHONE_NUMBER,
-//                EMPLOYEE.MARITAL_STATUS,
-//                EMPLOYEE.AVATAR,
-//                EMPLOYEE.GENDER,
-//                EMPLOYEE.BIRTH_DATE,
-//                GRADE_TYPE.NAME.as(GRADE),
-//                OFFICE.NAME.as(OFFICE_NAME),
-//                AREA.NAME.as(AREA_NAME),
-//                year(currentDate())
-//                    .minus(year(WORKING_CONTRACT.START_DATE))
-//                    .concat(YEAR)
-//                    .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
-//                    .concat(MONTH)
-//                    .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
-//                    .concat(DAY)
-//                    .as(SENIORITY),
-//                WORKING_CONTRACT.START_DATE,
-//                WORKING_CONTRACT.CONTRACT_URL,
-//                WORKING_CONTRACT.WORKING_CONTRACT_ID,
-//                JOB.POSITION.as(POSITION_NAME),
-//                WORKING_TYPE.NAME.as(WORKING_NAME))
-//            .from(EMPLOYEE)
-//            .leftJoin(WORKING_CONTRACT)
-//            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-//            .leftJoin(AREA)
-//            .on(AREA.AREA_ID.eq(WORKING_CONTRACT.AREA_ID))
-//            .leftJoin(OFFICE)
-//            .on(OFFICE.OFFICE_ID.eq(WORKING_CONTRACT.OFFICE_ID))
-//            .leftJoin(JOB)
-//            .on(JOB.JOB_ID.eq(WORKING_CONTRACT.JOB_ID))
-//            .leftJoin(GRADE_TYPE)
-//            .on(GRADE_TYPE.GRADE_ID.eq(WORKING_CONTRACT.GRADE_ID))
-//            .leftJoin(WORKING_TYPE)
-//            .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-//            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-//
-//    return query.fetchOptionalInto(EmployeeDetailResponse.class);
-    return null;
+    final var query =
+        dslContext
+            .select(
+                EMPLOYEE.EMPLOYEE_ID,
+                EMPLOYEE.FULL_NAME,
+                EMPLOYEE.COMPANY_EMAIL,
+                (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                        .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
+                    .as(WORKING_STATUS),
+                EMPLOYEE.PHONE_NUMBER,
+                EMPLOYEE.GENDER,
+                EMPLOYEE.BIRTH_DATE,
+                EMPLOYEE.MARITAL_STATUS,
+                EMPLOYEE.AVATAR,
+                GRADE_TYPE.NAME.as(GRADE),
+                OFFICE.NAME.as(OFFICE_NAME),
+                AREA.NAME.as(AREA_NAME),
+                year(currentDate())
+                    .minus(year(WORKING_CONTRACT.START_DATE))
+                    .concat(YEAR)
+                    .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                    .concat(MONTH)
+                    .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                    .concat(DAY)
+                    .as(SENIORITY),
+                JOB.POSITION.as(POSITION_NAME),
+                WORKING_TYPE.NAME.as(WORKING_NAME),
+                WORKING_CONTRACT.CONTRACT_URL,
+                WORKING_CONTRACT.START_DATE,
+                WORKING_CONTRACT.END_DATE,
+                WORKING_CONTRACT.WORKING_CONTRACT_ID,
+                WORKING_PLACE.WORKING_PLACE_ID)
+            .from(EMPLOYEE)
+            .leftJoin(Tables.WORKING_CONTRACT)
+            .on(Tables.WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(AREA)
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+            .leftJoin(OFFICE)
+            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+            .leftJoin(Tables.JOB)
+            .on(Tables.JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+            .leftJoin(Tables.GRADE_TYPE)
+            .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+            .leftJoin(WORKING_TYPE)
+            .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
+
+    return query.fetchOptionalInto(EmployeeDetailResponse.class);
   }
 
   @Override

@@ -3,7 +3,6 @@ package com.csproject.hrm.dto.request;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -14,6 +13,7 @@ public class EmployeeDetailRequest {
   private String full_name;
   private String employee_id;
   private LocalDate start_date;
+  private LocalDate end_date;
   private Boolean working_status;
   private String contract_url;
   private String phone_number;
@@ -23,9 +23,11 @@ public class EmployeeDetailRequest {
   private String personal_email;
   private String gender;
   private String marital_status;
+  private Boolean working_place_status;
   private Long office_id;
   private Long job_id;
   private Long area_id;
   private Long working_contract_id;
+  private Long working_place_id;
   private String avatar;
 }
