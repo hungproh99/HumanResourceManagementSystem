@@ -14,19 +14,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "bonus_salary")
-public class BonusSalary {
+@Table(name = "advances_salary")
+public class AdvancesSalary {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "bonus_id")
+  @Column(name = "advances_id")
   private Long id;
 
   @Column(name = "value")
   private BigDecimal value;
-
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
-  @JoinColumn(name = "deduction_type_id")
-  private BonusType bonusType;
 
   @Column(name = "description")
   private String description;

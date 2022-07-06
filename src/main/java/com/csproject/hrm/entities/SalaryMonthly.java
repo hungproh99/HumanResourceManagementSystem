@@ -37,4 +37,10 @@ public class SalaryMonthly {
 
   @OneToMany(mappedBy = "salaryMonthly", fetch = FetchType.LAZY)
   private List<BonusSalary> bonusSalaries;
+
+  @OneToMany(mappedBy = "salaryMonthly", fetch = FetchType.LAZY)
+  private List<DeductionSalary> deductionSalaries;
+
+  @OneToMany(mappedBy = "salaryMonthly", fetch = FetchType.LAZY)
+  private List<AdvancesSalary> advancesSalaries;
 }
