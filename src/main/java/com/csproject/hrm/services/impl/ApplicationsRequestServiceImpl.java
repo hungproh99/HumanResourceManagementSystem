@@ -67,7 +67,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + applicationsRequest.getEmployeeId());
     }
     if (applicationsRequest.getEmployeeId() == null
-        || applicationsRequest.getRequestTypeId() == null
         || applicationsRequest.getRequestNameId() == null
         || applicationsRequest.getRequestStatusId() == null
         || applicationsRequest.getFullName() == null

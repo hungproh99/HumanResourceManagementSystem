@@ -25,9 +25,6 @@ public class RequestType {
   @Column(name = "name")
   private ERequestType eRequestType;
 
-  @OneToOne(mappedBy = "requestType", fetch = FetchType.LAZY)
-  private ApplicationsRequest applicationsRequest;
-
   @OneToMany(mappedBy = "requestType", fetch = FetchType.LAZY)
   private List<RequestName> requestNames;
 }

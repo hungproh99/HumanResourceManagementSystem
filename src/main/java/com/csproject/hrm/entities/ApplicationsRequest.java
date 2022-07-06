@@ -30,10 +30,6 @@ public class ApplicationsRequest {
   private String description;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "request_type")
-  private RequestType requestType;
-
-  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "request_name")
   private RequestName requestName;
 
