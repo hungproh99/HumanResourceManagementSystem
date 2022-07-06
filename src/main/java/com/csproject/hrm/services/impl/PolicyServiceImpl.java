@@ -2,8 +2,7 @@ package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.EPolicyCategory;
 import com.csproject.hrm.common.enums.EPolicyType;
-import com.csproject.hrm.dto.response.ListPolicyResponse;
-import com.csproject.hrm.dto.response.PolicyResponse;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.PolicyRepository;
 import com.csproject.hrm.services.PolicyService;
@@ -28,5 +27,17 @@ public class PolicyServiceImpl implements PolicyService {
         });
     int total = policyRepository.getTotalPolicyByCategoryID(queryParam);
     return ListPolicyResponse.builder().policyResponseList(policyRespons).total(total).build();
+  }
+
+  @Override
+  public List<PolicyCategoryResponse> getAllPolicyCategory() {
+    List<PolicyCategoryResponse> policyCategoryResponseList =
+        policyRepository.getAllPolicyCategory();
+    policyCategoryResponseList.forEach(
+        policyCategoryResponse -> {
+          policyCategoryResponse.setPolicy_category(
+              EPolicyCategory.getLabel(policyCategoryResponse.getPolicy_category()));
+        });
+    return policyCategoryResponseList;
   }
 }

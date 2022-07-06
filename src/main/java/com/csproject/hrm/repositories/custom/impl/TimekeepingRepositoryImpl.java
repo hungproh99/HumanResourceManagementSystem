@@ -108,8 +108,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 timekeepingStatusList.forEach(
                     timekeepingStatus -> {
                       timekeepingStatus.setTimekeeping_status(
-                          ETimekeepingStatus.getValue(
-                              timekeepingStatus.getTimekeeping_status()));
+                          ETimekeepingStatus.getValue(timekeepingStatus.getTimekeeping_status()));
                     });
                 timekeeping.setTimekeeping_status(timekeepingStatusList);
               });
@@ -186,8 +185,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 timekeepingStatusList.forEach(
                     timekeepingStatus -> {
                       timekeepingStatus.setTimekeeping_status(
-                          ETimekeepingStatus.getValue(
-                              timekeepingStatus.getTimekeeping_status()));
+                          ETimekeepingStatus.getValue(timekeepingStatus.getTimekeeping_status()));
                     });
                 timekeeping.setTimekeeping_status(timekeepingStatusList);
               });

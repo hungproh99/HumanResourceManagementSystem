@@ -35,7 +35,7 @@ public interface EmployeeDetailRepositoryCustom {
 
   Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID);
 
-  List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
+  Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
 
   Optional<EmployeeDetailResponse> findMainDetail(String employeeID);
 

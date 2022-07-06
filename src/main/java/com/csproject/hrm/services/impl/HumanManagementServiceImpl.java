@@ -8,17 +8,12 @@ import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.ContractRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.HumanManagementService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.*;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,6 +36,20 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired ContractRepository contractRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
+
+  private static int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
+    int numOfNonEmptyCells = 0;
+    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      if (row != null) {
+        Cell cell = row.getCell(columnIndex);
+        if (cell != null && cell.getCellType() != CellType.BLANK) {
+          numOfNonEmptyCells++;
+        }
+      }
+    }
+    return numOfNonEmptyCells;
+  }
 
   @Override
   public HrmResponseList getListHumanResource(QueryParam queryParam) {
@@ -204,11 +214,12 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Override
   public void importCsvToEmployee(InputStream inputStream) {
     List<HrmRequest> hrmRequestList = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+    try (BufferedReader reader =
+            new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         CSVParser csvParser =
             new CSVParser(
                 reader,
-                CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim()); ) {
+                CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
       for (CSVRecord csvRecord : csvParser) {
         try {
           String fullName = csvRecord.get("Full Name");
@@ -255,20 +266,6 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Override
   public List<String> getListManagerByName(String name) {
     return employeeRepository.getListManagerByName(name);
-  }
-
-  private static int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
-    int numOfNonEmptyCells = 0;
-    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      if (row != null) {
-        Cell cell = row.getCell(columnIndex);
-        if (cell != null && cell.getCellType() != CellType.BLANK) {
-          numOfNonEmptyCells++;
-        }
-      }
-    }
-    return numOfNonEmptyCells;
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
