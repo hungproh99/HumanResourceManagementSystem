@@ -5,6 +5,7 @@ import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,9 +18,9 @@ public interface TimekeepingRepositoryCustom {
   Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
       String employeeID, LocalDate date);
 
-	List<ListTimekeepingStatusResponse> getListTimekeepingStatus(Long timekeepingID);
+  List<ListTimekeepingStatusResponse> getListTimekeepingStatus(Long timekeepingID);
 
-	List<CheckInCheckOutResponse> getCheckInCheckOutByTimekeepingID(Long timekeepingID);
+  List<CheckInCheckOutResponse> getCheckInCheckOutByTimekeepingID(Long timekeepingID);
 
   int countListAllTimekeeping(QueryParam queryParam);
 
@@ -34,4 +35,12 @@ public interface TimekeepingRepositoryCustom {
       LocalDate endDate,
       long oldTimekeepingStatus,
       long newTimekeepingStatus);
+
+  void insertOvertimeByEmployeeIdAndRangeDate(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      LocalTime startTime,
+      LocalTime endTime,
+      Long overtimeType);
 }

@@ -9,7 +9,6 @@ import lombok.*;
 public class ApplicationsRequestRequest {
   private Long applicationRequestId;
   private String employeeId;
-  private Long requestTypeId;
   private Long requestNameId;
   private Long requestStatusId;
   private String fullName;

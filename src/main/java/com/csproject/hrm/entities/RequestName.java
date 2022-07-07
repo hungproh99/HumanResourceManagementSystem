@@ -17,15 +17,12 @@ import javax.persistence.*;
 public class RequestName {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "type_id")
+  @Column(name = "request_name_id")
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "request_code")
-  private ERequestName eRequestName;
-
   @Column(name = "name")
-  private String requestName;
+  private ERequestName eRequestName;
 
   @Column(name = "description")
   private String description;

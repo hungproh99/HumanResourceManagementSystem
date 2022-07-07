@@ -33,8 +33,8 @@ public class Policy {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "minimum_level_accept")
-  private int minimumLevelAccept;
+  @Column(name = "maximum_level_accept")
+  private int maximumLevelAccept;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = PolicyType.class)
   @JoinColumn(name = "policy_type_id")

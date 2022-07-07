@@ -2,7 +2,7 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
-import com.csproject.hrm.repositories.custom.BonusSalaryRepositoryCustom;
+import com.csproject.hrm.repositories.custom.DeductionSalaryRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -14,10 +14,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.jooq.codegen.maven.example.tables.BonusSalary.BONUS_SALARY;
+import static org.jooq.codegen.maven.example.tables.DeductionSalary.DEDUCTION_SALARY;
 
 @AllArgsConstructor
-public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
+public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryCustom {
   private static final Map<String, Field<?>> field2Map;
 
   static {
@@ -28,17 +28,17 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
   @Autowired private final DBConnection connection;
 
   @Override
-  public void insertBonusSalaryByEmployeeId(
+  public void insertDeductionSalaryByEmployeeId(
       Long salaryId, LocalDate date, String description, BigDecimal bonus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .insertInto(
-                BONUS_SALARY,
-                BONUS_SALARY.DATE,
-                BONUS_SALARY.DESCRIPTION,
-                BONUS_SALARY.VALUE,
-                BONUS_SALARY.SALARY_ID)
+                DEDUCTION_SALARY,
+                DEDUCTION_SALARY.DATE,
+                DEDUCTION_SALARY.DESCRIPTION,
+                DEDUCTION_SALARY.VALUE,
+                DEDUCTION_SALARY.SALARY_ID)
             .values(date, description, bonus, salaryId)
             .execute();
   }

@@ -1,6 +1,6 @@
 package com.csproject.hrm.entities;
 
-import com.csproject.hrm.common.enums.ERequestType;
+import com.csproject.hrm.common.enums.EBonus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,17 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "request_type")
-public class RequestType {
+@Table(name = "bonus_type")
+public class BonusType {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "type_id")
+  @Column(name = "bonus_type_id")
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "name")
-  private ERequestType eRequestType;
+  @Column(name = "bonus_type")
+  private EBonus eBonus;
 
-  @OneToMany(mappedBy = "requestType", fetch = FetchType.LAZY)
-  private List<RequestName> requestNames;
+  @OneToMany(mappedBy = "bonusType", fetch = FetchType.LAZY)
+  private List<BonusSalary> bonusSalaries;
 }

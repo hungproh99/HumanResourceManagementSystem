@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Repository
-public interface BonusSalaryRepositoryCustom {
-  void insertBonusSalaryByEmployeeId(
+public interface DeductionSalaryRepositoryCustom {
+  void insertDeductionSalaryByEmployeeId(
       Long salaryId, LocalDate date, String description, BigDecimal bonus);
 }

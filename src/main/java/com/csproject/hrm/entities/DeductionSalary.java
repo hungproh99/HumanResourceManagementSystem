@@ -14,11 +14,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "bonus_salary")
-public class BonusSalary {
+@Table(name = "deduction_salary")
+public class DeductionSalary {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "bonus_id")
+  @Column(name = "deduction_id")
   private Long id;
 
   @Column(name = "value")
@@ -26,7 +26,7 @@ public class BonusSalary {
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
   @JoinColumn(name = "deduction_type_id")
-  private BonusType bonusType;
+  private DeductionType deductionType;
 
   @Column(name = "description")
   private String description;

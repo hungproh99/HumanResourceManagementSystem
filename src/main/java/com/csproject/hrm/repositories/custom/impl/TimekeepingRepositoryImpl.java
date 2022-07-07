@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.ListTimekeepingStatus.LIST_TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
+import static org.jooq.codegen.maven.example.tables.Overtime.OVERTIME;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.codegen.maven.example.tables.TimekeepingStatus.TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
@@ -555,5 +557,41 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .where(conditions)
         .and(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
         .orderBy(sortFields);
+  }
+
+  @Override
+  public void insertOvertimeByEmployeeIdAndRangeDate(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      LocalTime startTime,
+      LocalTime endTime,
+      Long overtimeType) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Long> timekeepingIdList =
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .fetchInto(Long.class);
+
+    dslContext.transaction(
+        configuration -> {
+          timekeepingIdList.forEach(
+              timekeepingId -> {
+                queries.add(
+                    dslContext
+                        .insertInto(
+                            OVERTIME,
+                            OVERTIME.TIMEKEEPING_ID,
+                            OVERTIME.START_TIME,
+                            OVERTIME.END_TIME,
+                            OVERTIME.OVERTIME_TYPE_ID)
+                        .values(timekeepingId, startTime, endTime, overtimeType));
+              });
+          DSL.using(configuration).batch(queries).execute();
+        });
   }
 }

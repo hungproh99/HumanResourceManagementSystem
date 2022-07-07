@@ -36,4 +36,7 @@ public class Timekeeping {
 
   @Column(name = "amount_work_per_day")
   private String amountWorkPerDay;
+
+  @OneToOne(mappedBy = "timekeeping", fetch = FetchType.LAZY)
+  private Overtime overTime;
 }

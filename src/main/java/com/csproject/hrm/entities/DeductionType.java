@@ -1,6 +1,6 @@
 package com.csproject.hrm.entities;
 
-import com.csproject.hrm.common.enums.ERequestType;
+import com.csproject.hrm.common.enums.EDeduction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,17 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "request_type")
-public class RequestType {
+@Table(name = "deduction_type")
+public class DeductionType {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "type_id")
+  @Column(name = "deduction_type_id")
   private Long id;
 
   @Enumerated(value = EnumType.STRING)
-  @Column(name = "name")
-  private ERequestType eRequestType;
+  @Column(name = "deduction_type")
+  private EDeduction eDeduction;
 
-  @OneToMany(mappedBy = "requestType", fetch = FetchType.LAZY)
-  private List<RequestName> requestNames;
+  @OneToMany(mappedBy = "deductionType", fetch = FetchType.LAZY)
+  private List<DeductionSalary> deductionSalaries;
 }

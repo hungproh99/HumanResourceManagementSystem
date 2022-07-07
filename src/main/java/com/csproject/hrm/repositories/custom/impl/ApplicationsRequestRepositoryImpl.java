@@ -2,7 +2,9 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.ERequestStatus;
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.RequestNameDto;
+import com.csproject.hrm.dto.dto.RequestStatusDto;
+import com.csproject.hrm.dto.dto.RequestTypeDto;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -25,10 +27,10 @@ import static org.aspectj.util.LangUtil.isEmpty;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
+import static org.jooq.codegen.maven.example.tables.Policy.POLICY;
 import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
-import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.impl.DSL.concat;
 import static org.jooq.impl.DSL.when;
 
@@ -56,9 +58,18 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
 
-    return getListApplicationRequestReceive(
-            conditions, orderByList, queryParam.pagination, employeeId)
-        .fetchInto(ApplicationsRequestResponse.class);
+    List<ApplicationsRequestResponse> applicationsRequestResponseList =
+        getListApplicationRequestReceive(conditions, orderByList, queryParam.pagination, employeeId)
+            .fetchInto(ApplicationsRequestResponse.class);
+
+    applicationsRequestResponseList.forEach(
+        applicationsRequestResponse -> {
+          applicationsRequestResponse.setChecked_by(
+              getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
+                  .fetchInto(String.class));
+        });
+
+    return applicationsRequestResponseList;
   }
 
   @Override
@@ -68,8 +79,18 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
 
-    return getListApplicationRequestSend(conditions, orderByList, queryParam.pagination, employeeId)
-        .fetchInto(ApplicationsRequestResponse.class);
+    List<ApplicationsRequestResponse> applicationsRequestResponseList =
+        getListApplicationRequestSend(conditions, orderByList, queryParam.pagination, employeeId)
+            .fetchInto(ApplicationsRequestResponse.class);
+
+    applicationsRequestResponseList.forEach(
+        applicationsRequestResponse -> {
+          applicationsRequestResponse.setChecked_by(
+              getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
+                  .fetchInto(String.class));
+        });
+
+    return applicationsRequestResponseList;
   }
 
   private Select<?> getListApplicationRequestReceive(
@@ -84,6 +105,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     return dslContext
         .select(
+            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
@@ -102,9 +124,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .leftJoin(REQUEST_STATUS)
         .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
         .leftJoin(REQUEST_NAME)
-        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
         .leftJoin(REQUEST_TYPE)
-        .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+        .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
         .where(conditions)
         .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
         .orderBy(sortFields)
@@ -113,6 +135,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .unionAll(
             dslContext
                 .select(
+                    APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
                     EMPLOYEE.EMPLOYEE_ID,
                     EMPLOYEE.FULL_NAME,
                     APPLICATIONS_REQUEST.CREATE_DATE,
@@ -134,9 +157,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                 .leftJoin(REQUEST_STATUS)
                 .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
                 .leftJoin(REQUEST_NAME)
-                .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+                .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
                 .leftJoin(REQUEST_TYPE)
-                .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+                .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
                 .leftJoin(selectForward)
                 .on(
                     selectForward
@@ -158,6 +181,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     return dslContext
         .select(
+            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
@@ -176,9 +200,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .leftJoin(REQUEST_STATUS)
         .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
         .leftJoin(REQUEST_NAME)
-        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
         .leftJoin(REQUEST_TYPE)
-        .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+        .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
         .where(conditions)
         .and(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(employeeId))
         .orderBy(sortFields)
@@ -197,7 +221,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .insertInto(
             APPLICATIONS_REQUEST,
             APPLICATIONS_REQUEST.EMPLOYEE_ID,
-            APPLICATIONS_REQUEST.REQUEST_TYPE,
             APPLICATIONS_REQUEST.REQUEST_STATUS,
             APPLICATIONS_REQUEST.REQUEST_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
@@ -208,7 +231,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.IS_BOOKMARK)
         .values(
             applicationsRequest.getEmployeeId(),
-            applicationsRequest.getRequestTypeId(),
             applicationsRequest.getRequestStatusId(),
             applicationsRequest.getRequestNameId(),
             createdDate,
@@ -248,6 +270,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final var query =
         dslContext
             .select(
+                APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
                 APPLICATIONS_REQUEST.CREATE_DATE,
@@ -266,15 +289,16 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .leftJoin(REQUEST_STATUS)
             .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
             .leftJoin(REQUEST_NAME)
-            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
             .leftJoin(REQUEST_TYPE)
-            .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+            .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
             .where(conditions)
             .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
             .orderBy(orderByList)
             .unionAll(
                 dslContext
                     .select(
+                        APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
                         EMPLOYEE.EMPLOYEE_ID,
                         EMPLOYEE.FULL_NAME,
                         APPLICATIONS_REQUEST.CREATE_DATE,
@@ -296,9 +320,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                     .leftJoin(REQUEST_STATUS)
                     .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
                     .leftJoin(REQUEST_NAME)
-                    .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+                    .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
                     .leftJoin(REQUEST_TYPE)
-                    .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+                    .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
                     .leftJoin(selectForward)
                     .on(
                         selectForward
@@ -319,6 +343,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final var query =
         dslContext
             .select(
+                APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
                 EMPLOYEE.EMPLOYEE_ID,
                 EMPLOYEE.FULL_NAME,
                 APPLICATIONS_REQUEST.CREATE_DATE,
@@ -337,9 +362,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .leftJoin(REQUEST_STATUS)
             .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
             .leftJoin(REQUEST_NAME)
-            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.TYPE_ID))
+            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
             .leftJoin(REQUEST_TYPE)
-            .on(APPLICATIONS_REQUEST.REQUEST_TYPE.eq(REQUEST_TYPE.TYPE_ID))
+            .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
             .where(conditions)
             .and(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(employeeId))
             .orderBy(orderByList);
@@ -465,9 +490,59 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
-            REQUEST_NAME.TYPE_ID.as("request_name_id"), REQUEST_NAME.NAME.as("request_name_name"))
+            REQUEST_NAME.REQUEST_NAME_ID.as("request_name_id"),
+            REQUEST_NAME.NAME.as("request_name_name"))
         .from(REQUEST_NAME)
         .where(REQUEST_NAME.REQUEST_TYPE_ID.eq(requestTypeID))
         .fetchInto(RequestNameDto.class);
+  }
+
+  @Override
+  public Boolean checkLevelOfManagerByRequestId(String employeeId, Long requestApplicationId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var level =
+        dslContext
+            .select(EMPLOYEE.LEVEL)
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .fetchOneInto(Integer.class);
+
+    final var maximumLevelAccept =
+        dslContext
+            .select(POLICY.MAXIMUM_LEVEL_ACCEPT)
+            .from(APPLICATIONS_REQUEST)
+            .leftJoin(REQUEST_NAME)
+            .on(REQUEST_NAME.REQUEST_NAME_ID.eq(APPLICATIONS_REQUEST.REQUEST_NAME))
+            .leftJoin(POLICY)
+            .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestApplicationId))
+            .fetchOneInto(Integer.class);
+
+    return level < maximumLevelAccept;
+  }
+
+  @Override
+  public void updateApproverAndForwardByRequestId(
+      Long requestId, String newApprover, String forwarder) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var updateApprover =
+        dslContext
+            .update(APPLICATIONS_REQUEST)
+            .set(APPLICATIONS_REQUEST.APPROVER, newApprover)
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+            .execute();
+
+    final var insertForwarder =
+        dslContext
+            .insertInto(FORWARDS, FORWARDS.EMPLOYEE_ID, FORWARDS.APPLICATIONS_REQUEST_ID)
+            .values(forwarder, requestId);
+  }
+
+  private Select<?> getListForwarderByRequestId(Long requestId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(FORWARDS.EMPLOYEE_ID)
+        .from(FORWARDS)
+        .where(FORWARDS.APPLICATIONS_REQUEST_ID.eq(requestId));
   }
 }

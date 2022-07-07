@@ -41,4 +41,8 @@ public interface ApplicationsRequestRepositoryCustom {
   List<RequestTypeDto> getAllRequestType();
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
+
+  Boolean checkLevelOfManagerByRequestId(String employeeId, Long requestId);
+
+  void updateApproverAndForwardByRequestId(Long requestId, String newApprover, String forwarder);
 }
