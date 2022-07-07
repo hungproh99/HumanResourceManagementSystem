@@ -25,4 +25,6 @@ public class ApplicationsRequestResponse {
   private String approver;
   private List<String> checked_by;
   private String is_bookmark;
+  private String is_enough_level;
+  private String is_read;
 }

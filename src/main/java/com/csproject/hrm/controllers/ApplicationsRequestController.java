@@ -70,7 +70,7 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PostMapping(URI_UPDATE_STATUS_APPLICATION_QUEST)
-  public ResponseEntity<?> updateApplicationRequest(
+  public ResponseEntity<?> updateStatusApplicationRequest(
       @RequestBody UpdateApplicationRequestRequest updateApplicationRequestRequest) {
     applicationsRequestService.updateStatusApplicationRequest(updateApplicationRequestRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
@@ -87,5 +87,12 @@ public class ApplicationsRequestController {
   public ResponseEntity<?> getAllRequestNameByRequestTypeID(@RequestParam Long requestTypeID) {
     return ResponseEntity.ok(
         applicationsRequestService.getAllRequestNameByRequestTypeID(requestTypeID));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PostMapping(URI_UPDATE_IS_READ)
+  public ResponseEntity<?> updateIsRead(@RequestParam Long requestId) {
+    applicationsRequestService.updateIsRead(requestId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

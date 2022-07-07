@@ -31,4 +31,6 @@ public interface EmployeeRepositoryCustom {
   List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list);
 
   List<String> getListManagerByName(String name);
+
+  List<String> getListEmployeeByNameAndId(String name);
 }

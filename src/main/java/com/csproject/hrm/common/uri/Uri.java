@@ -43,4 +43,8 @@ public class Uri {
       "/list_all_application_request_receive";
   public static final String URI_UPDATE_STATUS_APPLICATION_QUEST =
       "/update_status_application_request";
+
+  public static final String URI_UPDATE_IS_READ = "/update_is_read";
+
+  public static final String URI_GET_LIST_EMPLOYEE_NAME_AND_ID = "/list_employee_name_id";
 }

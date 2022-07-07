@@ -42,7 +42,9 @@ public interface ApplicationsRequestRepositoryCustom {
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
-  Boolean checkLevelOfManagerByRequestId(String employeeId, Long requestId);
+  String checkLevelOfManagerByRequestId(String employeeId, Long requestId);
 
   void updateApproverAndForwardByRequestId(Long requestId, String newApprover, String forwarder);
+
+  void changeIsRead(boolean isRead, Long requestId);
 }
