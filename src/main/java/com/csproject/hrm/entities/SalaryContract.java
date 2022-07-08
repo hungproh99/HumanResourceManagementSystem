@@ -37,9 +37,6 @@ public class SalaryContract {
   @Column(name = "start_date")
   private LocalDate startDate;
 
-  @Column(name = "end_date")
-  private LocalDate endDate;
-
   @OneToMany(mappedBy = "salaryContract", fetch = FetchType.LAZY)
   private List<SalaryMonthly> salaryMonthlies;
 }

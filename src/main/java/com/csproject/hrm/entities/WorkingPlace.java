@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -39,6 +40,9 @@ public class WorkingPlace {
   @Column(name = "working_place_status")
   @Type(type = "boolean")
   private Boolean workingPlaceStatus;
+
+  @Column(name = "start_date")
+  private LocalDate startDate;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = WorkingContract.class)
   @JoinColumn(name = "working_contract_id")

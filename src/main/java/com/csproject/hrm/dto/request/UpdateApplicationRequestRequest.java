@@ -8,6 +8,5 @@ import lombok.*;
 @Builder
 public class UpdateApplicationRequestRequest {
   private Long applicationRequestId;
-  private String approverId;
   private String requestStatus;
 }

@@ -24,7 +24,7 @@ public interface TimekeepingRepositoryCustom {
 
   int countListAllTimekeeping(QueryParam queryParam);
 
-  void insertTimekeepingByEmployeeId(String employeeId, LocalDate date);
+  void insertTimekeepingByEmployeeId(String employeeId, LocalDate startDate, LocalDate endDate);
 
   void insertTimekeepingStatusByEmployeeIdAndRangeDate(
       String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus);

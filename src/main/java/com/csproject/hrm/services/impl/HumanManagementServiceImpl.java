@@ -10,7 +10,7 @@ import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
-import com.csproject.hrm.repositories.ContractRepository;
+import com.csproject.hrm.repositories.WorkingPlaceRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.services.HumanManagementService;
 import org.apache.commons.csv.*;
@@ -33,23 +33,9 @@ import static com.csproject.hrm.common.constant.Constants.*;
 @Service
 public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired EmployeeRepository employeeRepository;
-  @Autowired ContractRepository contractRepository;
+  @Autowired WorkingPlaceRepository contractRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
-
-  private static int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
-    int numOfNonEmptyCells = 0;
-    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      if (row != null) {
-        Cell cell = row.getCell(columnIndex);
-        if (cell != null && cell.getCellType() != CellType.BLANK) {
-          numOfNonEmptyCells++;
-        }
-      }
-    }
-    return numOfNonEmptyCells;
-  }
 
   @Override
   public HrmResponseList getListHumanResource(QueryParam queryParam) {
@@ -265,7 +251,32 @@ public class HumanManagementServiceImpl implements HumanManagementService {
 
   @Override
   public List<String> getListManagerByName(String name) {
+    if (name == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
     return employeeRepository.getListManagerByName(name);
+  }
+
+  @Override
+  public List<String> getListEmployeeByNameAndId(String name) {
+    if (name == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
+    return employeeRepository.getListEmployeeByNameAndId(name);
+  }
+
+  private static int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
+    int numOfNonEmptyCells = 0;
+    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      if (row != null) {
+        Cell cell = row.getCell(columnIndex);
+        if (cell != null && cell.getCellType() != CellType.BLANK) {
+          numOfNonEmptyCells++;
+        }
+      }
+    }
+    return numOfNonEmptyCells;
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {

@@ -36,6 +36,8 @@ public interface HumanManagementService {
 
   List<String> getListManagerByName(String name);
 
+  List<String> getListEmployeeByNameAndId(String name);
+
   void exportEmployeeToExcel(
       HttpServletResponse response, QueryParam queryParam, List<String> list);
 

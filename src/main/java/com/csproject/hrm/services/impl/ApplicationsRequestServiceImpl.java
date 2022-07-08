@@ -86,14 +86,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   public void updateStatusApplicationRequest(
       UpdateApplicationRequestRequest updateApplicationRequestRequest) {
     if (updateApplicationRequestRequest.getApplicationRequestId() == null
-        || updateApplicationRequestRequest.getRequestStatus() == null
-        || updateApplicationRequestRequest.getApproverId() == null) {
+        || updateApplicationRequestRequest.getRequestStatus() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    }
-    if (employeeRepository.findById(updateApplicationRequestRequest.getApproverId()).isEmpty()) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST,
-          NOT_EXIST_USER_WITH + updateApplicationRequestRequest.getApproverId());
     }
     LocalDateTime latestDate = LocalDateTime.now();
     applicationsRequestRepository.updateStatusApplicationRequest(
@@ -136,5 +130,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         });
 
     return requestNameDtoList;
+  }
+
+  @Override
+  public void updateIsRead(Long requestId) {
+    boolean isRead = false;
+    applicationsRequestRepository.changeIsRead(isRead, requestId);
   }
 }

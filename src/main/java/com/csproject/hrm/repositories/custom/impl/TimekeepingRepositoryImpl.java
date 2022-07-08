@@ -362,14 +362,22 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public void insertTimekeepingByEmployeeId(String employeeId, LocalDate date) {
+  public void insertTimekeepingByEmployeeId(
+      String employeeId, LocalDate startDate, LocalDate endDate) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-
-    final var query =
-        dslContext
-            .insertInto(TIMEKEEPING, TIMEKEEPING.EMPLOYEE_ID, TIMEKEEPING.DATE)
-            .values(employeeId, date)
-            .execute();
+    List<LocalDate> listOfDates = startDate.datesUntil(endDate).collect(Collectors.toList());
+    List<Query> queries = new ArrayList<>();
+    dslContext.transaction(
+        configuration -> {
+          listOfDates.forEach(
+              date -> {
+                queries.add(
+                    dslContext
+                        .insertInto(TIMEKEEPING, TIMEKEEPING.EMPLOYEE_ID, TIMEKEEPING.DATE)
+                        .values(employeeId, date));
+              });
+          DSL.using(configuration).batch(queries).execute();
+        });
   }
 
   @Override

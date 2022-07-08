@@ -59,4 +59,8 @@ public class ApplicationsRequest {
   @Column(name = "is_remind")
   @Type(type = "boolean")
   private Boolean isRemind;
+
+  @Column(name = "is_read")
+  @Type(type = "boolean")
+  private Boolean isRead;
 }

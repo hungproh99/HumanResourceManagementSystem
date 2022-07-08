@@ -67,6 +67,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setChecked_by(
               getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
                   .fetchInto(String.class));
+          applicationsRequestResponse.setIs_enough_level(
+              checkLevelOfManagerByRequestId(
+                  employeeId, applicationsRequestResponse.getApplication_request_id()));
         });
 
     return applicationsRequestResponseList;
@@ -117,7 +120,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.APPROVER,
             (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                     .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                .as(IS_BOOKMARK))
+                .as(IS_BOOKMARK),
+            APPLICATIONS_REQUEST.IS_READ)
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -150,7 +154,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                     APPLICATIONS_REQUEST.APPROVER,
                     (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                             .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                        .as(IS_BOOKMARK))
+                        .as(IS_BOOKMARK),
+                    APPLICATIONS_REQUEST.IS_READ)
                 .from(EMPLOYEE)
                 .leftJoin(APPLICATIONS_REQUEST)
                 .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -193,7 +198,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.APPROVER,
             (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                     .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                .as(IS_BOOKMARK))
+                .as(IS_BOOKMARK),
+            APPLICATIONS_REQUEST.IS_READ)
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -252,7 +258,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.REQUEST_STATUS,
             ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))
         .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
-        .set(APPLICATIONS_REQUEST.APPROVER, updateApplicationRequestRequest.getApproverId())
         .where(
             APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(
                 updateApplicationRequestRequest.getApplicationRequestId()))
@@ -498,7 +503,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
-  public Boolean checkLevelOfManagerByRequestId(String employeeId, Long requestApplicationId) {
+  public String checkLevelOfManagerByRequestId(String employeeId, Long requestApplicationId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var level =
         dslContext
@@ -518,7 +523,11 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestApplicationId))
             .fetchOneInto(Integer.class);
 
-    return level < maximumLevelAccept;
+    if (maximumLevelAccept == null || level == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
+    }
+
+    return level < maximumLevelAccept ? "True" : "False";
   }
 
   @Override
@@ -544,5 +553,24 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .select(FORWARDS.EMPLOYEE_ID)
         .from(FORWARDS)
         .where(FORWARDS.APPLICATIONS_REQUEST_ID.eq(requestId));
+  }
+
+  @Override
+  public void changeIsRead(boolean isRead, Long requestId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var queryIsRead =
+        dslContext
+            .select(APPLICATIONS_REQUEST.IS_READ)
+            .from(APPLICATIONS_REQUEST)
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+            .fetchOneInto(Boolean.class);
+    if (Boolean.TRUE.equals(queryIsRead)) {
+      final var query =
+          dslContext
+              .update(APPLICATIONS_REQUEST)
+              .set(APPLICATIONS_REQUEST.IS_READ, isRead)
+              .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+              .execute();
+    }
   }
 }

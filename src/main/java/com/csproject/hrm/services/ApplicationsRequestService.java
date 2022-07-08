@@ -25,4 +25,6 @@ public interface ApplicationsRequestService {
   List<RequestTypeDto> getAllRequestType();
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
+
+  void updateIsRead(Long requestId);
 }
