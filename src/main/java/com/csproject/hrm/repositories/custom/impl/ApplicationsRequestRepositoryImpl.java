@@ -523,6 +523,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestApplicationId))
             .fetchOneInto(Integer.class);
 
+    if (maximumLevelAccept == null || level == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
+    }
+
     return level < maximumLevelAccept ? "True" : "False";
   }
 

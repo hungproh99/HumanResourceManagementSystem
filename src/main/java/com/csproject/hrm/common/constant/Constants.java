@@ -119,4 +119,5 @@ public class Constants {
   public static final String EMPLOYEE_ASSET_STATUS_INVALID = "Invalid Employee Asset Status";
   public static final String DEDUCTION_INVALID = "Invalid Deduction Type";
   public static final String BONUS_INVALID = "Invalid Bonus Type";
+  public static final String NULL_LEVEL = "Level is null";
 }
