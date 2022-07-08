@@ -152,36 +152,33 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
   @Override
   public void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance) {
-    //    final DSLContext dslContext = DSL.using(connection.getConnection());
-    //    dslContext
-    //        .update(EMPLOYEE)
-    //        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
-    //        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
-    //        .execute();
-    //
-    //    dslContext
-    //        .insertInto(
-    //            EMPLOYEE_INSURANCE_TAX,
-    //            INSURANCE.INSURANCE_ID,
-    //            INSURANCE.EMPLOYEE_ID,
-    //            INSURANCE.ADDRESS,
-    //            INSURANCE.INSURANCE_NAME,
-    //            INSURANCE.PERCENT,
-    //            INSURANCE.DESCRIPTION)
-    //        .values(
-    //            taxAndInsurance.getInsuranceId(),
-    //            taxAndInsurance.getEmployeeId(),
-    //            taxAndInsurance.getInsuranceAddress(),
-    //            taxAndInsurance.getInsuranceName(),
-    //            taxAndInsurance.getInsurancePercent(),
-    //            taxAndInsurance.getInsuranceDescription())
-    //        .onDuplicateKeyUpdate()
-    //        .set(INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
-    //        .set(INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-    //        .set(INSURANCE.INSURANCE_NAME, taxAndInsurance.getInsuranceName())
-    //        .set(INSURANCE.PERCENT, taxAndInsurance.getInsurancePercent())
-    //        .set(INSURANCE.DESCRIPTION, taxAndInsurance.getInsurancePercent())
-    //        .execute();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .update(EMPLOYEE)
+        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
+        .execute();
+
+    dslContext
+        .insertInto(
+            EMPLOYEE_INSURANCE,
+            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
+            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
+            EMPLOYEE_INSURANCE.ADDRESS,
+            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
+            EMPLOYEE_INSURANCE.POLICY_TYPE_ID)
+        .values(
+            taxAndInsurance.getInsuranceId(),
+            taxAndInsurance.getEmployeeId(),
+            taxAndInsurance.getInsuranceAddress(),
+            taxAndInsurance.getInsuranceStatus(),
+            taxAndInsurance.getPolicyTypeId())
+        .onDuplicateKeyUpdate()
+        .set(EMPLOYEE_INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
+        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
+        .set(EMPLOYEE_INSURANCE.INSURANCE_STATUS, taxAndInsurance.getInsuranceStatus())
+        .set(EMPLOYEE_INSURANCE.POLICY_TYPE_ID, taxAndInsurance.getPolicyTypeId())
+        .execute();
   }
 
   @Override
@@ -423,21 +420,24 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
-    return null;
-    //    final DSLContext dslContext = DSL.using(connection.getConnection());
-    //    final var query =
-    //        dslContext
-    //            .select(
-    //                EMPLOYEE.TAX_CODE,
-    //                INSURANCE.INSURANCE_ID,
-    //                INSURANCE.INSURANCE_NAME,
-    //                INSURANCE.ADDRESS)
-    //            .from(EMPLOYEE)
-    //            .leftJoin(INSURANCE)
-    //            .on(INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-    //            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    //    return query.fetchInto(TaxAndInsuranceResponse.class);
+  public Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .select(
+                EMPLOYEE.TAX_CODE,
+                EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
+                EMPLOYEE_INSURANCE.ADDRESS,
+                POLICY_TYPE.POLICY_TYPE_,
+                POLICY_TYPE.POLICY_TYPE_ID,
+                POLICY_TYPE.POLICY_CATEGORY_ID)
+            .from(EMPLOYEE)
+            .leftJoin(EMPLOYEE_INSURANCE)
+            .on(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(POLICY_TYPE)
+            .on(EMPLOYEE_INSURANCE.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
+    return query.fetchOptionalInto(TaxAndInsuranceResponse.class);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package com.csproject.hrm.services.impl;
 
+import com.csproject.hrm.common.enums.EPolicyType;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
@@ -149,12 +150,17 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
-  public List<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
+  public Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
     if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
-      return employeeDetailRepository.findTaxAndInsurance(employeeID);
+      Optional<TaxAndInsuranceResponse> taxAndInsuranceResponse =
+          employeeDetailRepository.findTaxAndInsurance(employeeID);
+      taxAndInsuranceResponse
+          .get()
+          .setPolicy_type(EPolicyType.getLabel(taxAndInsuranceResponse.get().getPolicy_type()));
+      return taxAndInsuranceResponse;
     } else {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
