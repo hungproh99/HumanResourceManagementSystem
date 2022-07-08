@@ -49,6 +49,9 @@ public class ApplicationsRequest {
   @Column(name = "approver")
   private String approver;
 
+  @Column(name = "data")
+  private String data;
+
   @OneToMany(mappedBy = "applicationsRequest", fetch = FetchType.LAZY)
   private List<Forwards> forwards;
 
