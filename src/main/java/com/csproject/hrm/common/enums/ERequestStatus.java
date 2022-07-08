@@ -27,7 +27,7 @@ public enum ERequestStatus {
 
   public static long getValue(String status) {
     for (ERequestStatus eRequestStatus : ERequestStatus.values()) {
-      if (eRequestStatus.label.equalsIgnoreCase(status)) {
+      if (eRequestStatus.name().equalsIgnoreCase(status)) {
         return eRequestStatus.value;
       }
     }
