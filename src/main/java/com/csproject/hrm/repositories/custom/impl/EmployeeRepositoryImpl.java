@@ -6,6 +6,7 @@ import com.csproject.hrm.dto.dto.RoleDto;
 import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
+import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.jooq.Pagination;
@@ -17,10 +18,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -292,29 +292,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   public Select<?> countAllEmployee(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(
-            EMPLOYEE.EMPLOYEE_ID,
-            EMPLOYEE.FULL_NAME,
-            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
-            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
-                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
-                .as(WORKING_STATUS),
-            EMPLOYEE.PHONE_NUMBER.as(PHONE),
-            EMPLOYEE.GENDER.as(GENDER),
-            EMPLOYEE.BIRTH_DATE,
-            GRADE_TYPE.NAME.as(GRADE),
-            OFFICE.NAME.as(OFFICE_NAME),
-            AREA.NAME.as(AREA_NAME),
-            year(currentDate())
-                .minus(year(WORKING_CONTRACT.START_DATE))
-                .concat(YEAR)
-                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
-                .concat(MONTH)
-                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
-                .concat(DAY)
-                .as(SENIORITY),
-            JOB.POSITION.as(POSITION_NAME),
-            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .select(EMPLOYEE.EMPLOYEE_ID)
         .from(EMPLOYEE)
         .leftJoin(WORKING_CONTRACT)
         .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -470,5 +448,165 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             job,
             grade,
             query.getValue(WORKING_CONTRACT.WORKING_CONTRACT_ID));
+  }
+
+  @Override
+  public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId) {
+    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    List<OrderField<?>> sortFields =
+        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<HrmResponse> hrmResponses =
+        findAllEmployeeOfManager(conditions, sortFields, queryParam.pagination, managerId)
+            .fetchInto(HrmResponse.class);
+
+    List<HrmResponse> hrmResponseList =
+        getListHrmResponse(hrmResponses, conditions, sortFields, queryParam.pagination);
+
+    List<HrmResponse> hrmResponsesCount =
+        countAllEmployeeOfManager(conditions, managerId).fetchInto(HrmResponse.class);
+
+    List<HrmResponse> hrmResponsesCountList =
+        getCountListHrmResponse(hrmResponsesCount, conditions);
+
+    hrmResponses.forEach(
+        hrmResponse -> {
+          hrmResponse.setArea_name(EArea.getLabel(hrmResponse.getArea_name()));
+          hrmResponse.setGrade(EGradeType.getLabel(hrmResponse.getGrade()));
+          hrmResponse.setPosition_name(EJob.getLabel(hrmResponse.getPosition_name()));
+          hrmResponse.setOffice_name(EOffice.getLabel(hrmResponse.getOffice_name()));
+          hrmResponse.setWorking_name(EWorkingType.getLabel(hrmResponse.getWorking_name()));
+        });
+
+    return HrmResponseList.builder()
+        .hrmResponse(hrmResponseList)
+        .total(hrmResponsesCountList.size())
+        .build();
+  }
+
+  public Select<?> countAllEmployeeOfManager(List<Condition> conditions, String managerId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID)
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions)
+        .and(EMPLOYEE.MANAGER_ID.eq(managerId));
+  }
+
+  public Select<?> findAllEmployeeOfManager(
+      List<Condition> conditions,
+      List<OrderField<?>> sortFields,
+      Pagination pagination,
+      String managerId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.COMPANY_EMAIL.as(EMAIL),
+            (when(EMPLOYEE.WORKING_STATUS.eq(Boolean.TRUE), ACTIVE)
+                    .when(EMPLOYEE.WORKING_STATUS.eq(Boolean.FALSE), DEACTIVE))
+                .as(WORKING_STATUS),
+            EMPLOYEE.PHONE_NUMBER.as(PHONE),
+            EMPLOYEE.GENDER.as(GENDER),
+            EMPLOYEE.BIRTH_DATE,
+            GRADE_TYPE.NAME.as(GRADE),
+            OFFICE.NAME.as(OFFICE_NAME),
+            AREA.NAME.as(AREA_NAME),
+            year(currentDate())
+                .minus(year(WORKING_CONTRACT.START_DATE))
+                .concat(YEAR)
+                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(MONTH)
+                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(DAY)
+                .as(SENIORITY),
+            JOB.POSITION.as(POSITION_NAME),
+            WORKING_TYPE.NAME.as(WORKING_NAME))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+        .where(conditions)
+        .and(EMPLOYEE.MANAGER_ID.eq(managerId))
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
+  }
+
+  private List<HrmResponse> getListHrmResponse(
+      List<HrmResponse> list,
+      List<Condition> conditions,
+      List<OrderField<?>> sortFields,
+      Pagination pagination) {
+    outer:
+    while (true) {
+      for (int i = 0; i < list.size(); i++) {
+        List<HrmResponse> hrmResponsesSub =
+            findAllEmployeeOfManager(
+                    conditions, sortFields, pagination, list.get(i).getEmployee_id())
+                .fetchInto(HrmResponse.class);
+        if (hrmResponsesSub.isEmpty() && i == list.size() - 1) {
+          break outer;
+        } else if (hrmResponsesSub.isEmpty()) {
+          continue;
+        } else {
+          hrmResponsesSub = getListHrmResponse(hrmResponsesSub, conditions, sortFields, pagination);
+          list =
+              Stream.of(list, hrmResponsesSub)
+                  .flatMap(x -> x.stream())
+                  .collect(Collectors.toList());
+        }
+      }
+    }
+    return list;
+  }
+
+  private List<HrmResponse> getCountListHrmResponse(
+      List<HrmResponse> list, List<Condition> conditions) {
+    outer:
+    while (true) {
+      for (int i = 0; i < list.size(); i++) {
+        List<HrmResponse> hrmResponsesSub =
+            countAllEmployeeOfManager(conditions, list.get(i).getEmployee_id())
+                .fetchInto(HrmResponse.class);
+        if (hrmResponsesSub.isEmpty() && i == list.size() - 1) {
+          break outer;
+        } else if (hrmResponsesSub.isEmpty()) {
+          continue;
+        } else {
+          hrmResponsesSub = getCountListHrmResponse(hrmResponsesSub, conditions);
+          list =
+              Stream.of(list, hrmResponsesSub)
+                  .flatMap(x -> x.stream())
+                  .collect(Collectors.toList());
+        }
+      }
+    }
+    return list;
   }
 }

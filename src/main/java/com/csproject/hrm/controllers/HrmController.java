@@ -6,6 +6,7 @@ import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.HumanManagementService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,18 +36,30 @@ import static com.csproject.hrm.common.uri.Uri.*;
 public class HrmController {
 
   @Autowired HumanManagementService humanManagementService;
+  @Autowired JwtUtils jwtUtils;
 
   @GetMapping(URI_GET_ALL_EMPLOYEE)
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getAllEmployee(@RequestParam Map<String, String> allRequestParams) {
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> getAllEmployee(
+      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
+    if (request.isUserInRole("MANAGER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+        HrmResponseList hrmResponseList =
+            humanManagementService.getListHumanResourceOfManager(queryParam, employeeId);
+        return ResponseEntity.ok(hrmResponseList);
+      }
+    }
     HrmResponseList hrmResponseList = humanManagementService.getListHumanResource(queryParam);
     return ResponseEntity.ok(hrmResponseList);
   }
 
   @PostMapping(URI_INSERT_EMPLOYEE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> addEmployee(@RequestBody HrmRequest hrmRequest) {
     humanManagementService.insertEmployee(hrmRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
