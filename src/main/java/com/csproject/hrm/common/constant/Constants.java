@@ -120,4 +120,6 @@ public class Constants {
   public static final String DEDUCTION_INVALID = "Invalid Deduction Type";
   public static final String BONUS_INVALID = "Invalid Bonus Type";
   public static final String NULL_LEVEL = "Level is null";
+
+  public static final String REQUEST_ID_PARAM = "requestId";
 }

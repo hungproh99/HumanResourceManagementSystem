@@ -46,6 +46,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     field2Map.put(IS_BOOKMARK_PARAM, APPLICATIONS_REQUEST.IS_BOOKMARK);
     field2Map.put(REQUEST_STATUS_PARAM, REQUEST_STATUS.NAME);
     field2Map.put(REQUEST_TYPE_PARAM, REQUEST_TYPE.NAME);
+    field2Map.put(REQUEST_ID_PARAM, APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID);
   }
 
   @Autowired private final JooqHelper queryHelper;
