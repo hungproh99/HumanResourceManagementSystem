@@ -1,9 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
-import com.csproject.hrm.dto.response.ListTimekeepingStatusResponse;
-import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -29,15 +26,15 @@ public interface TimekeepingRepositoryCustom {
 
   void insertTimekeepingByEmployeeId(String employeeId, LocalDate startDate, LocalDate endDate);
 
-  void upsertTimekeepingStatusByEmployeeIdAndRangeDate(
+  void insertTimekeepingStatusByEmployeeIdAndRangeDate(
+      String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus);
+
+  void updateTimekeepingStatusByEmployeeIdAndRangeDate(
       String employeeId,
       LocalDate startDate,
       LocalDate endDate,
       long oldTimekeepingStatus,
       long newTimekeepingStatus);
-
-  void deleteTimekeepingStatusByEmployeeIdAndDate(
-      String employeeId, LocalDate date, long oldTimekeepingStatus);
 
   void insertOvertimeByEmployeeIdAndRangeDate(
       String employeeId,

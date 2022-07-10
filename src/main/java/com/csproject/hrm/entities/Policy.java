@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -30,7 +27,7 @@ public class Policy {
   @Type(type = "boolean")
   private Boolean policyStatus;
 
-  @Column(name = "description")
+  @Column(name = "description",length = 1000)
   private String description;
 
   @Column(name = "maximum_level_accept")

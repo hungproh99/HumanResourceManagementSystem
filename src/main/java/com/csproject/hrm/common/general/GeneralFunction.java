@@ -2,13 +2,9 @@ package com.csproject.hrm.common.general;
 
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.repositories.EmployeeRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.passay.CharacterData;
-import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
-import org.passay.PasswordGenerator;
+import org.passay.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -129,6 +125,26 @@ public class GeneralFunction {
             "text/html");
       }
       emailSender.send(messages);
+    } catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void sendEmailCreateRequest(
+      String createId, String receiveId, String from, String to, String subject) {
+    MimeMessage message = emailSender.createMimeMessage();
+    Resource resource = resourceLoader.getResource("classpath:email-create-request.vm");
+    boolean multipart = true;
+    try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+      helper.setTo(to);
+      helper.setFrom(from);
+      helper.setSubject(subject);
+      message.setContent(String.format(data, receiveId, createId), "text/html");
+      emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
     }

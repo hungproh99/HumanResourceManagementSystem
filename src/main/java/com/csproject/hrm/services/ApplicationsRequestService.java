@@ -1,15 +1,10 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.dto.dto.RequestNameDto;
-import com.csproject.hrm.dto.dto.RequestStatusDto;
-import com.csproject.hrm.dto.dto.RequestTypeDto;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.Writer;
 import java.util.List;
 
 public interface ApplicationsRequestService {
@@ -32,17 +27,9 @@ public interface ApplicationsRequestService {
 
   void updateIsRead(Long requestId);
 
-  void updateApplicationRequest(Long requestId);
+  void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
 
-  void exportApplicationRequestReceiveByExcel(
-      HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);
+  List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
 
-  void exportApplicationRequestSendByExcel(
-      HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);
-
-  void exportApplicationRequestReceiveToCsv(
-      Writer writer, QueryParam queryParam, String employeeId, List<Long> list);
-
-  void exportApplicationRequestSendToCsv(
-      Writer writer, QueryParam queryParam, String employeeId, List<Long> list);
+  void createApproveTaxEnrollment(List<String> taxNameList, String employeeId);
 }

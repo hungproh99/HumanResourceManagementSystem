@@ -8,5 +8,5 @@ import java.time.LocalDate;
 @Repository
 public interface BonusSalaryRepositoryCustom {
   void insertBonusSalaryByEmployeeId(
-      Long salaryId, LocalDate date, String description, Long bonusType , BigDecimal bonus);
+      Long salaryId, LocalDate date, String description, BigDecimal bonus);
 }

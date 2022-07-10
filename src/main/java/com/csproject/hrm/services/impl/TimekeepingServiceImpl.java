@@ -129,7 +129,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
           .forEach(
               listTimekeepingStatusResponse1 ->
                   listTimekeepingStatusResponse1.setTimekeeping_status(
-                      ETimekeepingStatus.getLabel(
+                      ETimekeepingStatus.getValue(
                           listTimekeepingStatusResponse1.getTimekeeping_status())));
       list.get().setTimekeeping_status(listTimekeepingStatusResponse);
       return list;

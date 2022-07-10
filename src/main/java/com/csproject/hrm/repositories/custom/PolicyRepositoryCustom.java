@@ -12,4 +12,6 @@ public interface PolicyRepositoryCustom {
   int getTotalPolicyByCategoryID(QueryParam queryParam);
 
   List<PolicyCategoryResponse> getAllPolicyCategory();
+
+  Long getTaxPolicyTypeIDByTaxName(String taxName);
 }

@@ -1,7 +1,6 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -77,9 +76,16 @@ public class ApplicationsRequestController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping("get_all_request_status")
+  public ResponseEntity<?> getAllRequestStatus() {
+    return ResponseEntity.ok(applicationsRequestService.getAllRequestStatus());
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_all_request_type")
-  public ResponseEntity<?> getAllRequestType() {
-    return ResponseEntity.ok(applicationsRequestService.getAllRequestType());
+  public ResponseEntity<?> getAllRequestType(@RequestParam String employeeId) {
+    return ResponseEntity.ok(
+        applicationsRequestService.getAllRequestTypeByEmployeeLevel(employeeId));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
@@ -96,10 +102,20 @@ public class ApplicationsRequestController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  @PostMapping(URI_UPDATE_APPLICATION_REQUEST)
-  public ResponseEntity<?> updateApplicationRequest(@RequestParam Long requestId) {
-    applicationsRequestService.updateApplicationRequest(requestId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PostMapping("create_request")
+  public ResponseEntity<?> createApplicationsRequest(
+      @RequestBody ApplicationsRequestRequestC applicationsRequest) {
+    applicationsRequestService.createApplicationsRequest(applicationsRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
+
+  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  //  @PutMapping("test2")
+  //  public ResponseEntity<?> createApproveTaxEnrollment(
+  //      @RequestBody String taxNameList, @RequestBody String employeeId) {
+  //    System.out.println(taxNameList);
+  //    //    applicationsRequestService.createApproveTaxEnrollment(taxNameList, employeeId);
+  //    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  //  }
 }

@@ -1,10 +1,7 @@
 package com.csproject.hrm.entities;
 
 import com.csproject.hrm.common.enums.ERequestName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -24,7 +21,7 @@ public class RequestName {
   @Column(name = "name")
   private ERequestName eRequestName;
 
-  @Column(name = "description")
+  @Column(name = "description", length = 1000)
   private String description;
 
   @OneToOne(mappedBy = "requestName", fetch = FetchType.LAZY)

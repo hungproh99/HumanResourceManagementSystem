@@ -59,8 +59,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .select(SALARY_MONTHLY.SALARY_ID)
         .from(SALARY_MONTHLY)
         .where(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(salaryContractId))
-        .and(SALARY_MONTHLY.START_DATE.le(date))
-        .and(SALARY_MONTHLY.END_DATE.ge(date))
+        .and(SALARY_MONTHLY.START_DATE.lt(date))
+        .and(SALARY_MONTHLY.END_DATE.gt(date))
         .fetchOneInto(Long.class);
   }
 }

@@ -45,11 +45,6 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId) {
-    return employeeRepository.findAllEmployeeOfManager(queryParam, managerId);
-  }
-
-  @Override
   public void insertEmployee(HrmRequest hrmRequest) {
     if (hrmRequest.getFullName() == null
         || hrmRequest.getRole() == null

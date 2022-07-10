@@ -6,10 +6,17 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.REQUEST_TYPE_INVALID;
 
 public enum ERequestType {
-  DAY_WORK("Day work", 1);
+  WORKING_SCHEDULE("Working Schedule", 1),
+  PAIR_LEAVE("Paid Leave", 2),
+  NOMINATION("Nomination", 3),
+  INTEGRITY("Integrity", 4),
+  COMPANY_ASSET("Company Asset", 5),
+  BEHAVIOUR("Behaviour", 6),
+  ADVANCE("Advance", 7),
+  TAX_ENROLLMENT("Tax Enrollment", 8);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   ERequestType(String label, long value) {
     this.label = label;

@@ -1,42 +1,24 @@
 package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.*;
-import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
-import com.csproject.hrm.dto.dto.ApplicationRequestDto;
-import com.csproject.hrm.dto.dto.RequestNameDto;
-import com.csproject.hrm.dto.dto.RequestStatusDto;
-import com.csproject.hrm.dto.dto.RequestTypeDto;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.common.general.GeneralFunction;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
-import com.csproject.hrm.repositories.custom.impl.BonusSalaryRepositoryImpl;
-import com.csproject.hrm.repositories.custom.impl.SalaryMonthlyRepositoryImpl;
 import com.csproject.hrm.services.ApplicationsRequestService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
+import java.time.*;
+import java.util.List;
+import java.util.Objects;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public class ApplicationsRequestServiceImpl implements ApplicationsRequestService {
@@ -44,13 +26,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Autowired EmployeeRepository employeeRepository;
   @Autowired ApplicationsRequestRepository applicationsRequestRepository;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
-  @Autowired TimekeepingRepository timekeepingRepository;
-  @Autowired WorkingPlaceRepository workingPlaceRepository;
-  @Autowired SalaryContractRepository salaryContractRepository;
-  @Autowired SalaryMonthlyRepositoryImpl salaryMonthlyRepository;
-  @Autowired BonusSalaryRepositoryImpl bonusSalaryRepository;
-  @Autowired DeductionSalaryRepository deductionSalaryRepository;
-  @Autowired AdvanceSalaryRepository advanceSalaryRepository;
+  @Autowired PolicyRepository policyRepository;
+  @Autowired GeneralFunction generalFunction;
 
   @Override
   public ListApplicationsRequestResponse getAllApplicationRequestReceive(
@@ -163,316 +140,355 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
-  public void updateApplicationRequest(Long requestId) {
-    Optional<ApplicationRequestDto> applicationRequestDto =
-        applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
-    if (applicationRequestDto.isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+  public void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest) {
+    String createEmployeeId = applicationsRequest.getCreateEmployeeId();
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(createEmployeeId)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + createEmployeeId);
     }
-    updateTimekeepingInformation(applicationRequestDto.get());
-  }
-
-  @Override
-  public void exportApplicationRequestReceiveByExcel(
-      HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list) {
-    if (list.size() == 0) {
-      throw new CustomDataNotFoundException(NO_DATA);
-    } else {
-      try {
-        List<ApplicationsRequestResponse> applicationsRequestResponseList =
-            applicationsRequestRepository.getListApplicationRequestReceiveByListId(
-                queryParam, employeeId, list);
-        ExcelExportApplicationRequest excelExportApplicationRequest =
-            new ExcelExportApplicationRequest(applicationsRequestResponseList);
-        excelExportApplicationRequest.export(response);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    String employeeId = applicationsRequest.getEmployeeId();
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
-  }
-
-  @Override
-  public void exportApplicationRequestSendByExcel(
-      HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list) {
-    if (list.size() == 0) {
-      throw new CustomDataNotFoundException(NO_DATA);
-    } else {
-      try {
-        List<ApplicationsRequestResponse> applicationsRequestResponseList =
-            applicationsRequestRepository.getListApplicationRequestSendByListId(
-                queryParam, employeeId, list);
-        ExcelExportApplicationRequest excelExportApplicationRequest =
-            new ExcelExportApplicationRequest(applicationsRequestResponseList);
-        excelExportApplicationRequest.export(response);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    Long requestTypeId = applicationsRequest.getRequestTypeId();
+    Long requestNameId = applicationsRequest.getRequestNameId();
+    if (requestTypeId == null || requestNameId == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
-  }
+    if (!applicationsRequestRepository.getAllRequestNameByRequestTypeID(requestTypeId).stream()
+        .anyMatch(requestNameDto -> requestNameDto.getRequest_name_id().equals(requestNameId))) {
+      throw new CustomDataNotFoundException("Request Type or Request Name not existed!");
+    }
+    if (!applicationsRequestRepository.checkPermissionToCreate(createEmployeeId, requestNameId)) {
+      throw new CustomErrorException("You don't have permission to create this request!");
+    }
 
-  @Override
-  public void exportApplicationRequestReceiveToCsv(
-      Writer writer, QueryParam queryParam, String employeeId, List<Long> list) {
-    if (list.size() == 0) {
-      throw new CustomDataNotFoundException(NO_DATA);
-    } else {
-      List<ApplicationsRequestResponse> applicationsRequestResponseList =
-          applicationsRequestRepository.getListApplicationRequestReceiveByListId(
-              queryParam, employeeId, list);
-      try (CSVPrinter csvPrinter =
-          new CSVPrinter(
-              writer,
-              CSVFormat.DEFAULT.withHeader(
-                  "Employee Id",
-                  "Full Name",
-                  "Create Date",
-                  "Request Title",
-                  "Description",
-                  "Request Status",
-                  "Latest Change",
-                  "Duration",
-                  "Approver",
-                  "Checked By"))) {
+    String approver =
+        Objects.requireNonNullElse(
+            employeeDetailRepository.getManagerIDByEmployeeID(createEmployeeId), "huynq100");
 
-        for (ApplicationsRequestResponse applicationsRequestResponse :
-            applicationsRequestResponseList) {
-          String checkBy = null;
-          for (int i = 0; i < applicationsRequestResponse.getChecked_by().size(); i++) {
-            if (i == applicationsRequestResponse.getChecked_by().size() - 1) {
-              checkBy += applicationsRequestResponse.getChecked_by().get(i);
-            }
-            checkBy += applicationsRequestResponse.getChecked_by().get(i) + ", ";
+    switch (requestTypeId.intValue()) {
+      case 1:
+        {
+          switch (requestNameId.intValue()) {
+            case 1:
+              {
+                applicationsRequest =
+                    createRequestForWorkingScheduleAndWorkingTime(applicationsRequest, approver);
+                break;
+              }
+            case 2:
+              {
+                applicationsRequest =
+                    createRequestForWorkingScheduleAndOT(applicationsRequest, approver);
+              }
+              break;
           }
-          csvPrinter.printRecord(
-              applicationsRequestResponse.getEmployee_id(),
-              applicationsRequestResponse.getFull_name(),
-              applicationsRequestResponse.getCreate_date(),
-              applicationsRequestResponse.getRequest_title(),
-              applicationsRequestResponse.getDescription(),
-              applicationsRequestResponse.getRequest_status(),
-              applicationsRequestResponse.getChange_status_time(),
-              applicationsRequestResponse.getDuration(),
-              applicationsRequestResponse.getApprover(),
-              checkBy);
+          break;
         }
-        csvPrinter.flush();
-      } catch (IOException e) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, CAN_NOT_WRITE_CSV);
-      }
+      case 2:
+        {
+          switch (requestNameId.intValue()) {
+            case 6:
+              {
+                applicationsRequest = createRequestForPairLeave(applicationsRequest, approver);
+                break;
+              }
+          }
+          break;
+        }
+      case 3:
+        {
+          //          if (!applicationsRequestRepository.checkPermissionToApprove(
+          //              createEmployeeId, requestNameId)) {
+          //            throw new CustomErrorException("You don't have permission to approve this
+          // request!");
+          //          }
+          switch (requestNameId.intValue()) {
+            case 3:
+              {
+                applicationsRequest =
+                    createRequestForNominationAndPromotion(applicationsRequest, approver);
+                break;
+              }
+            case 4:
+            case 5:
+              {
+                applicationsRequest =
+                    createRequestForNominationAndSalaryIncreaseOrBonus(
+                        applicationsRequest, approver);
+                break;
+              }
+          }
+          break;
+        }
+      case 4:
+      case 5:
+      case 6:
+        {
+          //          if (!applicationsRequestRepository.checkPermissionToApprove(
+          //              createEmployeeId, requestNameId)) {
+          //            throw new CustomErrorException("You don't have permission to approve this
+          // request!");
+          //          }
+          applicationsRequest = createRequestForPenalise(applicationsRequest, approver);
+          break;
+        }
+      case 7:
+        {
+          switch (requestNameId.intValue()) {
+            case 12:
+              {
+                applicationsRequest = createRequestForAdvances(applicationsRequest, approver);
+                break;
+              }
+          }
+          break;
+        }
+      case 8:
+        {
+          switch (requestNameId.intValue()) {
+            case 13:
+              {
+                applicationsRequest = createRequestForTaxEnrollment(applicationsRequest, approver);
+                break;
+              }
+          }
+          break;
+        }
     }
+    applicationsRequest.setApprover(approver);
+    applicationsRequest.setRequestStatusId(Long.valueOf(1));
+    applicationsRequest.setCreateDate(LocalDate.now());
+    applicationsRequest.setLatestDate(LocalDate.now());
+    applicationsRequest.setDuration(LocalDate.now().plusDays(3));
+    applicationsRequest.setIsBookmark(false);
+    applicationsRequest.setIsRemind(false);
+    applicationsRequest.setIsRead(false);
+
+    generalFunction.sendEmailCreateRequest(
+        createEmployeeId, employeeId, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+
+    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
+  }
+
+  private ApplicationsRequestRequestC setDescriptionAndData(
+      ApplicationsRequestRequestC applicationsRequest, String[] valueArray) {
+    String data = "";
+    String description =
+        applicationsRequestRepository.getDescriptionByRequestNameID(
+            applicationsRequest.getRequestNameId());
+    String[] keyArray = getKeyInDescription(description);
+    for (int i = 0; i < keyArray.length; i++) {
+      description =
+          description.replaceAll(
+              "\\[" + keyArray[i] + "\\]", "<p style=\"color:red\">" + valueArray[i] + "</p>");
+      data = data + "[" + keyArray[i] + "|" + valueArray[i] + "]";
+    }
+    applicationsRequest.setData(data);
+    applicationsRequest.setDescription(
+        description + "<br>P/S: " + applicationsRequest.getDescription());
+    return applicationsRequest;
+  }
+
+  private ApplicationsRequestRequestC createRequestForWorkingScheduleAndWorkingTime(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+    String date = checkLocalDateNull(applicationsRequest.getDate()).toString();
+
+    String[] valueArray = {approver, date};
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForWorkingScheduleAndOT(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+    String startTime = checkLocalTimeNull(applicationsRequest.getStartTime()).toString();
+    String endTime = checkLocalTimeNull(applicationsRequest.getEndTime()).toString();
+    String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
+    String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
+
+    String[] valueArray = {approver, startDate, endDate, startTime, endTime};
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForPairLeave(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+    String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
+    String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
+
+    String[] valueArray = {approver, startDate, endDate};
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForAdvances(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+    String value = checkStringNull(applicationsRequest.getValue());
+
+    String[] valueArray = {approver, value};
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForTaxEnrollment(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+    List<String> taxTypes = applicationsRequest.getTaxType();
+    String taxType = StringUtils.join(taxTypes, ",");
+
+    String[] valueArray = {approver, taxType};
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForNominationAndPromotion(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+
+    String employeeId = applicationsRequest.getEmployeeId();
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomDataNotFoundException(
+          NO_EMPLOYEE_WITH_ID + applicationsRequest.getEmployeeId());
+    }
+
+    String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
+    String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
+    String desiredTitle = checkStringNull(applicationsRequest.getDesiredTitle());
+    String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
+    String desiredArea = checkStringNull(applicationsRequest.getDesiredArea());
+    String currentOffice = checkStringNull(applicationsRequest.getCurrentOffice());
+    String desiredOffice = checkStringNull(applicationsRequest.getDesiredOffice());
+
+    String[] valueArray = {
+      approver,
+      employeeName + "-" + employeeId,
+      currentTitle,
+      currentArea,
+      currentOffice,
+      desiredTitle,
+      desiredArea,
+      desiredOffice
+    };
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForNominationAndSalaryIncreaseOrBonus(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+
+    String employeeId = applicationsRequest.getEmployeeId();
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomDataNotFoundException(
+          NO_EMPLOYEE_WITH_ID + applicationsRequest.getEmployeeId());
+    }
+
+    String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
+    String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
+    String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
+    String currentOffice = checkStringNull(applicationsRequest.getCurrentOffice());
+    String value = checkStringNull(applicationsRequest.getValue());
+
+    String[] valueArray = {
+      approver, employeeName + "-" + employeeId, currentTitle, currentArea, currentOffice, value
+    };
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private ApplicationsRequestRequestC createRequestForPenalise(
+      ApplicationsRequestRequestC applicationsRequest, String approver) {
+
+    String employeeId = applicationsRequest.getEmployeeId();
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomDataNotFoundException(
+          NO_EMPLOYEE_WITH_ID + applicationsRequest.getEmployeeId());
+    }
+
+    String date = checkLocalDateNull(applicationsRequest.getDate()).toString();
+    String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
+    String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
+    String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
+    String currentOffice = checkStringNull(applicationsRequest.getCurrentOffice());
+    String value = checkStringNull(applicationsRequest.getValue());
+    PolicyTypeAndNameResponse policyTypeAndName =
+        applicationsRequestRepository.getPolicyByRequestNameID(
+            applicationsRequest.getRequestNameId());
+
+    String[] valueArray = {
+      approver,
+      date,
+      employeeName + "-" + employeeId,
+      currentTitle,
+      currentArea,
+      currentOffice,
+      policyTypeAndName.getPolicy_type(),
+      policyTypeAndName.getPolicy_name(),
+      value
+    };
+
+    return setDescriptionAndData(applicationsRequest, valueArray);
+  }
+
+  private String checkStringNull(String value) {
+    if (value == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    } else {
+      return value;
+    }
+  }
+
+  private LocalDate checkLocalDateNull(LocalDate value) {
+    if (value == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    } else {
+      return value;
+    }
+  }
+
+  private LocalTime checkLocalTimeNull(LocalTime value) {
+    if (value == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    } else {
+      return value;
+    }
+  }
+
+  private String[] getKeyInDescription(String description) {
+    return StringUtils.substringsBetween(description, "[", "]");
   }
 
   @Override
-  public void exportApplicationRequestSendToCsv(
-      Writer writer, QueryParam queryParam, String employeeId, List<Long> list) {
-    if (list.size() == 0) {
-      throw new CustomDataNotFoundException(NO_DATA);
-    } else {
-      List<ApplicationsRequestResponse> applicationsRequestResponseList =
-          applicationsRequestRepository.getListApplicationRequestSendByListId(
-              queryParam, employeeId, list);
-      try (CSVPrinter csvPrinter =
-          new CSVPrinter(
-              writer,
-              CSVFormat.DEFAULT.withHeader(
-                  "Employee Id",
-                  "Full Name",
-                  "Create Date",
-                  "Request Title",
-                  "Description",
-                  "Request Status",
-                  "Latest Change",
-                  "Duration",
-                  "Approver",
-                  "Checked By"))) {
-
-        for (ApplicationsRequestResponse applicationsRequestResponse :
-            applicationsRequestResponseList) {
-          String checkBy = null;
-          for (int i = 0; i < applicationsRequestResponse.getChecked_by().size(); i++) {
-            if (i == applicationsRequestResponse.getChecked_by().size() - 1) {
-              checkBy += applicationsRequestResponse.getChecked_by().get(i);
-            }
-            checkBy += applicationsRequestResponse.getChecked_by().get(i) + ", ";
-          }
-          csvPrinter.printRecord(
-              applicationsRequestResponse.getEmployee_id(),
-              applicationsRequestResponse.getFull_name(),
-              applicationsRequestResponse.getCreate_date(),
-              applicationsRequestResponse.getRequest_title(),
-              applicationsRequestResponse.getDescription(),
-              applicationsRequestResponse.getRequest_status(),
-              applicationsRequestResponse.getChange_status_time(),
-              applicationsRequestResponse.getDuration(),
-              applicationsRequestResponse.getApprover(),
-              checkBy);
-        }
-        csvPrinter.flush();
-      } catch (IOException e) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, CAN_NOT_WRITE_CSV);
-      }
+  public List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
+    List<RequestTypeDto> requestTypeDtoList =
+        applicationsRequestRepository.getAllRequestTypeByEmployeeLevel(employeeId);
+    requestTypeDtoList.forEach(
+        requestTypeDto -> {
+          requestTypeDto.setRequest_type_name(
+              ERequestType.getLabel(requestTypeDto.getRequest_type_name()));
+        });
+
+    return requestTypeDtoList;
   }
 
-  private void updateTimekeepingInformation(ApplicationRequestDto requestDto) {
-    Set<Map.Entry<String, String>> hashMap = splitData(requestDto.getData()).entrySet();
-    String requestName = requestDto.getRequestName();
-    String employeeId = requestDto.getEmployeeId();
-    LocalDate currentDate = LocalDate.now();
-    LocalDate startDate = null, endDate = null, date = null;
-    LocalTime startTime = null, endTime = null;
-    Long overtimeType = null,
-        deductionType = null,
-        bonusType = null,
-        desiredPosition = null,
-        desiredArea = null,
-        desiredOffice = null,
-        desiredGrade = null,
-        salaryId = null;
-    BigDecimal value = BigDecimal.ZERO;
-    String description = null;
-    for (Map.Entry<String, String> i : hashMap) {
-      switch (i.getKey()) {
-        case "Start_Date":
-          startDate = LocalDate.parse(i.getValue());
-          break;
-        case "End_Date":
-          endDate = LocalDate.parse(i.getValue());
-          break;
-        case "Start_Time":
-          startTime = LocalTime.parse(i.getValue());
-          break;
-        case "End_Time":
-          endTime = LocalTime.parse(i.getValue());
-          break;
-        case "Date":
-          date = LocalDate.parse(i.getValue());
-          break;
-        case "Overtime_Type":
-          overtimeType = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Position":
-          desiredPosition = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Area":
-          desiredArea = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Office":
-          desiredOffice = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Grade":
-          desiredGrade = Long.parseLong(i.getValue());
-          break;
-        case "Value":
-          value = BigDecimal.valueOf(Long.parseLong(i.getValue()));
-          break;
-        case "Bonus_Type":
-          bonusType = Long.parseLong(i.getValue());
-          break;
-        case "Deduction_Type":
-          deductionType = Long.parseLong(i.getValue());
-          break;
-        case "Description":
-          description = i.getValue();
-          break;
-      }
+  @Override
+  public void createApproveTaxEnrollment(List<String> taxNameList, String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
-    switch (requestName) {
-      case "LEAVE_SOON":
-      case "WORK_LATE":
-        timekeepingRepository.deleteTimekeepingStatusByEmployeeIdAndDate(
-            employeeId, date, ETimekeepingStatus.getValue(requestName));
-        break;
-      case "OVERTIME":
-        if (endDate.isAfter(currentDate)) {
-          timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, currentDate, endDate);
-        }
-        timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
-            employeeId,
-            startDate,
-            endDate,
-            ETimekeepingStatus.getValue(requestName),
-            ETimekeepingStatus.getValue(requestName));
+    if (taxNameList == null || taxNameList.get(0) == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
 
-        timekeepingRepository.insertOvertimeByEmployeeIdAndRangeDate(
-            employeeId, startDate, endDate, startTime, endTime, overtimeType);
-        break;
-      case "PAID_LEAVE":
-        timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
-            employeeId,
-            startDate,
-            endDate,
-            ETimekeepingStatus.getValue("DAY_OFF"),
-            ETimekeepingStatus.getValue(requestName));
-        break;
-      case "PROMOTION":
-        workingPlaceRepository.insertNewWorkingPlace(
-            employeeId,
-            desiredArea,
-            desiredOffice,
-            desiredGrade,
-            desiredPosition,
-            startDate,
-            false,
-            true);
-        salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
-        break;
-      case "SALARY_INCREMENT":
-        salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
-        break;
-      case "BONUS":
-        salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
-        bonusSalaryRepository.insertBonusSalaryByEmployeeId(
-            salaryId, date, description, bonusType, value);
-        break;
-      case "CONFLICT_CUSTOMER":
-      case "LEAK_INFORMATION":
-        salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
-        deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
-            salaryId, date, description, deductionType, value);
-        if (deductionType.equals(EDeduction.getValue("FIRE")))
-          employeeRepository.updateStatusEmployee(employeeId, false);
-        break;
-      case "ADVANCE":
-        salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
-        advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
-        break;
+    EmployeeTaxDto employeeTaxDto;
+    for (String taxName : taxNameList) {
+      employeeTaxDto = new EmployeeTaxDto();
+      employeeTaxDto.setTaxTypeID(policyRepository.getTaxPolicyTypeIDByTaxName(taxName));
+      employeeTaxDto.setEmployeeID(employeeId);
+      employeeTaxDto.setTaxStatus(true);
+      employeeTaxDto.setTaxTypeName(taxName);
+      System.out.println(employeeTaxDto);
+      //      applicationsRequestRepository.createApproveTaxEnrollment(employeeTaxDto);
     }
-  }
-
-  private HashMap<String, String> splitData(String data) {
-    HashMap<String, String> hashMap = new HashMap<>();
-    if (!isBlank(data)) {
-      String[] splitBracket = StringUtils.substringsBetween(data, "[", "]");
-      for (String split : splitBracket) {
-        String[] splitColon = split.split(SEPARATOR, TWO_NUMBER);
-        hashMap.put(splitColon[ZERO_NUMBER], splitColon[ONE_NUMBER]);
-      }
-    } else {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
-    }
-    return hashMap;
-  }
-
-  private Object getValue(Cell cell) {
-    switch (cell.getCellType()) {
-      case STRING:
-        return cell.getStringCellValue();
-      case NUMERIC:
-        return String.valueOf((int) cell.getNumericCellValue());
-      case BOOLEAN:
-        return cell.getBooleanCellValue();
-      case ERROR:
-        return cell.getErrorCellValue();
-      case FORMULA:
-        return cell.getCellFormula();
-      case BLANK:
-        return null;
-      case _NONE:
-        return null;
-      default:
-        break;
-    }
-    return null;
   }
 }

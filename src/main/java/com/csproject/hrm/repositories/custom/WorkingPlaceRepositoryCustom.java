@@ -18,10 +18,10 @@ public interface WorkingPlaceRepositoryCustom {
 
   void insertNewWorkingPlace(
       String employeeId,
-      Long area,
-      Long office,
-      Long grade,
-      Long position,
+      long area,
+      long office,
+      long grade,
+      long position,
       LocalDate startDate,
       boolean oldStatus,
       boolean newStatus);
