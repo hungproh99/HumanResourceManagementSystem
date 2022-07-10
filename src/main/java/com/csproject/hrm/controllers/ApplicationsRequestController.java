@@ -95,4 +95,11 @@ public class ApplicationsRequestController {
     applicationsRequestService.updateIsRead(requestId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PostMapping(URI_UPDATE_APPLICATION_REQUEST)
+  public ResponseEntity<?> updateApplicationRequest(@RequestParam Long requestId) {
+    applicationsRequestService.updateApplicationRequest(requestId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
 }

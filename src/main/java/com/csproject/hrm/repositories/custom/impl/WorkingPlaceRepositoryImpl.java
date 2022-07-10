@@ -1,6 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.AreaDto;
+import com.csproject.hrm.dto.dto.GradeDto;
+import com.csproject.hrm.dto.dto.JobDto;
+import com.csproject.hrm.dto.dto.OfficeDto;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.repositories.custom.WorkingPlaceRepositoryCustom;
@@ -11,7 +14,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.jooq.codegen.maven.example.Tables.*;
 
@@ -70,10 +75,10 @@ public class WorkingPlaceRepositoryImpl implements WorkingPlaceRepositoryCustom 
   @Override
   public void insertNewWorkingPlace(
       String employeeId,
-      long area,
-      long office,
-      long grade,
-      long position,
+      Long area,
+      Long office,
+      Long grade,
+      Long position,
       LocalDate startDate,
       boolean oldStatus,
       boolean newStatus) {

@@ -23,10 +23,19 @@ public enum ETimekeepingStatus {
     this.value = value;
   }
 
-  public static String getValue(String status) {
+  public static String getLabel(String status) {
     for (ETimekeepingStatus eTimekeepingStatus : ETimekeepingStatus.values()) {
       if (eTimekeepingStatus.name().equalsIgnoreCase(status)) {
         return eTimekeepingStatus.label;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, TIMEKEEPING_STATUS_INVALID);
+  }
+
+  public static long getValue(String status) {
+    for (ETimekeepingStatus eTimekeepingStatus : ETimekeepingStatus.values()) {
+      if (eTimekeepingStatus.name().equalsIgnoreCase(status)) {
+        return eTimekeepingStatus.value;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, TIMEKEEPING_STATUS_INVALID);

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.OVER_TIME_INVALID;
 
 public enum EOvertime {
-  OVERTIME("Overtime", 1);
+  ORDINARY("Ordinary", 1);
 
   private String label;
   private long value;

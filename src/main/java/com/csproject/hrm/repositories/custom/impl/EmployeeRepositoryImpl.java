@@ -18,7 +18,10 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -481,6 +484,16 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .hrmResponse(hrmResponseList)
         .total(hrmResponsesCountList.size())
         .build();
+  }
+
+  @Override
+  public void updateStatusEmployee(String employeeId, boolean status) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(EMPLOYEE)
+            .set(EMPLOYEE.WORKING_STATUS, status)
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
   }
 
   public Select<?> countAllEmployeeOfManager(List<Condition> conditions, String managerId) {

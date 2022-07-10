@@ -36,4 +36,6 @@ public interface EmployeeRepositoryCustom {
   List<String> getListEmployeeByNameAndId(String name);
 
   HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId);
+
+  void updateStatusEmployee(String employeeId, boolean status);
 }

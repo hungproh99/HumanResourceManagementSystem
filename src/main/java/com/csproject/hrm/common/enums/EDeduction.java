@@ -24,4 +24,13 @@ public enum EDeduction {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, DEDUCTION_INVALID);
   }
+
+  public static long getValue(String deduction) {
+    for (EDeduction eDeduction : EDeduction.values()) {
+      if (eDeduction.name().equalsIgnoreCase(deduction)) {
+        return eDeduction.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, DEDUCTION_INVALID);
+  }
 }

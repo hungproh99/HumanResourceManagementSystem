@@ -1,7 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -110,7 +112,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 timekeepingStatusList.forEach(
                     timekeepingStatus -> {
                       timekeepingStatus.setTimekeeping_status(
-                          ETimekeepingStatus.getValue(timekeepingStatus.getTimekeeping_status()));
+                          ETimekeepingStatus.getLabel(timekeepingStatus.getTimekeeping_status()));
                     });
                 timekeeping.setTimekeeping_status(timekeepingStatusList);
               });
@@ -187,7 +189,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 timekeepingStatusList.forEach(
                     timekeepingStatus -> {
                       timekeepingStatus.setTimekeeping_status(
-                          ETimekeepingStatus.getValue(timekeepingStatus.getTimekeeping_status()));
+                          ETimekeepingStatus.getLabel(timekeepingStatus.getTimekeeping_status()));
                     });
                 timekeeping.setTimekeeping_status(timekeepingStatusList);
               });
@@ -381,66 +383,75 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public void insertTimekeepingStatusByEmployeeIdAndRangeDate(
-      String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus) {
-    List<Query> queries = new ArrayList<>();
+  public void upsertTimekeepingStatusByEmployeeIdAndRangeDate(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      long oldTimekeepingStatus,
+      long newTimekeepingStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Query> queries = new ArrayList<>();
     List<Long> timekeepingIdList =
         dslContext
             .select(TIMEKEEPING.TIMEKEEPING_ID)
             .from(TIMEKEEPING)
             .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
-            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .and(TIMEKEEPING.DATE.ge(startDate))
+            .and(TIMEKEEPING.DATE.le(endDate))
             .fetchInto(Long.class);
 
     dslContext.transaction(
         configuration -> {
           timekeepingIdList.forEach(
               timekeepingId -> {
-                queries.add(
-                    dslContext
-                        .insertInto(
-                            LIST_TIMEKEEPING_STATUS,
-                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
-                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID)
-                        .values(timekeepingId, timekeepingStatus));
+                boolean checkExist =
+                    dslContext.fetchExists(
+                        select(LIST_TIMEKEEPING_STATUS.LIST_ID)
+                            .from(LIST_TIMEKEEPING_STATUS)
+                            .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
+                            .and(
+                                LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
+                                    oldTimekeepingStatus)));
+                if (checkExist && oldTimekeepingStatus != newTimekeepingStatus) {
+                  queries.add(
+                      dslContext
+                          .update(LIST_TIMEKEEPING_STATUS)
+                          .set(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID, newTimekeepingStatus)
+                          .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
+                          .and(
+                              LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
+                                  oldTimekeepingStatus)));
+                } else if (!checkExist && oldTimekeepingStatus == newTimekeepingStatus) {
+                  queries.add(
+                      dslContext
+                          .insertInto(
+                              LIST_TIMEKEEPING_STATUS,
+                              LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
+                              LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID)
+                          .values(timekeepingId, newTimekeepingStatus));
+                }
               });
           DSL.using(configuration).batch(queries).execute();
         });
   }
 
   @Override
-  public void updateTimekeepingStatusByEmployeeIdAndRangeDate(
-      String employeeId,
-      LocalDate startDate,
-      LocalDate endDate,
-      long oldTimekeepingStatus,
-      long newTimekeepingStatus) {
-    List<Query> queries = new ArrayList<>();
+  public void deleteTimekeepingStatusByEmployeeIdAndDate(
+      String employeeId, LocalDate date, long oldTimekeepingStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<Long> timekeepingIdList =
+    Long timekeepingId =
         dslContext
             .select(TIMEKEEPING.TIMEKEEPING_ID)
             .from(TIMEKEEPING)
             .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
-            .and(TIMEKEEPING.DATE.between(startDate, endDate))
-            .fetchInto(Long.class);
-
-    dslContext.transaction(
-        configuration -> {
-          timekeepingIdList.forEach(
-              timekeepingId -> {
-                queries.add(
-                    dslContext
-                        .update(LIST_TIMEKEEPING_STATUS)
-                        .set(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID, newTimekeepingStatus)
-                        .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
-                        .and(
-                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
-                                oldTimekeepingStatus)));
-              });
-          DSL.using(configuration).batch(queries).execute();
-        });
+            .and(TIMEKEEPING.DATE.eq(date))
+            .fetchOneInto(Long.class);
+    final var query =
+        dslContext
+            .delete(LIST_TIMEKEEPING_STATUS)
+            .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
+            .and(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(oldTimekeepingStatus))
+            .execute();
   }
 
   private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
@@ -582,7 +593,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .select(TIMEKEEPING.TIMEKEEPING_ID)
             .from(TIMEKEEPING)
             .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
-            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .and(TIMEKEEPING.DATE.ge(startDate))
+            .and(TIMEKEEPING.DATE.le(endDate))
             .fetchInto(Long.class);
 
     dslContext.transaction(

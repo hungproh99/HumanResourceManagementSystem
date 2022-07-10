@@ -1,6 +1,9 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.ApplicationRequestDto;
+import com.csproject.hrm.dto.dto.RequestNameDto;
+import com.csproject.hrm.dto.dto.RequestStatusDto;
+import com.csproject.hrm.dto.dto.RequestTypeDto;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ApplicationsRequestRepositoryCustom {
@@ -47,4 +51,12 @@ public interface ApplicationsRequestRepositoryCustom {
   void updateApproverAndForwardByRequestId(Long requestId, String newApprover, String forwarder);
 
   void changeIsRead(boolean isRead, Long requestId);
+
+  Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId);
+
+  List<ApplicationsRequestResponse> getListApplicationRequestReceiveByListId(
+      QueryParam queryParam, String employeeId, List<Long> list);
+
+  List<ApplicationsRequestResponse> getListApplicationRequestSendByListId(
+      QueryParam queryParam, String employeeId, List<Long> list);
 }

@@ -25,7 +25,7 @@ public class BonusSalary {
   private BigDecimal value;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
-  @JoinColumn(name = "deduction_type_id")
+  @JoinColumn(name = "bonus_type_id")
   private BonusType bonusType;
 
   @Column(name = "description")
