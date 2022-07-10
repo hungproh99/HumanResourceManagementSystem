@@ -5,6 +5,8 @@ import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.Writer;
 import java.util.List;
 
 public interface ApplicationsRequestService {
@@ -26,6 +28,20 @@ public interface ApplicationsRequestService {
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
   void updateIsRead(Long requestId);
+
+  void updateApplicationRequest(Long requestId);
+
+  void exportApplicationRequestReceiveByExcel(
+      HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);
+
+  void exportApplicationRequestSendByExcel(
+      HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);
+
+  void exportApplicationRequestReceiveToCsv(
+      Writer writer, QueryParam queryParam, String employeeId, List<Long> list);
+
+  void exportApplicationRequestSendToCsv(
+      Writer writer, QueryParam queryParam, String employeeId, List<Long> list);
 
   void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
 

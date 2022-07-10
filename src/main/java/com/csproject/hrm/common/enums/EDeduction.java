@@ -8,8 +8,8 @@ import static com.csproject.hrm.common.constant.Constants.DEDUCTION_INVALID;
 public enum EDeduction {
   LATE_WORK("Late work", 1);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   EDeduction(String label, long value) {
     this.label = label;
@@ -20,6 +20,15 @@ public enum EDeduction {
     for (EDeduction eDeduction : EDeduction.values()) {
       if (eDeduction.name().equalsIgnoreCase(deduction)) {
         return eDeduction.label;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, DEDUCTION_INVALID);
+  }
+
+  public static long getValue(String deduction) {
+    for (EDeduction eDeduction : EDeduction.values()) {
+      if (eDeduction.name().equalsIgnoreCase(deduction)) {
+        return eDeduction.value;
       }
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, DEDUCTION_INVALID);

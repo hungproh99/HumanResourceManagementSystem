@@ -102,6 +102,13 @@ public class ApplicationsRequestController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PostMapping(URI_UPDATE_APPLICATION_REQUEST)
+  public ResponseEntity<?> updateApplicationRequest(@RequestParam Long requestId) {
+    applicationsRequestService.updateApplicationRequest(requestId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PostMapping("create_request")
   public ResponseEntity<?> createApplicationsRequest(

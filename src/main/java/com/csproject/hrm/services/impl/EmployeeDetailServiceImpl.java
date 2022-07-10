@@ -1,6 +1,6 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EPolicyType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
@@ -173,10 +173,23 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
-    if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
-      return employeeDetailRepository.findMainDetail(employeeID);
-    } else {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
+    Optional<EmployeeDetailResponse> employeeDetailResponse =
+        employeeDetailRepository.findMainDetail(employeeID);
+    employeeDetailResponse
+        .get()
+        .setArea_name(EArea.getLabel(employeeDetailResponse.get().getArea_name()));
+    employeeDetailResponse
+        .get()
+        .setOffice_name(EOffice.getLabel(employeeDetailResponse.get().getOffice_name()));
+    employeeDetailResponse
+        .get()
+        .setPosition_name(EJob.getLabel(employeeDetailResponse.get().getPosition_name()));
+    employeeDetailResponse
+        .get()
+        .setGrade(EGradeType.getLabel(employeeDetailResponse.get().getGrade()));
+    return employeeDetailResponse;
   }
 }

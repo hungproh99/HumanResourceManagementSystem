@@ -29,7 +29,7 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
 
   @Override
   public void insertDeductionSalaryByEmployeeId(
-      Long salaryId, LocalDate date, String description, BigDecimal bonus) {
+      Long salaryId, LocalDate date, String description, Long deductionType, BigDecimal bonus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
@@ -38,8 +38,9 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
                 DEDUCTION_SALARY.DATE,
                 DEDUCTION_SALARY.DESCRIPTION,
                 DEDUCTION_SALARY.VALUE,
-                DEDUCTION_SALARY.SALARY_ID)
-            .values(date, description, bonus, salaryId)
+                DEDUCTION_SALARY.SALARY_ID,
+                DEDUCTION_SALARY.DEDUCTION_TYPE_ID)
+            .values(date, description, bonus, salaryId, deductionType)
             .execute();
   }
 }

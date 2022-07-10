@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ApplicationsRequestRepositoryCustom {
@@ -47,6 +48,14 @@ public interface ApplicationsRequestRepositoryCustom {
   void updateApproverAndForwardByRequestId(Long requestId, String newApprover, String forwarder);
 
   void changeIsRead(boolean isRead, Long requestId);
+
+  Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId);
+
+  List<ApplicationsRequestResponse> getListApplicationRequestReceiveByListId(
+      QueryParam queryParam, String employeeId, List<Long> list);
+
+  List<ApplicationsRequestResponse> getListApplicationRequestSendByListId(
+      QueryParam queryParam, String employeeId, List<Long> list);
 
   void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
 

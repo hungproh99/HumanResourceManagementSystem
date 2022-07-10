@@ -1,7 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.ERequestStatus;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -31,8 +31,7 @@ import static org.jooq.codegen.maven.example.tables.Policy.POLICY;
 import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
-import static org.jooq.impl.DSL.concat;
-import static org.jooq.impl.DSL.when;
+import static org.jooq.impl.DSL.*;
 
 @AllArgsConstructor
 public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRepositoryCustom {
@@ -46,6 +45,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     field2Map.put(IS_BOOKMARK_PARAM, APPLICATIONS_REQUEST.IS_BOOKMARK);
     field2Map.put(REQUEST_STATUS_PARAM, REQUEST_STATUS.NAME);
     field2Map.put(REQUEST_TYPE_PARAM, REQUEST_TYPE.NAME);
+    field2Map.put(REQUEST_ID_PARAM, APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID);
   }
 
   @Autowired private final JooqHelper queryHelper;
@@ -70,6 +70,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setIs_enough_level(
               checkLevelOfManagerByRequestId(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
+          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
+          applicationsRequestResponse.setRequest_title(
+              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
         });
 
     return applicationsRequestResponseList;
@@ -91,6 +94,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setChecked_by(
               getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
                   .fetchInto(String.class));
+          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
+          applicationsRequestResponse.setRequest_title(
+              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
         });
 
     return applicationsRequestResponseList;
@@ -575,6 +581,79 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
+  public Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(APPLICATIONS_REQUEST.EMPLOYEE_ID, REQUEST_NAME.NAME, APPLICATIONS_REQUEST.DATA)
+        .from(APPLICATIONS_REQUEST)
+        .leftJoin(REQUEST_NAME)
+        .on(REQUEST_NAME.REQUEST_NAME_ID.eq(APPLICATIONS_REQUEST.REQUEST_NAME))
+        .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+        .fetchOptionalInto(ApplicationRequestDto.class);
+  }
+
+  @Override
+  public List<ApplicationsRequestResponse> getListApplicationRequestReceiveByListId(
+      QueryParam queryParam, String employeeId, List<Long> list) {
+    final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
+
+    final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
+    Condition condition = noCondition();
+    for (Long id : list) {
+      condition = condition.or(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(id));
+    }
+    conditions.add(condition);
+
+    List<ApplicationsRequestResponse> applicationsRequestResponseList =
+        getListApplicationRequestReceive(conditions, orderByList, queryParam.pagination, employeeId)
+            .fetchInto(ApplicationsRequestResponse.class);
+
+    applicationsRequestResponseList.forEach(
+        applicationsRequestResponse -> {
+          applicationsRequestResponse.setChecked_by(
+              getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
+                  .fetchInto(String.class));
+          applicationsRequestResponse.setIs_enough_level(
+              checkLevelOfManagerByRequestId(
+                  employeeId, applicationsRequestResponse.getApplication_request_id()));
+          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
+          applicationsRequestResponse.setRequest_title(
+              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+        });
+
+    return applicationsRequestResponseList;
+  }
+
+  @Override
+  public List<ApplicationsRequestResponse> getListApplicationRequestSendByListId(
+      QueryParam queryParam, String employeeId, List<Long> list) {
+    final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
+
+    final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
+    Condition condition = noCondition();
+    for (Long id : list) {
+      condition = condition.or(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(id));
+    }
+    conditions.add(condition);
+
+    List<ApplicationsRequestResponse> applicationsRequestResponseList =
+        getListApplicationRequestSend(conditions, orderByList, queryParam.pagination, employeeId)
+            .fetchInto(ApplicationsRequestResponse.class);
+
+    applicationsRequestResponseList.forEach(
+        applicationsRequestResponse -> {
+          applicationsRequestResponse.setChecked_by(
+              getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
+                  .fetchInto(String.class));
+          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
+          applicationsRequestResponse.setRequest_title(
+              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+        });
+
+    return applicationsRequestResponseList;
+  }
+
+  @Override
   public void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext
@@ -598,9 +677,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             applicationsRequest.getRequestStatusId(),
             applicationsRequest.getDescription(),
             applicationsRequest.getApprover(),
-            applicationsRequest.getCreateDate().atStartOfDay(),
-            applicationsRequest.getLatestDate().atStartOfDay(),
-            applicationsRequest.getDuration().atStartOfDay(),
+            applicationsRequest.getCreateDate(),
+            applicationsRequest.getLatestDate(),
+            applicationsRequest.getDuration(),
             applicationsRequest.getData(),
             applicationsRequest.getIsRemind(),
             applicationsRequest.getIsBookmark(),

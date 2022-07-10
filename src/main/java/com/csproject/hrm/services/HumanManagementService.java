@@ -42,4 +42,6 @@ public interface HumanManagementService {
       HttpServletResponse response, QueryParam queryParam, List<String> list);
 
   void importExcelToEmployee(Workbook workBook);
+
+  HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId);
 }

@@ -51,6 +51,7 @@ public class Constants {
   public static final String ORDER_BY = "orderBy";
   public static final String COMMA = ",";
   public static final String COLON = ":";
+  public static final String SEPARATOR = "|";
   public static final String OFFSET = "offset";
   public static final String LIMIT = "limit";
   public static final String INVALID_NUMBER_FORMAT = "Invalid Number Format";
@@ -120,4 +121,6 @@ public class Constants {
   public static final String DEDUCTION_INVALID = "Invalid Deduction Type";
   public static final String BONUS_INVALID = "Invalid Bonus Type";
   public static final String NULL_LEVEL = "Level is null";
+
+  public static final String REQUEST_ID_PARAM = "requestId";
 }

@@ -1,10 +1,9 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.EmployeeTypeDto;
-import com.csproject.hrm.dto.dto.RoleDto;
-import com.csproject.hrm.dto.dto.WorkingTypeDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
+import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -33,4 +32,8 @@ public interface EmployeeRepositoryCustom {
   List<String> getListManagerByName(String name);
 
   List<String> getListEmployeeByNameAndId(String name);
+
+  HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId);
+
+  void updateStatusEmployee(String employeeId, boolean status);
 }

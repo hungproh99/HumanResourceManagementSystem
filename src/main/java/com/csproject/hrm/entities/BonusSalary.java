@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -25,7 +22,7 @@ public class BonusSalary {
   private BigDecimal value;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
-  @JoinColumn(name = "deduction_type_id")
+  @JoinColumn(name = "bonus_type_id")
   private BonusType bonusType;
 
   @Column(name = "description")

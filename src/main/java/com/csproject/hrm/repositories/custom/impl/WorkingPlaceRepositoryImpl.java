@@ -70,10 +70,10 @@ public class WorkingPlaceRepositoryImpl implements WorkingPlaceRepositoryCustom 
   @Override
   public void insertNewWorkingPlace(
       String employeeId,
-      long area,
-      long office,
-      long grade,
-      long position,
+      Long area,
+      Long office,
+      Long grade,
+      Long position,
       LocalDate startDate,
       boolean oldStatus,
       boolean newStatus) {

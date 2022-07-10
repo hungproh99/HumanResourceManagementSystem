@@ -2,8 +2,7 @@ package com.csproject.hrm.dto.request;
 
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 
 @Data
@@ -17,9 +16,9 @@ public class ApplicationsRequestRequestC {
   private Long requestStatusId;
   private Long requestTypeId;
   private String description;
-  private LocalDate createDate;
-  private LocalDate latestDate;
-  private LocalDate duration;
+  private LocalDateTime createDate;
+  private LocalDateTime latestDate;
+  private LocalDateTime duration;
   private String approver;
   private String data;
   private Boolean isBookmark;

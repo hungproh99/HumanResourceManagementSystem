@@ -26,8 +26,15 @@ public interface TimekeepingRepositoryCustom {
 
   void insertTimekeepingByEmployeeId(String employeeId, LocalDate startDate, LocalDate endDate);
 
-  void insertTimekeepingStatusByEmployeeIdAndRangeDate(
-      String employeeId, LocalDate startDate, LocalDate endDate, long timekeepingStatus);
+  void upsertTimekeepingStatusByEmployeeIdAndRangeDate(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      long oldTimekeepingStatus,
+      long newTimekeepingStatus);
+
+  void deleteTimekeepingStatusByEmployeeIdAndDate(
+      String employeeId, LocalDate date, long oldTimekeepingStatus);
 
   void updateTimekeepingStatusByEmployeeIdAndRangeDate(
       String employeeId,
