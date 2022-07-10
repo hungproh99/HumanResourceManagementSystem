@@ -1,12 +1,9 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.ApplicationRequestDto;
-import com.csproject.hrm.dto.dto.RequestNameDto;
-import com.csproject.hrm.dto.dto.RequestStatusDto;
-import com.csproject.hrm.dto.dto.RequestTypeDto;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -59,4 +56,18 @@ public interface ApplicationsRequestRepositoryCustom {
 
   List<ApplicationsRequestResponse> getListApplicationRequestSendByListId(
       QueryParam queryParam, String employeeId, List<Long> list);
+
+  void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
+
+  List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
+
+  String getDescriptionByRequestNameID(Long requestNameID);
+
+  PolicyTypeAndNameResponse getPolicyByRequestNameID(Long requestNameID);
+
+  Boolean checkPermissionToCreate(String employeeId, Long requestNameId);
+
+  Boolean checkPermissionToApprove(String employeeId, Long requestNameId);
+
+  void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto);
 }

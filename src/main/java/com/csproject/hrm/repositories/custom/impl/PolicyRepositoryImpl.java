@@ -92,4 +92,15 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
         .from(POLICY_CATEGORY)
         .fetchInto(PolicyCategoryResponse.class);
   }
+
+  @Override
+  public Long getTaxPolicyTypeIDByTaxName(String taxName) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select(POLICY_TYPE.POLICY_TYPE_ID)
+        .from(POLICY_TYPE)
+        .where(POLICY_TYPE.POLICY_TYPE_.eq(taxName))
+        .fetchOneInto(Long.class);
+  }
 }

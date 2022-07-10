@@ -1,9 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -21,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
+import static org.jooq.codegen.maven.example.Tables.OVERTIME;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.CheckinCheckout.CHECKIN_CHECKOUT;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
@@ -28,7 +27,6 @@ import static org.jooq.codegen.maven.example.tables.GradeType.GRADE_TYPE;
 import static org.jooq.codegen.maven.example.tables.Job.JOB;
 import static org.jooq.codegen.maven.example.tables.ListTimekeepingStatus.LIST_TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.Office.OFFICE;
-import static org.jooq.codegen.maven.example.tables.Overtime.OVERTIME;
 import static org.jooq.codegen.maven.example.tables.Timekeeping.TIMEKEEPING;
 import static org.jooq.codegen.maven.example.tables.TimekeepingStatus.TIMEKEEPING_STATUS;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
@@ -298,7 +296,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .select(
                 LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
                 LIST_TIMEKEEPING_STATUS.LIST_ID,
-                TIMEKEEPING_STATUS.NAME.as("timekeeping_status_name"))
+                TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS))
             .from(LIST_TIMEKEEPING_STATUS)
             .leftJoin(TIMEKEEPING_STATUS)
             .on(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(TIMEKEEPING_STATUS.TYPE_ID))
@@ -452,6 +450,40 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
             .and(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(oldTimekeepingStatus))
             .execute();
+  }
+
+  @Override
+  public void updateTimekeepingStatusByEmployeeIdAndRangeDate(
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      long oldTimekeepingStatus,
+      long newTimekeepingStatus) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Long> timekeepingIdList =
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .fetchInto(Long.class);
+
+    dslContext.transaction(
+        configuration -> {
+          timekeepingIdList.forEach(
+              timekeepingId -> {
+                queries.add(
+                    dslContext
+                        .update(LIST_TIMEKEEPING_STATUS)
+                        .set(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID, newTimekeepingStatus)
+                        .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
+                        .and(
+                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
+                                oldTimekeepingStatus)));
+              });
+          DSL.using(configuration).batch(queries).execute();
+        });
   }
 
   private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
