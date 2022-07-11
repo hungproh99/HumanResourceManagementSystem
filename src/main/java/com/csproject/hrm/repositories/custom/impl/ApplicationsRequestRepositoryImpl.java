@@ -697,7 +697,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
             .fetchOneInto(Integer.class);
     return dslContext
-        .select(
+        .selectDistinct(
             REQUEST_TYPE.TYPE_ID.as("request_type_id"), REQUEST_TYPE.NAME.as("request_type_name"))
         .from(REQUEST_TYPE)
         .leftJoin(REQUEST_NAME)
@@ -705,6 +705,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .leftJoin(POLICY)
         .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
         .where(POLICY.MAXIMUM_LEVEL_ACCEPT.greaterOrEqual(level))
+        .orderBy(REQUEST_TYPE.TYPE_ID)
         .fetchInto(RequestTypeDto.class);
   }
 
