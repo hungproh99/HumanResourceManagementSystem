@@ -48,8 +48,6 @@ public interface ApplicationsRequestRepositoryCustom {
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
-  String checkLevelOfManagerByRequestId(String employeeId, Long requestId);
-
   void changeIsRead(boolean isRead, Long requestId);
 
   Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId);

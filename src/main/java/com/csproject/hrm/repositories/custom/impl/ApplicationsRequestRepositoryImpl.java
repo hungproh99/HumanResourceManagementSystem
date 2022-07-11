@@ -94,9 +94,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
-                      employeeId, applicationsRequestResponse.getApplication_request_id())
-                  ? "Notification"
-                  : "Request");
+                  employeeId, applicationsRequestResponse.getApplication_request_id()));
         });
 
     return applicationsRequestResponseList;
@@ -123,9 +121,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
-                      employeeId, applicationsRequestResponse.getApplication_request_id())
-                  ? "Notification"
-                  : "Request");
+                  employeeId, applicationsRequestResponse.getApplication_request_id()));
         });
 
     return applicationsRequestResponseList;
@@ -510,8 +506,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .fetchInto(RequestNameDto.class);
   }
 
-  @Override
-  public String checkLevelOfManagerByRequestId(String employeeId, Long requestApplicationId) {
+  private String checkLevelOfManagerByRequestId(String employeeId, Long requestApplicationId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var level =
         dslContext
@@ -621,9 +616,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
-                      employeeId, applicationsRequestResponse.getApplication_request_id())
-                  ? "Notification"
-                  : "Request");
+                  employeeId, applicationsRequestResponse.getApplication_request_id()));
         });
 
     return applicationsRequestResponseList;
@@ -655,15 +648,13 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
-                      employeeId, applicationsRequestResponse.getApplication_request_id())
-                  ? "Notification"
-                  : "Request");
+                  employeeId, applicationsRequestResponse.getApplication_request_id()));
         });
 
     return applicationsRequestResponseList;
   }
 
-  private boolean checkNotificationOrRequest(String employeeId, Long requestId) {
+  private String checkNotificationOrRequest(String employeeId, Long requestId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final String managerId =
         dslContext
@@ -677,6 +668,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .from(APPLICATIONS_REQUEST)
             .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
             .fetchOneInto(String.class);
-    return managerId.equals(employeeIdSendRequest);
+    return managerId.equals(employeeIdSendRequest) ? "Notification" : "Request";
   }
 }
