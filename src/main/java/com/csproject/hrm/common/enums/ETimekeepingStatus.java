@@ -15,8 +15,8 @@ public enum ETimekeepingStatus {
   HOLIDAY("holiday", 7),
   OVERTIME("overtime", 8);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   ETimekeepingStatus(String label, long value) {
     this.label = label;

@@ -1,8 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.EmployeeTypeDto;
-import com.csproject.hrm.dto.dto.RoleDto;
-import com.csproject.hrm.dto.dto.WorkingTypeDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;

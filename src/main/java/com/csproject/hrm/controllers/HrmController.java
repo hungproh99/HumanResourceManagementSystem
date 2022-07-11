@@ -149,10 +149,7 @@ public class HrmController {
   @GetMapping(URI_LIST_ROLE_TYPE)
   @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
   public ResponseEntity<?> getListRoleType(HttpServletRequest request) {
-    boolean isAdmin = false;
-    if (request.isUserInRole("ADMIN")) {
-      isAdmin = true;
-    }
+    boolean isAdmin = request.isUserInRole("ADMIN");
     return ResponseEntity.ok(humanManagementService.getListRoleType(isAdmin));
   }
 

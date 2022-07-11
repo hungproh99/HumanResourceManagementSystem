@@ -40,4 +40,6 @@ public interface EmployeeDetailRepositoryCustom {
   Optional<EmployeeDetailResponse> findMainDetail(String employeeID);
 
   boolean checkEmployeeIDIsExists(String employeeID);
+
+  String getManagerIDByEmployeeID(String employeeID);
 }

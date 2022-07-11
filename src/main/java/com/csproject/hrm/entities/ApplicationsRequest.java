@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -26,7 +23,7 @@ public class ApplicationsRequest {
   @JoinColumn(name = "employee_id")
   private Employee employee;
 
-  @Column(name = "description")
+  @Column(name = "description", length = 1000)
   private String description;
 
   @OneToOne(cascade = CascadeType.ALL)

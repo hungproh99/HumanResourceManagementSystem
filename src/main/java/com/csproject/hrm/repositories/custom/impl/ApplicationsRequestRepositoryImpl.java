@@ -1,16 +1,11 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.ERequestName;
-import com.csproject.hrm.common.enums.ERequestStatus;
-import com.csproject.hrm.common.enums.ERequestType;
-import com.csproject.hrm.dto.dto.ApplicationRequestDto;
-import com.csproject.hrm.dto.dto.RequestNameDto;
-import com.csproject.hrm.dto.dto.RequestStatusDto;
-import com.csproject.hrm.dto.dto.RequestTypeDto;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
@@ -28,6 +23,8 @@ import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
+import static org.jooq.codegen.maven.example.Tables.EMPLOYEE_TAX;
+import static org.jooq.codegen.maven.example.Tables.POLICY_TYPE;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
@@ -652,6 +649,165 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         });
 
     return applicationsRequestResponseList;
+  }
+
+
+  @Override
+  public void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+            .insertInto(
+                    APPLICATIONS_REQUEST,
+                    APPLICATIONS_REQUEST.EMPLOYEE_ID,
+                    APPLICATIONS_REQUEST.REQUEST_NAME,
+                    APPLICATIONS_REQUEST.REQUEST_STATUS,
+                    APPLICATIONS_REQUEST.DESCRIPTION,
+                    APPLICATIONS_REQUEST.APPROVER,
+                    APPLICATIONS_REQUEST.CREATE_DATE,
+                    APPLICATIONS_REQUEST.LATEST_DATE,
+                    APPLICATIONS_REQUEST.DURATION,
+                    APPLICATIONS_REQUEST.DATA,
+                    APPLICATIONS_REQUEST.IS_REMIND,
+                    APPLICATIONS_REQUEST.IS_BOOKMARK,
+                    APPLICATIONS_REQUEST.IS_READ)
+            .values(
+                    applicationsRequest.getCreateEmployeeId(),
+                    applicationsRequest.getRequestNameId(),
+                    applicationsRequest.getRequestStatusId(),
+                    applicationsRequest.getDescription(),
+                    applicationsRequest.getApprover(),
+                    applicationsRequest.getCreateDate(),
+                    applicationsRequest.getLatestDate(),
+                    applicationsRequest.getDuration(),
+                    applicationsRequest.getData(),
+                    applicationsRequest.getIsRemind(),
+                    applicationsRequest.getIsBookmark(),
+                    applicationsRequest.getIsRead())
+            .execute();
+  }
+
+  @Override
+  public List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var level =
+            dslContext
+                    .select(EMPLOYEE.LEVEL)
+                    .from(EMPLOYEE)
+                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+                    .fetchOneInto(Integer.class);
+    return dslContext
+            .selectDistinct(
+                    REQUEST_TYPE.TYPE_ID.as("request_type_id"), REQUEST_TYPE.NAME.as("request_type_name"))
+            .from(REQUEST_TYPE)
+            .leftJoin(REQUEST_NAME)
+            .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+            .leftJoin(POLICY)
+            .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+            .where(POLICY.MAXIMUM_LEVEL_ACCEPT.greaterOrEqual(level))
+            .orderBy(REQUEST_TYPE.TYPE_ID)
+            .fetchInto(RequestTypeDto.class);
+  }
+
+  @Override
+  public String getDescriptionByRequestNameID(Long requestNameID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+            .select(REQUEST_NAME.DESCRIPTION)
+            .from(REQUEST_NAME)
+            .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameID))
+            .fetchOneInto(String.class);
+  }
+
+  @Override
+  public PolicyTypeAndNameResponse getPolicyByRequestNameID(Long requestNameID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+            .select(POLICY_TYPE.POLICY_TYPE_, POLICY_TYPE.POLICY_NAME)
+            .from(REQUEST_NAME)
+            .leftJoin(POLICY)
+            .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
+            .leftJoin(POLICY_TYPE)
+            .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
+            .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameID))
+            .fetchOneInto(PolicyTypeAndNameResponse.class);
+  }
+
+  @Override
+  public Boolean checkPermissionToCreate(String employeeId, Long requestNameId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    final var level =
+            dslContext
+                    .select(EMPLOYEE.LEVEL)
+                    .from(EMPLOYEE)
+                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+                    .fetchOneInto(Integer.class);
+
+    final var maximumLevelAccept =
+            dslContext
+                    .select(POLICY.MAXIMUM_LEVEL_ACCEPT)
+                    .from(REQUEST_NAME)
+                    .leftJoin(POLICY)
+                    .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+                    .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
+                    .fetchOneInto(Integer.class);
+
+    if (maximumLevelAccept == null || level == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
+    }
+    return level <= maximumLevelAccept;
+  }
+
+  @Override
+  public Boolean checkPermissionToApprove(String employeeId, Long requestNameId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    final var level =
+            dslContext
+                    .select(EMPLOYEE.LEVEL)
+                    .from(EMPLOYEE)
+                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+                    .fetchOneInto(Integer.class);
+
+    final var minimumLevelAccept =
+            dslContext
+                    .select(POLICY.MINIMUM_LEVEL_ACCEPT)
+                    .from(REQUEST_NAME)
+                    .leftJoin(POLICY)
+                    .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+                    .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
+                    .fetchOneInto(Integer.class);
+
+    if (minimumLevelAccept == null || level == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
+    }
+    return level <= minimumLevelAccept;
+  }
+
+  @Override
+  public void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    boolean check =
+            dslContext.fetchExists(
+                    dslContext
+                            .select()
+                            .from(EMPLOYEE_TAX)
+                            .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
+
+    if (!check) {
+      dslContext
+              .insertInto(
+                      EMPLOYEE_TAX,
+                      EMPLOYEE_TAX.EMPLOYEE_ID,
+                      EMPLOYEE_TAX.POLICY_TYPE_ID,
+                      EMPLOYEE_TAX.TAX_STATUS)
+              .values(
+                      employeeTaxDto.getEmployeeID(),
+                      employeeTaxDto.getTaxTypeID(),
+                      employeeTaxDto.getTaxStatus())
+              .execute();
+    }
   }
 
   private String checkNotificationOrRequest(String employeeId, Long requestId) {

@@ -8,8 +8,8 @@ import static com.csproject.hrm.common.constant.Constants.DEDUCTION_INVALID;
 public enum EDeduction {
   LATE_WORK("Late work", 1);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   EDeduction(String label, long value) {
     this.label = label;

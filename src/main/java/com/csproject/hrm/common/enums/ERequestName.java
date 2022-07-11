@@ -6,10 +6,22 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.REQUEST_NAME_INVALID;
 
 public enum ERequestName {
-  PAID_LEAVE("Paid Leave", 1);
+  WORKING_TIME("Working Time", 1),
+  OT("OT", 2),
+  PAID_LEAVE("Paid Leave", 5),
+  ADVANCES("Advances", 11),
+  PROMOTION("Promotion", 3),
+  SALARY_INCREMENT("Salary increment ", 4),
+  BONUS("Bonus ", 4),
+  LEAKING_SECURED_INFORMATION("Leaking secured information", 6),
+  COMPANY_ASSET("Company asset", 7),
+  CONFLICT_WITH_CUSTOMER("Conflict with customer", 8),
+  CONFLICT_WITH_INTERNAL_COMPANY("Conflict in internal company", 9),
+  WORKING_ENVIRONMENT("Working Environment", 10),
+  TAX_ENROLLMENT("Tax Enrollment", 12);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   ERequestName(String label, long value) {
     this.label = label;

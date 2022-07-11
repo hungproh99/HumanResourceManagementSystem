@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.REQUEST_STATUS_INVALID;
 
 public enum ERequestStatus {
-  PENDING("Pending", 1);
+  PENDING("Pending", 1),
+  APPROVED("Approved", 2),
+  REJECTED("Rejected", 3);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   ERequestStatus(String label, long value) {
     this.label = label;

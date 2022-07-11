@@ -1,10 +1,7 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.dto.dto.RequestNameDto;
-import com.csproject.hrm.dto.dto.RequestStatusDto;
-import com.csproject.hrm.dto.dto.RequestTypeDto;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 
@@ -45,4 +42,10 @@ public interface ApplicationsRequestService {
 
   void exportApplicationRequestSendToCsv(
       Writer writer, QueryParam queryParam, String employeeId, List<Long> list);
+
+  void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
+
+  List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
+
+  void createApproveTaxEnrollment(List<String> taxNameList, String employeeId);
 }
