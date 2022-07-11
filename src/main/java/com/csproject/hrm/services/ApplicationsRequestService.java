@@ -31,6 +31,8 @@ public interface ApplicationsRequestService {
 
   void updateApproveApplicationRequest(Long requestId);
 
+  void updateRejectApplicationRequest(Long requestId);
+
   void exportApplicationRequestReceiveByExcel(
       HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);
 

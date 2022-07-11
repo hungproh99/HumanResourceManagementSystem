@@ -46,6 +46,7 @@ public class Uri {
 
   public static final String URI_UPDATE_IS_READ = "/update_is_read";
   public static final String URI_UPDATE_APPROVE_APPLICATION_REQUEST = "/update_approve_application_request";
+  public static final String URI_UPDATE_REJECT_APPLICATION_REQUEST = "/update_reject_application_request";
 
   public static final String URI_GET_LIST_EMPLOYEE_NAME_AND_ID = "/list_employee_name_id";
 

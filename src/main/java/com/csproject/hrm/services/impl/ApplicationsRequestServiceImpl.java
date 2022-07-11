@@ -150,18 +150,33 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Override
   public void updateIsRead(Long requestId) {
+    if(requestId == null){
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+    }
     boolean isRead = false;
     applicationsRequestRepository.changeIsRead(isRead, requestId);
   }
 
   @Override
   public void updateApproveApplicationRequest(Long requestId) {
+    if(requestId == null){
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+    }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
     if (applicationRequestDto.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
     updateApproveInformation(applicationRequestDto.get(), requestId);
+  }
+
+  @Override
+  public void updateRejectApplicationRequest(Long requestId) {
+    if(requestId == null){
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+    }
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.REJECTED.name(), LocalDateTime.now());
   }
 
   @Override
@@ -429,7 +444,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         employeeId, date, ETimekeepingStatus.getValue(requestName));
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updateOvertime(
@@ -464,7 +479,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         employeeId, startDate, endDate, startTime, endTime, overtimeType);
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updatePaidLeave(
@@ -484,7 +499,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         ETimekeepingStatus.getValue(requestName));
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updatePromotion(
@@ -517,7 +532,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updateSalaryIncrement(
@@ -528,7 +543,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updateBonusSalary(
@@ -551,7 +566,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         salaryId, date, description, bonusType, value);
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updateConflictAndLeakInfo(
@@ -576,7 +591,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       employeeRepository.updateStatusEmployee(employeeId, false);
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private void updateAdvanceRequest(
@@ -593,7 +608,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
 
     applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name());
+        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
   private HashMap<String, String> splitData(String data) {

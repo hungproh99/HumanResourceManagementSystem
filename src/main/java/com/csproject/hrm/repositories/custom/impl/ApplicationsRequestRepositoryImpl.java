@@ -308,12 +308,13 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
-  public void updateStatusApplication(Long requestId, String status) {
+  public void updateStatusApplication(Long requestId, String status, LocalDateTime latestDate) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .update(APPLICATIONS_REQUEST)
             .set(APPLICATIONS_REQUEST.REQUEST_STATUS, ERequestStatus.getValue(status))
+            .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
             .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
             .execute();
   }
