@@ -29,8 +29,10 @@ public interface ApplicationsRequestRepositoryCustom {
       LocalDateTime latestDate,
       LocalDateTime duration);
 
-  void updateStatusApplicationRequest(
-      UpdateApplicationRequestRequest updateApplicationRequestRequest, LocalDateTime latestDate);
+  void updateCheckedApplicationRequest(
+      UpdateApplicationRequestRequest updateApplicationRequestRequest,
+      String employeeId,
+      LocalDateTime latestDate);
 
   int countListApplicationRequestReceive(QueryParam queryParam, String employeeId);
 
@@ -47,8 +49,6 @@ public interface ApplicationsRequestRepositoryCustom {
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
   String checkLevelOfManagerByRequestId(String employeeId, Long requestId);
-
-  void updateApproverAndForwardByRequestId(Long requestId, String newApprover, String forwarder);
 
   void changeIsRead(boolean isRead, Long requestId);
 

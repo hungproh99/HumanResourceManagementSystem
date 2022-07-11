@@ -16,6 +16,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -69,10 +73,17 @@ public class ApplicationsRequestController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @PostMapping(URI_UPDATE_STATUS_APPLICATION_QUEST)
-  public ResponseEntity<?> updateStatusApplicationRequest(
+  @PostMapping(URI_UPDATE_CHECK_APPLICATION_QUEST)
+  public ResponseEntity<?> updateCheckedApplicationRequest(
+      HttpServletRequest request,
       @RequestBody UpdateApplicationRequestRequest updateApplicationRequestRequest) {
-    applicationsRequestService.updateStatusApplicationRequest(updateApplicationRequestRequest);
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      applicationsRequestService.updateCheckedApplicationRequest(
+          updateApplicationRequestRequest, employeeId);
+    }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
@@ -97,9 +108,103 @@ public class ApplicationsRequestController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  @PostMapping(URI_UPDATE_APPLICATION_REQUEST)
+  @PostMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
   public ResponseEntity<?> updateApplicationRequest(@RequestParam Long requestId) {
     applicationsRequestService.updateApplicationRequest(requestId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DOWNLOAD_CSV_REQUEST_RECEIVE)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> downloadCsvRequestReceive(
+      HttpServletRequest request,
+      HttpServletResponse servletResponse,
+      @RequestBody List<Long> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    servletResponse.setContentType("text/csv; charset=UTF-8");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=\"Application_Request.csv\"");
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      applicationsRequestService.exportApplicationRequestReceiveToCsv(
+          servletResponse.getWriter(), queryParam, employeeId, listId);
+    }
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DOWNLOAD_EXCEL_REQUEST_RECEIVE)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> downloadExcelRequestReceive(
+      HttpServletRequest request,
+      HttpServletResponse servletResponse,
+      @RequestBody List<Long> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    servletResponse.setContentType("application/octet-stream");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      applicationsRequestService.exportApplicationRequestReceiveByExcel(
+          servletResponse, queryParam, employeeId, listId);
+    }
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DOWNLOAD_CSV_REQUEST_SEND)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> downloadCsvRequestSend(
+      HttpServletRequest request,
+      HttpServletResponse servletResponse,
+      @RequestBody List<Long> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    servletResponse.setContentType("text/csv; charset=UTF-8");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=\"Application_Request.csv\"");
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      applicationsRequestService.exportApplicationRequestSendToCsv(
+          servletResponse.getWriter(), queryParam, employeeId, listId);
+    }
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DOWNLOAD_EXCEL_REQUEST_SEND)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> downloadExcelRequestSend(
+      HttpServletRequest request,
+      HttpServletResponse servletResponse,
+      @RequestBody List<Long> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    servletResponse.setContentType("application/octet-stream");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      applicationsRequestService.exportApplicationRequestSendByExcel(
+          servletResponse, queryParam, employeeId, listId);
+    }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

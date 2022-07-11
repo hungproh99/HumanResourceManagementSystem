@@ -433,7 +433,6 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       case FORMULA:
         return cell.getCellFormula();
       case BLANK:
-        return null;
       case _NONE:
         return null;
       default:

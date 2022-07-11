@@ -1,6 +1,9 @@
 package com.csproject.hrm.dto.request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -9,4 +12,5 @@ import lombok.*;
 public class UpdateApplicationRequestRequest {
   private Long applicationRequestId;
   private String requestStatus;
+  private String approverId;
 }

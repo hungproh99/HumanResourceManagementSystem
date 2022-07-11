@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
@@ -61,9 +62,24 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
 
-    List<ApplicationsRequestResponse> applicationsRequestResponseList =
-        getListApplicationRequestReceive(conditions, orderByList, queryParam.pagination, employeeId)
+    List<ApplicationsRequestResponse> applicationsRequestResponseForwardList =
+        getListApplicationRequestReceiveForward(
+                conditions, orderByList, queryParam.pagination, employeeId)
             .fetchInto(ApplicationsRequestResponse.class);
+
+    applicationsRequestResponseForwardList.forEach(
+        applicationsRequestResponse -> {
+          applicationsRequestResponse.setIs_read("True");
+        });
+
+    List<ApplicationsRequestResponse> applicationsRequestResponseList =
+        Stream.of(
+                applicationsRequestResponseForwardList,
+                getListApplicationRequestReceive(
+                        conditions, orderByList, queryParam.pagination, employeeId)
+                    .fetchInto(ApplicationsRequestResponse.class))
+            .flatMap(x -> x.stream())
+            .collect(Collectors.toList());
 
     applicationsRequestResponseList.forEach(
         applicationsRequestResponse -> {
@@ -76,6 +92,11 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
           applicationsRequestResponse.setRequest_title(
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setType(
+              checkNotificationOrRequest(
+                      employeeId, applicationsRequestResponse.getApplication_request_id())
+                  ? "Notification"
+                  : "Request");
         });
 
     return applicationsRequestResponseList;
@@ -100,12 +121,56 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
           applicationsRequestResponse.setRequest_title(
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setType(
+              checkNotificationOrRequest(
+                      employeeId, applicationsRequestResponse.getApplication_request_id())
+                  ? "Notification"
+                  : "Request");
         });
 
     return applicationsRequestResponseList;
   }
 
   private Select<?> getListApplicationRequestReceive(
+      List<Condition> conditions,
+      List<OrderField<?>> sortFields,
+      Pagination pagination,
+      String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select(
+            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
+            EMPLOYEE.EMPLOYEE_ID,
+            EMPLOYEE.FULL_NAME,
+            APPLICATIONS_REQUEST.CREATE_DATE,
+            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+            APPLICATIONS_REQUEST.DESCRIPTION,
+            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+            APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+            APPLICATIONS_REQUEST.DURATION,
+            APPLICATIONS_REQUEST.APPROVER,
+            (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                    .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                .as(IS_BOOKMARK),
+            APPLICATIONS_REQUEST.IS_READ)
+        .from(EMPLOYEE)
+        .leftJoin(APPLICATIONS_REQUEST)
+        .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(REQUEST_STATUS)
+        .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+        .leftJoin(REQUEST_NAME)
+        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
+        .leftJoin(REQUEST_TYPE)
+        .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+        .where(conditions)
+        .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
+  }
+
+  private Select<?> getListApplicationRequestReceiveForward(
       List<Condition> conditions,
       List<OrderField<?>> sortFields,
       Pagination pagination,
@@ -140,50 +205,16 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
         .leftJoin(REQUEST_TYPE)
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+        .leftJoin(selectForward)
+        .on(
+            selectForward
+                .field(FORWARDS.APPLICATIONS_REQUEST_ID)
+                .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
         .where(conditions)
-        .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
+        .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
         .orderBy(sortFields)
         .limit(pagination.limit)
-        .offset(pagination.offset)
-        .unionAll(
-            dslContext
-                .select(
-                    APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
-                    EMPLOYEE.EMPLOYEE_ID,
-                    EMPLOYEE.FULL_NAME,
-                    APPLICATIONS_REQUEST.CREATE_DATE,
-                    concat(REQUEST_NAME.NAME)
-                        .concat(" ")
-                        .concat(REQUEST_TYPE.NAME)
-                        .as(REQUEST_TITLE),
-                    APPLICATIONS_REQUEST.DESCRIPTION,
-                    REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
-                    APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-                    APPLICATIONS_REQUEST.DURATION,
-                    APPLICATIONS_REQUEST.APPROVER,
-                    (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
-                            .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                        .as(IS_BOOKMARK),
-                    APPLICATIONS_REQUEST.IS_READ)
-                .from(EMPLOYEE)
-                .leftJoin(APPLICATIONS_REQUEST)
-                .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-                .leftJoin(REQUEST_STATUS)
-                .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
-                .leftJoin(REQUEST_NAME)
-                .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
-                .leftJoin(REQUEST_TYPE)
-                .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-                .leftJoin(selectForward)
-                .on(
-                    selectForward
-                        .field(FORWARDS.APPLICATIONS_REQUEST_ID)
-                        .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
-                .where(conditions)
-                .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
-                .orderBy(sortFields)
-                .limit(pagination.limit)
-                .offset(pagination.offset));
+        .offset(pagination.offset);
   }
 
   private Select<?> getListApplicationRequestSend(
@@ -258,19 +289,29 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
-  public void updateStatusApplicationRequest(
-      UpdateApplicationRequestRequest updateApplicationRequestRequest, LocalDateTime latestDate) {
+  public void updateCheckedApplicationRequest(
+      UpdateApplicationRequestRequest updateApplicationRequestRequest,
+      String employeeId,
+      LocalDateTime latestDate) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    dslContext
-        .update(APPLICATIONS_REQUEST)
-        .set(
-            APPLICATIONS_REQUEST.REQUEST_STATUS,
-            ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))
-        .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
-        .where(
-            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(
-                updateApplicationRequestRequest.getApplicationRequestId()))
-        .execute();
+    dslContext.transaction(
+        configuration -> {
+          DSL.using(configuration)
+              .update(APPLICATIONS_REQUEST)
+              .set(
+                  APPLICATIONS_REQUEST.REQUEST_STATUS,
+                  ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))
+              .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
+              .set(APPLICATIONS_REQUEST.APPROVER, updateApplicationRequestRequest.getApproverId())
+              .where(
+                  APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(
+                      updateApplicationRequestRequest.getApplicationRequestId()))
+              .execute();
+          final var insertForwarder =
+              dslContext
+                  .insertInto(FORWARDS, FORWARDS.EMPLOYEE_ID, FORWARDS.APPLICATIONS_REQUEST_ID)
+                  .values(employeeId, updateApplicationRequestRequest.getApplicationRequestId());
+        });
   }
 
   @Override
@@ -283,20 +324,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     final var query =
         dslContext
-            .select(
-                APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
-                EMPLOYEE.EMPLOYEE_ID,
-                EMPLOYEE.FULL_NAME,
-                APPLICATIONS_REQUEST.CREATE_DATE,
-                concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
-                APPLICATIONS_REQUEST.DESCRIPTION,
-                REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
-                APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-                APPLICATIONS_REQUEST.DURATION,
-                APPLICATIONS_REQUEST.APPROVER,
-                (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
-                        .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                    .as(IS_BOOKMARK))
+            .select(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID)
             .from(EMPLOYEE)
             .leftJoin(APPLICATIONS_REQUEST)
             .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -311,23 +339,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .orderBy(orderByList)
             .unionAll(
                 dslContext
-                    .select(
-                        APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
-                        EMPLOYEE.EMPLOYEE_ID,
-                        EMPLOYEE.FULL_NAME,
-                        APPLICATIONS_REQUEST.CREATE_DATE,
-                        concat(REQUEST_NAME.NAME)
-                            .concat(" ")
-                            .concat(REQUEST_TYPE.NAME)
-                            .as(REQUEST_TITLE),
-                        APPLICATIONS_REQUEST.DESCRIPTION,
-                        REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
-                        APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-                        APPLICATIONS_REQUEST.DURATION,
-                        APPLICATIONS_REQUEST.APPROVER,
-                        (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
-                                .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                            .as(IS_BOOKMARK))
+                    .select(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID)
                     .from(EMPLOYEE)
                     .leftJoin(APPLICATIONS_REQUEST)
                     .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -356,20 +368,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     final var query =
         dslContext
-            .select(
-                APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
-                EMPLOYEE.EMPLOYEE_ID,
-                EMPLOYEE.FULL_NAME,
-                APPLICATIONS_REQUEST.CREATE_DATE,
-                concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
-                APPLICATIONS_REQUEST.DESCRIPTION,
-                REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
-                APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-                APPLICATIONS_REQUEST.DURATION,
-                APPLICATIONS_REQUEST.APPROVER,
-                (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
-                        .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                    .as(IS_BOOKMARK))
+            .select(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID)
             .from(EMPLOYEE)
             .leftJoin(APPLICATIONS_REQUEST)
             .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -539,23 +538,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     return level < maximumLevelAccept ? "True" : "False";
   }
 
-  @Override
-  public void updateApproverAndForwardByRequestId(
-      Long requestId, String newApprover, String forwarder) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var updateApprover =
-        dslContext
-            .update(APPLICATIONS_REQUEST)
-            .set(APPLICATIONS_REQUEST.APPROVER, newApprover)
-            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
-            .execute();
-
-    final var insertForwarder =
-        dslContext
-            .insertInto(FORWARDS, FORWARDS.EMPLOYEE_ID, FORWARDS.APPLICATIONS_REQUEST_ID)
-            .values(forwarder, requestId);
-  }
-
   private Select<?> getListForwarderByRequestId(Long requestId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
@@ -607,9 +589,24 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     }
     conditions.add(condition);
 
-    List<ApplicationsRequestResponse> applicationsRequestResponseList =
-        getListApplicationRequestReceive(conditions, orderByList, queryParam.pagination, employeeId)
+    List<ApplicationsRequestResponse> applicationsRequestResponseForwardList =
+        getListApplicationRequestReceiveForward(
+                conditions, orderByList, queryParam.pagination, employeeId)
             .fetchInto(ApplicationsRequestResponse.class);
+
+    applicationsRequestResponseForwardList.forEach(
+        applicationsRequestResponse -> {
+          applicationsRequestResponse.setIs_read("True");
+        });
+
+    List<ApplicationsRequestResponse> applicationsRequestResponseList =
+        Stream.of(
+                applicationsRequestResponseForwardList,
+                getListApplicationRequestReceive(
+                        conditions, orderByList, queryParam.pagination, employeeId)
+                    .fetchInto(ApplicationsRequestResponse.class))
+            .flatMap(x -> x.stream())
+            .collect(Collectors.toList());
 
     applicationsRequestResponseList.forEach(
         applicationsRequestResponse -> {
@@ -622,6 +619,11 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
           applicationsRequestResponse.setRequest_title(
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setType(
+              checkNotificationOrRequest(
+                      employeeId, applicationsRequestResponse.getApplication_request_id())
+                  ? "Notification"
+                  : "Request");
         });
 
     return applicationsRequestResponseList;
@@ -651,8 +653,30 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
           applicationsRequestResponse.setRequest_title(
               ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setType(
+              checkNotificationOrRequest(
+                      employeeId, applicationsRequestResponse.getApplication_request_id())
+                  ? "Notification"
+                  : "Request");
         });
 
     return applicationsRequestResponseList;
+  }
+
+  private boolean checkNotificationOrRequest(String employeeId, Long requestId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final String managerId =
+        dslContext
+            .select(EMPLOYEE.MANAGER_ID)
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .fetchOneInto(String.class);
+    final String employeeIdSendRequest =
+        dslContext
+            .select(APPLICATIONS_REQUEST.EMPLOYEE_ID)
+            .from(APPLICATIONS_REQUEST)
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+            .fetchOneInto(String.class);
+    return managerId.equals(employeeIdSendRequest);
   }
 }

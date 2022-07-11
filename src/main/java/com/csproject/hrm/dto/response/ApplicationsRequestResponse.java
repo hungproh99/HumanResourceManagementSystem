@@ -27,4 +27,5 @@ public class ApplicationsRequestResponse {
   private String is_bookmark;
   private String is_enough_level;
   private String is_read;
+  private String type;
 }

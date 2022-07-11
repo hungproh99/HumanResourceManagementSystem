@@ -21,8 +21,8 @@ public interface ApplicationsRequestService {
 
   void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest);
 
-  void updateStatusApplicationRequest(
-      UpdateApplicationRequestRequest updateApplicationRequestRequest);
+  void updateCheckedApplicationRequest(
+      UpdateApplicationRequestRequest updateApplicationRequestRequest, String employeeId);
 
   List<RequestStatusDto> getAllRequestStatus();
 

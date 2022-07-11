@@ -21,7 +21,6 @@ import com.csproject.hrm.services.ApplicationsRequestService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -107,15 +106,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
-  public void updateStatusApplicationRequest(
-      UpdateApplicationRequestRequest updateApplicationRequestRequest) {
+  public void updateCheckedApplicationRequest(
+      UpdateApplicationRequestRequest updateApplicationRequestRequest, String employeeId) {
     if (updateApplicationRequestRequest.getApplicationRequestId() == null
-        || updateApplicationRequestRequest.getRequestStatus() == null) {
+        || updateApplicationRequestRequest.getRequestStatus() == null
+        || updateApplicationRequestRequest.getApproverId() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
     LocalDateTime latestDate = LocalDateTime.now();
-    applicationsRequestRepository.updateStatusApplicationRequest(
-        updateApplicationRequestRequest, latestDate);
+    applicationsRequestRepository.updateCheckedApplicationRequest(
+        updateApplicationRequestRequest, employeeId, latestDate);
   }
 
   @Override
@@ -331,6 +331,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         salaryId = null;
     BigDecimal value = BigDecimal.ZERO;
     String description = null;
+    if (employeeId == null || requestName == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data in request");
+    }
     for (Map.Entry<String, String> i : hashMap) {
       switch (i.getKey()) {
         case "Start_Date":
@@ -380,64 +383,173 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     switch (requestName) {
       case "LEAVE_SOON":
       case "WORK_LATE":
-        timekeepingRepository.deleteTimekeepingStatusByEmployeeIdAndDate(
-            employeeId, date, ETimekeepingStatus.getValue(requestName));
+        updateWorkingTime(date, employeeId, requestName);
         break;
       case "OVERTIME":
-        if (endDate.isAfter(currentDate)) {
-          timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, currentDate, endDate);
-        }
-        timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
-            employeeId,
+        updateOvertime(
             startDate,
             endDate,
-            ETimekeepingStatus.getValue(requestName),
-            ETimekeepingStatus.getValue(requestName));
-
-        timekeepingRepository.insertOvertimeByEmployeeIdAndRangeDate(
-            employeeId, startDate, endDate, startTime, endTime, overtimeType);
+            startTime,
+            endTime,
+            overtimeType,
+            currentDate,
+            employeeId,
+            requestName);
         break;
       case "PAID_LEAVE":
-        timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
-            employeeId,
-            startDate,
-            endDate,
-            ETimekeepingStatus.getValue("DAY_OFF"),
-            ETimekeepingStatus.getValue(requestName));
+        updatePaidLeave(startDate, endDate, employeeId, requestName);
         break;
       case "PROMOTION":
-        workingPlaceRepository.insertNewWorkingPlace(
-            employeeId,
+        updatePromotion(
             desiredArea,
             desiredOffice,
-            desiredGrade,
             desiredPosition,
+            desiredGrade,
             startDate,
-            false,
-            true);
-        salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+            value,
+            employeeId);
         break;
       case "SALARY_INCREMENT":
-        salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+        updateSalaryIncrement(startDate, value, employeeId);
         break;
       case "BONUS":
-        salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
-        bonusSalaryRepository.insertBonusSalaryByEmployeeId(
-            salaryId, date, description, bonusType, value);
+        updateBonusSalary(date, description, value, employeeId, salaryId, bonusType);
         break;
       case "CONFLICT_CUSTOMER":
       case "LEAK_INFORMATION":
-        salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
-        deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
-            salaryId, date, description, deductionType, value);
-        if (deductionType.equals(EDeduction.getValue("FIRE")))
-          employeeRepository.updateStatusEmployee(employeeId, false);
+        updateConflictAndLeakInfo(date, description, value, employeeId, salaryId, deductionType);
         break;
       case "ADVANCE":
-        salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
-        advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
+        updateAdvanceRequest(date, description, value, employeeId, salaryId);
         break;
     }
+  }
+
+  private void updateWorkingTime(LocalDate date, String employeeId, String requestName) {
+    if (date == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    timekeepingRepository.deleteTimekeepingStatusByEmployeeIdAndDate(
+        employeeId, date, ETimekeepingStatus.getValue(requestName));
+  }
+
+  private void updateOvertime(
+      LocalDate startDate,
+      LocalDate endDate,
+      LocalTime startTime,
+      LocalTime endTime,
+      Long overtimeType,
+      LocalDate currentDate,
+      String employeeId,
+      String requestName) {
+    if (startDate == null
+        || endDate == null
+        || startTime == null
+        || endTime == null
+        || overtimeType == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    if (endDate.isAfter(currentDate)) {
+      timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, currentDate, endDate);
+    }
+    timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
+        employeeId,
+        startDate,
+        endDate,
+        ETimekeepingStatus.getValue(requestName),
+        ETimekeepingStatus.getValue(requestName));
+
+    timekeepingRepository.insertOvertimeByEmployeeIdAndRangeDate(
+        employeeId, startDate, endDate, startTime, endTime, overtimeType);
+  }
+
+  private void updatePaidLeave(
+      LocalDate startDate, LocalDate endDate, String employeeId, String requestName) {
+    if (startDate == null || endDate == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
+        employeeId,
+        startDate,
+        endDate,
+        ETimekeepingStatus.getValue("DAY_OFF"),
+        ETimekeepingStatus.getValue(requestName));
+  }
+
+  private void updatePromotion(
+      Long desiredArea,
+      Long desiredOffice,
+      Long desiredPosition,
+      Long desiredGrade,
+      LocalDate startDate,
+      BigDecimal value,
+      String employeeId) {
+    if (desiredArea == null
+        || desiredOffice == null
+        || desiredPosition == null
+        || desiredGrade == null
+        || startDate == null
+        || value == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    workingPlaceRepository.insertNewWorkingPlace(
+        employeeId,
+        desiredArea,
+        desiredOffice,
+        desiredGrade,
+        desiredPosition,
+        startDate,
+        false,
+        true);
+    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+  }
+
+  private void updateSalaryIncrement(LocalDate startDate, BigDecimal value, String employeeId) {
+    if (startDate == null || value == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+  }
+
+  private void updateBonusSalary(
+      LocalDate date,
+      String description,
+      BigDecimal value,
+      String employeeId,
+      Long salaryId,
+      Long bonusType) {
+    if (date == null || description == null || bonusType == null || value == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
+    bonusSalaryRepository.insertBonusSalaryByEmployeeId(
+        salaryId, date, description, bonusType, value);
+  }
+
+  private void updateConflictAndLeakInfo(
+      LocalDate date,
+      String description,
+      BigDecimal value,
+      String employeeId,
+      Long salaryId,
+      Long deductionType) {
+    if (date == null || description == null || deductionType == null || value == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
+    deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
+        salaryId, date, description, deductionType, value);
+    if (deductionType.equals(EDeduction.getValue("FIRE")))
+      employeeRepository.updateStatusEmployee(employeeId, false);
+  }
+
+  private void updateAdvanceRequest(
+      LocalDate date, String description, BigDecimal value, String employeeId, Long salaryId) {
+    if (date == null || description == null || value == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+    }
+    salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
+    advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
   }
 
   private HashMap<String, String> splitData(String data) {
@@ -445,8 +557,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (!isBlank(data)) {
       String[] splitBracket = StringUtils.substringsBetween(data, "[", "]");
       for (String split : splitBracket) {
-        String[] splitColon = split.split(SEPARATOR, TWO_NUMBER);
-        hashMap.put(splitColon[ZERO_NUMBER], splitColon[ONE_NUMBER]);
+        String[] splitSeparator = split.split(SEPARATOR, TWO_NUMBER);
+        if (isInvalidSplit(splitSeparator)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
+        }
+        hashMap.put(splitSeparator[ZERO_NUMBER], splitSeparator[ONE_NUMBER]);
       }
     } else {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
@@ -454,25 +569,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return hashMap;
   }
 
-  private Object getValue(Cell cell) {
-    switch (cell.getCellType()) {
-      case STRING:
-        return cell.getStringCellValue();
-      case NUMERIC:
-        return String.valueOf((int) cell.getNumericCellValue());
-      case BOOLEAN:
-        return cell.getBooleanCellValue();
-      case ERROR:
-        return cell.getErrorCellValue();
-      case FORMULA:
-        return cell.getCellFormula();
-      case BLANK:
-        return null;
-      case _NONE:
-        return null;
-      default:
-        break;
-    }
-    return null;
+  private boolean isInvalidSplit(String[] split) {
+    return split.length != TWO_NUMBER || isBlank(split[ZERO_NUMBER]) || isBlank(split[ONE_NUMBER]);
   }
 }

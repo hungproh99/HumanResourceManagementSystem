@@ -41,11 +41,16 @@ public class Uri {
       "/list_all_application_request_send";
   public static final String URI_GET_LIST_APPLICATION_REQUEST_RECEIVE =
       "/list_all_application_request_receive";
-  public static final String URI_UPDATE_STATUS_APPLICATION_QUEST =
-      "/update_status_application_request";
+  public static final String URI_UPDATE_CHECK_APPLICATION_QUEST =
+      "/update_checked_application_request";
 
   public static final String URI_UPDATE_IS_READ = "/update_is_read";
-  public static final String URI_UPDATE_APPLICATION_REQUEST = "/update_application_request";
+  public static final String URI_UPDATE_APPROVE_APPLICATION_REQUEST = "/update_approve_application_request";
 
   public static final String URI_GET_LIST_EMPLOYEE_NAME_AND_ID = "/list_employee_name_id";
+
+  public static final String URI_DOWNLOAD_EXCEL_REQUEST_RECEIVE = "/download_excel_request_receive";
+  public static final String URI_DOWNLOAD_CSV_REQUEST_RECEIVE = "/download_csv_request_receive";
+  public static final String URI_DOWNLOAD_EXCEL_REQUEST_SEND = "/download_excel_request_send";
+  public static final String URI_DOWNLOAD_CSV_REQUEST_SEND = "/download_csv_request_send";
 }
