@@ -155,13 +155,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
-  public void updateApplicationRequest(Long requestId) {
+  public void updateApproveApplicationRequest(Long requestId) {
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
     if (applicationRequestDto.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
-    updateTimekeepingInformation(applicationRequestDto.get());
+    updateApproveInformation(applicationRequestDto.get(), requestId);
   }
 
   @Override
@@ -306,7 +306,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
   }
 
-  private void updateTimekeepingInformation(ApplicationRequestDto requestDto) {
+  private void updateApproveInformation(ApplicationRequestDto requestDto, Long requestId) {
     Set<Map.Entry<String, String>> hashMap = splitData(requestDto.getData()).entrySet();
     String requestName = requestDto.getRequestName();
     String employeeId = requestDto.getEmployeeId();
@@ -375,7 +375,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     switch (requestName) {
       case "LEAVE_SOON":
       case "WORK_LATE":
-        updateWorkingTime(date, employeeId, requestName);
+        updateWorkingTime(date, employeeId, requestName, requestId);
         break;
       case "OVERTIME":
         updateOvertime(
@@ -386,10 +386,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             overtimeType,
             currentDate,
             employeeId,
-            requestName);
+            requestName,
+            requestId);
         break;
       case "PAID_LEAVE":
-        updatePaidLeave(startDate, endDate, employeeId, requestName);
+        updatePaidLeave(startDate, endDate, employeeId, requestName, requestId);
         break;
       case "PROMOTION":
         updatePromotion(
@@ -399,30 +400,36 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             desiredGrade,
             startDate,
             value,
-            employeeId);
+            employeeId,
+            requestId);
         break;
       case "SALARY_INCREMENT":
-        updateSalaryIncrement(startDate, value, employeeId);
+        updateSalaryIncrement(startDate, value, employeeId, requestId);
         break;
       case "BONUS":
-        updateBonusSalary(date, description, value, employeeId, salaryId, bonusType);
+        updateBonusSalary(date, description, value, employeeId, salaryId, bonusType, requestId);
         break;
       case "CONFLICT_CUSTOMER":
       case "LEAK_INFORMATION":
-        updateConflictAndLeakInfo(date, description, value, employeeId, salaryId, deductionType);
+        updateConflictAndLeakInfo(
+            date, description, value, employeeId, salaryId, deductionType, requestId);
         break;
       case "ADVANCE":
-        updateAdvanceRequest(date, description, value, employeeId, salaryId);
+        updateAdvanceRequest(date, description, value, employeeId, salaryId, requestId);
         break;
     }
   }
 
-  private void updateWorkingTime(LocalDate date, String employeeId, String requestName) {
-    if (date == null) {
+  private void updateWorkingTime(
+      LocalDate date, String employeeId, String requestName, Long requestId) {
+    if (date == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     timekeepingRepository.deleteTimekeepingStatusByEmployeeIdAndDate(
         employeeId, date, ETimekeepingStatus.getValue(requestName));
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private void updateOvertime(
@@ -433,12 +440,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       Long overtimeType,
       LocalDate currentDate,
       String employeeId,
-      String requestName) {
+      String requestName,
+      Long requestId) {
     if (startDate == null
         || endDate == null
         || startTime == null
         || endTime == null
-        || overtimeType == null) {
+        || overtimeType == null
+        || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     if (endDate.isAfter(currentDate)) {
@@ -453,11 +462,18 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     timekeepingRepository.insertOvertimeByEmployeeIdAndRangeDate(
         employeeId, startDate, endDate, startTime, endTime, overtimeType);
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private void updatePaidLeave(
-      LocalDate startDate, LocalDate endDate, String employeeId, String requestName) {
-    if (startDate == null || endDate == null) {
+      LocalDate startDate,
+      LocalDate endDate,
+      String employeeId,
+      String requestName,
+      Long requestId) {
+    if (startDate == null || endDate == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
@@ -466,6 +482,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         endDate,
         ETimekeepingStatus.getValue("DAY_OFF"),
         ETimekeepingStatus.getValue(requestName));
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private void updatePromotion(
@@ -475,13 +494,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       Long desiredGrade,
       LocalDate startDate,
       BigDecimal value,
-      String employeeId) {
+      String employeeId,
+      Long requestId) {
     if (desiredArea == null
         || desiredOffice == null
         || desiredPosition == null
         || desiredGrade == null
         || startDate == null
-        || value == null) {
+        || value == null
+        || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     workingPlaceRepository.insertNewWorkingPlace(
@@ -494,13 +515,20 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         false,
         true);
     salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
-  private void updateSalaryIncrement(LocalDate startDate, BigDecimal value, String employeeId) {
-    if (startDate == null || value == null) {
+  private void updateSalaryIncrement(
+      LocalDate startDate, BigDecimal value, String employeeId, Long requestId) {
+    if (startDate == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private void updateBonusSalary(
@@ -509,13 +537,21 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       BigDecimal value,
       String employeeId,
       Long salaryId,
-      Long bonusType) {
-    if (date == null || description == null || bonusType == null || value == null) {
+      Long bonusType,
+      Long requestId) {
+    if (date == null
+        || description == null
+        || bonusType == null
+        || value == null
+        || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
     bonusSalaryRepository.insertBonusSalaryByEmployeeId(
         salaryId, date, description, bonusType, value);
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private void updateConflictAndLeakInfo(
@@ -524,8 +560,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       BigDecimal value,
       String employeeId,
       Long salaryId,
-      Long deductionType) {
-    if (date == null || description == null || deductionType == null || value == null) {
+      Long deductionType,
+      Long requestId) {
+    if (date == null
+        || description == null
+        || deductionType == null
+        || value == null
+        || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
@@ -533,15 +574,26 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         salaryId, date, description, deductionType, value);
     if (deductionType.equals(EDeduction.getValue("FIRE")))
       employeeRepository.updateStatusEmployee(employeeId, false);
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private void updateAdvanceRequest(
-      LocalDate date, String description, BigDecimal value, String employeeId, Long salaryId) {
-    if (date == null || description == null || value == null) {
+      LocalDate date,
+      String description,
+      BigDecimal value,
+      String employeeId,
+      Long salaryId,
+      Long requestId) {
+    if (date == null || description == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
     advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
+
+    applicationsRequestRepository.updateStatusApplication(
+        requestId, ERequestStatus.APPROVED.name());
   }
 
   private HashMap<String, String> splitData(String data) {

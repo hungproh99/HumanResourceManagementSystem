@@ -29,7 +29,7 @@ public interface ApplicationsRequestService {
 
   void updateIsRead(Long requestId);
 
-  void updateApplicationRequest(Long requestId);
+  void updateApproveApplicationRequest(Long requestId);
 
   void exportApplicationRequestReceiveByExcel(
       HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);

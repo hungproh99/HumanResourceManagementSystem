@@ -308,6 +308,17 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   }
 
   @Override
+  public void updateStatusApplication(Long requestId, String status) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(APPLICATIONS_REQUEST)
+            .set(APPLICATIONS_REQUEST.REQUEST_STATUS, ERequestStatus.getValue(status))
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+            .execute();
+  }
+
+  @Override
   public int countListApplicationRequestReceive(QueryParam queryParam, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final List<Condition> conditions = getListConditionApplicationRequest(queryParam);

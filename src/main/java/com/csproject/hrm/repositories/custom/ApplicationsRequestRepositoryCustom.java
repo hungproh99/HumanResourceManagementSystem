@@ -31,6 +31,8 @@ public interface ApplicationsRequestRepositoryCustom {
       String employeeId,
       LocalDateTime latestDate);
 
+  void updateStatusApplication(Long requestId, String status);
+
   int countListApplicationRequestReceive(QueryParam queryParam, String employeeId);
 
   int countListApplicationRequestSend(QueryParam queryParam, String employeeId);

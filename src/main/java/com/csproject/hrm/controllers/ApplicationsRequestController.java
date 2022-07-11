@@ -115,8 +115,8 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PostMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
-  public ResponseEntity<?> updateApplicationRequest(@RequestParam Long requestId) {
-    applicationsRequestService.updateApplicationRequest(requestId);
+  public ResponseEntity<?> updateApproveApplicationRequest(@RequestParam Long requestId) {
+    applicationsRequestService.updateApproveApplicationRequest(requestId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
