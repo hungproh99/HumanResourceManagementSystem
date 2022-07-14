@@ -443,6 +443,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         (key, values) -> {
           Condition condition = DSL.noCondition();
           Condition requestTypeCondition = DSL.noCondition();
+          Condition createDateCondition = DSL.noCondition();
           for (QueryFilter filter : values) {
 
             final Field<?> field = field2Map.get(filter.field);
@@ -452,11 +453,13 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             }
             if (filter.field.equals(REQUEST_TYPE_PARAM)) {
               requestTypeCondition = requestTypeCondition.or(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(CREATE_DATE)) {
+              createDateCondition = createDateCondition.or(queryHelper.condition(filter, field));
             } else {
               condition = condition.and(queryHelper.condition(filter, field));
             }
           }
-          condition = condition.and(requestTypeCondition);
+          condition = condition.and(requestTypeCondition).and(createDateCondition);
           conditions.add(condition);
         });
     return conditions;
@@ -550,7 +553,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
     }
 
-    return level <= maximumLevelAccept ? "True" : "False";
+    return level <= maximumLevelAccept && level > 0 ? "True" : "False";
   }
 
   private Select<?> getListForwarderByRequestId(Long requestId) {
