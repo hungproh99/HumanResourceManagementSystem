@@ -772,15 +772,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             applicationsRequest.getRequestNameId());
     String[] keyArray = getKeyInDescription(description);
     for (int i = 0; i < keyArray.length; i++) {
-      description =
-          description.replaceAll(
-              "\\[" + keyArray[i] + "\\]",
-              "<span style=\"color:red\">" + valueArray[i] + "</span>");
+      description = description.replaceAll("\\[" + keyArray[i] + "\\]", "[" + valueArray[i] + "]");
       data = data + "[" + keyArray[i] + "|" + valueArray[i] + "]";
     }
     applicationsRequest.setData(data);
     applicationsRequest.setDescription(
-        description + "<br>P/S: " + applicationsRequest.getDescription());
+        description + "P/S: " + applicationsRequest.getDescription());
     return applicationsRequest;
   }
 
