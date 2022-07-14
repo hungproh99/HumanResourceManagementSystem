@@ -6,16 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BonusSalaryResponse {
-  private Long bonus_id;
-  private BigDecimal value;
-  private String bonus_name;
-  private Date date;
-  private String description;
+public class EmployeeInsuranceResponseList {
+  private List<EmployeeInsuranceResponse> employeeInsuranceResponseList;
+  private BigDecimal total;
 }

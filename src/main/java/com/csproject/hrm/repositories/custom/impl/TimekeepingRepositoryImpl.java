@@ -1,7 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -452,40 +454,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .execute();
   }
 
-  @Override
-  public void updateTimekeepingStatusByEmployeeIdAndRangeDate(
-      String employeeId,
-      LocalDate startDate,
-      LocalDate endDate,
-      long oldTimekeepingStatus,
-      long newTimekeepingStatus) {
-    List<Query> queries = new ArrayList<>();
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<Long> timekeepingIdList =
-        dslContext
-            .select(TIMEKEEPING.TIMEKEEPING_ID)
-            .from(TIMEKEEPING)
-            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
-            .and(TIMEKEEPING.DATE.between(startDate, endDate))
-            .fetchInto(Long.class);
-
-    dslContext.transaction(
-        configuration -> {
-          timekeepingIdList.forEach(
-              timekeepingId -> {
-                queries.add(
-                    dslContext
-                        .update(LIST_TIMEKEEPING_STATUS)
-                        .set(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID, newTimekeepingStatus)
-                        .where(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
-                        .and(
-                            LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
-                                oldTimekeepingStatus)));
-              });
-          DSL.using(configuration).batch(queries).execute();
-        });
-  }
-
   private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
@@ -645,5 +613,80 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
               });
           DSL.using(configuration).batch(queries).execute();
         });
+  }
+
+  @Override
+  public void insertTimekeeping(Double point, LocalDate date, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .insertInto(
+                TIMEKEEPING,
+                TIMEKEEPING.AMOUNT_WORK_PER_DAY,
+                TIMEKEEPING.DATE,
+                TIMEKEEPING.EMPLOYEE_ID)
+            .values(point, date, employeeId)
+            .execute();
+  }
+
+  @Override
+  public void updatePointPerDay(Double point, LocalDate date, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(TIMEKEEPING)
+            .set(TIMEKEEPING.AMOUNT_WORK_PER_DAY, point)
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+            .and(TIMEKEEPING.DATE.eq(date))
+            .execute();
+  }
+
+  @Override
+  public LocalTime getFirstTimeCheckInByTimekeeping(LocalDate date, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    TableLike<?> rowNumberAsc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    return dslContext
+        .select(rowNumberAsc.field(CHECKIN_CHECKOUT.CHECKIN))
+        .from(rowNumberAsc)
+        .leftJoin(TIMEKEEPING)
+        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(rowNumberAsc.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)))
+        .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1))
+        .and(TIMEKEEPING.DATE.eq(date))
+        .and(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+        .fetchOneInto(LocalTime.class);
+  }
+
+  public LocalTime getLastTimeCheckInByTimekeeping(LocalDate date, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    TableLike<?> rowNumberDesc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    return dslContext
+        .select(rowNumberDesc.field(CHECKIN_CHECKOUT.CHECKOUT))
+        .from(rowNumberDesc)
+        .leftJoin(TIMEKEEPING)
+        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(rowNumberDesc.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)))
+        .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1))
+        .and(TIMEKEEPING.DATE.eq(date))
+        .and(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+        .fetchOneInto(LocalTime.class);
   }
 }

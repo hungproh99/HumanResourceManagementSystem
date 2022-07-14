@@ -622,4 +622,34 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     }
     return list;
   }
+
+  @Override
+  public String getEmployeeNameByEmployeeId(String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.FULL_NAME)
+        .from(EMPLOYEE)
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .fetchOneInto(String.class);
+  }
+
+  @Override
+  public String getEmployeeEmailByEmployeeId(String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.COMPANY_EMAIL)
+        .from(EMPLOYEE)
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .fetchOneInto(String.class);
+  }
+
+  @Override
+  public List<String> getAllEmployeeIdActive() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID)
+        .from(EMPLOYEE)
+        .where(EMPLOYEE.WORKING_STATUS.isTrue())
+        .fetchInto(String.class);
+  }
 }

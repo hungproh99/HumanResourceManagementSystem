@@ -1,16 +1,23 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
+import com.csproject.hrm.dto.dto.PolicyDto;
 import com.csproject.hrm.dto.response.PolicyCategoryResponse;
 import com.csproject.hrm.dto.response.PolicyResponse;
-import com.csproject.hrm.jooq.*;
+import com.csproject.hrm.jooq.DBConnection;
+import com.csproject.hrm.jooq.JooqHelper;
+import com.csproject.hrm.jooq.Pagination;
+import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.custom.PolicyRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.impl.DSL.when;
@@ -102,5 +109,17 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
         .from(POLICY_TYPE)
         .where(POLICY_TYPE.POLICY_TYPE_.eq(taxName))
         .fetchOneInto(Long.class);
+  }
+
+  @Override
+  public Optional<PolicyDto> getPolicyDtoByPolicyType(String policyType) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(POLICY_TYPE.POLICY_NAME, POLICY.DATA)
+        .from(POLICY)
+        .leftJoin(POLICY_TYPE)
+        .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
+        .where(POLICY_TYPE.POLICY_TYPE_.eq(policyType))
+        .fetchOptionalInto(PolicyDto.class);
   }
 }

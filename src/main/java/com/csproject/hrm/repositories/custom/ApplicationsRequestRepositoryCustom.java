@@ -1,7 +1,10 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
 import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
 import com.csproject.hrm.jooq.QueryParam;
@@ -70,4 +73,8 @@ public interface ApplicationsRequestRepositoryCustom {
   Boolean checkPermissionToApprove(String employeeId, Long requestNameId);
 
   void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto);
+
+  List<ApplicationRequestRemindResponse> getAllApplicationRequestToRemind(LocalDateTime checkDate);
+
+  void updateAllApplicationRequestRemind(Long requestId, boolean isRemind);
 }

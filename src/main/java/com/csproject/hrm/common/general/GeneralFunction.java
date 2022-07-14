@@ -2,9 +2,13 @@ package com.csproject.hrm.common.general;
 
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.repositories.EmployeeRepository;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.passay.CharacterData;
-import org.passay.*;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -144,6 +148,47 @@ public class GeneralFunction {
       helper.setFrom(from);
       helper.setSubject(subject);
       message.setContent(String.format(data, receiveId, createId), "text/html");
+      emailSender.send(message);
+    } catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void sendEmailRemindRequest(
+      String approveName,
+      String createName,
+      String createDate,
+      List<String> checkBy,
+      String requestId,
+      String from,
+      String to,
+      String subject) {
+    MimeMessage message = emailSender.createMimeMessage();
+    Resource resource = resourceLoader.getResource("classpath:email-remind-request.vm");
+    boolean multipart = true;
+    String paragraph = null;
+    if (checkBy != null) {
+      String check = null;
+      for (int i = 0; i < checkBy.size(); i++) {
+        if (i == checkBy.size() - 1) {
+          check += checkBy.get(i);
+        } else {
+          check += checkBy.get(i) + ", ";
+        }
+      }
+      paragraph = "<div>It already checked by:  <strong>" + check + "</strong></div>";
+    }
+    try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+      helper.setTo(to);
+      helper.setFrom(from);
+      helper.setSubject(subject);
+      message.setContent(
+          String.format(data, approveName, createName, createDate, paragraph, requestId),
+          "text/html");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
