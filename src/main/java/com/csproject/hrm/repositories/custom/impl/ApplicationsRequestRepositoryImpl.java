@@ -550,7 +550,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
     }
 
-    return level < maximumLevelAccept ? "True" : "False";
+    return level <= maximumLevelAccept ? "True" : "False";
   }
 
   private Select<?> getListForwarderByRequestId(Long requestId) {
