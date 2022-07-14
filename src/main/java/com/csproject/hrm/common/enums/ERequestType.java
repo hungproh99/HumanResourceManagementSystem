@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.REQUEST_TYPE_INVALID;
 
 public enum ERequestType {
-  WORKING_SCHEDULE("Working Schedule", 1),
+  WORKING_TIME("Working Time", 1),
   PAIR_LEAVE("Paid Leave", 2),
   NOMINATION("Nomination", 3),
   INTEGRITY("Integrity", 4),

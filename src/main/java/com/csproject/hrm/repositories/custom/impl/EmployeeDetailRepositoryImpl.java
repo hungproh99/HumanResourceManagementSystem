@@ -506,12 +506,21 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public String getManagerIDByEmployeeID(String employeeID) {
+  public String getManagerByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    String managerID =
+        dslContext
+            .select(EMPLOYEE.MANAGER_ID.concat(EMPLOYEE.MANAGER_ID))
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+            .fetchOneInto(String.class);
+
     return dslContext
-        .select(EMPLOYEE.MANAGER_ID)
+        .select()
+        .select(EMPLOYEE.FULL_NAME.concat(" - ").concat(EMPLOYEE.EMPLOYEE_ID))
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(managerID))
         .fetchOneInto(String.class);
   }
 }

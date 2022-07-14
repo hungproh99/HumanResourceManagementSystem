@@ -70,4 +70,6 @@ public interface ApplicationsRequestRepositoryCustom {
   Boolean checkPermissionToApprove(String employeeId, Long requestNameId);
 
   void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto);
+
+  String getDataOfPolicy(Long requestNameId);
 }

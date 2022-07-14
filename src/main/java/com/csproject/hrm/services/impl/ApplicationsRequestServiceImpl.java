@@ -655,22 +655,24 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String approver =
         Objects.requireNonNullElse(
-            employeeDetailRepository.getManagerIDByEmployeeID(createEmployeeId), "huynq100");
+            employeeDetailRepository.getManagerByEmployeeID(createEmployeeId),
+            "Nguyen Quang Huy - huynq100");
+
+    applicationsRequest.setApprover(approver);
 
     switch (requestTypeId.intValue()) {
       case 1:
         {
           switch (requestNameId.intValue()) {
             case 1:
+            case 14:
               {
-                applicationsRequest =
-                    createRequestForWorkingScheduleAndWorkingTime(applicationsRequest, approver);
+                applicationsRequest = createRequestForWorkingTime(applicationsRequest);
                 break;
               }
             case 2:
               {
-                applicationsRequest =
-                    createRequestForWorkingScheduleAndOT(applicationsRequest, approver);
+                applicationsRequest = createRequestForWorkingScheduleAndOT(applicationsRequest);
               }
               break;
           }
@@ -681,7 +683,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           switch (requestNameId.intValue()) {
             case 6:
               {
-                applicationsRequest = createRequestForPairLeave(applicationsRequest, approver);
+                applicationsRequest = createRequestForPairLeave(applicationsRequest);
                 break;
               }
           }
@@ -697,16 +699,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           switch (requestNameId.intValue()) {
             case 3:
               {
-                applicationsRequest =
-                    createRequestForNominationAndPromotion(applicationsRequest, approver);
+                applicationsRequest = createRequestForNominationAndPromotion(applicationsRequest);
                 break;
               }
             case 4:
             case 5:
               {
                 applicationsRequest =
-                    createRequestForNominationAndSalaryIncreaseOrBonus(
-                        applicationsRequest, approver);
+                    createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
               }
           }
@@ -721,7 +721,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           //            throw new CustomErrorException("You don't have permission to approve this
           // request!");
           //          }
-          applicationsRequest = createRequestForPenalise(applicationsRequest, approver);
+          applicationsRequest = createRequestForPenalise(applicationsRequest);
           break;
         }
       case 7:
@@ -729,7 +729,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           switch (requestNameId.intValue()) {
             case 12:
               {
-                applicationsRequest = createRequestForAdvances(applicationsRequest, approver);
+                applicationsRequest = createRequestForAdvances(applicationsRequest);
                 break;
               }
           }
@@ -740,15 +740,17 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           switch (requestNameId.intValue()) {
             case 13:
               {
-                applicationsRequest = createRequestForTaxEnrollment(applicationsRequest, approver);
+                applicationsRequest = createRequestForTaxEnrollment(applicationsRequest);
                 break;
               }
           }
           break;
         }
     }
-    applicationsRequest.setApprover(approver);
-    applicationsRequest.setRequestStatusId(Long.valueOf(1));
+
+    applicationsRequest.setApprover(applicationsRequest.getApprover().split("-")[1].trim());
+
+    applicationsRequest.setRequestStatusId(1L);
     applicationsRequest.setCreateDate(LocalDateTime.now());
     applicationsRequest.setLatestDate(LocalDateTime.now());
     applicationsRequest.setDuration(LocalDateTime.now().plusDays(3));
@@ -782,8 +784,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return applicationsRequest;
   }
 
-  private ApplicationsRequestRequestC createRequestForWorkingScheduleAndWorkingTime(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+  private ApplicationsRequestRequestC createRequestForWorkingTime(
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
     String date = checkLocalDateNull(applicationsRequest.getDate()).toString();
 
     String[] valueArray = {approver, date};
@@ -792,7 +795,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForWorkingScheduleAndOT(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
     String startTime = checkLocalTimeNull(applicationsRequest.getStartTime()).toString();
     String endTime = checkLocalTimeNull(applicationsRequest.getEndTime()).toString();
     String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
@@ -804,7 +808,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForPairLeave(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
     String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
     String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
 
@@ -814,7 +819,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForAdvances(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
     String value = checkStringNull(applicationsRequest.getValue());
 
     String[] valueArray = {approver, value};
@@ -823,7 +829,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForTaxEnrollment(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
     List<String> taxTypes = applicationsRequest.getTaxType();
     String taxType = StringUtils.join(taxTypes, ",");
 
@@ -833,7 +840,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForNominationAndPromotion(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
 
     String employeeId = applicationsRequest.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
@@ -863,7 +871,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForNominationAndSalaryIncreaseOrBonus(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
 
     String employeeId = applicationsRequest.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
@@ -884,7 +893,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private ApplicationsRequestRequestC createRequestForPenalise(
-      ApplicationsRequestRequestC applicationsRequest, String approver) {
+      ApplicationsRequestRequestC applicationsRequest) {
+    String approver = applicationsRequest.getApprover();
 
     String employeeId = applicationsRequest.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
@@ -938,6 +948,108 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     } else {
       return value;
     }
+  }
+
+  private Boolean checkLevelApprove(ApplicationsRequestRequestC applicationsRequest) {
+    String data =
+        applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
+    String[] splitData = getKeyInDescription(data);
+
+    Long requestTypeId = applicationsRequest.getRequestTypeId();
+    Long requestNameId = applicationsRequest.getRequestNameId();
+
+    //        switch (requestTypeId.intValue()) {
+    //          case 1:
+    //            {
+    //              switch (requestNameId.intValue()) {
+    //                case 1:
+    //                  {
+    //                    applicationsRequest =
+    //                        createRequestForWorkingScheduleAndWorkingTime(applicationsRequest,
+    //     approver);
+    //                    break;
+    //                  }
+    //                case 2:
+    //                  {
+    //                    applicationsRequest =
+    //                        createRequestForWorkingScheduleAndOT(applicationsRequest, approver);
+    //                  }
+    //                  break;
+    //              }
+    //              break;
+    //            }
+    //          case 2:
+    //            {
+    //              switch (requestNameId.intValue()) {
+    //                case 6:
+    //                  {
+    //                    applicationsRequest = createRequestForPairLeave(applicationsRequest,
+    //     approver);
+    //                    break;
+    //                  }
+    //              }
+    //              break;
+    //            }
+    //          case 3:
+    //            {
+    //              switch (requestNameId.intValue()) {
+    //                case 3:
+    //                  {
+    //                    applicationsRequest =
+    //                        createRequestForNominationAndPromotion(applicationsRequest, approver);
+    //                    break;
+    //                  }
+    //                case 4:
+    //                case 5:
+    //                  {
+    //                    applicationsRequest =
+    //                        createRequestForNominationAndSalaryIncreaseOrBonus(
+    //                            applicationsRequest, approver);
+    //                    break;
+    //                  }
+    //              }
+    //              break;
+    //            }
+    //          case 4:
+    //          case 5:
+    //          case 6:
+    //            {
+    //              //          if (!applicationsRequestRepository.checkPermissionToApprove(
+    //              //              createEmployeeId, requestNameId)) {
+    //              //            throw new CustomErrorException("You don't have permission to
+    // approve
+    //     this
+    //              // request!");
+    //              //          }
+    //              applicationsRequest = createRequestForPenalise(applicationsRequest, approver);
+    //              break;
+    //            }
+    //          case 7:
+    //            {
+    //              switch (requestNameId.intValue()) {
+    //                case 12:
+    //                  {
+    //                    applicationsRequest = createRequestForAdvances(applicationsRequest,
+    // approver);
+    //                    break;
+    //                  }
+    //              }
+    //              break;
+    //            }
+    //          case 8:
+    //            {
+    //              switch (requestNameId.intValue()) {
+    //                case 13:
+    //                  {
+    //                    applicationsRequest = createRequestForTaxEnrollment(applicationsRequest,
+    //     approver);
+    //                    break;
+    //                  }
+    //              }
+    //              break;
+    //            }
+    //        }
+    return null;
   }
 
   private String[] getKeyInDescription(String description) {

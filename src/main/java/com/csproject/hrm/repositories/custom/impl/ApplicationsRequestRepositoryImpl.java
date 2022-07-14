@@ -837,4 +837,16 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .fetchOneInto(String.class);
     return managerId.equals(employeeIdSendRequest) ? "Notification" : "Request";
   }
+
+  @Override
+  public String getDataOfPolicy(Long requestNameId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(POLICY.DATA)
+        .from(REQUEST_NAME)
+        .leftJoin(POLICY)
+        .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
+        .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
+        .fetchOneInto(String.class);
+  }
 }
