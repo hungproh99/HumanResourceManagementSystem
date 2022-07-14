@@ -27,8 +27,11 @@ public class Policy {
   @Type(type = "boolean")
   private Boolean policyStatus;
 
-  @Column(name = "description",length = 1000)
+  @Column(name = "description", length = 1000)
   private String description;
+
+  @Column(name = "data")
+  private String data;
 
   @Column(name = "maximum_level_accept")
   private int maximumLevelAccept;

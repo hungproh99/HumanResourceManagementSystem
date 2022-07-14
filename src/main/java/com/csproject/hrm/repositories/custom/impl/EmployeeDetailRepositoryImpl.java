@@ -499,7 +499,10 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   public boolean checkEmployeeIDIsExists(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchExists(
-        dslContext.selectFrom(EMPLOYEE).where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID)));
+        dslContext
+            .select(EMPLOYEE.EMPLOYEE_ID)
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID)));
   }
 
   @Override

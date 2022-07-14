@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -150,7 +151,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Override
   public void updateIsRead(Long requestId) {
-    if(requestId == null){
+    if (requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
     boolean isRead = false;
@@ -159,7 +160,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Override
   public void updateApproveApplicationRequest(Long requestId) {
-    if(requestId == null){
+    if (requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
@@ -172,7 +173,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Override
   public void updateRejectApplicationRequest(Long requestId) {
-    if(requestId == null){
+    if (requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
     applicationsRequestRepository.updateStatusApplication(
@@ -633,14 +634,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
+  @Transactional
   public void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest) {
     String createEmployeeId = applicationsRequest.getCreateEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(createEmployeeId)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + createEmployeeId);
-    }
-    String employeeId = applicationsRequest.getEmployeeId();
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
     Long requestTypeId = applicationsRequest.getRequestTypeId();
     Long requestNameId = applicationsRequest.getRequestNameId();
@@ -761,7 +759,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
 
     generalFunction.sendEmailCreateRequest(
-        createEmployeeId, employeeId, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
   }
 
   private ApplicationsRequestRequestC setDescriptionAndData(
@@ -774,7 +772,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     for (int i = 0; i < keyArray.length; i++) {
       description =
           description.replaceAll(
-              "\\[" + keyArray[i] + "\\]", "<p style=\"color:red\">" + valueArray[i] + "</p>");
+              "\\[" + keyArray[i] + "\\]",
+              "<span style=\"color:red\">" + valueArray[i] + "</span>");
       data = data + "[" + keyArray[i] + "|" + valueArray[i] + "]";
     }
     applicationsRequest.setData(data);
@@ -838,8 +837,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String employeeId = applicationsRequest.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-      throw new CustomDataNotFoundException(
-          NO_EMPLOYEE_WITH_ID + applicationsRequest.getEmployeeId());
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
 
     String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
@@ -869,8 +867,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String employeeId = applicationsRequest.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-      throw new CustomDataNotFoundException(
-          NO_EMPLOYEE_WITH_ID + applicationsRequest.getEmployeeId());
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
 
     String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
@@ -891,8 +888,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String employeeId = applicationsRequest.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-      throw new CustomDataNotFoundException(
-          NO_EMPLOYEE_WITH_ID + applicationsRequest.getEmployeeId());
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
     }
 
     String date = checkLocalDateNull(applicationsRequest.getDate()).toString();
