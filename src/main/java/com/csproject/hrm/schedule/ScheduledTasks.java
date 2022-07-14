@@ -87,7 +87,7 @@ public class ScheduledTasks {
     LocalTime startTime = null, endTime = null;
     List<RangePunishPolicy> listRange = new ArrayList<>();
     Long maxTimePunish = null, minTimePunish = null;
-    BigDecimal minusMoney = BigDecimal.ZERO;
+
     String punish = null;
     for (Map.Entry<String, String> i : hashMap) {
       switch (i.getKey()) {
@@ -103,32 +103,36 @@ public class ScheduledTasks {
           break;
       }
     }
-    Set<Map.Entry<String, String>> hashMapPunish = splitData(punish).entrySet();
-    for (Map.Entry<String, String> j : hashMap) {
-      if (j.getKey().contains("-")) {
-
-      } else if (j.getKey().contains("<")) {
-        minTimePunish = Long.parseLong(j.getValue().substring(1));
-      } else if (j.getKey().contains(">")) {
-        maxTimePunish = Long.parseLong(j.getValue().substring(1));
-      }
-    }
     LocalTime finalStartTime = startTime;
     LocalTime finalEndTime = endTime;
+    List<RangePunishPolicy> finalListRange = listRange;
     employeeIdList.forEach(
         employeeId -> {
+          BigDecimal minusMoney = BigDecimal.ZERO;
+
           LocalTime firstTimeCheckIn =
               timekeepingRepository.getFirstTimeCheckInByTimekeeping(currentDate, employeeId);
           LocalTime lastTimeCheckOut =
               timekeepingRepository.getLastTimeCheckInByTimekeeping(currentDate, employeeId);
           if (firstTimeCheckIn.isAfter(finalStartTime)) {
             Long rangeTime = MINUTES.between(firstTimeCheckIn, finalStartTime);
-
+            for (RangePunishPolicy rangePunishPolicy : finalListRange) {
+              if (rangePunishPolicy.getMinTime() < rangeTime
+                  && rangePunishPolicy.getMaxTime() > rangeTime) {
+                minusMoney = minusMoney.subtract(rangePunishPolicy.getMinus());
+              }
+            }
           } else if (lastTimeCheckOut.isBefore(finalEndTime)) {
-
+            Long rangeTime = MINUTES.between(lastTimeCheckOut, finalEndTime);
+            for (RangePunishPolicy rangePunishPolicy : finalListRange) {
+              if (rangePunishPolicy.getMinTime() < rangeTime
+                  && rangePunishPolicy.getMaxTime() > rangeTime) {
+                minusMoney = minusMoney.subtract(rangePunishPolicy.getMinus());
+              }
+            }
           }
 
-//          timekeepingRepository.updatePointPerDay();
+          //          timekeepingRepository.updatePointPerDay();
         });
   }
 

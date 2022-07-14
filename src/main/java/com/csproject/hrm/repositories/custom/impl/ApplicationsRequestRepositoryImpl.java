@@ -584,7 +584,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   public Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(APPLICATIONS_REQUEST.EMPLOYEE_ID, REQUEST_NAME.NAME, APPLICATIONS_REQUEST.DATA)
+        .select(
+            APPLICATIONS_REQUEST.EMPLOYEE_ID.as("employeeId"),
+            REQUEST_NAME.NAME.as("requestName"),
+            APPLICATIONS_REQUEST.DATA)
         .from(APPLICATIONS_REQUEST)
         .leftJoin(REQUEST_NAME)
         .on(REQUEST_NAME.REQUEST_NAME_ID.eq(APPLICATIONS_REQUEST.REQUEST_NAME))
@@ -676,85 +679,84 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     return applicationsRequestResponseList;
   }
 
-
   @Override
   public void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext
-            .insertInto(
-                    APPLICATIONS_REQUEST,
-                    APPLICATIONS_REQUEST.EMPLOYEE_ID,
-                    APPLICATIONS_REQUEST.REQUEST_NAME,
-                    APPLICATIONS_REQUEST.REQUEST_STATUS,
-                    APPLICATIONS_REQUEST.DESCRIPTION,
-                    APPLICATIONS_REQUEST.APPROVER,
-                    APPLICATIONS_REQUEST.CREATE_DATE,
-                    APPLICATIONS_REQUEST.LATEST_DATE,
-                    APPLICATIONS_REQUEST.DURATION,
-                    APPLICATIONS_REQUEST.DATA,
-                    APPLICATIONS_REQUEST.IS_REMIND,
-                    APPLICATIONS_REQUEST.IS_BOOKMARK,
-                    APPLICATIONS_REQUEST.IS_READ)
-            .values(
-                    applicationsRequest.getCreateEmployeeId(),
-                    applicationsRequest.getRequestNameId(),
-                    applicationsRequest.getRequestStatusId(),
-                    applicationsRequest.getDescription(),
-                    applicationsRequest.getApprover(),
-                    applicationsRequest.getCreateDate(),
-                    applicationsRequest.getLatestDate(),
-                    applicationsRequest.getDuration(),
-                    applicationsRequest.getData(),
-                    applicationsRequest.getIsRemind(),
-                    applicationsRequest.getIsBookmark(),
-                    applicationsRequest.getIsRead())
-            .execute();
+        .insertInto(
+            APPLICATIONS_REQUEST,
+            APPLICATIONS_REQUEST.EMPLOYEE_ID,
+            APPLICATIONS_REQUEST.REQUEST_NAME,
+            APPLICATIONS_REQUEST.REQUEST_STATUS,
+            APPLICATIONS_REQUEST.DESCRIPTION,
+            APPLICATIONS_REQUEST.APPROVER,
+            APPLICATIONS_REQUEST.CREATE_DATE,
+            APPLICATIONS_REQUEST.LATEST_DATE,
+            APPLICATIONS_REQUEST.DURATION,
+            APPLICATIONS_REQUEST.DATA,
+            APPLICATIONS_REQUEST.IS_REMIND,
+            APPLICATIONS_REQUEST.IS_BOOKMARK,
+            APPLICATIONS_REQUEST.IS_READ)
+        .values(
+            applicationsRequest.getCreateEmployeeId(),
+            applicationsRequest.getRequestNameId(),
+            applicationsRequest.getRequestStatusId(),
+            applicationsRequest.getDescription(),
+            applicationsRequest.getApprover(),
+            applicationsRequest.getCreateDate(),
+            applicationsRequest.getLatestDate(),
+            applicationsRequest.getDuration(),
+            applicationsRequest.getData(),
+            applicationsRequest.getIsRemind(),
+            applicationsRequest.getIsBookmark(),
+            applicationsRequest.getIsRead())
+        .execute();
   }
 
   @Override
   public List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var level =
-            dslContext
-                    .select(EMPLOYEE.LEVEL)
-                    .from(EMPLOYEE)
-                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
-                    .fetchOneInto(Integer.class);
+        dslContext
+            .select(EMPLOYEE.LEVEL)
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+            .fetchOneInto(Integer.class);
     return dslContext
-            .selectDistinct(
-                    REQUEST_TYPE.TYPE_ID.as("request_type_id"), REQUEST_TYPE.NAME.as("request_type_name"))
-            .from(REQUEST_TYPE)
-            .leftJoin(REQUEST_NAME)
-            .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-            .leftJoin(POLICY)
-            .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
-            .where(POLICY.MAXIMUM_LEVEL_ACCEPT.greaterOrEqual(level))
-            .orderBy(REQUEST_TYPE.TYPE_ID)
-            .fetchInto(RequestTypeDto.class);
+        .selectDistinct(
+            REQUEST_TYPE.TYPE_ID.as("request_type_id"), REQUEST_TYPE.NAME.as("request_type_name"))
+        .from(REQUEST_TYPE)
+        .leftJoin(REQUEST_NAME)
+        .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+        .leftJoin(POLICY)
+        .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+        .where(POLICY.MAXIMUM_LEVEL_ACCEPT.greaterOrEqual(level))
+        .orderBy(REQUEST_TYPE.TYPE_ID)
+        .fetchInto(RequestTypeDto.class);
   }
 
   @Override
   public String getDescriptionByRequestNameID(Long requestNameID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-            .select(REQUEST_NAME.DESCRIPTION)
-            .from(REQUEST_NAME)
-            .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameID))
-            .fetchOneInto(String.class);
+        .select(REQUEST_NAME.DESCRIPTION)
+        .from(REQUEST_NAME)
+        .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameID))
+        .fetchOneInto(String.class);
   }
 
   @Override
   public PolicyTypeAndNameResponse getPolicyByRequestNameID(Long requestNameID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-            .select(POLICY_TYPE.POLICY_TYPE_, POLICY_TYPE.POLICY_NAME)
-            .from(REQUEST_NAME)
-            .leftJoin(POLICY)
-            .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
-            .leftJoin(POLICY_TYPE)
-            .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
-            .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameID))
-            .fetchOneInto(PolicyTypeAndNameResponse.class);
+        .select(POLICY_TYPE.POLICY_TYPE_, POLICY_TYPE.POLICY_NAME)
+        .from(REQUEST_NAME)
+        .leftJoin(POLICY)
+        .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
+        .leftJoin(POLICY_TYPE)
+        .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
+        .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameID))
+        .fetchOneInto(PolicyTypeAndNameResponse.class);
   }
 
   @Override
@@ -762,20 +764,20 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
     final var level =
-            dslContext
-                    .select(EMPLOYEE.LEVEL)
-                    .from(EMPLOYEE)
-                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
-                    .fetchOneInto(Integer.class);
+        dslContext
+            .select(EMPLOYEE.LEVEL)
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+            .fetchOneInto(Integer.class);
 
     final var maximumLevelAccept =
-            dslContext
-                    .select(POLICY.MAXIMUM_LEVEL_ACCEPT)
-                    .from(REQUEST_NAME)
-                    .leftJoin(POLICY)
-                    .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
-                    .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
-                    .fetchOneInto(Integer.class);
+        dslContext
+            .select(POLICY.MAXIMUM_LEVEL_ACCEPT)
+            .from(REQUEST_NAME)
+            .leftJoin(POLICY)
+            .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+            .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
+            .fetchOneInto(Integer.class);
 
     if (maximumLevelAccept == null || level == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
@@ -788,11 +790,11 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
     final var level =
-            dslContext
-                    .select(EMPLOYEE.LEVEL)
-                    .from(EMPLOYEE)
-                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
-                    .fetchOneInto(Integer.class);
+        dslContext
+            .select(EMPLOYEE.LEVEL)
+            .from(EMPLOYEE)
+            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+            .fetchOneInto(Integer.class);
 
     final var minimumLevelAccept =
         dslContext
@@ -814,24 +816,24 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
     boolean check =
-            dslContext.fetchExists(
-                    dslContext
-                            .select()
-                            .from(EMPLOYEE_TAX)
-                            .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
+        dslContext.fetchExists(
+            dslContext
+                .select()
+                .from(EMPLOYEE_TAX)
+                .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
 
     if (!check) {
       dslContext
-              .insertInto(
-                      EMPLOYEE_TAX,
-                      EMPLOYEE_TAX.EMPLOYEE_ID,
-                      EMPLOYEE_TAX.POLICY_TYPE_ID,
-                      EMPLOYEE_TAX.TAX_STATUS)
-              .values(
-                      employeeTaxDto.getEmployeeID(),
-                      employeeTaxDto.getTaxTypeID(),
-                      employeeTaxDto.getTaxStatus())
-              .execute();
+          .insertInto(
+              EMPLOYEE_TAX,
+              EMPLOYEE_TAX.EMPLOYEE_ID,
+              EMPLOYEE_TAX.POLICY_TYPE_ID,
+              EMPLOYEE_TAX.TAX_STATUS)
+          .values(
+              employeeTaxDto.getEmployeeID(),
+              employeeTaxDto.getTaxTypeID(),
+              employeeTaxDto.getTaxStatus())
+          .execute();
     }
   }
 
@@ -843,6 +845,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .from(EMPLOYEE)
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
             .fetchOneInto(String.class);
+    if (managerId == null) {
+      return "Notification";
+    }
     final String employeeIdSendRequest =
         dslContext
             .select(APPLICATIONS_REQUEST.EMPLOYEE_ID)
