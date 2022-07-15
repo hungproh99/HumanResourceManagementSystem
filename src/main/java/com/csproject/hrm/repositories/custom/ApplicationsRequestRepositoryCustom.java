@@ -71,5 +71,9 @@ public interface ApplicationsRequestRepositoryCustom {
 
   void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto);
 
+  List<ApplicationRequestRemindResponse> getAllApplicationRequestToRemind(LocalDateTime checkDate);
+
+  void updateAllApplicationRequestRemind(Long requestId, boolean isRemind);
+
   String getDataOfPolicy(Long requestNameId);
 }

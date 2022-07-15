@@ -36,6 +36,9 @@ public class Policy {
   @Column(name = "maximum_level_accept")
   private int maximumLevelAccept;
 
+  @Column(name = "data")
+  private String data;
+
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = PolicyType.class)
   @JoinColumn(name = "policy_type_id")
   private PolicyType policyType;

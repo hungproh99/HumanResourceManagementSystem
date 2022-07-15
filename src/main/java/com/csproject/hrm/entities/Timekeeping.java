@@ -35,7 +35,7 @@ public class Timekeeping {
   private List<ListTimekeepingStatus> listTimekeepingStatuses;
 
   @Column(name = "amount_work_per_day")
-  private String amountWorkPerDay;
+  private Double amountWorkPerDay;
 
   @OneToOne(mappedBy = "timekeeping", fetch = FetchType.LAZY)
   private Overtime overTime;

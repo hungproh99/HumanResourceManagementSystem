@@ -1,0 +1,9 @@
+<div>Dear <strong>%s</strong>,</div>
+
+<div>You you missed the request of <strong>%s</strong> created at <strong>%s</strong>.</div>
+
+%s
+
+<div>Click this <a href="http://localhost:3000/forgot/%s">Request</a> to check.</div>
+
+<div>Request processing system.</div>

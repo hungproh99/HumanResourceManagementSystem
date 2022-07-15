@@ -12,10 +12,9 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BonusSalaryResponse {
-  private Long bonus_id;
+public class AdvanceSalaryResponse {
+  private Long advance_id;
   private BigDecimal value;
-  private String bonus_name;
   private Date date;
   private String description;
 }

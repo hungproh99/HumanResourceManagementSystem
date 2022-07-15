@@ -69,10 +69,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setIs_read("True");
         });
 
-    System.out.println(
-        getListApplicationRequestReceive(
-            conditions, orderByList, queryParam.pagination, employeeId));
-
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         Stream.of(
                 applicationsRequestResponseForwardList,
@@ -90,9 +86,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setIs_enough_level(
               checkLevelOfManagerByRequestId(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
-          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
-          applicationsRequestResponse.setRequest_title(
-              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setRequest_name(
+              ERequestName.getLabel(applicationsRequestResponse.getRequest_name()));
+          applicationsRequestResponse.setRequest_type(
+              ERequestType.getLabel(applicationsRequestResponse.getRequest_type()));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
@@ -117,9 +114,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setChecked_by(
               getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
                   .fetchInto(String.class));
-          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
-          applicationsRequestResponse.setRequest_title(
-              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setRequest_name(
+              ERequestName.getLabel(applicationsRequestResponse.getRequest_name()));
+          applicationsRequestResponse.setRequest_type(
+              ERequestType.getLabel(applicationsRequestResponse.getRequest_type()));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
@@ -141,7 +139,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
-            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+            REQUEST_NAME.NAME.as("request_name"),
+            REQUEST_TYPE.NAME.as("request_type"),
             APPLICATIONS_REQUEST.DESCRIPTION,
             REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
@@ -183,7 +182,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
-            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+            REQUEST_NAME.NAME.as("request_name"),
+            REQUEST_TYPE.NAME.as("request_type"),
             APPLICATIONS_REQUEST.DESCRIPTION,
             REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
@@ -227,7 +227,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             EMPLOYEE.EMPLOYEE_ID,
             EMPLOYEE.FULL_NAME,
             APPLICATIONS_REQUEST.CREATE_DATE,
-            concat(REQUEST_NAME.NAME).concat(" ").concat(REQUEST_TYPE.NAME).as(REQUEST_TITLE),
+            REQUEST_NAME.NAME.as("request_name"),
+            REQUEST_TYPE.NAME.as("request_type"),
             APPLICATIONS_REQUEST.DESCRIPTION,
             REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
@@ -543,7 +544,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
     }
 
-    return level < maximumLevelAccept ? "True" : "False";
+    return level <= maximumLevelAccept && level > 0 ? "True" : "False";
   }
 
   private Select<?> getListForwarderByRequestId(Long requestId) {
@@ -577,7 +578,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   public Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(APPLICATIONS_REQUEST.EMPLOYEE_ID, REQUEST_NAME.NAME, APPLICATIONS_REQUEST.DATA)
+        .select(
+            APPLICATIONS_REQUEST.EMPLOYEE_ID.as("employeeId"),
+            REQUEST_NAME.NAME.as("requestName"),
+            APPLICATIONS_REQUEST.DATA)
         .from(APPLICATIONS_REQUEST)
         .leftJoin(REQUEST_NAME)
         .on(REQUEST_NAME.REQUEST_NAME_ID.eq(APPLICATIONS_REQUEST.REQUEST_NAME))
@@ -624,9 +628,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setIs_enough_level(
               checkLevelOfManagerByRequestId(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
-          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
-          applicationsRequestResponse.setRequest_title(
-              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setRequest_name(
+              ERequestName.getLabel(applicationsRequestResponse.getRequest_name()));
+          applicationsRequestResponse.setRequest_type(
+              ERequestType.getLabel(applicationsRequestResponse.getRequest_type()));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
@@ -656,9 +661,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setChecked_by(
               getListForwarderByRequestId(applicationsRequestResponse.getApplication_request_id())
                   .fetchInto(String.class));
-          String[] split = applicationsRequestResponse.getRequest_title().split("\\s+");
-          applicationsRequestResponse.setRequest_title(
-              ERequestName.getLabel(split[0]) + " " + ERequestType.getLabel(split[1]));
+          applicationsRequestResponse.setRequest_name(
+              ERequestName.getLabel(applicationsRequestResponse.getRequest_name()));
+          applicationsRequestResponse.setRequest_type(
+              ERequestType.getLabel(applicationsRequestResponse.getRequest_type()));
           applicationsRequestResponse.setType(
               checkNotificationOrRequest(
                   employeeId, applicationsRequestResponse.getApplication_request_id()));
@@ -833,6 +839,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .from(EMPLOYEE)
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
             .fetchOneInto(String.class);
+    if (managerId == null) {
+      return "Notification";
+    }
     final String employeeIdSendRequest =
         dslContext
             .select(APPLICATIONS_REQUEST.EMPLOYEE_ID)
@@ -840,6 +849,57 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
             .fetchOneInto(String.class);
     return managerId.equals(employeeIdSendRequest) ? "Notification" : "Request";
+  }
+
+  @Override
+  public List<ApplicationRequestRemindResponse> getAllApplicationRequestToRemind(
+      LocalDateTime checkDate) {
+    List<ApplicationRequestRemindResponse> applicationRequestRemindResponses =
+        getListRequestRemind(checkDate).fetchInto(ApplicationRequestRemindResponse.class);
+    applicationRequestRemindResponses.forEach(
+        applicationRequestRemindResponse -> {
+          applicationRequestRemindResponse.setChecked_by(
+              getListForwarderByRequestId(
+                      applicationRequestRemindResponse.getApplication_request_id())
+                  .fetchInto(String.class));
+        });
+
+    return applicationRequestRemindResponses;
+  }
+
+  @Override
+  public void updateAllApplicationRequestRemind(Long requestId, boolean isRemind) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(APPLICATIONS_REQUEST)
+            .set(APPLICATIONS_REQUEST.IS_REMIND, isRemind)
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+            .execute();
+  }
+
+  private Select<?> getListRequestRemind(LocalDateTime checkDate) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
+            REQUEST_NAME.NAME.as("request_name"),
+            REQUEST_TYPE.NAME.as("request_type"),
+            APPLICATIONS_REQUEST.CREATE_DATE,
+            EMPLOYEE.FULL_NAME,
+            EMPLOYEE.EMPLOYEE_ID,
+            APPLICATIONS_REQUEST.APPROVER)
+        .from(EMPLOYEE)
+        .leftJoin(APPLICATIONS_REQUEST)
+        .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(REQUEST_STATUS)
+        .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+        .leftJoin(REQUEST_NAME)
+        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
+        .leftJoin(REQUEST_TYPE)
+        .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+        .where(APPLICATIONS_REQUEST.DURATION.eq(checkDate))
+        .and(APPLICATIONS_REQUEST.IS_REMIND.isFalse());
   }
 
   @Override

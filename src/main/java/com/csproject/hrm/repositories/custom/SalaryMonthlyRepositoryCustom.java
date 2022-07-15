@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface SalaryMonthlyRepositoryCustom {
-  List<SalaryMonthlyResponse> getAllSalaryMonthly(QueryParam queryParam);
+  List<SalaryMonthlyResponse> getAllSalaryMonthly(QueryParam queryParam, String managerId);
 
   Long getSalaryIdByEmployeeIdAndDate(String employeeId, LocalDate date);
 }

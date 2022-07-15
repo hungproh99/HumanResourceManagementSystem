@@ -4,9 +4,15 @@ import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -22,7 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -234,7 +242,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                   "Employee Id",
                   "Full Name",
                   "Create Date",
-                  "Request Title",
+                  "Request Type",
+                  "Request Name",
                   "Description",
                   "Request Status",
                   "Latest Change",
@@ -255,7 +264,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               applicationsRequestResponse.getEmployee_id(),
               applicationsRequestResponse.getFull_name(),
               applicationsRequestResponse.getCreate_date(),
-              applicationsRequestResponse.getRequest_title(),
+              applicationsRequestResponse.getRequest_type(),
+              applicationsRequestResponse.getRequest_name(),
               applicationsRequestResponse.getDescription(),
               applicationsRequestResponse.getRequest_status(),
               applicationsRequestResponse.getChange_status_time(),
@@ -286,7 +296,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                   "Employee Id",
                   "Full Name",
                   "Create Date",
-                  "Request Title",
+                  "Request Type",
+                  "Request Name",
                   "Description",
                   "Request Status",
                   "Latest Change",
@@ -307,7 +318,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               applicationsRequestResponse.getEmployee_id(),
               applicationsRequestResponse.getFull_name(),
               applicationsRequestResponse.getCreate_date(),
-              applicationsRequestResponse.getRequest_title(),
+              applicationsRequestResponse.getRequest_type(),
+              applicationsRequestResponse.getRequest_name(),
               applicationsRequestResponse.getDescription(),
               applicationsRequestResponse.getRequest_status(),
               applicationsRequestResponse.getChange_status_time(),
@@ -618,7 +630,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       String[] splitBracket = StringUtils.substringsBetween(data, "[", "]");
       for (String split : splitBracket) {
         String[] splitSeparator = split.split(SEPARATOR, TWO_NUMBER);
-        if (isInvalidSplit(splitSeparator)) {
+        if (isInvalidSplit(splitSeparator)
+            || splitSeparator[ZERO_NUMBER] == null
+            || splitSeparator[ONE_NUMBER] == null) {
           throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
         }
         hashMap.put(splitSeparator[ZERO_NUMBER], splitSeparator[ONE_NUMBER]);

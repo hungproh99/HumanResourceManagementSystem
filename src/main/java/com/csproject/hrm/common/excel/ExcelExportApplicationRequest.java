@@ -40,13 +40,14 @@ public class ExcelExportApplicationRequest {
     createCell(row, 0, "Employee Id", style);
     createCell(row, 1, "Full Name", style);
     createCell(row, 2, "Create Date", style);
-    createCell(row, 3, "Request Title", style);
-    createCell(row, 4, "Description", style);
-    createCell(row, 5, "Request Status", style);
-    createCell(row, 6, "Latest Change", style);
-    createCell(row, 7, "Duration", style);
-    createCell(row, 8, "Approver", style);
-    createCell(row, 9, "Checked By", style);
+    createCell(row, 3, "Request Type", style);
+    createCell(row, 4, "Request Name", style);
+    createCell(row, 5, "Description", style);
+    createCell(row, 6, "Request Status", style);
+    createCell(row, 7, "Latest Change", style);
+    createCell(row, 8, "Duration", style);
+    createCell(row, 9, "Approver", style);
+    createCell(row, 10, "Checked By", style);
   }
 
   private void createCell(Row row, int columnCount, Object value, CellStyle style) {
@@ -81,7 +82,8 @@ public class ExcelExportApplicationRequest {
       createCell(row, columnCount++, applicationsRequestResponse.getEmployee_id(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getFull_name(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getCreate_date(), style);
-      createCell(row, columnCount++, applicationsRequestResponse.getRequest_title(), style);
+      createCell(row, columnCount++, applicationsRequestResponse.getRequest_type(), style);
+      createCell(row, columnCount++, applicationsRequestResponse.getRequest_name(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getDescription(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getRequest_status(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getChange_status_time(), style);
