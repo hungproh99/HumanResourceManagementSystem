@@ -691,11 +691,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         }
       case 3:
         {
-          //          if (!applicationsRequestRepository.checkPermissionToApprove(
-          //              createEmployeeId, requestNameId)) {
-          //            throw new CustomErrorException("You don't have permission to approve this
-          // request!");
-          //          }
           switch (requestNameId.intValue()) {
             case 3:
               {
@@ -703,8 +698,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                 break;
               }
             case 4:
+              {
+                checkLevelAndValueToApprove(applicationsRequest, "salary");
+                applicationsRequest =
+                    createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
+                break;
+              }
             case 5:
               {
+                checkLevelAndValueToApprove(applicationsRequest, "bonus");
                 applicationsRequest =
                     createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
@@ -716,11 +718,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       case 5:
       case 6:
         {
-          //          if (!applicationsRequestRepository.checkPermissionToApprove(
-          //              createEmployeeId, requestNameId)) {
-          //            throw new CustomErrorException("You don't have permission to approve this
-          // request!");
-          //          }
           applicationsRequest = createRequestForPenalise(applicationsRequest);
           break;
         }
@@ -758,10 +755,70 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequest.setIsRemind(false);
     applicationsRequest.setIsRead(false);
 
-    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
+    //    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
+    //
+    //    generalFunction.sendEmailCreateRequest(
+    //        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+  }
 
-    generalFunction.sendEmailCreateRequest(
-        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+  private void checkLevelAndValueToApprove(
+      ApplicationsRequestRequestC applicationsRequest, String type) {
+    String data =
+        applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
+    String[] splitData = getKeyInDescription(data);
+
+    String employeeId = applicationsRequest.getCreateEmployeeId().trim();
+    long value = Long.parseLong(applicationsRequest.getValue().trim());
+    int level = employeeDetailRepository.getLevelByEmployeeID(employeeId);
+
+    for (String data1 : splitData) {
+      if (data1.contains(type)) {
+        String[] data2 = getBonusAndSalary(data1);
+        switch (data2[1].length()) {
+          case 1:
+            {
+              if (Integer.parseInt(data2[1]) >= level) {
+                if (value <= Long.parseLong(data2[2])) {
+                  return;
+                } else {
+                  throw new CustomErrorException(
+                      "Please input " + type + " value under " + data2[2] + "!");
+                }
+              }
+              break;
+            }
+          case 2:
+            {
+              String[] data4 = data2[1].split("");
+              if (Integer.parseInt(data4[1]) < level) {
+                if (value <= Long.parseLong(data2[2])) {
+                  return;
+                } else {
+                  throw new CustomErrorException(
+                      "Please input " + type + " value under " + data2[2] + "!");
+                }
+              }
+              break;
+            }
+          case 3:
+            {
+              String[] data4 = data2[1].split("");
+              if ((Integer.parseInt(data4[0]) <= level && Integer.parseInt(data4[2]) >= level)) {
+                if (value <= Long.parseLong(data2[2])) {
+                  return;
+                } else {
+                  throw new CustomErrorException(
+                      "Please input " + type + " value under " + data2[2] + "!");
+                }
+              }
+              break;
+            }
+          default:
+            throw new CustomErrorException("You don't have permission to create request!");
+        }
+      }
+    }
+    throw new CustomErrorException("You don't have permission to create request!");
   }
 
   private ApplicationsRequestRequestC setDescriptionAndData(
@@ -879,11 +936,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
     String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
     String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
-    String currentOffice = checkStringNull(applicationsRequest.getCurrentOffice());
     String value = checkStringNull(applicationsRequest.getValue());
 
+    String type = "";
+
+    if (applicationsRequest.getRequestNameId().equals(5L)) {
+      type = checkStringNull(applicationsRequest.getType());
+    }
+
     String[] valueArray = {
-      approver, employeeName + "-" + employeeId, currentTitle, currentArea, currentOffice, value
+      approver, employeeName + "-" + employeeId, currentTitle, currentArea, value, type
     };
 
     return setDescriptionAndData(applicationsRequest, valueArray);
@@ -948,109 +1010,40 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private Boolean checkLevelApprove(ApplicationsRequestRequestC applicationsRequest) {
-    String data =
-        applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
-    String[] splitData = getKeyInDescription(data);
-
-    Long requestTypeId = applicationsRequest.getRequestTypeId();
-    Long requestNameId = applicationsRequest.getRequestNameId();
-
-    //        switch (requestTypeId.intValue()) {
-    //          case 1:
-    //            {
-    //              switch (requestNameId.intValue()) {
-    //                case 1:
-    //                  {
-    //                    applicationsRequest =
-    //                        createRequestForWorkingScheduleAndWorkingTime(applicationsRequest,
-    //     approver);
-    //                    break;
-    //                  }
-    //                case 2:
-    //                  {
-    //                    applicationsRequest =
-    //                        createRequestForWorkingScheduleAndOT(applicationsRequest, approver);
-    //                  }
-    //                  break;
+    //    String data =
+    //        applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
+    //    String[] splitData = getKeyInDescription(data);
+    //
+    //    Long requestTypeId = applicationsRequest.getRequestTypeId();
+    //    Long requestNameId = applicationsRequest.getRequestNameId();
+    //
+    //    switch (requestTypeId.intValue()) {
+    //      case 3:
+    //        {
+    //          switch (requestNameId.intValue()) {
+    //            case 4:
+    //              {
+    //                checkLevelAnhValueToApprove(splitData, applicationsRequest);
+    //                break;
     //              }
-    //              break;
-    //            }
-    //          case 2:
-    //            {
-    //              switch (requestNameId.intValue()) {
-    //                case 6:
-    //                  {
-    //                    applicationsRequest = createRequestForPairLeave(applicationsRequest,
-    //     approver);
-    //                    break;
-    //                  }
+    //            case 5:
+    //              {
+    //                //                String[] data = getBonusAndSalary(splitData);
+    //                break;
     //              }
-    //              break;
-    //            }
-    //          case 3:
-    //            {
-    //              switch (requestNameId.intValue()) {
-    //                case 3:
-    //                  {
-    //                    applicationsRequest =
-    //                        createRequestForNominationAndPromotion(applicationsRequest, approver);
-    //                    break;
-    //                  }
-    //                case 4:
-    //                case 5:
-    //                  {
-    //                    applicationsRequest =
-    //                        createRequestForNominationAndSalaryIncreaseOrBonus(
-    //                            applicationsRequest, approver);
-    //                    break;
-    //                  }
-    //              }
-    //              break;
-    //            }
-    //          case 4:
-    //          case 5:
-    //          case 6:
-    //            {
-    //              //          if (!applicationsRequestRepository.checkPermissionToApprove(
-    //              //              createEmployeeId, requestNameId)) {
-    //              //            throw new CustomErrorException("You don't have permission to
-    // approve
-    //     this
-    //              // request!");
-    //              //          }
-    //              applicationsRequest = createRequestForPenalise(applicationsRequest, approver);
-    //              break;
-    //            }
-    //          case 7:
-    //            {
-    //              switch (requestNameId.intValue()) {
-    //                case 12:
-    //                  {
-    //                    applicationsRequest = createRequestForAdvances(applicationsRequest,
-    // approver);
-    //                    break;
-    //                  }
-    //              }
-    //              break;
-    //            }
-    //          case 8:
-    //            {
-    //              switch (requestNameId.intValue()) {
-    //                case 13:
-    //                  {
-    //                    applicationsRequest = createRequestForTaxEnrollment(applicationsRequest,
-    //     approver);
-    //                    break;
-    //                  }
-    //              }
-    //              break;
-    //            }
+    //          }
+    //          break;
     //        }
+    //    }
     return null;
   }
 
   private String[] getKeyInDescription(String description) {
     return StringUtils.substringsBetween(description, "[", "]");
+  }
+
+  private String[] getBonusAndSalary(String data) {
+    return data.split("\\|");
   }
 
   @Override

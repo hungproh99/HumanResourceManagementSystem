@@ -42,4 +42,6 @@ public interface EmployeeDetailRepositoryCustom {
   boolean checkEmployeeIDIsExists(String employeeID);
 
   String getManagerByEmployeeID(String employeeID);
+
+  Integer getLevelByEmployeeID(String employeeID);
 }

@@ -69,6 +69,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
           applicationsRequestResponse.setIs_read("True");
         });
 
+    System.out.println(
+        getListApplicationRequestReceive(
+            conditions, orderByList, queryParam.pagination, employeeId));
+
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         Stream.of(
                 applicationsRequestResponseForwardList,

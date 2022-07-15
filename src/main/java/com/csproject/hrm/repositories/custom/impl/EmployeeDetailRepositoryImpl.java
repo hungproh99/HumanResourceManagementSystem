@@ -523,4 +523,16 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(managerID))
         .fetchOneInto(String.class);
   }
+
+  @Override
+  public Integer getLevelByEmployeeID(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select()
+        .select(EMPLOYEE.LEVEL)
+        .from(EMPLOYEE)
+        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .fetchOneInto(Integer.class);
+  }
 }
