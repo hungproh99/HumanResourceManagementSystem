@@ -4,12 +4,10 @@ import com.csproject.hrm.common.enums.EPolicyType;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.PolicyDto;
 import com.csproject.hrm.dto.dto.RangePunishPolicy;
+import com.csproject.hrm.dto.dto.SalaryContractDto;
 import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
 import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.repositories.ApplicationsRequestRepository;
-import com.csproject.hrm.repositories.EmployeeRepository;
-import com.csproject.hrm.repositories.PolicyRepository;
-import com.csproject.hrm.repositories.TimekeepingRepository;
+import com.csproject.hrm.repositories.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,7 @@ public class ScheduledTasks {
   @Autowired TimekeepingRepository timekeepingRepository;
   @Autowired PolicyRepository policyRepository;
   @Autowired GeneralFunction generalFunction;
+  @Autowired SalaryContractRepository salaryContractRepository;
 
   @Scheduled(cron = "0 59 23 ? * * ")
   public void scheduleTaskSendMailRemind() {
@@ -109,6 +108,12 @@ public class ScheduledTasks {
     employeeIdList.forEach(
         employeeId -> {
           BigDecimal minusMoney = BigDecimal.ZERO;
+          Optional<SalaryContractDto> salaryContractDto =
+              salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
+          if (salaryContractDto.isEmpty()) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
+          }
 
           LocalTime firstTimeCheckIn =
               timekeepingRepository.getFirstTimeCheckInByTimekeeping(currentDate, employeeId);

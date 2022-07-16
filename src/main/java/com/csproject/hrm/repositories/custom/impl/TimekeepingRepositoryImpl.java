@@ -689,4 +689,20 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .and(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
         .fetchOneInto(LocalTime.class);
   }
+
+  @Override
+  public int countActualWorkPerMonthByEmployee(
+      LocalDate startDate, LocalDate endDate, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchCount(
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .leftJoin(LIST_TIMEKEEPING_STATUS)
+            .on(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .leftJoin(TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+            .where(TIMEKEEPING_STATUS.NAME.ne(ETimekeepingStatus.DAY_OFF.name())));
+
+  }
 }

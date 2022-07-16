@@ -54,4 +54,6 @@ public interface TimekeepingRepositoryCustom {
   LocalTime getFirstTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
   LocalTime getLastTimeCheckInByTimekeeping(LocalDate date, String employeeId);
+
+  int countActualWorkPerMonthByEmployee(LocalDate startDate, LocalDate endDate, String employeeId);
 }
