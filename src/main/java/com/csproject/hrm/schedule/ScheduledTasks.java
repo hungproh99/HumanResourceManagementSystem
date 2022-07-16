@@ -6,10 +6,7 @@ import com.csproject.hrm.dto.dto.PolicyDto;
 import com.csproject.hrm.dto.dto.RangePunishPolicy;
 import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
 import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.repositories.ApplicationsRequestRepository;
-import com.csproject.hrm.repositories.EmployeeRepository;
-import com.csproject.hrm.repositories.PolicyRepository;
-import com.csproject.hrm.repositories.TimekeepingRepository;
+import com.csproject.hrm.repositories.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 

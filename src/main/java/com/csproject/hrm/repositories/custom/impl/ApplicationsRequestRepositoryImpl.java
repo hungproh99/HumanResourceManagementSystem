@@ -1,16 +1,10 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.ERequestName;
-import com.csproject.hrm.common.enums.ERequestStatus;
-import com.csproject.hrm.common.enums.ERequestType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
@@ -788,27 +782,27 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   @Override
   public Boolean checkPermissionToApprove(String employeeId, Long requestNameId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-
-    final var level =
-        dslContext
-            .select(EMPLOYEE.LEVEL)
-            .from(EMPLOYEE)
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
-            .fetchOneInto(Integer.class);
-
-    final var minimumLevelAccept =
-        dslContext
-            .select(POLICY.MAXIMUM_LEVEL_ACCEPT)
-            .from(REQUEST_NAME)
-            .leftJoin(POLICY)
-            .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
-            .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
-            .fetchOneInto(Integer.class);
-
-    if (minimumLevelAccept == null || level == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
-    }
-    return level <= minimumLevelAccept;
+    return true;
+    //    final var level =
+    //            dslContext
+    //                    .select(EMPLOYEE.LEVEL)
+    //                    .from(EMPLOYEE)
+    //                    .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeId))
+    //                    .fetchOneInto(Integer.class);
+    //
+    //    final var minimumLevelAccept =
+    //            dslContext
+    //                    .select(POLICY.MINIMUM_LEVEL_ACCEPT)
+    //                    .from(REQUEST_NAME)
+    //                    .leftJoin(POLICY)
+    //                    .on(POLICY.POLICY_ID.eq(REQUEST_NAME.POLICY_ID))
+    //                    .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
+    //                    .fetchOneInto(Integer.class);
+    //
+    //    if (minimumLevelAccept == null || level == null) {
+    //      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_LEVEL);
+    //    }
+    //    return level <= minimumLevelAccept;
   }
 
   @Override
@@ -906,5 +900,17 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
         .where(APPLICATIONS_REQUEST.DURATION.eq(checkDate))
         .and(APPLICATIONS_REQUEST.IS_REMIND.isFalse());
+  }
+
+  @Override
+  public String getDataOfPolicy(Long requestNameId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(POLICY.DATA)
+        .from(REQUEST_NAME)
+        .leftJoin(POLICY)
+        .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
+        .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
+        .fetchOneInto(String.class);
   }
 }
