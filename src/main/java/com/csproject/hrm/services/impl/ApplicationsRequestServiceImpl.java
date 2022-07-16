@@ -4,15 +4,9 @@ import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -28,9 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -661,7 +653,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     if (!applicationsRequestRepository.getAllRequestNameByRequestTypeID(requestTypeId).stream()
         .anyMatch(requestNameDto -> requestNameDto.getRequest_name_id().equals(requestNameId))) {
-      throw new CustomDataNotFoundException("Request Type or Request Name not existed!");
+      throw new CustomDataNotFoundException("Request Type or Request Name does not existed!");
     }
     if (!applicationsRequestRepository.checkPermissionToCreate(createEmployeeId, requestNameId)) {
       throw new CustomErrorException("You don't have permission to create this request!");
@@ -697,6 +689,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           switch (requestNameId.intValue()) {
             case 6:
               {
+                if (getPaidLeaveDayRemaining(applicationsRequest.getCreateEmployeeId()) < 1) {
+                  throw new CustomErrorException("Your paid leave remaining is over!");
+                }
                 applicationsRequest = createRequestForPairLeave(applicationsRequest);
                 break;
               }
@@ -769,10 +764,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequest.setIsRemind(false);
     applicationsRequest.setIsRead(false);
 
-    //    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
-    //
-    //    generalFunction.sendEmailCreateRequest(
-    //        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
+
+    generalFunction.sendEmailCreateRequest(
+        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
   }
 
   private void checkLevelAndValueToApprove(
@@ -844,8 +839,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String[] keyArray = getKeyInDescription(description);
     for (int i = 0; i < keyArray.length; i++) {
       description = description.replaceAll("\\[" + keyArray[i] + "\\]", "[" + valueArray[i] + "]");
+    }
+    for (int i = 1; i < keyArray.length - 1; i++) {
       data = data + "[" + keyArray[i] + "|" + valueArray[i] + "]";
     }
+
+    System.out.println(description);
+    System.out.println(data);
+
     applicationsRequest.setData(data);
     applicationsRequest.setDescription(
         description + "P/S: " + applicationsRequest.getDescription());
@@ -856,8 +857,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       ApplicationsRequestRequestC applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String date = checkLocalDateNull(applicationsRequest.getDate()).toString();
+    String employee =
+        checkStringNull(
+            employeeDetailRepository.getEmployeeInfoByEmployeeID(
+                applicationsRequest.getCreateEmployeeId()));
 
-    String[] valueArray = {approver, date};
+    String[] valueArray = {approver, date, employee};
 
     return setDescriptionAndData(applicationsRequest, valueArray);
   }
@@ -869,8 +874,19 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String endTime = checkLocalTimeNull(applicationsRequest.getEndTime()).toString();
     String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
     String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
+    String employee =
+        checkStringNull(
+            employeeDetailRepository.getEmployeeInfoByEmployeeID(
+                applicationsRequest.getCreateEmployeeId()));
 
-    String[] valueArray = {approver, startDate, endDate, startTime, endTime};
+    if (applicationsRequest.getStartDate().isAfter(applicationsRequest.getEndDate())) {
+      throw new CustomErrorException("Please choose end date after start date!");
+    }
+    if (applicationsRequest.getStartTime().isAfter(applicationsRequest.getEndTime())) {
+      throw new CustomErrorException("Please choose end time after start time!");
+    }
+
+    String[] valueArray = {approver, startDate, endDate, startTime, endTime, employee};
 
     return setDescriptionAndData(applicationsRequest, valueArray);
   }
@@ -880,8 +896,17 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String approver = applicationsRequest.getApprover();
     String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
     String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
+    String reason = checkStringNull(applicationsRequest.getReason());
+    String employee =
+        checkStringNull(
+            employeeDetailRepository.getEmployeeInfoByEmployeeID(
+                applicationsRequest.getCreateEmployeeId()));
 
-    String[] valueArray = {approver, startDate, endDate};
+    if (applicationsRequest.getStartDate().isAfter(applicationsRequest.getEndDate())) {
+      throw new CustomErrorException("Please choose end date after start date!");
+    }
+
+    String[] valueArray = {approver, startDate, endDate, reason, employee};
 
     return setDescriptionAndData(applicationsRequest, valueArray);
   }
@@ -890,8 +915,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       ApplicationsRequestRequestC applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String value = checkStringNull(applicationsRequest.getValue());
+    String employee =
+        checkStringNull(
+            employeeDetailRepository.getEmployeeInfoByEmployeeID(
+                applicationsRequest.getCreateEmployeeId()));
 
-    String[] valueArray = {approver, value};
+    String[] valueArray = {approver, value, employee};
 
     return setDescriptionAndData(applicationsRequest, valueArray);
   }
@@ -901,8 +930,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String approver = applicationsRequest.getApprover();
     List<String> taxTypes = applicationsRequest.getTaxType();
     String taxType = StringUtils.join(taxTypes, ",");
+    String employee =
+        checkStringNull(
+            employeeDetailRepository.getEmployeeInfoByEmployeeID(
+                applicationsRequest.getCreateEmployeeId()));
 
-    String[] valueArray = {approver, taxType};
+    String[] valueArray = {approver, taxType, employee};
 
     return setDescriptionAndData(applicationsRequest, valueArray);
   }
@@ -926,7 +959,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String[] valueArray = {
       approver,
-      employeeName + "-" + employeeId,
+      employeeName + " - " + employeeId,
       currentTitle,
       currentArea,
       currentOffice,
@@ -951,15 +984,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
     String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
     String value = checkStringNull(applicationsRequest.getValue());
+    String employee =
+        checkStringNull(
+            employeeDetailRepository.getEmployeeInfoByEmployeeID(
+                applicationsRequest.getCreateEmployeeId()));
 
-    String type = "";
-
-    if (applicationsRequest.getRequestNameId().equals(5L)) {
-      type = checkStringNull(applicationsRequest.getType());
-    }
+    String type = checkStringNull(applicationsRequest.getType());
 
     String[] valueArray = {
-      approver, employeeName + "-" + employeeId, currentTitle, currentArea, value, type
+      approver, employeeName + " - " + employeeId, currentTitle, currentArea, value, type, employee
     };
 
     return setDescriptionAndData(applicationsRequest, valueArray);
@@ -987,7 +1020,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String[] valueArray = {
       approver,
       date,
-      employeeName + "-" + employeeId,
+      employeeName + " - " + employeeId,
       currentTitle,
       currentArea,
       currentOffice,
@@ -1023,33 +1056,25 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
   }
 
-  private Boolean checkLevelApprove(ApplicationsRequestRequestC applicationsRequest) {
-    //    String data =
-    //        applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
+  @Override
+  public int getPaidLeaveDayRemaining(String employeeId) {
+    int current = timekeepingRepository.countPaidLeaveOfEmployeeByYear(employeeId);
+
+    String data = applicationsRequestRepository.getDataOfPolicy(6L);
+    String[] splitData = getKeyInDescription(data);
+
+    return Integer.parseInt(splitData[0].split("\\|")[1]) - current;
+  }
+
+  @Override
+  public int getOTDTimeRemaining(String employeeId) {
+    //    int current = timekeepingRepository.countOvertimeOfEmployeeByYear(employeeId);
+    //
+    //    String data = applicationsRequestRepository.getDataOfPolicy(2L);
     //    String[] splitData = getKeyInDescription(data);
     //
-    //    Long requestTypeId = applicationsRequest.getRequestTypeId();
-    //    Long requestNameId = applicationsRequest.getRequestNameId();
-    //
-    //    switch (requestTypeId.intValue()) {
-    //      case 3:
-    //        {
-    //          switch (requestNameId.intValue()) {
-    //            case 4:
-    //              {
-    //                checkLevelAnhValueToApprove(splitData, applicationsRequest);
-    //                break;
-    //              }
-    //            case 5:
-    //              {
-    //                //                String[] data = getBonusAndSalary(splitData);
-    //                break;
-    //              }
-    //          }
-    //          break;
-    //        }
-    //    }
-    return null;
+    //    return Integer.parseInt(splitData[1].split("\\|")[1]) - current;
+    return 0;
   }
 
   private String[] getKeyInDescription(String description) {

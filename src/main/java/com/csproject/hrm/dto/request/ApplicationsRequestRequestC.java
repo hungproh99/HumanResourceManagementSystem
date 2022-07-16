@@ -40,4 +40,5 @@ public class ApplicationsRequestRequestC {
   private String desiredOffice;
   private String value;
   private String type;
+  private String reason;
 }

@@ -30,9 +30,6 @@ public class Policy {
   @Column(name = "description", length = 1000)
   private String description;
 
-  @Column(name = "data")
-  private String data;
-
   @Column(name = "maximum_level_accept")
   private int maximumLevelAccept;
 

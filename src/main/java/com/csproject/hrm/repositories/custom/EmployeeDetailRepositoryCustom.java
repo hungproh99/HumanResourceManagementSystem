@@ -43,5 +43,7 @@ public interface EmployeeDetailRepositoryCustom {
 
   String getManagerByEmployeeID(String employeeID);
 
+  String getEmployeeInfoByEmployeeID(String employeeID);
+
   Integer getLevelByEmployeeID(String employeeID);
 }

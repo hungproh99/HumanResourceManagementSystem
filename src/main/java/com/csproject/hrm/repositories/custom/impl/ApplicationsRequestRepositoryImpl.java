@@ -4,8 +4,7 @@ import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
@@ -32,7 +31,8 @@ import static org.jooq.codegen.maven.example.tables.Policy.POLICY;
 import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
 import static org.jooq.codegen.maven.example.tables.RequestType.REQUEST_TYPE;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.when;
 
 @AllArgsConstructor
 public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRepositoryCustom {
