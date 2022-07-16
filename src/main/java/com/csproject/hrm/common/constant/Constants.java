@@ -51,7 +51,7 @@ public class Constants {
   public static final String ORDER_BY = "orderBy";
   public static final String COMMA = ",";
   public static final String COLON = ":";
-  public static final String SEPARATOR = "|";
+  public static final String SEPARATOR = "\\|";
   public static final String OFFSET = "offset";
   public static final String LIMIT = "limit";
   public static final String INVALID_NUMBER_FORMAT = "Invalid Number Format";
