@@ -13,4 +13,5 @@ public class SalaryContractDto {
   private Long salary_contract_id;
   private BigDecimal base_salary;
   private BigDecimal additional_salary;
+  private String working_type;
 }

@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GradeDto {
-  private Long grade_id;
-  private String name;
-  private String description;
+public class OvertimeDto {
+  private LocalTime start_time;
+  private LocalTime end_time;
+  private String overtime_type;
 }

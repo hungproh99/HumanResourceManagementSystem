@@ -37,7 +37,7 @@ public class EmployeeAsset {
   @Column(name = "quantity")
   private int quantity;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = CategoryCompanyAsset.class)
   @JoinColumn(name = "category_asset_id")
   private CategoryCompanyAsset categoryCompanyAsset;
 }

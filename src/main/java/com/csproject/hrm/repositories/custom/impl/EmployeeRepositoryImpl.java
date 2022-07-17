@@ -18,10 +18,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -651,5 +648,22 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .from(EMPLOYEE)
         .where(EMPLOYEE.WORKING_STATUS.isTrue())
         .fetchInto(String.class);
+  }
+
+  @Override
+  public Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId) {
+    List<Condition> conditions = new ArrayList<>();
+    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.desc());
+    HrmResponse hrmResponse =
+        findAllEmployee(conditions, sortFields, Pagination.defaultPage())
+            .fetchOneInto(HrmResponse.class);
+    hrmResponse.setArea_name(EArea.getLabel(hrmResponse.getArea_name()));
+    hrmResponse.setGrade(EGradeType.getLabel(hrmResponse.getGrade()));
+    hrmResponse.setPosition_name(EJob.getLabel(hrmResponse.getPosition_name()));
+    hrmResponse.setOffice_name(EOffice.getLabel(hrmResponse.getOffice_name()));
+    hrmResponse.setWorking_name(EWorkingType.getLabel(hrmResponse.getWorking_name()));
+    return Optional.of(hrmResponse);
   }
 }

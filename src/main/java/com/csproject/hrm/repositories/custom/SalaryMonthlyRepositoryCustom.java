@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
+import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
+import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,9 @@ import java.util.List;
 
 @Repository
 public interface SalaryMonthlyRepositoryCustom {
-  List<SalaryMonthlyResponse> getAllSalaryMonthly(QueryParam queryParam, String managerId);
+  List<SalaryMonthlyDetailResponse> getAllSalaryMonthly(QueryParam queryParam, String managerId);
 
-  Long getSalaryIdByEmployeeIdAndDate(String employeeId, LocalDate date);
+  Long getSalaryIdByEmployeeIdAndDate(String employeeId, LocalDate startDate, LocalDate endDate);
+
+  void insertSalaryMonthlyByEmployee(List<SalaryMonthlyDto> salaryMonthlyDtoList);
 }

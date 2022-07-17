@@ -12,7 +12,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SalaryMonthlyResponse {
+public class SalaryMonthlyDetailResponse {
   private Long salary_id;
   private String employee_id;
   private String full_name;

@@ -1,12 +1,12 @@
 package com.csproject.hrm.services;
 
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
 import com.csproject.hrm.dto.response.TimekeepingResponsesList;
 import com.csproject.hrm.jooq.QueryParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +20,6 @@ public interface TimekeepingService {
 
   Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
       String employeeID, String date);
+
+  void upsertPointPerDay(LocalDate currentDate);
 }

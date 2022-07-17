@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
+import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
 import com.csproject.hrm.dto.response.ListTimekeepingStatusResponse;
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
@@ -47,13 +48,25 @@ public interface TimekeepingRepositoryCustom {
       LocalTime endTime,
       Long overtimeType);
 
-  void insertTimekeeping(Double point, LocalDate date, String employeeId);
-
-  void updatePointPerDay(Double point, LocalDate date, String employeeId);
+  void insertTimekeeping(TimekeepingDto timekeepingDto, String timekeepingStatus);
 
   LocalTime getFirstTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
   LocalTime getLastTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
-  int countActualWorkPerMonthByEmployee(LocalDate startDate, LocalDate endDate, String employeeId);
+  void updatePointPerDay(List<TimekeepingDto> timekeepingDtoList);
+
+  boolean checkExistDateInTimekeeping(LocalDate date, String employeeId);
+
+  int countTimeDayOffPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  int countTimePaidLeavePerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  Double countPointDayWorkPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  Double countPointOTPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
 }

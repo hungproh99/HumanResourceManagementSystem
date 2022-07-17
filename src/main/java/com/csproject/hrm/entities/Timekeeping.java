@@ -34,8 +34,11 @@ public class Timekeeping {
   @OneToMany(mappedBy = "timekeeping", fetch = FetchType.LAZY)
   private List<ListTimekeepingStatus> listTimekeepingStatuses;
 
-  @Column(name = "amount_work_per_day")
-  private Double amountWorkPerDay;
+  @Column(name = "point_ot_day")
+  private Double pointOTDay;
+
+  @Column(name = "point_work_day")
+  private Double pointWorkDay;
 
   @OneToOne(mappedBy = "timekeeping", fetch = FetchType.LAZY)
   private Overtime overTime;

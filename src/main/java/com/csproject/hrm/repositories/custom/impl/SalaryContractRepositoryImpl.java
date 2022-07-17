@@ -74,12 +74,15 @@ public class SalaryContractRepositoryImpl implements SalaryContractRepositoryCus
         .select(
             SALARY_CONTRACT.SALARY_CONTRACT_ID,
             SALARY_CONTRACT.BASE_SALARY,
-            SALARY_CONTRACT.ADDITIONAL_SALARY)
+            SALARY_CONTRACT.ADDITIONAL_SALARY,
+            WORKING_TYPE.NAME.as("working_type"))
         .from(SALARY_CONTRACT)
         .leftJoin(WORKING_CONTRACT)
         .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
         .leftJoin(EMPLOYEE)
         .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+        .leftJoin(WORKING_TYPE)
+        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
         .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))

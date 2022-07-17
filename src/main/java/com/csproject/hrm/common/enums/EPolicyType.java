@@ -19,7 +19,8 @@ public enum EPolicyType {
   SI("SI", 11),
   HI("HI", 12),
   UI("UI", 13),
-  PI("PI", 14);
+  PI("PI", 14),
+  OT("OT", 15);
 
   private final String label;
   private final long value;

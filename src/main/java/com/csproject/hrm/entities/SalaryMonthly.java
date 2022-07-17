@@ -25,6 +25,30 @@ public class SalaryMonthly {
   @Column(name = "final_salary")
   private BigDecimal finalSalary;
 
+  @Column(name = "standard_point")
+  private Double standardPoint;
+
+  @Column(name = "actual_point")
+  private Double actualPoint;
+
+  @Column(name = "ot_point")
+  private Double otPoint;
+
+  @Column(name = "total_deduction")
+  private BigDecimal totalDeduction;
+
+  @Column(name = "total_bonus")
+  private BigDecimal totalBonus;
+
+  @Column(name = "total_insurance_payment")
+  private BigDecimal totalInsurancePayment;
+
+  @Column(name = "total_tax_payment")
+  private BigDecimal totalTaxPayment;
+
+  @Column(name = "total_advance")
+  private BigDecimal totalAdvance;
+
   @Column(name = "start_date")
   private LocalDate startDate;
 

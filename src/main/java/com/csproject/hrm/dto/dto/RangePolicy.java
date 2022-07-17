@@ -1,4 +1,4 @@
-package com.csproject.hrm.dto.response;
+package com.csproject.hrm.dto.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EmployeeInsuranceResponse {
-  private Long employee_insurance_id;
+public class RangePolicy {
+  private Long min;
+  private Long max;
   private BigDecimal value;
-  private Long policy_type_id;
-  private String insurance_name;
-  private String insurance_value;
 }

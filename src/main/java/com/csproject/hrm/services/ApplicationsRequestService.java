@@ -1,12 +1,17 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.dto.RequestNameDto;
+import com.csproject.hrm.dto.dto.RequestStatusDto;
+import com.csproject.hrm.dto.dto.RequestTypeDto;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ApplicationsRequestService {
@@ -50,4 +55,6 @@ public interface ApplicationsRequestService {
   List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
 
   void createApproveTaxEnrollment(List<String> taxNameList, String employeeId);
+
+  void updateAllApplicationRequestRemind(LocalDateTime checkDate);
 }

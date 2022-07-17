@@ -904,7 +904,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
         .leftJoin(REQUEST_TYPE)
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-        .where(APPLICATIONS_REQUEST.DURATION.eq(checkDate))
+        .where(APPLICATIONS_REQUEST.DURATION.le(checkDate))
         .and(APPLICATIONS_REQUEST.IS_REMIND.isFalse());
   }
 }
