@@ -3,8 +3,12 @@ package com.csproject.hrm.common.general;
 import com.csproject.hrm.common.enums.EPolicyType;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
+import com.csproject.hrm.dto.response.EmployeeInsuranceResponse;
+import com.csproject.hrm.dto.response.EmployeeTaxResponse;
 import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.repositories.EmployeeInsuranceRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
+import com.csproject.hrm.repositories.EmployeeTaxRepository;
 import com.csproject.hrm.repositories.PolicyRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +50,8 @@ public class GeneralFunction {
   @Autowired ResourceLoader resourceLoader;
   @Autowired EmployeeRepository employeeRepository;
   @Autowired PolicyRepository policyRepository;
+  @Autowired EmployeeTaxRepository employeeTaxRepository;
+  @Autowired EmployeeInsuranceRepository employeeInsuranceRepository;
 
   public String generateEmailEmployee(String id) {
     return id + DOMAIN_EMAIL;
@@ -258,8 +264,55 @@ public class GeneralFunction {
           break;
       }
     }
-
     return overtimeDataDto;
+  }
+
+  public List<EmployeeTaxResponse> readTaxDataByEmployeeId(
+      String employeeId, BigDecimal baseSalary) {
+    List<EmployeeTaxResponse> employeeTaxResponses =
+        employeeTaxRepository.getListTaxByEmployeeId(employeeId);
+    for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
+      Optional<PolicyDto> policyTaxDto =
+          policyRepository.getPolicyDtoByPolicyType(employeeTaxResponse.getPolicy_type());
+      if (policyTaxDto.isEmpty()) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
+      }
+      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get().getData()).entrySet();
+      for (Map.Entry<String, String> i : hashMap) {
+        employeeTaxResponse.setTax_name(i.getKey());
+        employeeTaxResponse.setTax_value(Double.parseDouble(i.getValue()));
+        employeeTaxResponse.setValue(
+            baseSalary
+                .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
+                .divide(BigDecimal.TEN)
+                .divide(BigDecimal.TEN));
+      }
+    }
+    return employeeTaxResponses;
+  }
+
+  public List<EmployeeInsuranceResponse> readInsuranceDataByEmployeeId(
+      String employeeId, BigDecimal baseSalary) {
+    List<EmployeeInsuranceResponse> employeeInsuranceResponses =
+        employeeInsuranceRepository.getListInsuranceByEmployeeId(employeeId);
+    for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
+      Optional<PolicyDto> policyTaxDto =
+          policyRepository.getPolicyDtoByPolicyType(employeeInsuranceResponse.getPolicy_type());
+      if (policyTaxDto.isEmpty()) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
+      }
+      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get().getData()).entrySet();
+      for (Map.Entry<String, String> i : hashMap) {
+        employeeInsuranceResponse.setInsurance_name(i.getKey());
+        employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
+        employeeInsuranceResponse.setValue(
+            baseSalary
+                .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
+                .divide(BigDecimal.TEN)
+                .divide(BigDecimal.TEN));
+      }
+    }
+    return employeeInsuranceResponses;
   }
 
   public HashMap<String, String> splitData(String data) {

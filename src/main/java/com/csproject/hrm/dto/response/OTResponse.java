@@ -14,5 +14,5 @@ import java.util.List;
 public class OTResponse {
   private String overtime_type;
   private List<OTDetailResponse> otDetailResponseList;
-  private Double total;
+  private Double totalOTPointByType;
 }

@@ -12,8 +12,7 @@ public interface DeductionSalaryRepositoryCustom {
   void insertDeductionSalaryByEmployeeId(
       Long salaryId, LocalDate date, String description, Long deductionType, BigDecimal bonus);
 
-  List<DeductionSalaryResponse> getListDeductionBySalaryIdAndMonth(
-      Long salaryId, LocalDate startDate, LocalDate endDate);
+  List<DeductionSalaryResponse> getListDeductionMonthlyBySalaryMonthlyId(Long salaryId);
 
-  BigDecimal sumDeductionBySalaryIdAndMonth(Long salaryId, LocalDate startDate, LocalDate endDate);
+  BigDecimal sumListDeductionMonthlyBySalaryMonthlyId(Long salaryId);
 }

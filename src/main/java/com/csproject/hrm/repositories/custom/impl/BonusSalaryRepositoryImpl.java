@@ -50,8 +50,7 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
   }
 
   @Override
-  public List<BonusSalaryResponse> getListBonusBySalaryIdAndMonth(
-      Long salaryId, LocalDate startDate, LocalDate endDate) {
+  public List<BonusSalaryResponse> getListBonusMonthlyBySalaryMonthlyId(Long salaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -66,14 +65,11 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
         .leftJoin(SALARY_MONTHLY)
         .on(SALARY_MONTHLY.SALARY_ID.eq(BONUS_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
-        .and(SALARY_MONTHLY.START_DATE.eq(startDate))
-        .and(SALARY_MONTHLY.END_DATE.eq(endDate))
         .fetchInto(BonusSalaryResponse.class);
   }
 
   @Override
-  public BigDecimal sumBonusBySalaryIdAndMonth(
-      Long salaryId, LocalDate startDate, LocalDate endDate) {
+  public BigDecimal sumListBonusMonthlyBySalaryMonthlyId(Long salaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(sum(BONUS_SALARY.VALUE))
@@ -83,8 +79,6 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
         .leftJoin(SALARY_MONTHLY)
         .on(SALARY_MONTHLY.SALARY_ID.eq(BONUS_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
-        .and(SALARY_MONTHLY.START_DATE.eq(startDate))
-        .and(SALARY_MONTHLY.END_DATE.eq(endDate))
         .fetchOneInto(BigDecimal.class);
   }
 }

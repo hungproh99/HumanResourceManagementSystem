@@ -12,8 +12,7 @@ public interface BonusSalaryRepositoryCustom {
   void insertBonusSalaryByEmployeeId(
       Long salaryId, LocalDate date, String description, Long bonusType, BigDecimal bonus);
 
-  List<BonusSalaryResponse> getListBonusBySalaryIdAndMonth(
-      Long salaryId, LocalDate startDate, LocalDate endDate);
+  List<BonusSalaryResponse> getListBonusMonthlyBySalaryMonthlyId(Long salaryId);
 
-  BigDecimal sumBonusBySalaryIdAndMonth(Long salaryId, LocalDate startDate, LocalDate endDate);
+  BigDecimal sumListBonusMonthlyBySalaryMonthlyId(Long salaryId);
 }

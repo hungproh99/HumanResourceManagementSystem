@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class EmployeeInsuranceResponse {
   private Long employee_insurance_id;
   private BigDecimal value;
-  private Long policy_type_id;
+  private String policy_type;
   private String insurance_name;
-  private String insurance_value;
+  private Double insurance_value;
 }

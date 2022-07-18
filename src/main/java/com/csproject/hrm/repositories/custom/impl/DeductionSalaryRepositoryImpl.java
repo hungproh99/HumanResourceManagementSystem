@@ -50,8 +50,7 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
   }
 
   @Override
-  public List<DeductionSalaryResponse> getListDeductionBySalaryIdAndMonth(
-      Long salaryId, LocalDate startDate, LocalDate endDate) {
+  public List<DeductionSalaryResponse> getListDeductionMonthlyBySalaryMonthlyId(Long salaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -66,14 +65,11 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
         .leftJoin(SALARY_MONTHLY)
         .on(SALARY_MONTHLY.SALARY_ID.eq(DEDUCTION_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
-        .and(SALARY_MONTHLY.START_DATE.eq(startDate))
-        .and(SALARY_MONTHLY.END_DATE.eq(endDate))
         .fetchInto(DeductionSalaryResponse.class);
   }
 
   @Override
-  public BigDecimal sumDeductionBySalaryIdAndMonth(
-      Long salaryId, LocalDate startDate, LocalDate endDate) {
+  public BigDecimal sumListDeductionMonthlyBySalaryMonthlyId(Long salaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(sum(DEDUCTION_SALARY.VALUE))
@@ -83,8 +79,6 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
         .leftJoin(SALARY_MONTHLY)
         .on(SALARY_MONTHLY.SALARY_ID.eq(DEDUCTION_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
-        .and(SALARY_MONTHLY.START_DATE.eq(startDate))
-        .and(SALARY_MONTHLY.END_DATE.eq(endDate))
         .fetchOneInto(BigDecimal.class);
   }
 }

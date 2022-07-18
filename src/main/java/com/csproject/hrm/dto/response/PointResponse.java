@@ -13,4 +13,5 @@ public class PointResponse {
   private Double actual_working_day;
   private Double unpaid_leave_day;
   private Double paid_leave_day;
+  private Double totalWorkPoint;
 }

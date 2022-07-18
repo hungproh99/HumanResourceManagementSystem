@@ -1,4 +1,4 @@
-package com.csproject.hrm.dto.dto;
+package com.csproject.hrm.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalaryMonthlyDto {
+public class SalaryMonthlyResponse {
   private String employeeId;
   private Double standardPoint;
   private Double actualPoint;

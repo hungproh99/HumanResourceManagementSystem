@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class EmployeeTaxResponse {
   private Long employee_tax_id;
   private BigDecimal value;
-  private Long policy_type_id;
+  private String policy_type;
   private String tax_name;
-  private String tax_value;
+  private Double tax_value;
 }
