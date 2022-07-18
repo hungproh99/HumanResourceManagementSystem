@@ -599,7 +599,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
     salaryId =
-        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(employeeId, startDate, lastDate);
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     bonusSalaryRepository.insertBonusSalaryByEmployeeId(
         salaryId, date, description, bonusType, value);
 
@@ -625,7 +626,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
     salaryId =
-        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(employeeId, startDate, lastDate);
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
         salaryId, date, description, deductionType, value);
     if (deductionType.equals(EDeduction.getValue("FIRE")))
@@ -648,7 +650,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
     salaryId =
-        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(employeeId, startDate, lastDate);
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
 
     applicationsRequestRepository.updateStatusApplication(

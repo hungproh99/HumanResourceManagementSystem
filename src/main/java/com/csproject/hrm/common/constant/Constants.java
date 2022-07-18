@@ -123,4 +123,7 @@ public class Constants {
   public static final String NULL_LEVEL = "Level is null";
 
   public static final String REQUEST_ID_PARAM = "requestId";
+  public static final String START_DATE = "startDate";
+  public static final String END_DATE = "endDate";
+  public static final String SALARY_STATUS_PARAM = "salaryStatus";
 }

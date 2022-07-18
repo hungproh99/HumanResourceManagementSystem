@@ -21,6 +21,7 @@ public class SalaryMonthlyDetailResponse {
   private LocalDate end_date;
   private BigDecimal base_salary;
   private BigDecimal final_salary;
+  private Double standardPoint;
   private PointResponse pointResponses;
   private OTResponseList otResponseList;
   private BonusSalaryResponseList bonusSalaryResponseList;

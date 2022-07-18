@@ -777,19 +777,4 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .and(TIMEKEEPING.DATE.le(lastDate))
         .fetchOneInto(Double.class);
   }
-
-  @Override
-  public Double countPointOTPerMonthByEmployeeId(
-      LocalDate firstDate, LocalDate lastDate, String employeeId) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext
-        .select(sum(TIMEKEEPING.POINT_OT_DAY))
-        .from(TIMEKEEPING)
-        .leftJoin(EMPLOYEE)
-        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
-        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
-        .and(TIMEKEEPING.DATE.ge(firstDate))
-        .and(TIMEKEEPING.DATE.le(lastDate))
-        .fetchOneInto(Double.class);
-  }
 }

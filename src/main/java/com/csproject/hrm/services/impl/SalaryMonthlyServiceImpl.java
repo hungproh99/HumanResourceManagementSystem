@@ -1,12 +1,15 @@
 package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.EOvertime;
+import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.SalaryContractDto;
+import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.dto.WorkingTimeDataDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.SalaryMonthlyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,22 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Autowired AdvanceSalaryRepository advanceSalaryRepository;
 
   @Override
+  public SalaryMonthlyResponseList getAllSalaryMonthly(
+      QueryParam queryParam, String employeeId, boolean isManager) {
+    List<String> employeeIdList = new ArrayList<>();
+    if (isManager) {
+      HrmResponseList hrmResponseList =
+          employeeRepository.findAllEmployeeOfManager(QueryParam.defaultParam(), employeeId);
+      for (HrmResponse hrmResponse : hrmResponseList.getHrmResponse()) {
+        employeeIdList.add(hrmResponse.getEmployee_id());
+      }
+    } else {
+      employeeIdList.add(employeeId);
+    }
+    return salaryMonthlyRepository.getAllSalaryMonthly(queryParam, employeeIdList);
+  }
+
+  @Override
   public SalaryMonthlyDetailResponse getSalaryMonthlyDetailByEmployeeId(
       String employeeId, LocalDate startDate, LocalDate endDate) {
     Optional<HrmResponse> hrmResponse = employeeRepository.getEmployeeByEmployeeId(employeeId);
@@ -43,92 +62,59 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
     Long salaryMonthlyId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, endDate);
+            employeeId, startDate, endDate, ESalaryMonthly.PENDING.name());
     if (hrmResponse.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
     } else if (salaryContractDto.isEmpty()) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "Don't have contract of " + employeeId);
     }
+    WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
+    int standardDayOfWork =
+        Integer.parseInt(
+            String.valueOf(
+                DAYS.between(workingTimeDataDto.getStartTime(), workingTimeDataDto.getEndTime())));
+
+    Double standardPoint =
+        getStandardPointOfWork(standardDayOfWork, hrmResponse.get().getWorking_name());
 
     PointResponse pointResponse =
         getPointResponseListByEmployeeId(
-            employeeId, hrmResponse.get().getWorking_name(), startDate, endDate);
+            employeeId, standardDayOfWork, hrmResponse.get().getWorking_name(), startDate, endDate);
 
-    List<String> listOtType = overtimeRepository.getListOvertimeType();
-    List<OTResponse> otResponses = new ArrayList<>();
-    for (String otType : listOtType) {
-      List<OTDetailResponse> listOTDetail =
-          overtimeRepository.getListOTDetailResponseByEmployeeIdAndDateAndOtType(
-              startDate, endDate, employeeId, EOvertime.getValue(otType));
-      Double totalPointByType =
-          overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDateAndOtType(
-              startDate, endDate, employeeId, EOvertime.getValue(otType));
-      otResponses.add(new OTResponse(otType, listOTDetail, totalPointByType));
-    }
-    Double totalOTPoint =
-        overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDate(
-            startDate, endDate, employeeId);
-    OTResponseList otResponseList = new OTResponseList(otResponses, totalOTPoint);
+    OTResponseList otResponseList = getOtResponseList(employeeId, startDate, endDate);
 
-    List<BonusSalaryResponse> bonusSalaryResponses =
-        bonusSalaryRepository.getListBonusMonthlyBySalaryMonthlyId(salaryMonthlyId);
-    BigDecimal totalBonus =
-        bonusSalaryRepository.sumListBonusMonthlyBySalaryMonthlyId(salaryMonthlyId);
-    BonusSalaryResponseList bonusSalaryResponseList =
-        new BonusSalaryResponseList(bonusSalaryResponses, totalBonus);
+    BonusSalaryResponseList bonusSalaryResponseList = getBonusSalaryResponseList(salaryMonthlyId);
 
-    List<DeductionSalaryResponse> deductionSalaryResponses =
-        deductionSalaryRepository.getListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
-    BigDecimal totalDeduction =
-        deductionSalaryRepository.sumListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
     DeductionSalaryResponseList deductionSalaryResponseList =
-        new DeductionSalaryResponseList(deductionSalaryResponses, totalDeduction);
+        getDeductionSalaryResponseList(salaryMonthlyId);
 
-    List<AdvanceSalaryResponse> advanceSalaryResponses =
-        advanceSalaryRepository.getListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
-    BigDecimal totalAdvance =
-        advanceSalaryRepository.sumListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
     AdvanceSalaryResponseList advanceSalaryResponseList =
-        new AdvanceSalaryResponseList(advanceSalaryResponses, totalAdvance);
+        getAdvanceSalaryResponseList(salaryMonthlyId);
 
-    List<EmployeeTaxResponse> employeeTaxResponses =
-        generalFunction.readTaxDataByEmployeeId(
-            employeeId, salaryContractDto.get().getBase_salary());
-    BigDecimal totalTax = BigDecimal.ZERO;
-    for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
-      totalTax = totalTax.add(employeeTaxResponse.getValue());
-    }
     EmployeeTaxResponseList employeeTaxResponseList =
-        new EmployeeTaxResponseList(employeeTaxResponses, totalTax);
+        getEmployeeTaxResponseList(employeeId, salaryContractDto.get().getBase_salary());
 
-    List<EmployeeInsuranceResponse> employeeInsuranceResponses =
-        generalFunction.readInsuranceDataByEmployeeId(
-            employeeId, salaryContractDto.get().getBase_salary());
-    BigDecimal totalInsurance = BigDecimal.ZERO;
-    for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
-      totalInsurance = totalInsurance.add(employeeInsuranceResponse.getValue());
-    }
     EmployeeInsuranceResponseList employeeInsuranceResponseList =
-        new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);
+        getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary());
 
-//    BigDecimal salaryPerDay =
-//        salaryContractDto
-//            .get()
-//            .getAdditional_salary()
-//            .divide(BigDecimal.valueOf(standardDayOfWork));
+    BigDecimal salaryPerDay =
+        salaryContractDto
+            .get()
+            .getAdditional_salary()
+            .divide(BigDecimal.valueOf(standardDayOfWork));
 
     BigDecimal finalSalary =
         salaryContractDto
             .get()
             .getBase_salary()
             .add(salaryContractDto.get().getAdditional_salary())
-//            .add(salaryPerDay.multiply(BigDecimal.valueOf(totalOTPoint)))
-            .add(totalBonus)
-            .subtract(totalDeduction)
-            .subtract(totalAdvance)
-            .subtract(totalTax)
-            .subtract(totalInsurance);
+            .add(salaryPerDay.multiply(BigDecimal.valueOf(otResponseList.getTotalOTPoint())))
+            .add(bonusSalaryResponseList.getTotal())
+            .subtract(deductionSalaryResponseList.getTotal())
+            .subtract(advanceSalaryResponseList.getTotal())
+            .subtract(employeeTaxResponseList.getTotal())
+            .subtract(employeeInsuranceResponseList.getTotal());
 
     return SalaryMonthlyDetailResponse.builder()
         .salary_monthly_id(salaryMonthlyId)
@@ -139,6 +125,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .end_date(endDate)
         .base_salary(salaryContractDto.get().getBase_salary())
         .final_salary(finalSalary)
+        .standardPoint(standardPoint)
         .pointResponses(pointResponse)
         .otResponseList(otResponseList)
         .bonusSalaryResponseList(bonusSalaryResponseList)
@@ -150,27 +137,56 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   @Override
-  public void insertSalaryMonthlyByEmployeeIdList(
+  public void upsertSalaryMonthlyByEmployeeIdList(
       List<String> employeeIdList, LocalDate startDate, LocalDate endDate) {
-    employeeIdList.forEach(employeeId -> {});
+    List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
+    employeeIdList.forEach(
+        employeeId -> {
+          SalaryMonthlyDetailResponse salaryMonthlyDetailResponse =
+              getSalaryMonthlyDetailByEmployeeId(employeeId, startDate, endDate);
+
+          salaryMonthlyDtoList.add(
+              SalaryMonthlyDto.builder()
+                  .salaryMonthlyId(salaryMonthlyDetailResponse.getSalary_monthly_id())
+                  .standardPoint(salaryMonthlyDetailResponse.getStandardPoint())
+                  .actualPoint(salaryMonthlyDetailResponse.getPointResponses().getTotalWorkPoint())
+                  .otPoint(salaryMonthlyDetailResponse.getOtResponseList().getTotalOTPoint())
+                  .totalDeduction(
+                      salaryMonthlyDetailResponse.getDeductionSalaryResponseList().getTotal())
+                  .totalBonus(salaryMonthlyDetailResponse.getBonusSalaryResponseList().getTotal())
+                  .totalInsurance(
+                      salaryMonthlyDetailResponse.getEmployeeInsuranceResponseList().getTotal())
+                  .totalTax(salaryMonthlyDetailResponse.getEmployeeTaxResponseList().getTotal())
+                  .totalAdvance(
+                      salaryMonthlyDetailResponse.getAdvanceSalaryResponseList().getTotal())
+                  .finalSalary(salaryMonthlyDetailResponse.getFinal_salary())
+                  .build());
+        });
+    salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);
+  }
+
+  private Double getStandardPointOfWork(int standardDayOfWork, String workingName) {
+    if (workingName.equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
+      return standardDayOfWork * 1D;
+    } else if (workingName.equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
+      return standardDayOfWork * 0.5D;
+    }
+    return 0D;
   }
 
   private PointResponse getPointResponseListByEmployeeId(
-      String employeeId, String workingName, LocalDate startDate, LocalDate endDate) {
-    WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
-    int standardDayOfWork =
-        Integer.parseInt(
-            String.valueOf(
-                DAYS.between(workingTimeDataDto.getStartTime(), workingTimeDataDto.getEndTime())));
+      String employeeId,
+      int standardDayOfWork,
+      String workingName,
+      LocalDate startDate,
+      LocalDate endDate) {
+
     if (standardDayOfWork == 0) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Standard day is 0 of " + employeeId);
     }
     Double standardHourWork = Double.parseDouble(String.valueOf(standardDayOfWork / 60));
     Double actualWorkingPoint =
         timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
-    Double otPoint =
-        timekeepingRepository.countPointOTPerMonthByEmployeeId(startDate, endDate, employeeId);
-    Double totalPointWork = actualWorkingPoint + otPoint;
 
     int paidLeaveDay =
         timekeepingRepository.countTimePaidLeavePerMonthByEmployeeId(
@@ -187,6 +203,71 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       paidLeaveHour = paidLeaveDay * 0.5D;
       unpaidLeaveHour = unpaidLeaveDay * 0.5D;
     }
-    return new PointResponse(actualWorkingHour, paidLeaveHour, unpaidLeaveHour, totalPointWork);
+    return new PointResponse(actualWorkingHour, paidLeaveHour, unpaidLeaveHour, actualWorkingPoint);
+  }
+
+  private OTResponseList getOtResponseList(
+      String employeeId, LocalDate startDate, LocalDate endDate) {
+    List<String> listOtType = overtimeRepository.getListOvertimeType();
+    List<OTResponse> otResponses = new ArrayList<>();
+    for (String otType : listOtType) {
+      List<OTDetailResponse> listOTDetail =
+          overtimeRepository.getListOTDetailResponseByEmployeeIdAndDateAndOtType(
+              startDate, endDate, employeeId, EOvertime.getValue(otType));
+      Double totalPointByType =
+          overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDateAndOtType(
+              startDate, endDate, employeeId, EOvertime.getValue(otType));
+      otResponses.add(new OTResponse(otType, listOTDetail, totalPointByType));
+    }
+    Double totalOTPoint =
+        overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDate(
+            startDate, endDate, employeeId);
+    return new OTResponseList(otResponses, totalOTPoint);
+  }
+
+  private BonusSalaryResponseList getBonusSalaryResponseList(Long salaryMonthlyId) {
+    List<BonusSalaryResponse> bonusSalaryResponses =
+        bonusSalaryRepository.getListBonusMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    BigDecimal totalBonus =
+        bonusSalaryRepository.sumListBonusMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    return new BonusSalaryResponseList(bonusSalaryResponses, totalBonus);
+  }
+
+  private DeductionSalaryResponseList getDeductionSalaryResponseList(Long salaryMonthlyId) {
+    List<DeductionSalaryResponse> deductionSalaryResponses =
+        deductionSalaryRepository.getListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    BigDecimal totalDeduction =
+        deductionSalaryRepository.sumListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    return new DeductionSalaryResponseList(deductionSalaryResponses, totalDeduction);
+  }
+
+  private AdvanceSalaryResponseList getAdvanceSalaryResponseList(Long salaryMonthlyId) {
+    List<AdvanceSalaryResponse> advanceSalaryResponses =
+        advanceSalaryRepository.getListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    BigDecimal totalAdvance =
+        advanceSalaryRepository.sumListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    return new AdvanceSalaryResponseList(advanceSalaryResponses, totalAdvance);
+  }
+
+  private EmployeeTaxResponseList getEmployeeTaxResponseList(
+      String employeeId, BigDecimal baseSalary) {
+    List<EmployeeTaxResponse> employeeTaxResponses =
+        generalFunction.readTaxDataByEmployeeId(employeeId, baseSalary);
+    BigDecimal totalTax = BigDecimal.ZERO;
+    for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
+      totalTax = totalTax.add(employeeTaxResponse.getValue());
+    }
+    return new EmployeeTaxResponseList(employeeTaxResponses, totalTax);
+  }
+
+  private EmployeeInsuranceResponseList getEmployeeInsuranceResponseList(
+      String employeeId, BigDecimal baseSalary) {
+    List<EmployeeInsuranceResponse> employeeInsuranceResponses =
+        generalFunction.readInsuranceDataByEmployeeId(employeeId, baseSalary);
+    BigDecimal totalInsurance = BigDecimal.ZERO;
+    for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
+      totalInsurance = totalInsurance.add(employeeInsuranceResponse.getValue());
+    }
+    return new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);
   }
 }

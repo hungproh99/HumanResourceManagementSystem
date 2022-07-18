@@ -1,6 +1,7 @@
-package com.csproject.hrm.dto.response;
+package com.csproject.hrm.dto.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +11,9 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalaryMonthlyResponse {
+@Builder
+public class SalaryMonthlyDto {
   private Long salaryMonthlyId;
-  private String employeeId;
-  private String position;
   private Double standardPoint;
   private Double actualPoint;
   private Double otPoint;
@@ -23,7 +23,4 @@ public class SalaryMonthlyResponse {
   private BigDecimal totalTax;
   private BigDecimal totalAdvance;
   private BigDecimal finalSalary;
-  private LocalDate startDate;
-  private LocalDate endDate;
-  private String salaryStatus;
 }

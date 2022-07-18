@@ -55,6 +55,10 @@ public class SalaryMonthly {
   @Column(name = "end_date")
   private LocalDate endDate;
 
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "salary_status_id")
+  private SalaryStatus salaryStatus;
+
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
   @JoinColumn(name = "salary_contract_id")
   private SalaryContract salaryContract;

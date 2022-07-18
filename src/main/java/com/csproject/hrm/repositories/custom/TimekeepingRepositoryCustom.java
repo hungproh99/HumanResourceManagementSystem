@@ -66,7 +66,4 @@ public interface TimekeepingRepositoryCustom {
 
   Double countPointDayWorkPerMonthByEmployeeId(
       LocalDate firstDate, LocalDate lastDate, String employeeId);
-
-  Double countPointOTPerMonthByEmployeeId(
-      LocalDate firstDate, LocalDate lastDate, String employeeId);
 }
