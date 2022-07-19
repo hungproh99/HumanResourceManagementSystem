@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class SalaryMonthlyResponse {
   private Long salaryMonthlyId;
   private String employeeId;
+  private String fullName;
   private String position;
   private Double standardPoint;
   private Double actualPoint;

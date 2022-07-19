@@ -174,8 +174,10 @@ public class HrmController {
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("text/csv; charset=UTF-8");
-    servletResponse.addHeader("Content-Disposition", "attachment; filename=\"employees.csv\"");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=\"employees_" + timestamp.getTime() + ".csv\"");
     humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }

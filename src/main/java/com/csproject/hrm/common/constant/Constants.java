@@ -126,4 +126,5 @@ public class Constants {
   public static final String START_DATE = "startDate";
   public static final String END_DATE = "endDate";
   public static final String SALARY_STATUS_PARAM = "salaryStatus";
+  public static final String NULL_PARAMETER = "Null Parameter";
 }

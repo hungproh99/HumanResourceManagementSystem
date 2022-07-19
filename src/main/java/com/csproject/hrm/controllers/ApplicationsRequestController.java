@@ -1,6 +1,8 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -155,9 +157,11 @@ public class ApplicationsRequestController {
           throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader(
-            "Content-Disposition", "attachment; filename=\"Application_Request.csv\"");
+        "Content-Disposition",
+        "attachment; filename=\"Application_Request_" + timestamp.getTime() + ".csv\"");
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
@@ -202,9 +206,11 @@ public class ApplicationsRequestController {
           throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader(
-            "Content-Disposition", "attachment; filename=\"Application_Request.csv\"");
+        "Content-Disposition",
+        "attachment; filename=\"Application_Request_" + timestamp.getTime() + ".csv\"");
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);

@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -44,12 +45,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
 
   @Override
   public SalaryMonthlyResponseList getAllSalaryMonthly(
-      QueryParam queryParam, List<String> employeeIdList) {
+      QueryParam queryParam, List<String> employeeIdList, boolean isManager) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    Condition condition = DSL.noCondition();
     for (String employeeId : employeeIdList) {
-      Condition condition = DSL.noCondition();
-      conditions.add(condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
+      condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
     }
+    if (!isManager) {
+      condition.and(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()));
+    }
+    conditions.add(condition);
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     List<SalaryMonthlyResponse> salaryMonthlyResponses =
@@ -57,6 +62,44 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .fetchInto(SalaryMonthlyResponse.class);
     int total = countAllSalaryMonthly(conditions);
     return new SalaryMonthlyResponseList(salaryMonthlyResponses, total);
+  }
+
+  @Override
+  public Optional<SalaryMonthlyResponse> getSalaryMonthlyBySalaryId(Long salaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            SALARY_MONTHLY.SALARY_ID.as("salaryMonthlyId"),
+            EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+            EMPLOYEE.FULL_NAME.as("fullName"),
+            JOB.POSITION.as("position"),
+            SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
+            SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
+            SALARY_MONTHLY.OT_POINT.as("otPoint"),
+            SALARY_MONTHLY.TOTAL_DEDUCTION.as("totalDeduction"),
+            SALARY_MONTHLY.TOTAL_BONUS.as("totalBonus"),
+            SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
+            SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
+            SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
+            SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
+            SALARY_MONTHLY.START_DATE.as("startDate"),
+            SALARY_MONTHLY.END_DATE.as("endDate"),
+            SALARY_STATUS.NAME.as("salaryStatus"))
+        .from(SALARY_MONTHLY)
+        .leftJoin(SALARY_CONTRACT)
+        .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(EMPLOYEE)
+        .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(SALARY_STATUS)
+        .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
+        .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
+        .fetchOptionalInto(SalaryMonthlyResponse.class);
   }
 
   @Override
@@ -99,6 +142,21 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .map(this::updateSalaryMonthlyByEmployee)
             .toArray(Query[]::new);
     dslContext.batch(queries).execute();
+  }
+
+  @Override
+  public List<SalaryMonthlyResponse> getListSalaryMonthlyToExport(
+      QueryParam queryParam, List<Long> list) {
+    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    Condition condition = DSL.noCondition();
+    for (Long salaryMonthId : list) {
+      condition.or(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthId));
+    }
+    conditions.add(condition);
+    List<OrderField<?>> sortFields =
+        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    return getAllSalaryMonthly(conditions, sortFields, queryParam.pagination)
+        .fetchInto(SalaryMonthlyResponse.class);
   }
 
   private InsertReturningStep<?> insertSalaryMonthlyByEmployee(
@@ -187,6 +245,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .select(
             SALARY_MONTHLY.SALARY_ID.as("salaryMonthlyId"),
             EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+            EMPLOYEE.FULL_NAME.as("fullName"),
             JOB.POSITION.as("position"),
             SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
             SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),

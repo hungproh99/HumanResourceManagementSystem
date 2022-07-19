@@ -1,7 +1,6 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
 import com.csproject.hrm.dto.response.TimekeepingResponsesList;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -48,8 +47,11 @@ public class TimekeepingController {
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("text/csv; charset=UTF-8");
-    servletResponse.addHeader("Content-Disposition", "attachment; filename=\"timekeeping.csv\"");
+    servletResponse.addHeader(
+        "Content-Disposition",
+        "attachment; filename=\"timekeeping_" + timestamp.getTime() + ".csv\"");
     timekeepingService.exportTimekeepingToCsv(servletResponse.getWriter(), queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
