@@ -12,8 +12,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class EmployeeInsuranceResponse {
-  private Long insurance_id;
+  private Long employee_insurance_id;
   private BigDecimal value;
+  private String policy_type;
   private String insurance_name;
-  private String insurance_value;
+  private Double insurance_value;
 }

@@ -3,6 +3,7 @@ package com.csproject.hrm.services.impl;
 import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
+import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
@@ -26,6 +27,8 @@ import java.time.*;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
@@ -43,6 +46,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Autowired AdvanceSalaryRepository advanceSalaryRepository;
   @Autowired PolicyRepository policyRepository;
   @Autowired GeneralFunction generalFunction;
+  @Autowired SalaryCalculator salaryCalculator;
 
   @Override
   public ListApplicationsRequestResponse getAllApplicationRequestReceive(
@@ -333,8 +337,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     LocalDate currentDate = LocalDate.now();
     LocalDate startDate = null, endDate = null, date = null;
     LocalTime startTime = null, endTime = null;
-    Long overtimeType = null,
-        deductionType = null,
+    Long deductionType = null,
         bonusType = null,
         desiredPosition = null,
         desiredArea = null,
@@ -362,9 +365,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           break;
         case "Date":
           date = LocalDate.parse(i.getValue());
-          break;
-        case "Overtime_Type":
-          overtimeType = Long.parseLong(i.getValue());
           break;
         case "Desired_Position":
           desiredPosition = Long.parseLong(i.getValue());
@@ -403,7 +403,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             endDate,
             startTime,
             endTime,
-            overtimeType,
             currentDate,
             employeeId,
             requestName,
@@ -457,7 +456,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       LocalDate endDate,
       LocalTime startTime,
       LocalTime endTime,
-      Long overtimeType,
       LocalDate currentDate,
       String employeeId,
       String requestName,
@@ -466,10 +464,34 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         || endDate == null
         || startTime == null
         || endTime == null
-        || overtimeType == null
         || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
+    List<LocalDate> holidayList = salaryCalculator.getAllHolidayByYear(currentDate);
+    List<LocalDate> weekendList = salaryCalculator.getAllWeekendByYear(currentDate);
+    boolean isHoliday = false;
+    boolean isWeekend = false;
+    Long overtimeType = null;
+    for (LocalDate date : holidayList) {
+      if (currentDate.equals(date)) {
+        isHoliday = true;
+        break;
+      }
+    }
+    for (LocalDate date : weekendList) {
+      if (currentDate.equals(date)) {
+        isWeekend = true;
+        break;
+      }
+    }
+    if (isHoliday) {
+      overtimeType = EOvertime.getValue(EOvertime.HOLIDAY.name());
+    } else if (isWeekend) {
+      overtimeType = EOvertime.getValue(EOvertime.WEEKEND.name());
+    } else {
+      overtimeType = EOvertime.getValue(EOvertime.IN_WEEK.name());
+    }
+
     if (endDate.isAfter(currentDate)) {
       timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, currentDate, endDate);
     }
@@ -566,7 +588,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
-    salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
+    LocalDate startDate = date.with(firstDayOfMonth());
+    LocalDate lastDate = date.with(lastDayOfMonth());
+    salaryId =
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     bonusSalaryRepository.insertBonusSalaryByEmployeeId(
         salaryId, date, description, bonusType, value);
 
@@ -589,7 +615,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
-    salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
+    LocalDate startDate = date.with(firstDayOfMonth());
+    LocalDate lastDate = date.with(lastDayOfMonth());
+    salaryId =
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
         salaryId, date, description, deductionType, value);
     if (deductionType.equals(EDeduction.getValue("FIRE")))
@@ -609,7 +639,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (date == null || description == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
-    salaryId = salaryMonthlyRepository.getSalaryIdByEmployeeIdAndDate(employeeId, date);
+    LocalDate startDate = date.with(firstDayOfMonth());
+    LocalDate lastDate = date.with(lastDayOfMonth());
+    salaryId =
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
 
     applicationsRequestRepository.updateStatusApplication(
@@ -1120,5 +1154,40 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       System.out.println(employeeTaxDto);
       //      applicationsRequestRepository.createApproveTaxEnrollment(employeeTaxDto);
     }
+  }
+
+  @Override
+  public void updateAllApplicationRequestRemind(LocalDateTime checkDate) {
+    List<ApplicationRequestRemindResponse> applicationRequestRemindResponses =
+        applicationsRequestRepository.getAllApplicationRequestToRemind(checkDate);
+
+    applicationRequestRemindResponses.forEach(
+        applicationRequestRemindResponse -> {
+          String createName =
+              applicationRequestRemindResponse.getFull_name()
+                  + " "
+                  + applicationRequestRemindResponse.getEmployee_id();
+
+          String approveName =
+              employeeRepository.getEmployeeNameByEmployeeId(
+                  applicationRequestRemindResponse.getApprover());
+
+          String approveEmail =
+              employeeRepository.getEmployeeEmailByEmployeeId(
+                  applicationRequestRemindResponse.getApprover());
+
+          generalFunction.sendEmailRemindRequest(
+              approveName,
+              createName,
+              applicationRequestRemindResponse.getCreate_date().toString(),
+              applicationRequestRemindResponse.getChecked_by(),
+              applicationRequestRemindResponse.getApplication_request_id().toString(),
+              FROM_EMAIL,
+              TO_EMAIL,
+              "Remind Request");
+
+          applicationsRequestRepository.updateAllApplicationRequestRemind(
+              applicationRequestRemindResponse.getApplication_request_id(), Boolean.TRUE);
+        });
   }
 }

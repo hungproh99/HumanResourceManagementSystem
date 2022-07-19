@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GradeDto {
-    private Long grade_id;
-    private String name;
-    private String description;
+  private Long grade_id;
+  private String name;
+  private String description;
 }

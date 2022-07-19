@@ -17,5 +17,6 @@ public class OTDetailResponse {
   private LocalDate date;
   private LocalTime start_time;
   private LocalTime end_time;
-  private Double point;
+  private Double otPoint;
+  private String overtime_type;
 }

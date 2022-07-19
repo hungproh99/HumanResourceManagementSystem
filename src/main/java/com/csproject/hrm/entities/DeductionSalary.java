@@ -24,7 +24,7 @@ public class DeductionSalary {
   @Column(name = "value")
   private BigDecimal value;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = DeductionType.class)
   @JoinColumn(name = "deduction_type_id")
   private DeductionType deductionType;
 
@@ -34,7 +34,7 @@ public class DeductionSalary {
   @Column(name = "date")
   private LocalDate date;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryMonthly.class)
   @JoinColumn(name = "salary_id")
   private SalaryMonthly salaryMonthly;
 }

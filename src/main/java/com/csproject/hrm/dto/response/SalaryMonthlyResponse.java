@@ -1,31 +1,30 @@
 package com.csproject.hrm.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class SalaryMonthlyResponse {
-  private Long salary_id;
-  private String employee_id;
-  private String full_name;
+  private Long salaryMonthlyId;
+  private String employeeId;
+  private String fullName;
   private String position;
-  private Date start_date;
-  private Date end_date;
-  private BigDecimal base_salary;
-  private BigDecimal final_salary;
-  private PointResponseList pointResponsesList;
-  private OTResponseList otResponseList;
-  private BonusSalaryResponseList bonusSalaryResponseList;
-  private DeductionSalaryResponseList deductionSalaryResponseList;
-  private AdvanceSalaryResponseList advanceSalaryResponseList;
-  private EmployeeTaxResponseList employeeTaxResponseList;
-  private EmployeeInsuranceResponseList employeeInsuranceResponseList;
+  private Double standardPoint;
+  private Double actualPoint;
+  private Double otPoint;
+  private BigDecimal totalDeduction;
+  private BigDecimal totalBonus;
+  private BigDecimal totalInsurance;
+  private BigDecimal totalTax;
+  private BigDecimal totalAdvance;
+  private BigDecimal finalSalary;
+  private LocalDate startDate;
+  private LocalDate endDate;
+  private String salaryStatus;
 }

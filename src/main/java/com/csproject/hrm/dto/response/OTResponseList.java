@@ -13,5 +13,5 @@ import java.util.List;
 @Builder
 public class OTResponseList {
   private List<OTResponse> otResponseList;
-  private Double total;
+  private Double totalOTPoint;
 }

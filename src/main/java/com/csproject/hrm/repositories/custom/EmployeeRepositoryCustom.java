@@ -10,6 +10,7 @@ import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeRepositoryCustom {
@@ -44,4 +45,6 @@ public interface EmployeeRepositoryCustom {
   String getEmployeeEmailByEmployeeId(String employeeId);
 
   List<String> getAllEmployeeIdActive();
+
+  Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId);
 }

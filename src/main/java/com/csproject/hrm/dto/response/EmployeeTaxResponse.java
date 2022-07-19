@@ -12,8 +12,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class EmployeeTaxResponse {
-  private Long tax_id;
+  private Long employee_tax_id;
   private BigDecimal value;
+  private String policy_type;
   private String tax_name;
-  private String tax_value;
+  private Double tax_value;
 }

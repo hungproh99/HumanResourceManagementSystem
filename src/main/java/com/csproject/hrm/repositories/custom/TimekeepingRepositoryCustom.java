@@ -1,6 +1,10 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.dto.TimekeepingDto;
+import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
+import com.csproject.hrm.dto.response.ListTimekeepingStatusResponse;
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -44,9 +48,7 @@ public interface TimekeepingRepositoryCustom {
       LocalTime endTime,
       Long overtimeType);
 
-  void insertTimekeeping(Double point, LocalDate date, String employeeId);
-
-  void updatePointPerDay(Double point, LocalDate date, String employeeId);
+  void insertTimekeeping(TimekeepingDto timekeepingDto, String timekeepingStatus);
 
   LocalTime getFirstTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
@@ -55,4 +57,17 @@ public interface TimekeepingRepositoryCustom {
   int countPaidLeaveOfEmployeeByYear(String employeeID);
 
   Integer countOvertimeOfEmployeeByYear(String employeeID);
+
+  void updatePointPerDay(List<TimekeepingDto> timekeepingDtoList);
+
+  boolean checkExistDateInTimekeeping(LocalDate date, String employeeId);
+
+  int countTimeDayOffPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  int countTimePaidLeavePerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  Double countPointDayWorkPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId);
 }

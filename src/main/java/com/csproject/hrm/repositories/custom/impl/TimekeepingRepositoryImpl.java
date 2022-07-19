@@ -1,7 +1,10 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -614,29 +617,61 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public void insertTimekeeping(Double point, LocalDate date, String employeeId) {
+  public void insertTimekeeping(TimekeepingDto timekeepingDto, String timekeepingStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
+    final var insertTimekeeping =
         dslContext
             .insertInto(
                 TIMEKEEPING,
-                TIMEKEEPING.AMOUNT_WORK_PER_DAY,
+                TIMEKEEPING.POINT_WORK_DAY,
+                TIMEKEEPING.POINT_OT_DAY,
                 TIMEKEEPING.DATE,
                 TIMEKEEPING.EMPLOYEE_ID)
-            .values(point, date, employeeId)
+            .values(
+                timekeepingDto.getPointWorkDay(),
+                timekeepingDto.getPointOTDay(),
+                timekeepingDto.getDate(),
+                timekeepingDto.getEmployeeId())
+            .returningResult(TIMEKEEPING.TIMEKEEPING_ID)
+            .fetchOne();
+    final var insertListTimekeepingStatus =
+        dslContext
+            .insertInto(
+                LIST_TIMEKEEPING_STATUS,
+                LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
+                LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID)
+            .values(
+                insertTimekeeping.getValue(TIMEKEEPING.TIMEKEEPING_ID),
+                ETimekeepingStatus.getValue(timekeepingStatus))
             .execute();
   }
 
   @Override
-  public void updatePointPerDay(Double point, LocalDate date, String employeeId) {
+  public void updatePointPerDay(List<TimekeepingDto> timekeepingDtoList) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
+    final var queries =
+        timekeepingDtoList.stream()
+            .map(
+                timekeepingDto ->
+                    dslContext
+                        .update(TIMEKEEPING)
+                        .set(TIMEKEEPING.POINT_WORK_DAY, timekeepingDto.getPointWorkDay())
+                        .set(TIMEKEEPING.POINT_OT_DAY, timekeepingDto.getPointOTDay())
+                        .where(TIMEKEEPING.EMPLOYEE_ID.eq(timekeepingDto.getEmployeeId()))
+                        .and(TIMEKEEPING.DATE.eq(timekeepingDto.getDate())))
+            .toArray(Query[]::new);
+    dslContext.batch(queries).execute();
+  }
+
+  @Override
+  public boolean checkExistDateInTimekeeping(LocalDate date, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
         dslContext
-            .update(TIMEKEEPING)
-            .set(TIMEKEEPING.AMOUNT_WORK_PER_DAY, point)
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
             .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
-            .and(TIMEKEEPING.DATE.eq(date))
-            .execute();
+            .and(TIMEKEEPING.DATE.eq(date)));
   }
 
   @Override
@@ -686,6 +721,61 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .and(TIMEKEEPING.DATE.eq(date))
         .and(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
         .fetchOneInto(LocalTime.class);
+  }
+
+  @Override
+  public int countTimeDayOffPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchCount(
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
+            .leftJoin(LIST_TIMEKEEPING_STATUS)
+            .on(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .leftJoin(TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+            .where(TIMEKEEPING_STATUS.NAME.eq(ETimekeepingStatus.DAY_OFF.name()))
+            .and(TIMEKEEPING.DATE.ge(firstDate))
+            .and(TIMEKEEPING.DATE.le(lastDate))
+            .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
+  }
+
+  @Override
+  public int countTimePaidLeavePerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchCount(
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
+            .leftJoin(LIST_TIMEKEEPING_STATUS)
+            .on(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .leftJoin(TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+            .where(TIMEKEEPING_STATUS.NAME.eq(ETimekeepingStatus.PAID_LEAVE.name()))
+            .and(TIMEKEEPING.DATE.ge(firstDate))
+            .and(TIMEKEEPING.DATE.le(lastDate))
+            .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
+  }
+
+  @Override
+  public Double countPointDayWorkPerMonthByEmployeeId(
+      LocalDate firstDate, LocalDate lastDate, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(sum(TIMEKEEPING.POINT_WORK_DAY))
+        .from(TIMEKEEPING)
+        .leftJoin(EMPLOYEE)
+        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .and(TIMEKEEPING.DATE.ge(firstDate))
+        .and(TIMEKEEPING.DATE.le(lastDate))
+        .fetchOneInto(Double.class);
   }
 
   @Override

@@ -54,4 +54,8 @@ public class Uri {
   public static final String URI_DOWNLOAD_CSV_REQUEST_RECEIVE = "/download_csv_request_receive";
   public static final String URI_DOWNLOAD_EXCEL_REQUEST_SEND = "/download_excel_request_send";
   public static final String URI_DOWNLOAD_CSV_REQUEST_SEND = "/download_csv_request_send";
+  public static final String URI_GET_ALL_SALARY_MONTHLY = "/get_all_salary_monthly";
+  public static final String URI_GET_SALARY_MONTHLY_DETAIL = "/get_salary_monthly_detail";
+  public static final String URI_DOWNLOAD_EXCEL_SALARY_MONTHLY = "/download_excel_salary_monthly";
+  public static final String URI_DOWNLOAD_CSV_SALARY_MONTHLY = "/download_csv_salary_monthly";
 }

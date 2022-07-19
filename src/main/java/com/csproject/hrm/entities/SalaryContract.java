@@ -34,6 +34,9 @@ public class SalaryContract {
   @Column(name = "base_salary")
   private BigDecimal baseSalary;
 
+  @Column(name = "additional_salary")
+  private BigDecimal additional_salary;
+
   @Column(name = "start_date")
   private LocalDate startDate;
 
