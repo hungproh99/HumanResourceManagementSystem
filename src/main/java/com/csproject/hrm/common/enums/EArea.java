@@ -6,10 +6,14 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.AREA_INVALID;
 
 public enum EArea {
-  BACK_OFFICE("Back Office", 1);
+  BACK_OFFICE("Back Office", 1),
+  SALES("Sales", 2),
+  MARKETING("Marketing", 3),
+  ACCOUNTANT("Accountant", 4),
+  HR("HR", 5);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   EArea(String label, long value) {
     this.label = label;
