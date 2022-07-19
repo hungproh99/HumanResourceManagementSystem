@@ -1,6 +1,5 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.PolicyDto;
 import com.csproject.hrm.dto.response.PolicyCategoryResponse;
 import com.csproject.hrm.dto.response.PolicyResponse;
 import com.csproject.hrm.jooq.QueryParam;
@@ -17,5 +16,5 @@ public interface PolicyRepositoryCustom {
 
   Long getTaxPolicyTypeIDByTaxName(String taxName);
 
-  Optional<PolicyDto> getPolicyDtoByPolicyType(String policyType);
+  Optional<String> getPolicyDtoByPolicyType(String policyName);
 }

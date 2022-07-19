@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Service
 public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
@@ -81,17 +83,14 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "Don't have contract of " + employeeId);
     }
-    WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
-    int standardDayOfWork =
-        Integer.parseInt(
-            String.valueOf(
-                DAYS.between(workingTimeDataDto.getStartTime(), workingTimeDataDto.getEndTime())));
-
     Double standardPoint = salaryMonthlyResponse.get().getStandardPoint();
 
     PointResponse pointResponse =
         getPointResponseListByEmployeeId(
-            employeeId, standardDayOfWork, hrmResponse.get().getWorking_name(), startDate, endDate);
+            employeeId,
+            hrmResponse.get().getWorking_name(),
+            startDate,
+            endDate);
 
     OTResponseList otResponseList =
         new OTResponseList(
@@ -157,20 +156,15 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
                 HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
           } else if (salaryContractDto.isEmpty()) {
             throw new CustomErrorException(
-                HttpStatus.BAD_REQUEST, "Don't have contract of " + employeeId);
+                HttpStatus.BAD_REQUEST, "Don't have salary contract of " + employeeId);
           }
-          WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
           int standardDayOfWork =
-              Integer.parseInt(
-                  String.valueOf(
-                      DAYS.between(
-                          workingTimeDataDto.getStartTime(), workingTimeDataDto.getEndTime())));
+              Integer.parseInt(String.valueOf(DAYS.between(startDate, endDate))) + 1;
           Double standardPoint =
               getStandardPointOfWork(standardDayOfWork, hrmResponse.get().getWorking_name());
           Double actualWorkingPoint =
               getPointResponseListByEmployeeId(
                       employeeId,
-                      standardDayOfWork,
                       hrmResponse.get().getWorking_name(),
                       startDate,
                       endDate)
@@ -194,30 +188,32 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
               salaryContractDto
                   .get()
                   .getAdditional_salary()
-                  .divide(BigDecimal.valueOf(standardDayOfWork));
+                  .divide(BigDecimal.valueOf(standardDayOfWork), 3, RoundingMode.HALF_UP);
           BigDecimal finalSalary =
               salaryContractDto
                   .get()
                   .getBase_salary()
                   .add(salaryContractDto.get().getAdditional_salary())
-                  .add(salaryPerDay.multiply(BigDecimal.valueOf(totalOTPoint)))
-                  .add(totalBonus)
-                  .subtract(totalDeduction)
-                  .subtract(totalAdvance)
-                  .subtract(totalTax)
-                  .subtract(totalInsurance);
+                  .add(
+                      salaryPerDay.multiply(
+                          BigDecimal.valueOf(totalOTPoint != null ? totalOTPoint : 0D)))
+                  .add(totalBonus != null ? totalBonus : BigDecimal.ZERO)
+                  .subtract(totalDeduction != null ? totalDeduction : BigDecimal.ZERO)
+                  .subtract(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
+                  .subtract(totalTax != null ? totalTax : BigDecimal.ZERO)
+                  .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO);
 
           salaryMonthlyDtoList.add(
               SalaryMonthlyDto.builder()
                   .salaryMonthlyId(salaryMonthlyId)
                   .standardPoint(standardPoint)
-                  .actualPoint(actualWorkingPoint)
-                  .otPoint(totalOTPoint)
-                  .totalDeduction(totalBonus)
-                  .totalBonus(totalDeduction)
-                  .totalInsurance(totalAdvance)
-                  .totalTax(totalTax)
-                  .totalAdvance(totalInsurance)
+                  .actualPoint(actualWorkingPoint != null ? actualWorkingPoint : 0D)
+                  .otPoint(totalOTPoint != null ? totalOTPoint : 0D)
+                  .totalDeduction(totalBonus != null ? totalBonus : BigDecimal.ZERO)
+                  .totalBonus(totalDeduction != null ? totalDeduction : BigDecimal.ZERO)
+                  .totalInsurance(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
+                  .totalTax(totalTax != null ? totalTax : BigDecimal.ZERO)
+                  .totalAdvance(totalInsurance != null ? totalInsurance : BigDecimal.ZERO)
                   .finalSalary(finalSalary)
                   .build());
         });
@@ -295,9 +291,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private Double getStandardPointOfWork(int standardDayOfWork, String workingName) {
-    if (workingName.equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
+    if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.FULL_TIME.name()))) {
       return standardDayOfWork * 1D;
-    } else if (workingName.equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
+    } else if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.PART_TIME.name()))) {
       return standardDayOfWork * 0.5D;
     }
     return 0D;
@@ -305,17 +301,15 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
 
   private PointResponse getPointResponseListByEmployeeId(
       String employeeId,
-      int standardDayOfWork,
       String workingName,
       LocalDate startDate,
       LocalDate endDate) {
-
-    if (standardDayOfWork == 0) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Standard day is 0 of " + employeeId);
-    }
-    Double standardHourWork = Double.parseDouble(String.valueOf(standardDayOfWork / 60));
     Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId)
+                != null
+            ? timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+                startDate, endDate, employeeId)
+            : 0D;
 
     int paidLeaveDay =
         timekeepingRepository.countTimePaidLeavePerMonthByEmployeeId(
@@ -323,12 +317,12 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     int unpaidLeaveDay =
         timekeepingRepository.countTimeDayOffPerMonthByEmployeeId(startDate, endDate, employeeId);
     Double actualWorkingHour = 0D, paidLeaveHour = 0D, unpaidLeaveHour = 0D;
-    if (workingName.equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
-      actualWorkingHour = actualWorkingPoint * standardHourWork;
+    if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.FULL_TIME.name()))) {
+      actualWorkingHour = actualWorkingPoint;
       paidLeaveHour = paidLeaveDay * 1D;
       unpaidLeaveHour = unpaidLeaveDay * 1D;
-    } else if (workingName.equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
-      actualWorkingHour = actualWorkingPoint * standardHourWork;
+    } else if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.PART_TIME.name()))) {
+      actualWorkingHour = actualWorkingPoint;
       paidLeaveHour = paidLeaveDay * 0.5D;
       unpaidLeaveHour = unpaidLeaveDay * 0.5D;
     }

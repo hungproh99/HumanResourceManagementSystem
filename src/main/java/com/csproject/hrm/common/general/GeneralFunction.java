@@ -1,7 +1,10 @@
 package com.csproject.hrm.common.general;
 
 import com.csproject.hrm.common.enums.EPolicyType;
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.OvertimeDataDto;
+import com.csproject.hrm.dto.dto.OvertimePoint;
+import com.csproject.hrm.dto.dto.RangePolicy;
+import com.csproject.hrm.dto.dto.WorkingTimeDataDto;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.EmployeeInsuranceResponse;
 import com.csproject.hrm.dto.response.EmployeeTaxResponse;
@@ -213,13 +216,12 @@ public class GeneralFunction {
 
   public WorkingTimeDataDto readWorkingTimeData() {
     WorkingTimeDataDto workingTimeDataDto = new WorkingTimeDataDto();
-    Optional<PolicyDto> policyWorkingTimeDto =
+    Optional<String> policyWorkingTimeDto =
         policyRepository.getPolicyDtoByPolicyType(EPolicyType.WORKING_TIME.name());
     if (policyWorkingTimeDto.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy working time is empty");
     }
-    Set<Map.Entry<String, String>> hashMap =
-        splitData(policyWorkingTimeDto.get().getData()).entrySet();
+    Set<Map.Entry<String, String>> hashMap = splitData(policyWorkingTimeDto.get()).entrySet();
 
     for (Map.Entry<String, String> i : hashMap) {
       switch (i.getKey()) {
@@ -239,13 +241,12 @@ public class GeneralFunction {
 
   public OvertimeDataDto readOvertimeData() {
     OvertimeDataDto overtimeDataDto = new OvertimeDataDto();
-    Optional<PolicyDto> policyOvertimeDto =
+    Optional<String> policyOvertimeDto =
         policyRepository.getPolicyDtoByPolicyType(EPolicyType.OT.name());
     if (policyOvertimeDto.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy overtime is empty");
     }
-    Set<Map.Entry<String, String>> hashMap =
-        splitData(policyOvertimeDto.get().getData()).entrySet();
+    Set<Map.Entry<String, String>> hashMap = splitData(policyOvertimeDto.get()).entrySet();
     for (Map.Entry<String, String> i : hashMap) {
       switch (i.getKey()) {
         case "Year":
@@ -272,12 +273,12 @@ public class GeneralFunction {
     List<EmployeeTaxResponse> employeeTaxResponses =
         employeeTaxRepository.getListTaxByEmployeeId(employeeId);
     for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
-      Optional<PolicyDto> policyTaxDto =
+      Optional<String> policyTaxDto =
           policyRepository.getPolicyDtoByPolicyType(employeeTaxResponse.getPolicy_type());
       if (policyTaxDto.isEmpty()) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
       }
-      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get().getData()).entrySet();
+      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
       for (Map.Entry<String, String> i : hashMap) {
         employeeTaxResponse.setTax_name(i.getKey());
         List<RangePolicy> rangePolicyList = splitRange(i.getValue());
@@ -288,10 +289,10 @@ public class GeneralFunction {
             value =
                 baseSalary.multiply(
                     rangePolicy.getValue().divide(BigDecimal.TEN).divide(BigDecimal.TEN));
+            employeeTaxResponse.setTax_value(rangePolicy.getValue().doubleValue());
             break;
           }
         }
-        employeeTaxResponse.setTax_value(Double.parseDouble(i.getValue()));
         employeeTaxResponse.setValue(value);
       }
     }
@@ -303,12 +304,12 @@ public class GeneralFunction {
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
         employeeInsuranceRepository.getListInsuranceByEmployeeId(employeeId);
     for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
-      Optional<PolicyDto> policyTaxDto =
+      Optional<String> policyTaxDto =
           policyRepository.getPolicyDtoByPolicyType(employeeInsuranceResponse.getPolicy_type());
       if (policyTaxDto.isEmpty()) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
       }
-      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get().getData()).entrySet();
+      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
       for (Map.Entry<String, String> i : hashMap) {
         employeeInsuranceResponse.setInsurance_name(i.getKey());
         employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));

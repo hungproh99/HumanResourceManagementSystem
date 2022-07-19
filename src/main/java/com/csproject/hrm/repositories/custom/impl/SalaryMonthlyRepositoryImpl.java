@@ -106,24 +106,19 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   public Long getSalaryMonthlyIdByEmployeeIdAndDate(
       String employeeId, LocalDate startDate, LocalDate endDate, String salaryStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    TableLike<?> contractTable =
-        dslContext
-            .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
-            .from(WORKING_CONTRACT)
-            .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId))
-            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue());
     Long salaryContractId =
         dslContext
             .select(SALARY_CONTRACT.SALARY_CONTRACT_ID)
             .from(SALARY_CONTRACT)
-            .where(
-                SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(
-                    contractTable.field(WORKING_CONTRACT.WORKING_CONTRACT_ID)))
-            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .leftJoin(WORKING_CONTRACT)
+            .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .where(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId))
             .fetchOneInto(Long.class);
     boolean checkExist = checkExistSalaryMonthly(startDate, endDate, salaryContractId);
     if (!checkExist) {
-      insertSalaryMonthlyByEmployee(employeeId, startDate, endDate, salaryStatus).execute();
+      insertSalaryMonthlyByEmployee(salaryContractId, startDate, endDate, salaryStatus).execute();
     }
     return dslContext
         .select(SALARY_MONTHLY.SALARY_ID)
@@ -160,24 +155,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   }
 
   private InsertReturningStep<?> insertSalaryMonthlyByEmployee(
-      String employeeId, LocalDate startDate, LocalDate endDate, String salaryStatus) {
+      Long salaryContractId, LocalDate startDate, LocalDate endDate, String salaryStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    TableLike<?> contractTable =
-        dslContext
-            .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
-            .from(WORKING_CONTRACT)
-            .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId))
-            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue());
-    Long salaryContractId =
-        dslContext
-            .select(SALARY_CONTRACT.SALARY_CONTRACT_ID)
-            .from(SALARY_CONTRACT)
-            .where(
-                SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(
-                    contractTable.field(WORKING_CONTRACT.WORKING_CONTRACT_ID)))
-            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
-            .fetchOneInto(Long.class);
-
     return dslContext
         .insertInto(
             SALARY_MONTHLY,

@@ -13,7 +13,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @Builder
 public class AdvanceSalaryResponse {
-  private Long advance_id;
+  private Long advances_id;
   private BigDecimal value;
   private Date date;
   private String description;
