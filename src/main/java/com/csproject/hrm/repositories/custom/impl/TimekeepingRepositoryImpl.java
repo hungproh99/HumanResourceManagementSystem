@@ -777,4 +777,95 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .and(TIMEKEEPING.DATE.le(lastDate))
         .fetchOneInto(Double.class);
   }
+
+  @Override
+  public int countPaidLeaveOfEmployeeByYear(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchCount(
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .leftJoin(LIST_TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
+            .leftJoin(TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+            .where(TIMEKEEPING.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+            .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
+            .and(TIMEKEEPING_STATUS.NAME.eq("PAID_LEAVE")));
+  }
+
+  @Override
+  public Integer countOvertimeOfEmployeeByYear(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    TableLike<?> rowNumberAsc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    TableLike<?> rowNumberDesc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    TableLike<?> firstTimeCheckIn =
+        dslContext
+            .select()
+            .from(rowNumberAsc)
+            .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1));
+    TableLike<?> lastTimeCheckOut =
+        dslContext
+            .select()
+            .from(rowNumberDesc)
+            .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
+
+    System.out.println(
+        dslContext
+            .select(TIMEKEEPING.TIMEKEEPING_ID)
+            .from(TIMEKEEPING)
+            .leftJoin(LIST_TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
+            .leftJoin(TIMEKEEPING_STATUS)
+            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+            .leftJoin(firstTimeCheckIn)
+            .on(
+                firstTimeCheckIn
+                    .field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .leftJoin(lastTimeCheckOut)
+            .on(
+                lastTimeCheckOut
+                    .field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .where(TIMEKEEPING.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+            .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
+            .and(TIMEKEEPING_STATUS.NAME.eq("OVERTIME")));
+    return dslContext
+        .select(TIMEKEEPING.TIMEKEEPING_ID)
+        .from(TIMEKEEPING)
+        .leftJoin(LIST_TIMEKEEPING_STATUS)
+        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
+        .leftJoin(TIMEKEEPING_STATUS)
+        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+        .leftJoin(firstTimeCheckIn)
+        .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
+        .leftJoin(lastTimeCheckOut)
+        .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
+        .where(TIMEKEEPING.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
+        .and(TIMEKEEPING_STATUS.NAME.eq("OVERTIME"))
+        .fetchOneInto(Integer.class);
+  }
 }

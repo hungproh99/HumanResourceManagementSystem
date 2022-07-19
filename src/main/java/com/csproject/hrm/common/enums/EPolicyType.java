@@ -12,15 +12,13 @@ public enum EPolicyType {
   BEHAVIOUR("Behaviour", 4),
   REWARD("Reward", 5),
   ALLOWANCE("Allowance", 6),
+  NOMINATION_RIGHT("Nomination right", 6),
   PAID_LEAVE("Paid Leave", 7),
   UNPAID_LEAVE("Unpaid Leave", 8),
-  VPN("VPN", 9),
-  FPT("FPT", 10),
-  SI("SI", 11),
-  HI("HI", 12),
-  UI("UI", 13),
-  PI("PI", 14),
-  OT("OT", 15);
+  TAX("Tax", 9),
+  INSURANCE("Insurance", 10),
+  OT("OT", 11),
+  ADVANCE("Advance", 12);
 
   private final String label;
   private final long value;

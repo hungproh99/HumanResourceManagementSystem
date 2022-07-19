@@ -54,6 +54,10 @@ public interface TimekeepingRepositoryCustom {
 
   LocalTime getLastTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
+  int countPaidLeaveOfEmployeeByYear(String employeeID);
+
+  Integer countOvertimeOfEmployeeByYear(String employeeID);
+
   void updatePointPerDay(List<TimekeepingDto> timekeepingDtoList);
 
   boolean checkExistDateInTimekeeping(LocalDate date, String employeeId);

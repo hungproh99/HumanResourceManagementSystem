@@ -1,12 +1,8 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -77,4 +73,6 @@ public interface ApplicationsRequestRepositoryCustom {
   List<ApplicationRequestRemindResponse> getAllApplicationRequestToRemind(LocalDateTime checkDate);
 
   void updateAllApplicationRequestRemind(Long requestId, boolean isRemind);
+
+  String getDataOfPolicy(Long requestNameId);
 }

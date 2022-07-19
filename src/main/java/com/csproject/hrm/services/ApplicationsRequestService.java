@@ -52,6 +52,10 @@ public interface ApplicationsRequestService {
 
   void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
 
+  int getPaidLeaveDayRemaining(String employeeId);
+
+  int getOTDTimeRemaining(String employeeId);
+
   List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
 
   void createApproveTaxEnrollment(List<String> taxNameList, String employeeId);
