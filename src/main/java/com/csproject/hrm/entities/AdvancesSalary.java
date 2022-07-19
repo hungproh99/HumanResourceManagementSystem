@@ -30,7 +30,7 @@ public class AdvancesSalary {
   @Column(name = "date")
   private LocalDate date;
 
-  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryMonthly.class)
   @JoinColumn(name = "salary_id")
   private SalaryMonthly salaryMonthly;
 }

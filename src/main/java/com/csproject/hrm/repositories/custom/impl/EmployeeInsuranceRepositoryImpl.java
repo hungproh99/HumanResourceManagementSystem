@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.jooq.codegen.maven.example.Tables.POLICY_NAME;
 import static org.jooq.codegen.maven.example.tables.EmployeeInsurance.EMPLOYEE_INSURANCE;
 import static org.jooq.codegen.maven.example.tables.PolicyType.POLICY_TYPE;
 
@@ -35,8 +36,10 @@ public class EmployeeInsuranceRepositoryImpl implements EmployeeInsuranceReposit
         .select(
             EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID, POLICY_TYPE.POLICY_TYPE_.as("policy_type"))
         .from(EMPLOYEE_INSURANCE)
+        .leftJoin(POLICY_NAME)
+        .on(POLICY_NAME.POLICY_NAME_ID.eq(EMPLOYEE_INSURANCE.POLICY_NAME_ID))
         .leftJoin(POLICY_TYPE)
-        .on(POLICY_TYPE.POLICY_TYPE_ID.eq(EMPLOYEE_INSURANCE.POLICY_TYPE_ID))
+        .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY_NAME.POLICY_TYPE_ID))
         .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(employeeId))
         .fetchInto(EmployeeInsuranceResponse.class);
   }

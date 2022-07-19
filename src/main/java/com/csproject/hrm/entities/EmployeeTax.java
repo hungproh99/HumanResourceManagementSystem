@@ -25,8 +25,8 @@ public class EmployeeTax {
   private Employee employee;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "policy_type_id")
-  private PolicyType policyType;
+  @JoinColumn(name = "policy_name_id")
+  private PolicyName policyName;
 
   @Column(name = "tax_status")
   @Type(type = "boolean")

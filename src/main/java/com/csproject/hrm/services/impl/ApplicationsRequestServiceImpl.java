@@ -5,9 +5,16 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -23,7 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -331,7 +340,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private void updateApproveInformation(ApplicationRequestDto requestDto, Long requestId) {
-    Set<Map.Entry<String, String>> hashMap = splitData(requestDto.getData()).entrySet();
+    Set<Map.Entry<String, String>> hashMap =
+        generalFunction.splitData(requestDto.getData()).entrySet();
     String requestName = requestDto.getRequestName();
     String employeeId = requestDto.getEmployeeId();
     LocalDate currentDate = LocalDate.now();
@@ -342,8 +352,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         desiredPosition = null,
         desiredArea = null,
         desiredOffice = null,
-        desiredGrade = null,
-        salaryId = null;
+        desiredGrade = null;
     BigDecimal value = BigDecimal.ZERO;
     String description = null;
     if (employeeId == null || requestName == null) {
@@ -426,15 +435,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         updateSalaryIncrement(startDate, value, employeeId, requestId);
         break;
       case "BONUS":
-        updateBonusSalary(date, description, value, employeeId, salaryId, bonusType, requestId);
+        updateBonusSalary(date, description, value, employeeId, bonusType, requestId);
         break;
       case "CONFLICT_CUSTOMER":
       case "LEAK_INFORMATION":
-        updateConflictAndLeakInfo(
-            date, description, value, employeeId, salaryId, deductionType, requestId);
+        updateConflictAndLeakInfo(date, description, value, employeeId, deductionType, requestId);
         break;
       case "ADVANCE":
-        updateAdvanceRequest(date, description, value, employeeId, salaryId, requestId);
+        updateAdvanceRequest(date, description, value, employeeId, requestId);
         break;
     }
   }
@@ -578,7 +586,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       String description,
       BigDecimal value,
       String employeeId,
-      Long salaryId,
       Long bonusType,
       Long requestId) {
     if (date == null
@@ -590,7 +597,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
-    salaryId =
+    Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     bonusSalaryRepository.insertBonusSalaryByEmployeeId(
@@ -605,7 +612,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       String description,
       BigDecimal value,
       String employeeId,
-      Long salaryId,
       Long deductionType,
       Long requestId) {
     if (date == null
@@ -617,7 +623,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
-    salaryId =
+    Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
@@ -634,39 +640,19 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       String description,
       BigDecimal value,
       String employeeId,
-      Long salaryId,
       Long requestId) {
     if (date == null || description == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
-    salaryId =
+    Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
     advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
 
     applicationsRequestRepository.updateStatusApplication(
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
-
-  private HashMap<String, String> splitData(String data) {
-    HashMap<String, String> hashMap = new HashMap<>();
-    if (!isBlank(data)) {
-      String[] splitBracket = StringUtils.substringsBetween(data, "[", "]");
-      for (String split : splitBracket) {
-        String[] splitSeparator = split.split(SEPARATOR, TWO_NUMBER);
-        if (isInvalidSplit(splitSeparator)
-            || splitSeparator[ZERO_NUMBER] == null
-            || splitSeparator[ONE_NUMBER] == null) {
-          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
-        }
-        hashMap.put(splitSeparator[ZERO_NUMBER], splitSeparator[ONE_NUMBER]);
-      }
-    } else {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
-    }
-    return hashMap;
   }
 
   private boolean isInvalidSplit(String[] split) {

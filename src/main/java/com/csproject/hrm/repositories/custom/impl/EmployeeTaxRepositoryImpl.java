@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.jooq.codegen.maven.example.Tables.POLICY_NAME;
 import static org.jooq.codegen.maven.example.tables.EmployeeTax.EMPLOYEE_TAX;
 import static org.jooq.codegen.maven.example.tables.PolicyType.POLICY_TYPE;
 
@@ -34,8 +35,10 @@ public class EmployeeTaxRepositoryImpl implements EmployeeTaxRepositoryCustom {
     return dslContext
         .select(EMPLOYEE_TAX.EMPLOYEE_TAX_ID, POLICY_TYPE.POLICY_TYPE_.as("policy_type"))
         .from(EMPLOYEE_TAX)
+        .leftJoin(POLICY_NAME)
+        .on(POLICY_NAME.POLICY_NAME_ID.eq(EMPLOYEE_TAX.POLICY_NAME_ID))
         .leftJoin(POLICY_TYPE)
-        .on(POLICY_TYPE.POLICY_TYPE_ID.eq(EMPLOYEE_TAX.POLICY_TYPE_ID))
+        .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY_NAME.POLICY_TYPE_ID))
         .where(EMPLOYEE_TAX.EMPLOYEE_ID.eq(employeeId))
         .fetchInto(EmployeeTaxResponse.class);
   }

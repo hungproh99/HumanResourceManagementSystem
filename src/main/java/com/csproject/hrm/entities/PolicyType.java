@@ -25,8 +25,8 @@ public class PolicyType {
   @Column(name = "policy_type")
   private EPolicyType ePolicyType;
 
-  @Column(name = "policy_name")
-  private String policyName;
+  @OneToMany(mappedBy = "policyType", fetch = FetchType.LAZY)
+  private List<PolicyName> policyName;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = PolicyCategory.class)
   @JoinColumn(name = "policy_category_id")
@@ -34,10 +34,4 @@ public class PolicyType {
 
   @OneToMany(mappedBy = "policyType", fetch = FetchType.LAZY)
   private List<Policy> policy;
-
-  @OneToOne(mappedBy = "policyType", fetch = FetchType.LAZY)
-  private EmployeeInsurance employeeInsurance;
-
-  @OneToOne(mappedBy = "policyType", fetch = FetchType.LAZY)
-  private EmployeeTax employeeTax;
 }
