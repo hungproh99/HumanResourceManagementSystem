@@ -1,7 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.dto.dto.PolicyDto;
 import com.csproject.hrm.dto.response.PolicyCategoryResponse;
 import com.csproject.hrm.dto.response.PolicyResponse;
 import com.csproject.hrm.jooq.DBConnection;
@@ -112,16 +111,14 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
   }
 
   @Override
-  public Optional<PolicyDto> getPolicyDtoByPolicyType(String policyType) {
+  public Optional<String> getPolicyDtoByPolicyType(String policyType) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(POLICY_NAME.POLICY_NAME_.as("policyName"), POLICY.DATA)
+        .select(POLICY.DATA)
         .from(POLICY)
         .leftJoin(POLICY_TYPE)
         .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
-        .leftJoin(POLICY_NAME)
-        .on(POLICY_NAME.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
         .where(POLICY_TYPE.POLICY_TYPE_.eq(policyType))
-        .fetchOptionalInto(PolicyDto.class);
+        .fetchOptionalInto(String.class);
   }
 }
