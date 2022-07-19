@@ -1,10 +1,16 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.ERequestName;
+import com.csproject.hrm.common.enums.ERequestStatus;
+import com.csproject.hrm.common.enums.ERequestType;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
@@ -22,8 +28,7 @@ import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
-import static org.jooq.codegen.maven.example.Tables.EMPLOYEE_TAX;
-import static org.jooq.codegen.maven.example.Tables.POLICY_TYPE;
+import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
@@ -743,7 +748,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   public PolicyTypeAndNameResponse getPolicyByRequestNameID(Long requestNameID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(POLICY_TYPE.POLICY_TYPE_, POLICY_TYPE.POLICY_NAME)
+        .select(POLICY_TYPE.POLICY_TYPE_)
+//                , POLICY_TYPE.POLICY_NAME)
         .from(REQUEST_NAME)
         .leftJoin(POLICY)
         .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
@@ -809,26 +815,26 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   public void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-    boolean check =
-        dslContext.fetchExists(
-            dslContext
-                .select()
-                .from(EMPLOYEE_TAX)
-                .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
-
-    if (!check) {
-      dslContext
-          .insertInto(
-              EMPLOYEE_TAX,
-              EMPLOYEE_TAX.EMPLOYEE_ID,
-              EMPLOYEE_TAX.POLICY_TYPE_ID,
-              EMPLOYEE_TAX.TAX_STATUS)
-          .values(
-              employeeTaxDto.getEmployeeID(),
-              employeeTaxDto.getTaxTypeID(),
-              employeeTaxDto.getTaxStatus())
-          .execute();
-    }
+//    boolean check =
+//        dslContext.fetchExists(
+//            dslContext
+//                .select()
+//                .from(EMPLOYEE_TAX)
+//                .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
+//
+//    if (!check) {
+//      dslContext
+//          .insertInto(
+//              EMPLOYEE_TAX,
+//              EMPLOYEE_TAX.EMPLOYEE_ID,
+//              EMPLOYEE_TAX.POLICY_TYPE_ID,
+//              EMPLOYEE_TAX.TAX_STATUS)
+//          .values(
+//              employeeTaxDto.getEmployeeID(),
+//              employeeTaxDto.getTaxTypeID(),
+//              employeeTaxDto.getTaxStatus())
+//          .execute();
+//    }
   }
 
   private String checkNotificationOrRequest(String employeeId, Long requestId) {

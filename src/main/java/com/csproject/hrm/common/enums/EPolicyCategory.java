@@ -11,7 +11,8 @@ public enum EPolicyCategory {
   TAX_POLICY("Tax Policy", 3),
   INSURANCE_POLICY("Insurance Policy", 4),
   LEAVE_POLICY("Leave Policy", 5),
-  SALARY_POLICY("Salary Policy", 6);
+  SALARY_POLICY("Salary Policy", 6),
+  OVER_TIME("Overtime", 7);
 
   private String label;
   private long value;

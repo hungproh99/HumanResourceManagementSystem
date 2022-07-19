@@ -255,10 +255,10 @@ public class GeneralFunction {
           overtimeDataDto.setMonth(Integer.parseInt(i.getValue()));
           break;
         case "OT_Type":
-          Set<Map.Entry<String, String>> map = splitData(i.getValue()).entrySet();
+          Set<Map.Entry<String, String>> map = splitSubData(i.getValue()).entrySet();
           List<OvertimePoint> overtimePointList = new ArrayList<>();
           for (Map.Entry<String, String> j : map) {
-            overtimePointList.add(new OvertimePoint(i.getKey(), Double.parseDouble(i.getValue())));
+            overtimePointList.add(new OvertimePoint(j.getKey(), Double.parseDouble(j.getValue())));
           }
           overtimeDataDto.setOvertimePointList(overtimePointList);
           break;
@@ -280,12 +280,19 @@ public class GeneralFunction {
       Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get().getData()).entrySet();
       for (Map.Entry<String, String> i : hashMap) {
         employeeTaxResponse.setTax_name(i.getKey());
+        List<RangePolicy> rangePolicyList = splitRange(i.getValue());
+        BigDecimal value = BigDecimal.ZERO;
+        for (RangePolicy rangePolicy : rangePolicyList) {
+          if (BigDecimal.valueOf(rangePolicy.getMax()).compareTo(baseSalary) >= 0
+              && BigDecimal.valueOf(rangePolicy.getMin()).compareTo(baseSalary) <= 0) {
+            value =
+                baseSalary.multiply(
+                    rangePolicy.getValue().divide(BigDecimal.TEN).divide(BigDecimal.TEN));
+            break;
+          }
+        }
         employeeTaxResponse.setTax_value(Double.parseDouble(i.getValue()));
-        employeeTaxResponse.setValue(
-            baseSalary
-                .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
-                .divide(BigDecimal.TEN)
-                .divide(BigDecimal.TEN));
+        employeeTaxResponse.setValue(value);
       }
     }
     return employeeTaxResponses;
@@ -334,27 +341,53 @@ public class GeneralFunction {
     return hashMap;
   }
 
+  public HashMap<String, String> splitSubData(String data) {
+    HashMap<String, String> hashMap = new HashMap<>();
+    if (!isBlank(data)) {
+      String[] splitComma = data.split(COMMA);
+      for (String a : splitComma) {
+        String[] splitBracket = StringUtils.substringsBetween(a, "{", "}");
+        for (String split : splitBracket) {
+          String[] splitSeparator = split.split(SEPARATOR, TWO_NUMBER);
+          if (isInvalidSplit(splitSeparator)
+              || splitSeparator[ZERO_NUMBER] == null
+              || splitSeparator[ONE_NUMBER] == null) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
+          }
+          hashMap.put(splitSeparator[ZERO_NUMBER], splitSeparator[ONE_NUMBER]);
+        }
+      }
+    } else {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
+    }
+    return hashMap;
+  }
+
   public List<RangePolicy> splitRange(String data) {
     List<RangePolicy> rangePolicyList = new ArrayList<>();
     if (!isBlank(data)) {
-      String[] splitBracket = StringUtils.substringsBetween(data, "[", "]");
-      for (String split : splitBracket) {
-        RangePolicy rangePolicy = null;
-        String[] splitSeparator = split.split(SEPARATOR, TWO_NUMBER);
-        if (isInvalidSplit(splitSeparator)
-            || splitSeparator[ZERO_NUMBER] == null
-            || splitSeparator[ONE_NUMBER] == null) {
-          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
+      String[] splitComma = data.split(COMMA);
+      for (String a : splitComma) {
+        String[] splitBracket = StringUtils.substringsBetween(a, "{", "}");
+        for (String split : splitBracket) {
+          RangePolicy rangePolicy = new RangePolicy();
+          String[] splitSeparator = split.split(SEPARATOR, TWO_NUMBER);
+          if (isInvalidSplit(splitSeparator)
+              || splitSeparator[ZERO_NUMBER] == null
+              || splitSeparator[ONE_NUMBER] == null) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
+          }
+          rangePolicy.setValue(BigDecimal.valueOf(Double.parseDouble(splitSeparator[ONE_NUMBER])));
+          String[] splitDash = splitSeparator[ZERO_NUMBER].split(DASH_CHARACTER, TWO_NUMBER);
+          if (isInvalidSplit(splitDash)
+              || splitDash[ZERO_NUMBER] == null
+              || splitDash[ONE_NUMBER] == null) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
+          }
+          rangePolicy.setMin(Long.parseLong(splitDash[ZERO_NUMBER]));
+          rangePolicy.setMax(Long.parseLong(splitDash[ONE_NUMBER]));
+          rangePolicyList.add(rangePolicy);
         }
-        rangePolicy.setValue(BigDecimal.valueOf(Long.parseLong(splitSeparator[ONE_NUMBER])));
-        String[] splitDash = splitSeparator[ZERO_NUMBER].split(DASH_CHARACTER, TWO_NUMBER);
-        if (isInvalidSplit(splitDash)
-            || splitDash[ZERO_NUMBER] == null
-            || splitDash[ONE_NUMBER] == null) {
-          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
-        }
-        rangePolicy.setMin(Long.parseLong(splitDash[ZERO_NUMBER]));
-        rangePolicy.setMax(Long.parseLong(splitDash[ONE_NUMBER]));
       }
     } else {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);

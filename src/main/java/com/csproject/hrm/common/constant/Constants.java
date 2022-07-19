@@ -114,6 +114,7 @@ public class Constants {
   public static final String CATEGORY_ID = "categoryID";
   public static final String POLICY_ID = "policyID";
   public static final String POLICY_TYPE_INVALID = "Invalid Policy Type";
+  public static final String POLICY_NAME_INVALID = "Invalid Policy Name";
   public static final String POLICY_CATEGORY_INVALID = "Invalid Category Type";
   public static final String OVER_TIME_INVALID = "Invalid Overtime";
   public static final String ASSET_INVALID = "Invalid Asset";

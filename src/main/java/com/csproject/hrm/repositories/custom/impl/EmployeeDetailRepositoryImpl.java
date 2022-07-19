@@ -159,26 +159,26 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
         .execute();
 
-    dslContext
-        .insertInto(
-            EMPLOYEE_INSURANCE,
-            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
-            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
-            EMPLOYEE_INSURANCE.ADDRESS,
-            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
-            EMPLOYEE_INSURANCE.POLICY_TYPE_ID)
-        .values(
-            taxAndInsurance.getInsuranceId(),
-            taxAndInsurance.getEmployeeId(),
-            taxAndInsurance.getInsuranceAddress(),
-            taxAndInsurance.getInsuranceStatus(),
-            taxAndInsurance.getPolicyTypeId())
-        .onDuplicateKeyUpdate()
-        .set(EMPLOYEE_INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
-        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-        .set(EMPLOYEE_INSURANCE.INSURANCE_STATUS, taxAndInsurance.getInsuranceStatus())
-        .set(EMPLOYEE_INSURANCE.POLICY_TYPE_ID, taxAndInsurance.getPolicyTypeId())
-        .execute();
+//    dslContext
+//        .insertInto(
+//            EMPLOYEE_INSURANCE,
+//            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
+//            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
+//            EMPLOYEE_INSURANCE.ADDRESS,
+//            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
+//            EMPLOYEE_INSURANCE.POLICY_TYPE_ID)
+//        .values(
+//            taxAndInsurance.getInsuranceId(),
+//            taxAndInsurance.getEmployeeId(),
+//            taxAndInsurance.getInsuranceAddress(),
+//            taxAndInsurance.getInsuranceStatus(),
+//            taxAndInsurance.getPolicyTypeId())
+//        .onDuplicateKeyUpdate()
+//        .set(EMPLOYEE_INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
+//        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
+//        .set(EMPLOYEE_INSURANCE.INSURANCE_STATUS, taxAndInsurance.getInsuranceStatus())
+//        .set(EMPLOYEE_INSURANCE.POLICY_TYPE_ID, taxAndInsurance.getPolicyTypeId())
+//        .execute();
   }
 
   @Override
@@ -434,8 +434,8 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EMPLOYEE)
             .leftJoin(EMPLOYEE_INSURANCE)
             .on(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(POLICY_TYPE)
-            .on(EMPLOYEE_INSURANCE.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
+//            .leftJoin(POLICY_TYPE)
+//            .on(EMPLOYEE_INSURANCE.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchOptionalInto(TaxAndInsuranceResponse.class);
   }

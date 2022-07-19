@@ -56,7 +56,7 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
             POLICY.CREATED_DATE,
             POLICY.EFFECTIVE_DATE,
             POLICY_TYPE.POLICY_TYPE_,
-            POLICY_TYPE.POLICY_NAME,
+//            POLICY_TYPE.POLICY_NAME,
             POLICY.DESCRIPTION,
             POLICY_CATEGORY.POLICY_CATEGORY_,
             (when(POLICY.POLICY_STATUS.isTrue(), "true")
@@ -115,10 +115,12 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
   public Optional<PolicyDto> getPolicyDtoByPolicyType(String policyType) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(POLICY_TYPE.POLICY_NAME, POLICY.DATA)
+        .select(POLICY_NAME.POLICY_NAME_.as("policyName"), POLICY.DATA)
         .from(POLICY)
         .leftJoin(POLICY_TYPE)
         .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
+        .leftJoin(POLICY_NAME)
+        .on(POLICY_NAME.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
         .where(POLICY_TYPE.POLICY_TYPE_.eq(policyType))
         .fetchOptionalInto(PolicyDto.class);
   }
