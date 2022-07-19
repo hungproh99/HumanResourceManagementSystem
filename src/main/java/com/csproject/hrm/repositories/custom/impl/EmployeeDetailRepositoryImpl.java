@@ -156,7 +156,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext
         .update(EMPLOYEE)
         .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(taxAndInsurance.getEmployeeId()))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
         .execute();
 
     dslContext
@@ -230,7 +230,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(EMPLOYEE.PHONE_NUMBER, employeeAdditionalInfo.getPhone_number())
         .set(EMPLOYEE.NICK_NAME, employeeAdditionalInfo.getNick_name())
         .set(EMPLOYEE.FACEBOOK, employeeAdditionalInfo.getFacebook())
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeAdditionalInfo.getEmployee_id()));
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeAdditionalInfo.getEmployee_id()));
   }
 
   @Override
@@ -312,7 +312,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(EMPLOYEE.GENDER, employeeDetailRequest.getGender())
         .set(EMPLOYEE.AVATAR, employeeDetailRequest.getAvatar())
         .set(EMPLOYEE.MARITAL_STATUS, employeeDetailRequest.getMarital_status())
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeDetailRequest.getEmployee_id()));
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeDetailRequest.getEmployee_id()));
   }
 
   @Override
@@ -333,7 +333,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(RELATIVE_INFORMATION.RELATIVE_TYPE.eq(RELATIVE_TYPE.TYPE_ID))
             .rightJoin(EMPLOYEE)
             .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(RelativeInformationResponse.class);
   }
 
@@ -358,7 +358,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(WORKING_HISTORY)
             .rightJoin(EMPLOYEE)
             .on(WORKING_HISTORY.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(WorkingHistoryResponse.class);
   }
 
@@ -377,7 +377,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EDUCATION)
             .rightJoin(EMPLOYEE)
             .on(EDUCATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(EducationResponse.class);
   }
 
@@ -391,7 +391,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(BANK)
             .rightJoin(EMPLOYEE)
             .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchOptionalInto(BankResponse.class);
   }
 
@@ -415,7 +415,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EMPLOYEE)
             .leftJoin(IDENTITY_CARD)
             .on(IDENTITY_CARD.CARD_ID.eq(EMPLOYEE.CARD_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchOptionalInto(EmployeeAdditionalInfo.class);
   }
 
@@ -436,7 +436,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
             .leftJoin(POLICY_TYPE)
             .on(EMPLOYEE_INSURANCE.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchOptionalInto(TaxAndInsuranceResponse.class);
   }
 
@@ -490,7 +490,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
     return query.fetchOptionalInto(EmployeeDetailResponse.class);
   }
@@ -502,7 +502,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         dslContext
             .select(EMPLOYEE.EMPLOYEE_ID)
             .from(EMPLOYEE)
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID)));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
   }
 
   @Override
@@ -513,13 +513,13 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         dslContext
             .select(EMPLOYEE.MANAGER_ID)
             .from(EMPLOYEE)
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
             .fetchOneInto(String.class);
 
     return dslContext
         .select(EMPLOYEE.FULL_NAME.concat(" - ").concat(EMPLOYEE.EMPLOYEE_ID))
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(managerID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(managerID))
         .fetchOneInto(String.class);
   }
 
@@ -529,7 +529,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     return dslContext
         .select(EMPLOYEE.FULL_NAME.concat(" - ").concat(EMPLOYEE.EMPLOYEE_ID))
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
         .fetchOneInto(String.class);
   }
 
@@ -538,10 +538,9 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
     return dslContext
-        .select()
         .select(EMPLOYEE.LEVEL)
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
         .fetchOneInto(Integer.class);
   }
 }

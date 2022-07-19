@@ -236,12 +236,4 @@ public class ApplicationsRequestController {
     }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
-
-  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  //  @GetMapping("test")
-  //  public ResponseEntity<?> createApproveTaxEnrollment(@RequestParam String employeeId) {
-  //    //    applicationsRequestService.createApproveTaxEnrollment(taxNameList, employeeId);
-  //
-  //    return ResponseEntity.ok(timekeepingRepository.countOvertimeOfEmployeeByYear(employeeId));
-  //  }
 }
