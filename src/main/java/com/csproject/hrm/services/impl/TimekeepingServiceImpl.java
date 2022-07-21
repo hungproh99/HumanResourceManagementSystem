@@ -1,6 +1,7 @@
 package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.common.excel.ExcelExportTimekeeping;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
@@ -38,10 +39,10 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   @Autowired TimekeepingRepository timekeepingRepository;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
   @Autowired EmployeeRepository employeeRepository;
-  @Autowired PolicyRepository policyRepository;
   @Autowired OvertimeRepository overtimeRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired SalaryCalculator salaryCalculator;
+  @Autowired SalaryContractRepository salaryContractRepository;
 
   @Override
   public TimekeepingResponsesList getListAllTimekeeping(QueryParam queryParam) {
@@ -178,7 +179,25 @@ public class TimekeepingServiceImpl implements TimekeepingService {
 
     employeeIdList.forEach(
         employeeId -> {
-          Double pointPerDay = salaryCalculator.getPointOfWorkByEmployeeId(employeeId);
+          Optional<SalaryContractDto> salaryContractDto =
+              salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
+          if (salaryContractDto.isEmpty()) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
+          }
+          Double maxPointPerDay = 0D;
+          if (salaryContractDto
+              .get()
+              .getWorking_type()
+              .equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
+            maxPointPerDay = 1D;
+          } else if (salaryContractDto
+              .get()
+              .getWorking_type()
+              .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
+            maxPointPerDay = 0.5D;
+          }
+
           Double pointOT = 0D;
           List<OvertimePoint> overtimePointList = overtimeDataDto.getOvertimePointList();
           Optional<OvertimeDto> overtimeDto =
@@ -210,20 +229,21 @@ public class TimekeepingServiceImpl implements TimekeepingService {
             Long rangeTime = MINUTES.between(firstTimeCheckIn, workingTimeDataDto.getStartTime());
             for (RangePolicy rangePolicy : workingTimeDataDto.getListRange()) {
               if (rangePolicy.getMin() < rangeTime && rangePolicy.getMax() > rangeTime) {
-                pointPerDay -=
-                    Double.parseDouble(String.valueOf(rangePolicy.getValue())) * pointPerDay;
+                maxPointPerDay -=
+                    Double.parseDouble(String.valueOf(rangePolicy.getValue())) * maxPointPerDay;
               }
             }
           } else if (lastTimeCheckOut.isBefore(workingTimeDataDto.getEndTime())) {
             Long rangeTime = MINUTES.between(lastTimeCheckOut, workingTimeDataDto.getEndTime());
             for (RangePolicy rangePolicy : workingTimeDataDto.getListRange()) {
               if (rangePolicy.getMin() < rangeTime && rangePolicy.getMax() > rangeTime) {
-                pointPerDay -=
-                    Double.parseDouble(String.valueOf(rangePolicy.getValue())) * pointPerDay;
+                maxPointPerDay -=
+                    Double.parseDouble(String.valueOf(rangePolicy.getValue())) * maxPointPerDay;
               }
             }
           }
-          timekeepingDtoList.add(new TimekeepingDto(pointPerDay, pointOT, currentDate, employeeId));
+          timekeepingDtoList.add(
+              new TimekeepingDto(maxPointPerDay, pointOT, currentDate, employeeId));
         });
     timekeepingRepository.updatePointPerDay(timekeepingDtoList);
   }

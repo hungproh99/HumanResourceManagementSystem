@@ -86,41 +86,4 @@ public class SalaryCalculator {
     }
     return localDateList;
   }
-
-//  public BigDecimal getMoneyPerDay(LocalDate firstDate, LocalDate lastDate, String employeeId) {
-//    Optional<SalaryContractDto> salaryContractDto =
-//        salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
-//    if (salaryContractDto.isEmpty()) {
-//      throw new CustomErrorException(
-//          HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
-//    }
-//    Integer actualWorkDate =
-//        timekeepingRepository.countActualWorkPerMonthByEmployee(firstDate, lastDate, employeeId);
-//    if (actualWorkDate == 0) {
-//      throw new CustomErrorException(
-//          HttpStatus.BAD_REQUEST, "Invalid actual work data of " + employeeId);
-//    }
-//    return salaryContractDto
-//        .get()
-//        .getAdditional_salary()
-//        .divide(BigDecimal.valueOf(actualWorkDate));
-//  }
-
-  public Double getPointOfWorkByEmployeeId(String employeeId) {
-    Optional<SalaryContractDto> salaryContractDto =
-        salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
-    if (salaryContractDto.isEmpty()) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
-    }
-    if (salaryContractDto.get().getWorking_type().equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
-      return 1D;
-    } else if (salaryContractDto
-        .get()
-        .getWorking_type()
-        .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
-      return 0.5D;
-    }
-    throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Error working type of " + employeeId);
-  }
 }

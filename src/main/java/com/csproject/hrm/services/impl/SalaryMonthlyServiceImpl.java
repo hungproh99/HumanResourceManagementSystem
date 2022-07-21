@@ -5,9 +5,9 @@ import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.common.excel.ExcelExportSalaryMonthly;
 import com.csproject.hrm.common.general.GeneralFunction;
+import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.SalaryContractDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
-import com.csproject.hrm.dto.dto.WorkingTimeDataDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -32,7 +32,6 @@ import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Service
 public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
@@ -46,6 +45,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Autowired BonusSalaryRepository bonusSalaryRepository;
   @Autowired DeductionSalaryRepository deductionSalaryRepository;
   @Autowired AdvanceSalaryRepository advanceSalaryRepository;
+
+  @Autowired SalaryCalculator salaryCalculator;
 
   @Override
   public SalaryMonthlyResponseList getAllSalaryMonthly(
@@ -74,23 +75,26 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     String employeeId = salaryMonthlyResponse.get().getEmployeeId();
     LocalDate startDate = salaryMonthlyResponse.get().getStartDate();
     LocalDate endDate = salaryMonthlyResponse.get().getEndDate();
-    Optional<HrmResponse> hrmResponse = employeeRepository.getEmployeeByEmployeeId(employeeId);
     Optional<SalaryContractDto> salaryContractDto =
         salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
-    if (hrmResponse.isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
-    } else if (salaryContractDto.isEmpty()) {
+    if (salaryContractDto.isEmpty()) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Don't have contract of " + employeeId);
+          HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
+    }
+    Double maxPointPerDay = 0D;
+    if (salaryContractDto.get().getWorking_type().equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
+      maxPointPerDay = 1D;
+    } else if (salaryContractDto
+        .get()
+        .getWorking_type()
+        .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
+      maxPointPerDay = 0.5D;
     }
     Double standardPoint = salaryMonthlyResponse.get().getStandardPoint();
-
+    Double actualWorkingPoint = salaryMonthlyResponse.get().getActualPoint();
     PointResponse pointResponse =
         getPointResponseListByEmployeeId(
-            employeeId,
-            hrmResponse.get().getWorking_name(),
-            startDate,
-            endDate);
+            employeeId, maxPointPerDay, actualWorkingPoint, startDate, endDate);
 
     OTResponseList otResponseList =
         new OTResponseList(
@@ -144,31 +148,34 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     List<String> employeeIdList = employeeRepository.getAllEmployeeIdActive();
     employeeIdList.forEach(
         employeeId -> {
-          Optional<HrmResponse> hrmResponse =
-              employeeRepository.getEmployeeByEmployeeId(employeeId);
           Optional<SalaryContractDto> salaryContractDto =
               salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
           Long salaryMonthlyId =
               salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
                   employeeId, startDate, endDate, ESalaryMonthly.PENDING.name());
-          if (hrmResponse.isEmpty()) {
-            throw new CustomErrorException(
-                HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
-          } else if (salaryContractDto.isEmpty()) {
+          if (salaryContractDto.isEmpty()) {
             throw new CustomErrorException(
                 HttpStatus.BAD_REQUEST, "Don't have salary contract of " + employeeId);
           }
+          Double maxPointPerDay = 0D;
+          if (salaryContractDto
+              .get()
+              .getWorking_type()
+              .equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
+            maxPointPerDay = 1D;
+          } else if (salaryContractDto
+              .get()
+              .getWorking_type()
+              .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
+            maxPointPerDay = 0.5D;
+          }
           int standardDayOfWork =
               Integer.parseInt(String.valueOf(DAYS.between(startDate, endDate))) + 1;
-          Double standardPoint =
-              getStandardPointOfWork(standardDayOfWork, hrmResponse.get().getWorking_name());
+          Double standardPoint = standardDayOfWork * maxPointPerDay;
+
           Double actualWorkingPoint =
-              getPointResponseListByEmployeeId(
-                      employeeId,
-                      hrmResponse.get().getWorking_name(),
-                      startDate,
-                      endDate)
-                  .getTotalWorkPoint();
+              timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+                  startDate, endDate, employeeId);
           Double totalOTPoint =
               overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDate(
                   startDate, endDate, employeeId);
@@ -290,43 +297,23 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     }
   }
 
-  private Double getStandardPointOfWork(int standardDayOfWork, String workingName) {
-    if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.FULL_TIME.name()))) {
-      return standardDayOfWork * 1D;
-    } else if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.PART_TIME.name()))) {
-      return standardDayOfWork * 0.5D;
-    }
-    return 0D;
-  }
-
   private PointResponse getPointResponseListByEmployeeId(
       String employeeId,
-      String workingName,
+      Double maxPointPerDay,
+      Double actualWorkingPoint,
       LocalDate startDate,
       LocalDate endDate) {
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId)
-                != null
-            ? timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
-                startDate, endDate, employeeId)
-            : 0D;
-
     int paidLeaveDay =
         timekeepingRepository.countTimePaidLeavePerMonthByEmployeeId(
             startDate, endDate, employeeId);
     int unpaidLeaveDay =
         timekeepingRepository.countTimeDayOffPerMonthByEmployeeId(startDate, endDate, employeeId);
-    Double actualWorkingHour = 0D, paidLeaveHour = 0D, unpaidLeaveHour = 0D;
-    if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.FULL_TIME.name()))) {
-      actualWorkingHour = actualWorkingPoint;
-      paidLeaveHour = paidLeaveDay * 1D;
-      unpaidLeaveHour = unpaidLeaveDay * 1D;
-    } else if (workingName.equalsIgnoreCase(EWorkingType.getLabel(EWorkingType.PART_TIME.name()))) {
-      actualWorkingHour = actualWorkingPoint;
-      paidLeaveHour = paidLeaveDay * 0.5D;
-      unpaidLeaveHour = unpaidLeaveDay * 0.5D;
-    }
-    return new PointResponse(actualWorkingHour, paidLeaveHour, unpaidLeaveHour, actualWorkingPoint);
+
+    return new PointResponse(
+        actualWorkingPoint - paidLeaveDay * maxPointPerDay,
+        unpaidLeaveDay * maxPointPerDay,
+        paidLeaveDay * maxPointPerDay,
+        actualWorkingPoint);
   }
 
   private List<OTResponse> getOtResponseList(
