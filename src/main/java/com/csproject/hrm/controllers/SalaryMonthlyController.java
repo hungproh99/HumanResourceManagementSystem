@@ -1,5 +1,9 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
+import com.csproject.hrm.dto.dto.BonusSalaryDto;
+import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.dto.UpdateStatusSalaryMonthlyDto;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -38,15 +42,15 @@ public class SalaryMonthlyController {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
-    boolean isManager = false;
-    if (request.isUserInRole("MANAGER")) {
-      isManager = true;
-    }
+    String role =
+        request.isUserInRole("ADMIN")
+            ? "ADMIN"
+            : (request.isUserInRole("MANAGER") ? "MANAGER" : "USER");
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       return ResponseEntity.ok(
-          salaryMonthlyService.getAllSalaryMonthly(queryParam, employeeId, isManager));
+          salaryMonthlyService.getAllSalaryMonthly(queryParam, employeeId, role));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
   }
@@ -104,6 +108,57 @@ public class SalaryMonthlyController {
     LocalDate startDate = LocalDate.of(2022,10,01);
     LocalDate endDate = LocalDate.of(2022,10,31);
     salaryMonthlyService.upsertSalaryMonthlyByEmployeeIdList(startDate, endDate);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_UPDATE_DEDUCTION_SALARY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> updateDeductionSalary(
+      @RequestBody DeductionSalaryDto deductionSalaryDto) {
+    salaryMonthlyService.updateDeductionSalary(deductionSalaryDto);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DELETE_DEDUCTION_SALARY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> deleteDeductionSalary(@RequestParam Long deductionId) {
+    salaryMonthlyService.deleteDeductionSalary(deductionId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_UPDATE_BONUS_SALARY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> updateBonusSalary(@RequestBody BonusSalaryDto bonusSalaryDto) {
+    salaryMonthlyService.updateBonusSalary(bonusSalaryDto);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DELETE_BONUS_SALARY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> deleteBonusSalary(@RequestParam Long bonusId) {
+    salaryMonthlyService.deleteBonusSalary(bonusId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_UPDATE_ADVANCE_SALARY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> updateAdvanceSalary(@RequestBody AdvanceSalaryDto advanceSalaryDto) {
+    salaryMonthlyService.updateAdvanceSalary(advanceSalaryDto);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_DELETE_ADVANCE_SALARY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> deleteAdvanceSalary(@RequestParam Long advanceId) {
+    salaryMonthlyService.deleteAdvanceSalary(advanceId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = URI_UPDATE_STATUS_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> updateStatusSalaryMonthly(
+      @RequestBody UpdateStatusSalaryMonthlyDto updateStatusSalaryMonthlyDto) {
+    salaryMonthlyService.updateStatusSalaryMonthly(updateStatusSalaryMonthlyDto);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

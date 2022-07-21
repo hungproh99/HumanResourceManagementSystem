@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
+import com.csproject.hrm.dto.dto.UpdateStatusSalaryMonthlyDto;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -13,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface SalaryMonthlyRepositoryCustom {
   SalaryMonthlyResponseList getAllSalaryMonthly(
-      QueryParam queryParam, List<String> employeeIdList, boolean isManager);
+      QueryParam queryParam, List<String> employeeIdList, String role);
 
   Optional<SalaryMonthlyResponse> getSalaryMonthlyBySalaryId(Long salaryId);
 
@@ -24,4 +25,9 @@ public interface SalaryMonthlyRepositoryCustom {
 
   List<SalaryMonthlyResponse> getListSalaryMonthlyToExport(
       QueryParam queryParam, List<Long> list);
+
+  void updateStatusSalaryMonthlyBySalaryMonthlyId(
+      UpdateStatusSalaryMonthlyDto updateStatusSalaryMonthlyDto);
+
+  boolean checkExistSalaryMonthly(Long salaryMonthlyId);
 }

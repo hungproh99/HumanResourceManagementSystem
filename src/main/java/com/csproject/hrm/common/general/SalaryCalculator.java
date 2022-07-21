@@ -1,22 +1,20 @@
 package com.csproject.hrm.common.general;
 
-import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.dto.dto.HolidayCalenderDto;
-import com.csproject.hrm.dto.dto.SalaryContractDto;
-import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.repositories.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
