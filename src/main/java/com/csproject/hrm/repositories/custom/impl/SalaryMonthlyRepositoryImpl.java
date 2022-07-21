@@ -2,24 +2,22 @@ package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
+import com.csproject.hrm.dto.dto.UpdateStatusSalaryMonthlyDto;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
-import com.csproject.hrm.jooq.DBConnection;
-import com.csproject.hrm.jooq.JooqHelper;
-import com.csproject.hrm.jooq.Pagination;
-import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.SalaryMonthlyRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
 import org.jooq.codegen.maven.example.Tables;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -27,6 +25,7 @@ import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.SalaryContract.SALARY_CONTRACT;
 import static org.jooq.codegen.maven.example.tables.SalaryMonthly.SALARY_MONTHLY;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
+import static org.jooq.impl.DSL.noCondition;
 
 @AllArgsConstructor
 public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCustom {
@@ -45,14 +44,41 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
 
   @Override
   public SalaryMonthlyResponseList getAllSalaryMonthly(
-      QueryParam queryParam, List<String> employeeIdList, boolean isManager) {
-    List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    Condition condition = DSL.noCondition();
+      QueryParam queryParam, List<String> employeeIdList, String role) {
+    List<Condition> conditions = new ArrayList<>();
+    final var mergeFilters =
+        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+    LocalDate currDate = LocalDate.now();
+    mergeFilters.forEach(
+        (key, values) -> {
+          Condition condition = DSL.noCondition();
+          for (QueryFilter filter : values) {
+
+            final Field<?> field = field2Map.get(filter.field);
+
+            if (Objects.isNull(field)) {
+              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
+            }
+            if (filter.field.equals(END_DATE)) {
+              condition = condition.and(queryHelper.condition(filter, field));
+              LocalDate endDate = LocalDate.parse(filter.condition.substring(3));
+              if (endDate.isAfter(currDate)) {
+                throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST, "Can't get salary monthly until end of month");
+              }
+            } else {
+              condition = condition.and(queryHelper.condition(filter, field));
+            }
+          }
+          conditions.add(condition);
+        });
+
+    Condition condition = noCondition();
     for (String employeeId : employeeIdList) {
-      condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
     }
-    if (!isManager) {
-      condition.and(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()));
+    if (!role.equalsIgnoreCase("MANAGER") || !role.equalsIgnoreCase("ADMIN")) {
+      condition = condition.and(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()));
     }
     conditions.add(condition);
     List<OrderField<?>> sortFields =
@@ -152,6 +178,28 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     return getAllSalaryMonthly(conditions, sortFields, queryParam.pagination)
         .fetchInto(SalaryMonthlyResponse.class);
+  }
+
+  @Override
+  public void updateStatusSalaryMonthlyBySalaryMonthlyId(
+      UpdateStatusSalaryMonthlyDto updateStatusSalaryMonthlyDto) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(SALARY_MONTHLY)
+            .set(SALARY_MONTHLY.SALARY_STATUS_ID, updateStatusSalaryMonthlyDto.getStatusSalary())
+            .where(SALARY_MONTHLY.SALARY_ID.eq(updateStatusSalaryMonthlyDto.getSalaryMonthlyId()))
+            .execute();
+  }
+
+  @Override
+  public boolean checkExistSalaryMonthly(Long salaryMonthlyId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select()
+            .from(SALARY_MONTHLY)
+            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyId)));
   }
 
   private InsertReturningStep<?> insertSalaryMonthlyByEmployee(

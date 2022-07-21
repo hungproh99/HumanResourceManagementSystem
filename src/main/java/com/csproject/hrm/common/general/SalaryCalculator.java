@@ -1,22 +1,20 @@
 package com.csproject.hrm.common.general;
 
-import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.dto.dto.HolidayCalenderDto;
-import com.csproject.hrm.dto.dto.SalaryContractDto;
-import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.repositories.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,42 +83,5 @@ public class SalaryCalculator {
       firstSaturday = firstSaturday.plus(Period.ofDays(7));
     }
     return localDateList;
-  }
-
-//  public BigDecimal getMoneyPerDay(LocalDate firstDate, LocalDate lastDate, String employeeId) {
-//    Optional<SalaryContractDto> salaryContractDto =
-//        salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
-//    if (salaryContractDto.isEmpty()) {
-//      throw new CustomErrorException(
-//          HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
-//    }
-//    Integer actualWorkDate =
-//        timekeepingRepository.countActualWorkPerMonthByEmployee(firstDate, lastDate, employeeId);
-//    if (actualWorkDate == 0) {
-//      throw new CustomErrorException(
-//          HttpStatus.BAD_REQUEST, "Invalid actual work data of " + employeeId);
-//    }
-//    return salaryContractDto
-//        .get()
-//        .getAdditional_salary()
-//        .divide(BigDecimal.valueOf(actualWorkDate));
-//  }
-
-  public Double getPointOfWorkByEmployeeId(String employeeId) {
-    Optional<SalaryContractDto> salaryContractDto =
-        salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
-    if (salaryContractDto.isEmpty()) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Error with contract salary of " + employeeId);
-    }
-    if (salaryContractDto.get().getWorking_type().equalsIgnoreCase(EWorkingType.FULL_TIME.name())) {
-      return 1D;
-    } else if (salaryContractDto
-        .get()
-        .getWorking_type()
-        .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
-      return 0.5D;
-    }
-    throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Error working type of " + employeeId);
   }
 }

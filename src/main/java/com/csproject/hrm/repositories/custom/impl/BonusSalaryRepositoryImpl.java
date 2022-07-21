@@ -1,5 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.dto.dto.BonusSalaryDto;
+import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.BonusSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -15,10 +17,14 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.jooq.codegen.maven.example.tables.BonusSalary.BONUS_SALARY;
 import static org.jooq.codegen.maven.example.tables.BonusType.BONUS_TYPE;
+import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.SalaryContract.SALARY_CONTRACT;
 import static org.jooq.codegen.maven.example.tables.SalaryMonthly.SALARY_MONTHLY;
+import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.sum;
 
 @AllArgsConstructor
@@ -80,5 +86,54 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
         .on(SALARY_MONTHLY.SALARY_ID.eq(BONUS_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
         .fetchOneInto(BigDecimal.class);
+  }
+
+  @Override
+  public void updateBonusSalaryByBonusSalaryId(BonusSalaryDto bonusSalaryDto) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(BONUS_SALARY)
+            .set(BONUS_SALARY.VALUE, bonusSalaryDto.getValue())
+            .set(BONUS_SALARY.DESCRIPTION, bonusSalaryDto.getDescription())
+            .set(BONUS_SALARY.DATE, bonusSalaryDto.getDate())
+            .set(BONUS_SALARY.BONUS_TYPE_ID, bonusSalaryDto.getBonusTypeId())
+            .where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryDto.getBonusSalaryId()))
+            .execute();
+  }
+
+  @Override
+  public void deleteBonusSalaryByBonusSalaryId(Long bonusSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext.delete(BONUS_SALARY).where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryId)).execute();
+  }
+
+  @Override
+  public Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByBonusSalary(Long bonusSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+            SALARY_MONTHLY.START_DATE.as("startDate"),
+            SALARY_MONTHLY.END_DATE.as("endDate"))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(SALARY_CONTRACT)
+        .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(SALARY_MONTHLY)
+        .on(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(SALARY_CONTRACT.SALARY_CONTRACT_ID))
+        .leftJoin(BONUS_SALARY)
+        .on(BONUS_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
+        .where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryId))
+        .fetchOptionalInto(SalaryMonthlyInfoDto.class);
+  }
+
+  @Override
+  public boolean checkExistBonusSalary(Long bonusSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext.select().from(BONUS_SALARY).where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryId)));
   }
 }

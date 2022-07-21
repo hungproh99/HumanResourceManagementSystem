@@ -58,4 +58,11 @@ public class Uri {
   public static final String URI_GET_SALARY_MONTHLY_DETAIL = "/get_salary_monthly_detail";
   public static final String URI_DOWNLOAD_EXCEL_SALARY_MONTHLY = "/download_excel_salary_monthly";
   public static final String URI_DOWNLOAD_CSV_SALARY_MONTHLY = "/download_csv_salary_monthly";
+  public static final String URI_UPDATE_DEDUCTION_SALARY = "/update_deduction_salary";
+  public static final String URI_DELETE_DEDUCTION_SALARY = "/delete_deduction_salary";
+  public static final String URI_UPDATE_BONUS_SALARY = "/update_bonus_salary";
+  public static final String URI_DELETE_BONUS_SALARY = "/delete_bonus_salary";
+  public static final String URI_UPDATE_ADVANCE_SALARY = "/update_advance_salary";
+  public static final String URI_DELETE_ADVANCE_SALARY = "/delete_advance_salary";
+  public static final String URI_UPDATE_STATUS_SALARY_MONTHLY = "/update_status_salary_monthly";
 }

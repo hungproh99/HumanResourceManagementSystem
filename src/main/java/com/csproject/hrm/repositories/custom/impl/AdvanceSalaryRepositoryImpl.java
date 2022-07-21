@@ -1,5 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
+import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.AdvanceSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -15,9 +17,13 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.jooq.codegen.maven.example.tables.AdvancesSalary.ADVANCES_SALARY;
+import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.SalaryContract.SALARY_CONTRACT;
 import static org.jooq.codegen.maven.example.tables.SalaryMonthly.SALARY_MONTHLY;
+import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.sum;
 
 @AllArgsConstructor
@@ -73,5 +79,59 @@ public class AdvanceSalaryRepositoryImpl implements AdvanceSalaryRepositoryCusto
         .on(SALARY_MONTHLY.SALARY_ID.eq(ADVANCES_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
         .fetchOneInto(BigDecimal.class);
+  }
+
+  @Override
+  public void updateAdvanceSalaryByAdvanceId(AdvanceSalaryDto advanceSalaryDto) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(ADVANCES_SALARY)
+            .set(ADVANCES_SALARY.VALUE, advanceSalaryDto.getValue())
+            .set(ADVANCES_SALARY.DESCRIPTION, advanceSalaryDto.getDescription())
+            .set(ADVANCES_SALARY.DATE, advanceSalaryDto.getDate())
+            .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceSalaryDto.getAdvanceId()))
+            .execute();
+  }
+
+  @Override
+  public void deleteAdvanceSalaryByAdvanceId(Long advanceId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .delete(ADVANCES_SALARY)
+            .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceId))
+            .execute();
+  }
+
+  @Override
+  public Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByAdvanceSalary(Long advanceSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+            SALARY_MONTHLY.START_DATE.as("startDate"),
+            SALARY_MONTHLY.END_DATE.as("endDate"))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(SALARY_CONTRACT)
+        .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(SALARY_MONTHLY)
+        .on(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(SALARY_CONTRACT.SALARY_CONTRACT_ID))
+        .leftJoin(ADVANCES_SALARY)
+        .on(ADVANCES_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
+        .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceSalaryId))
+        .fetchOptionalInto(SalaryMonthlyInfoDto.class);
+  }
+
+  @Override
+  public boolean checkExistAdvanceSalary(Long advanceSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select()
+            .from(ADVANCES_SALARY)
+            .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceSalaryId)));
   }
 }

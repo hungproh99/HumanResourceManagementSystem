@@ -1,5 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.DeductionSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -15,10 +17,14 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.jooq.codegen.maven.example.tables.DeductionSalary.DEDUCTION_SALARY;
 import static org.jooq.codegen.maven.example.tables.DeductionType.DEDUCTION_TYPE;
+import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
+import static org.jooq.codegen.maven.example.tables.SalaryContract.SALARY_CONTRACT;
 import static org.jooq.codegen.maven.example.tables.SalaryMonthly.SALARY_MONTHLY;
+import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.sum;
 
 @AllArgsConstructor
@@ -80,5 +86,60 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
         .on(SALARY_MONTHLY.SALARY_ID.eq(DEDUCTION_SALARY.SALARY_ID))
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
         .fetchOneInto(BigDecimal.class);
+  }
+
+  @Override
+  public void updateDeductionSalaryByDeductionSalaryId(DeductionSalaryDto deductionSalaryDto) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(DEDUCTION_SALARY)
+            .set(DEDUCTION_SALARY.VALUE, deductionSalaryDto.getValue())
+            .set(DEDUCTION_SALARY.DESCRIPTION, deductionSalaryDto.getDescription())
+            .set(DEDUCTION_SALARY.DATE, deductionSalaryDto.getDate())
+            .set(DEDUCTION_SALARY.DEDUCTION_TYPE_ID, deductionSalaryDto.getDeductionTypeId())
+            .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryDto.getDeductionSalaryId()))
+            .execute();
+  }
+
+  @Override
+  public void deleteDeductionSalaryByDeductionSalaryId(Long deductionSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .delete(DEDUCTION_SALARY)
+            .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryId))
+            .execute();
+  }
+
+  @Override
+  public Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByDeductionSalary(Long deductionSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+            SALARY_MONTHLY.START_DATE.as("startDate"),
+            SALARY_MONTHLY.END_DATE.as("endDate"))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(SALARY_CONTRACT)
+        .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(SALARY_MONTHLY)
+        .on(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(SALARY_CONTRACT.SALARY_CONTRACT_ID))
+        .leftJoin(DEDUCTION_SALARY)
+        .on(DEDUCTION_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
+        .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryId))
+        .fetchOptionalInto(SalaryMonthlyInfoDto.class);
+  }
+
+  @Override
+  public boolean checkExistDeductionSalary(Long deductionSalaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select()
+            .from(DEDUCTION_SALARY)
+            .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryId)));
   }
 }

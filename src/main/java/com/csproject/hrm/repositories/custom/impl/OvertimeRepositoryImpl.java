@@ -83,7 +83,7 @@ public class OvertimeRepositoryImpl implements OvertimeRepositoryCustom {
             OVERTIME.START_TIME,
             OVERTIME.END_TIME,
             TIMEKEEPING.DATE,
-            TIMEKEEPING.POINT_OT_DAY.as("point"))
+            TIMEKEEPING.POINT_OT_DAY.as("otPoint"))
         .from(OVERTIME)
         .leftJoin(TIMEKEEPING)
         .on(OVERTIME.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))

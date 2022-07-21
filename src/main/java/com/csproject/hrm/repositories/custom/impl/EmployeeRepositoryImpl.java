@@ -453,6 +453,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   @Override
   public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    conditions.add(EMPLOYEE.WORKING_STATUS.isTrue());
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     List<HrmResponse> hrmResponses =
