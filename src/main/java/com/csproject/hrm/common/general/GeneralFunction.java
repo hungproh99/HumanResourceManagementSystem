@@ -303,24 +303,35 @@ public class GeneralFunction {
       String employeeId, BigDecimal baseSalary) {
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
         employeeInsuranceRepository.getListInsuranceByEmployeeId(employeeId);
-    for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
-      Optional<String> policyTaxDto =
-          policyRepository.getPolicyDtoByPolicyType(employeeInsuranceResponse.getPolicy_type());
-      if (policyTaxDto.isEmpty()) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
-      }
-      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
-      for (Map.Entry<String, String> i : hashMap) {
-        employeeInsuranceResponse.setInsurance_name(i.getKey());
-        employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
-        employeeInsuranceResponse.setValue(
-            baseSalary
-                .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
-                .divide(BigDecimal.TEN)
-                .divide(BigDecimal.TEN));
-      }
+    if (employeeInsuranceResponses.isEmpty()) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Not have any insurance of " + employeeId);
     }
-    return employeeInsuranceResponses;
+    List<EmployeeInsuranceResponse> finalEmployeeInsurance = new ArrayList<>();
+    Optional<String> policyTaxDto =
+        policyRepository.getPolicyDtoByPolicyType(
+            employeeInsuranceResponses.get(0).getPolicy_type());
+    if (policyTaxDto.isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
+    }
+    Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
+    int count = 0;
+    for (Map.Entry<String, String> i : hashMap) {
+      if (employeeInsuranceResponses.size() == count) {
+        break;
+      }
+      EmployeeInsuranceResponse employeeInsuranceResponse = employeeInsuranceResponses.get(count);
+      employeeInsuranceResponse.setInsurance_name(i.getKey());
+      employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
+      employeeInsuranceResponse.setValue(
+          baseSalary
+              .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
+              .divide(BigDecimal.TEN)
+              .divide(BigDecimal.TEN));
+      finalEmployeeInsurance.add(employeeInsuranceResponse);
+      count++;
+    }
+    return finalEmployeeInsurance;
   }
 
   public HashMap<String, String> splitData(String data) {
