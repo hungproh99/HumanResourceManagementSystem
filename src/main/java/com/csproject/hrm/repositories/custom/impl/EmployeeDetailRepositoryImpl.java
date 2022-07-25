@@ -546,4 +546,16 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
         .fetchOneInto(Integer.class);
   }
+
+  @Override
+  public int countNumberDependentRelative(String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchCount(
+        dslContext
+            .select()
+            .from(RELATIVE_INFORMATION)
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(RELATIVE_INFORMATION.EMPLOYEE_ID))
+            .where(RELATIVE_INFORMATION.IS_DEPENDENT.isTrue()));
+  }
 }

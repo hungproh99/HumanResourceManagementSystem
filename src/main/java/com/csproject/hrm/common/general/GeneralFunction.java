@@ -9,10 +9,7 @@ import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.response.EmployeeInsuranceResponse;
 import com.csproject.hrm.dto.response.EmployeeTaxResponse;
 import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.repositories.EmployeeInsuranceRepository;
-import com.csproject.hrm.repositories.EmployeeRepository;
-import com.csproject.hrm.repositories.EmployeeTaxRepository;
-import com.csproject.hrm.repositories.PolicyRepository;
+import com.csproject.hrm.repositories.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -55,6 +52,7 @@ public class GeneralFunction {
   @Autowired PolicyRepository policyRepository;
   @Autowired EmployeeTaxRepository employeeTaxRepository;
   @Autowired EmployeeInsuranceRepository employeeInsuranceRepository;
+  @Autowired EmployeeDetailRepository employeeDetailRepository;
 
   public String generateEmailEmployee(String id) {
     return id + DOMAIN_EMAIL;
@@ -269,7 +267,7 @@ public class GeneralFunction {
   }
 
   public List<EmployeeTaxResponse> readTaxDataByEmployeeId(
-      String employeeId, BigDecimal lastSalary) {
+      String employeeId, BigDecimal finalSalary, BigDecimal totalInsurance) {
     List<EmployeeTaxResponse> employeeTaxResponses =
         employeeTaxRepository.getListTaxByEmployeeId(employeeId);
     if (employeeTaxResponses.isEmpty()) {
@@ -283,13 +281,17 @@ public class GeneralFunction {
     }
     Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
     int count = 0;
-    BigDecimal salaryLevel = BigDecimal.ZERO;
+    int countNumberDependent = employeeDetailRepository.countNumberDependentRelative(employeeId);
+    BigDecimal familyAllowancesPersonal = BigDecimal.ZERO;
+    BigDecimal familyAllowancesDependent = BigDecimal.ZERO;
     for (Map.Entry<String, String> i : hashMap) {
       if (employeeTaxResponses.size() == count) {
         break;
       }
-      if (i.getKey().equalsIgnoreCase("Salary_Level")) {
-        salaryLevel = BigDecimal.valueOf(Long.parseLong(i.getValue()));
+      if (i.getKey().equalsIgnoreCase("Family_Allowances_Personal")) {
+        familyAllowancesPersonal = BigDecimal.valueOf(Long.parseLong(i.getValue()));
+      } else if (i.getKey().equalsIgnoreCase("Family_Allowances_Dependent")) {
+        familyAllowancesDependent = BigDecimal.valueOf(Long.parseLong(i.getValue()));
       } else {
         List<RangePolicy> rangePolicyList = splitRange(i.getValue());
         BigDecimal value = BigDecimal.ZERO;
@@ -302,11 +304,16 @@ public class GeneralFunction {
             maxValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMax()));
           }
           minValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMin()));
-
-          if (maxValue.compareTo(lastSalary.subtract(salaryLevel)) >= 0
-              && minValue.compareTo(lastSalary.subtract(salaryLevel)) < 0) {
+          BigDecimal finalTax =
+              finalSalary.subtract(
+                  familyAllowancesPersonal
+                      .add(
+                          familyAllowancesDependent.multiply(
+                              BigDecimal.valueOf(countNumberDependent)))
+                      .add(totalInsurance));
+          if (maxValue.compareTo(finalTax) >= 0 && minValue.compareTo(finalTax) < 0) {
             value =
-                lastSalary.multiply(
+                finalSalary.multiply(
                     BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue()))
                         .divide(BigDecimal.TEN)
                         .divide(BigDecimal.TEN));

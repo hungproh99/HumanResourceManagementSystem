@@ -1,6 +1,10 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -32,6 +36,10 @@ public class RelativeInformation {
   
   @Column(name = "contact")
   private String contact;
+
+  @Column(name = "is_dependent")
+  @Type(type = "boolean")
+  private Boolean isDependentABoolean;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")

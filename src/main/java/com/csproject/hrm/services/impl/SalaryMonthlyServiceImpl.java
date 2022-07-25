@@ -117,13 +117,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
             getAdvanceSalaryResponseList(salaryMonthlyId),
             salaryMonthlyResponse.get().getTotalAdvance());
 
+    BigDecimal baseSalary = salaryContractDto.get().getBase_salary();
+    BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
     EmployeeTaxResponseList employeeTaxResponseList =
-        getEmployeeTaxResponseList(
-            employeeId,
-            salaryContractDto
-                .get()
-                .getBase_salary()
-                .add(salaryContractDto.get().getAdditional_salary()));
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary);
 
     EmployeeInsuranceResponseList employeeInsuranceResponseList =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary());
@@ -434,14 +431,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         deductionSalaryRepository.sumListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
     BigDecimal totalAdvance =
         advanceSalaryRepository.sumListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    BigDecimal baseSalary = salaryContractDto.get().getBase_salary();
+    BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
     BigDecimal totalTax =
-        getEmployeeTaxResponseList(
-                employeeId,
-                salaryContractDto
-                    .get()
-                    .getBase_salary()
-                    .add(salaryContractDto.get().getAdditional_salary()))
-            .getTotal();
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary).getTotal();
     BigDecimal totalInsurance =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary())
             .getTotal();
@@ -526,9 +519,11 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private EmployeeTaxResponseList getEmployeeTaxResponseList(
-      String employeeId, BigDecimal lastSalary) {
+      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary) {
+    BigDecimal finalSalary = baseSalary.add(additionalSalary);
+    BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     List<EmployeeTaxResponse> employeeTaxResponses =
-        generalFunction.readTaxDataByEmployeeId(employeeId, lastSalary);
+        generalFunction.readTaxDataByEmployeeId(employeeId, baseSalary, totalInsurance);
     BigDecimal totalTax = BigDecimal.ZERO;
     if (employeeTaxResponses.isEmpty()) {
       return new EmployeeTaxResponseList(employeeTaxResponses, totalTax);
