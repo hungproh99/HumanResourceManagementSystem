@@ -23,7 +23,6 @@ public class EmployeeDetailRequest {
   private String personal_email;
   private String gender;
   private String marital_status;
-  private Boolean working_place_status;
   private Long office_id;
   private Long job_id;
   private Long area_id;

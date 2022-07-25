@@ -157,11 +157,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       Optional<TaxAndInsuranceResponse> taxAndInsuranceResponse =
           employeeDetailRepository.findTaxAndInsurance(employeeID);
-      if (taxAndInsuranceResponse.get().getPolicy_type() != null) {
-        taxAndInsuranceResponse
-            .get()
-            .setPolicy_type(EPolicyType.getLabel(taxAndInsuranceResponse.get().getPolicy_type()));
-      }
       return taxAndInsuranceResponse;
     } else {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
@@ -190,6 +185,9 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     employeeDetailResponse
         .get()
         .setGrade(EGradeType.getLabel(employeeDetailResponse.get().getGrade()));
+    employeeDetailResponse
+        .get()
+        .setWorking_name(EWorkingType.getLabel(employeeDetailResponse.get().getWorking_name()));
     return employeeDetailResponse;
   }
 }

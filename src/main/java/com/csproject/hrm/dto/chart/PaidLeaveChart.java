@@ -2,10 +2,14 @@ package com.csproject.hrm.dto.chart;
 
 import lombok.*;
 
-@Data
+import java.util.List;
+
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class PaidLeaveChart {
-  private String quarter;
+  private String label;
+  private List<PaidLeaveChartList> value;
 }

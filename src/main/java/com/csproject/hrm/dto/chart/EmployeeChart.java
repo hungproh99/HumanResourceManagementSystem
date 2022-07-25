@@ -1,15 +1,14 @@
 package com.csproject.hrm.dto.chart;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@Setter
+@Getter
 public class EmployeeChart {
-  private String managerID;
+  private String employeeID;
   private String title;
   private String name;
   private String avatar;

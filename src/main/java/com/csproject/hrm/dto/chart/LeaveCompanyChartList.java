@@ -2,11 +2,12 @@ package com.csproject.hrm.dto.chart;
 
 import lombok.*;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkingTypeChart {
-  private String label;
-  private int value;
+public class LeaveCompanyChartList {
+  private String reason;
+  private Integer value;
 }

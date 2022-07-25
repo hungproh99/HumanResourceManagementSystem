@@ -7,10 +7,14 @@ import static com.csproject.hrm.common.constant.Constants.GRADE_TYPE_INVALID;
 
 public enum EGradeType {
   DEVELOP_1("Develop 1", 1),
-  DEVELOP_2("Develop 2", 2);
+  DEVELOP_2("Develop 2", 2),
+  MARKETING_1("Marketing 1", 3),
+  MARKETING_2("Marketing 2", 4),
+  SALE_1("Sale 1", 5),
+  SALE_2("Sale 2", 6);
 
-  private String label;
-  private long value;
+  private final String label;
+  private final long value;
 
   EGradeType(String label, long value) {
     this.label = label;

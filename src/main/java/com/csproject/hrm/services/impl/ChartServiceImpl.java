@@ -1,19 +1,33 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EWorkingType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.chart.*;
-import com.csproject.hrm.dto.dto.WorkingTypeDto;
-import com.csproject.hrm.repositories.ChartRepository;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
+import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ChartService;
+import com.csproject.hrm.services.SalaryMonthlyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 
 @Service
 public class ChartServiceImpl implements ChartService {
 
   @Autowired ChartRepository chartRepository;
+  @Autowired WorkingPlaceRepository contractRepository;
+  @Autowired SalaryMonthlyRepository salaryMonthlyRepository;
+  @Autowired SalaryMonthlyService salaryMonthlyService;
 
   @Override
   public String getAreaNameByEmployeeID(String employeeID) {
@@ -41,7 +55,7 @@ public class ChartServiceImpl implements ChartService {
     return dataCharts;
   }
 
-  private List<SeniorityChart> getSeniority(String areaName) {
+  private List<GeneralChart> getSeniority(String areaName) {
     List<Integer> seniorityList =
         chartRepository.getAllEmployeeSeniorityForChartByAreaName(areaName);
     Map<String, Integer> map = new LinkedHashMap<>();
@@ -70,10 +84,10 @@ public class ChartServiceImpl implements ChartService {
           }
         });
 
-    List<SeniorityChart> list = new ArrayList<>();
+    List<GeneralChart> list = new ArrayList<>();
     map.forEach(
         (s, i) -> {
-          SeniorityChart chart = new SeniorityChart();
+          GeneralChart chart = new GeneralChart();
           chart.setLabel(s);
           chart.setValue(i);
           list.add(chart);
@@ -81,7 +95,7 @@ public class ChartServiceImpl implements ChartService {
     return list;
   }
 
-  private List<AgeChart> getAge(String areaName) {
+  private List<GeneralChart> getAge(String areaName) {
     List<Integer> ageList = chartRepository.getAllEmployeeAgeForChartByAreaName(areaName);
     Map<String, Integer> map = new LinkedHashMap<>();
     map.put("18-24", 0);
@@ -109,10 +123,10 @@ public class ChartServiceImpl implements ChartService {
           }
         });
 
-    List<AgeChart> list = new ArrayList<>();
+    List<GeneralChart> list = new ArrayList<>();
     map.forEach(
         (s, i) -> {
-          AgeChart chart = new AgeChart();
+          GeneralChart chart = new GeneralChart();
           chart.setLabel(s);
           chart.setValue(i);
           list.add(chart);
@@ -121,49 +135,232 @@ public class ChartServiceImpl implements ChartService {
     return list;
   }
 
-  private List<WorkingTypeChart> getWorkingType(String areaName) {
+  private List<GeneralChart> getWorkingType(String areaName) {
     List<WorkingTypeDto> workingTypeIDs = chartRepository.getAllWorkingType();
-    List<WorkingTypeChart> list = new ArrayList<>();
+    List<GeneralChart> list = new ArrayList<>();
 
     workingTypeIDs.forEach(
         type -> {
-          WorkingTypeChart chart = new WorkingTypeChart();
+          GeneralChart chart = new GeneralChart();
           chart.setLabel(EWorkingType.getLabel(type.getName()));
           chart.setValue(
               chartRepository.countTotalEmployeeByContractTypeAndAreaName(
                   areaName, type.getType_id()));
           list.add(chart);
         });
-    list.sort((o1, o2) -> o1.getLabel().compareToIgnoreCase(o2.getLabel()));
     return list;
   }
 
   @Override
-  public OrganizationalChart getOrganizationalByAreaName(String areaName) {
+  public OrganizationalChart getOrganizational() {
     OrganizationalChart chart = new OrganizationalChart();
+    chart.setTitle("HRM");
+    chart.setChildren(getAreaManager());
 
-    chart.setTitle(areaName);
-    chart.setChildren(getEmployeeByAreaName(areaName));
     return chart;
   }
 
-  private List<EmployeeChart> getEmployeeByAreaName(String areaName) {
-    List<EmployeeChart> list = chartRepository.getManagerByAreaName(areaName);
-
-    list.forEach(
-        employee -> {
-          employee.setChildren(getEmployeeByManagerID(employee.getManagerID()));
+  private List<EmployeeChart> getAreaManager() {
+    List<AreaDto> areaList = contractRepository.getListArea();
+    List<EmployeeChart> list = new ArrayList<>();
+    areaList.forEach(
+        area -> {
+          EmployeeChart employee = chartRepository.getManagerByManagerID(area.getManager_id());
+          employee.setTitle(EArea.getLabel(area.getName()));
+          employee.setChildren(
+              getEmployeeByManagerID(employee.getEmployeeID(), EArea.getLabel(area.getName())));
+          list.add(employee);
         });
     return list;
   }
 
-  private List<EmployeeChart> getEmployeeByManagerID(String managerID) {
+  private List<EmployeeChart> getEmployeeByManagerID(String managerID, String areaName) {
     List<EmployeeChart> list = chartRepository.getEmployeeByManagerID(managerID);
+    AtomicInteger i = new AtomicInteger(1);
 
     list.forEach(
         employee -> {
-          employee.setChildren(getEmployeeByManagerID(employee.getManagerID()));
+          employee.setTitle(areaName + "-" + i.getAndIncrement());
+          employee.setChildren(
+              getEmployeeByManagerID(employee.getEmployeeID(), employee.getTitle()));
         });
     return list;
+  }
+
+  @Override
+  public List<LeaveCompanyChart> getLeaveCompanyReasonByYearAndAreaName(
+      Integer year, String areaName) {
+    List<LeaveCompanyChart> list = new ArrayList<>();
+    List<LeaveCompanyReasonDto> LeaveCompanyReasonList = chartRepository.getAllLeaveCompanyReason();
+
+    for (int i = 0; i <= 2; i++) {
+      LeaveCompanyChart chart = new LeaveCompanyChart();
+      chart.setLabel("Q" + (i + 1) + " " + year);
+
+      List<LeaveCompanyChartList> leaveCompanyChartList = new ArrayList<>();
+      int finalI = i * 4;
+      LeaveCompanyReasonList.forEach(
+          leaveCompanyReason -> {
+            Month month = Month.of(finalI + 4);
+            LocalDate startDate = LocalDate.of(year, finalI + 1, 1);
+            LocalDate endDate = LocalDate.of(year, month, month.length(startDate.isLeapYear()));
+
+            LeaveCompanyChartList leaveCompanyChart = new LeaveCompanyChartList();
+
+            leaveCompanyChart.setReason(leaveCompanyReason.getReason_name());
+            leaveCompanyChart.setValue(
+                chartRepository.countLeaveCompanyReasonByDateAndReasonID(
+                    startDate, endDate, leaveCompanyReason.getReason_id(), areaName));
+
+            leaveCompanyChartList.add(leaveCompanyChart);
+          });
+
+      chart.setValue(leaveCompanyChartList);
+      list.add(chart);
+    }
+    return list;
+  }
+
+  @Override
+  public List<PaidLeaveChart> getPaidLeaveReasonByYearAndAreaName(Integer year, String areaName) {
+    List<PaidLeaveChart> list = new ArrayList<>();
+    for (int i = 1; i <= 12; i++) {
+      PaidLeaveChart chart = new PaidLeaveChart();
+      chart.setLabel(
+          Month.of(i).getDisplayName(TextStyle.SHORT_STANDALONE, Locale.US) + " " + year);
+
+      List<PaidLeaveReasonDto> paidLeaveReasonList = chartRepository.getAllPaidLeaveReason();
+
+      List<PaidLeaveChartList> paidLeaveChartList = new ArrayList<>();
+      int finalI = i;
+      paidLeaveReasonList.forEach(
+          paidLeaveReason -> {
+            LocalDate startDate = LocalDate.of(year, finalI, 1);
+            LocalDate endDate =
+                LocalDate.of(year, finalI, startDate.getMonth().length(startDate.isLeapYear()));
+
+            PaidLeaveChartList paidLeaveChart = new PaidLeaveChartList();
+
+            paidLeaveChart.setReason(paidLeaveReason.getReason_name());
+            paidLeaveChart.setValue(
+                chartRepository.countPaidLeaveReasonByDateAndReasonID(
+                    startDate, endDate, paidLeaveReason.getReason_id(), areaName));
+
+            paidLeaveChartList.add(paidLeaveChart);
+          });
+
+      chart.setValue(paidLeaveChartList);
+      list.add(chart);
+    }
+    return list;
+  }
+
+  @Override
+  public List<GeneralSalaryChart> getSalaryStructureByDateAndEmployeeID(
+      LocalDate date, String employeeID) {
+    List<GeneralSalaryChart> list = new ArrayList<>();
+    Map<String, BigDecimal> map = new LinkedHashMap<>();
+
+    LocalDate startDate = date.withDayOfMonth(1);
+    LocalDate endDate = date.withDayOfMonth(date.getMonth().length(date.isLeapYear()));
+
+    Long salaryID =
+        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+            employeeID, startDate, endDate, ESalaryMonthly.APPROVED.name());
+
+    SalaryMonthlyDetailResponse salaryMonthly =
+        salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);
+
+    map.put("Base", salaryMonthly.getBase_salary());
+    map.put("Bonus", salaryMonthly.getBonusSalaryResponseList().getTotal());
+    map.put("Deduction", salaryMonthly.getDeductionSalaryResponseList().getTotal());
+    map.put("Advance", salaryMonthly.getAdvanceSalaryResponseList().getTotal());
+    map.put("Tax", salaryMonthly.getEmployeeTaxResponseList().getTotal());
+    map.put("Insurance", salaryMonthly.getEmployeeInsuranceResponseList().getTotal());
+
+    map.forEach(
+        (k, v) -> {
+          GeneralSalaryChart chart = new GeneralSalaryChart();
+          chart.setLabel(k);
+          chart.setValue(v);
+          list.add(chart);
+        });
+
+    return list;
+  }
+
+  @Override
+  public List<GeneralSalaryChart> getSalaryHistoryByDateAndEmployeeIDAndType(
+      LocalDate date, String employeeID, String type) {
+    List<GeneralSalaryChart> list = new ArrayList<>();
+    Map<String, BigDecimal> map = new LinkedHashMap<>();
+
+    LocalDate startDate = date.withDayOfYear(1);
+    LocalDate endDate = date.with(lastDayOfYear());
+    if ("yearly".equalsIgnoreCase(type)) {
+      endDate = LocalDate.now().with(lastDayOfYear());
+    }
+
+    List<SalaryMonthlyResponse> monthlyResponses =
+        chartRepository.getSalaryHistoryByDateAndEmployeeIDAndType(
+            startDate, endDate, employeeID, type);
+
+    AtomicReference<BigDecimal> value = new AtomicReference<>(BigDecimal.ZERO);
+    AtomicInteger count = new AtomicInteger();
+    AtomicInteger currentYear = new AtomicInteger();
+    monthlyResponses.forEach(
+        data -> {
+          LocalDate date1 = data.getStartDate();
+          GeneralSalaryChart chart = new GeneralSalaryChart();
+          if ("yearly".equalsIgnoreCase(type)) {
+            if (currentYear.get() == 0) {
+              value.set(data.getFinalSalary());
+              currentYear.set(date1.getYear());
+              count.set(1);
+
+              map.put(String.valueOf(currentYear), value.get());
+            } else if (currentYear.get() == date1.getYear()) {
+              value.set(value.get().add(data.getFinalSalary()));
+              currentYear.set(date1.getYear());
+              count.getAndIncrement();
+
+              map.put(
+                  String.valueOf(currentYear), value.get().divide(BigDecimal.valueOf(count.get())));
+            } else if (currentYear.get() != date1.getYear()) {
+              map.put(
+                  String.valueOf(currentYear), value.get().divide(BigDecimal.valueOf(count.get())));
+
+              value.set(data.getFinalSalary());
+              currentYear.set(date1.getYear());
+              count.set(1);
+
+              map.put(String.valueOf(currentYear), value.get());
+            }
+          } else if ("monthly".equalsIgnoreCase(type)) {
+            chart.setLabel(
+                Month.of(date1.getMonthValue())
+                        .getDisplayName(TextStyle.SHORT_STANDALONE, Locale.US)
+                    + " "
+                    + date1.getYear());
+            chart.setValue(data.getFinalSalary());
+            list.add(chart);
+          }
+        });
+    if ("yearly".equalsIgnoreCase(type)) {
+      map.forEach(
+          (k, v) -> {
+            GeneralSalaryChart chart = new GeneralSalaryChart();
+            chart.setLabel(k);
+            chart.setValue(v);
+            list.add(chart);
+          });
+    }
+
+    return list;
+  }
+
+  @Override
+  public LocalDate getStartDateOfContract(String employeeID) {
+    return chartRepository.getStartDateOfContract(employeeID);
   }
 }

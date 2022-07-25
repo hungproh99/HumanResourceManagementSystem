@@ -2,11 +2,12 @@ package com.csproject.hrm.dto.chart;
 
 import lombok.*;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AgeChart {
+public class GeneralChart {
   private String label;
   private int value;
 }

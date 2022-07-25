@@ -11,7 +11,5 @@ public class TaxAndInsuranceRequest {
   private String taxCode;
   private Long insuranceId;
   private String employeeId;
-  private Boolean insuranceStatus;
   private String insuranceAddress;
-  private Long policyNameId;
 }

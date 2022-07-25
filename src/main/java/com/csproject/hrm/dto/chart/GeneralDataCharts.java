@@ -4,7 +4,8 @@ import lombok.*;
 
 import java.util.List;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -12,7 +13,7 @@ public class GeneralDataCharts {
   private int totalEmployee;
   private int totalMaleEmployee;
   private int totalFemaleEmployee;
-  private List<SeniorityChart> seniorityList;
-  private List<AgeChart> ageList;
-  private List<WorkingTypeChart> workingTypeList;
+  private List<GeneralChart> seniorityList;
+  private List<GeneralChart> ageList;
+  private List<GeneralChart> workingTypeList;
 }

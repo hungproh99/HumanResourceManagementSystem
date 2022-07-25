@@ -2,13 +2,14 @@ package com.csproject.hrm.dto.chart;
 
 import lombok.*;
 
-import java.util.List;
+import java.math.BigDecimal;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LeaveChart {
+public class GeneralSalaryChart {
   private String label;
-  private List<LeaveCompanyChart> value;
+  private BigDecimal value;
 }

@@ -5,8 +5,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AreaDto {
-  private long area_id;
-  private String name;
-  private String manager_id;
+public class PaidLeaveReasonDto {
+  private Long reason_id;
+  private String reason_name;
 }
