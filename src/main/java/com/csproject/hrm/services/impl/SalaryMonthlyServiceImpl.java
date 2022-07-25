@@ -5,6 +5,7 @@ import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.common.excel.ExcelExportSalaryMonthly;
 import com.csproject.hrm.common.general.GeneralFunction;
+import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
@@ -43,6 +44,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Autowired BonusSalaryRepository bonusSalaryRepository;
   @Autowired DeductionSalaryRepository deductionSalaryRepository;
   @Autowired AdvanceSalaryRepository advanceSalaryRepository;
+  @Autowired SalaryCalculator salaryCalculator;
 
   @Override
   public SalaryMonthlyResponseList getAllSalaryMonthly(
@@ -116,7 +118,12 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
             salaryMonthlyResponse.get().getTotalAdvance());
 
     EmployeeTaxResponseList employeeTaxResponseList =
-        getEmployeeTaxResponseList(employeeId, salaryContractDto.get().getBase_salary());
+        getEmployeeTaxResponseList(
+            employeeId,
+            salaryContractDto
+                .get()
+                .getBase_salary()
+                .add(salaryContractDto.get().getAdditional_salary()));
 
     EmployeeInsuranceResponseList employeeInsuranceResponseList =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary());
@@ -395,7 +402,25 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
       maxPointPerDay = 0.5D;
     }
-    int standardDayOfWork = Integer.parseInt(String.valueOf(DAYS.between(startDate, endDate))) + 1;
+    List<LocalDate> getListHoliday = salaryCalculator.getAllHolidayByYear(startDate);
+    List<LocalDate> getListWeekend = salaryCalculator.getAllWeekendByYear(startDate);
+    int countHolidayInMonth = 0, countWeekendInMonth = 0;
+    for (LocalDate date : getListHoliday) {
+      if (date.isAfter(startDate) && date.isBefore(endDate)) {
+        countHolidayInMonth++;
+      }
+    }
+    for (LocalDate date : getListWeekend) {
+      if (date.isAfter(startDate) && date.isBefore(endDate)) {
+        countWeekendInMonth++;
+      }
+    }
+    int standardDayOfWork =
+        Integer.parseInt(String.valueOf(DAYS.between(startDate, endDate)))
+            + 1
+            - countHolidayInMonth
+            - countWeekendInMonth;
+
     Double standardPoint = standardDayOfWork * maxPointPerDay;
 
     Double actualWorkingPoint =
@@ -410,14 +435,21 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal totalAdvance =
         advanceSalaryRepository.sumListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
     BigDecimal totalTax =
-        getEmployeeTaxResponseList(employeeId, salaryContractDto.get().getBase_salary()).getTotal();
+        getEmployeeTaxResponseList(
+                employeeId,
+                salaryContractDto
+                    .get()
+                    .getBase_salary()
+                    .add(salaryContractDto.get().getAdditional_salary()))
+            .getTotal();
     BigDecimal totalInsurance =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary())
             .getTotal();
     BigDecimal salaryPerDay =
-        salaryContractDto
-            .get()
-            .getAdditional_salary()
+        (salaryContractDto
+                .get()
+                .getAdditional_salary()
+                .add(salaryContractDto.get().getBase_salary()))
             .divide(BigDecimal.valueOf(standardDayOfWork), 3, RoundingMode.HALF_UP);
     BigDecimal finalSalary =
         salaryContractDto
@@ -494,10 +526,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private EmployeeTaxResponseList getEmployeeTaxResponseList(
-      String employeeId, BigDecimal baseSalary) {
+      String employeeId, BigDecimal lastSalary) {
     List<EmployeeTaxResponse> employeeTaxResponses =
-        generalFunction.readTaxDataByEmployeeId(employeeId, baseSalary);
+        generalFunction.readTaxDataByEmployeeId(employeeId, lastSalary);
     BigDecimal totalTax = BigDecimal.ZERO;
+    if (employeeTaxResponses.isEmpty()) {
+      return new EmployeeTaxResponseList(employeeTaxResponses, totalTax);
+    }
     for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
       totalTax = totalTax.add(employeeTaxResponse.getValue());
     }
@@ -509,6 +544,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
         generalFunction.readInsuranceDataByEmployeeId(employeeId, baseSalary);
     BigDecimal totalInsurance = BigDecimal.ZERO;
+    if (employeeInsuranceResponses.isEmpty()) {
+      return new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);
+    }
     for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
       totalInsurance = totalInsurance.add(employeeInsuranceResponse.getValue());
     }

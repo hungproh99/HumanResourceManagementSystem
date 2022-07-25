@@ -269,34 +269,60 @@ public class GeneralFunction {
   }
 
   public List<EmployeeTaxResponse> readTaxDataByEmployeeId(
-      String employeeId, BigDecimal baseSalary) {
+      String employeeId, BigDecimal lastSalary) {
     List<EmployeeTaxResponse> employeeTaxResponses =
         employeeTaxRepository.getListTaxByEmployeeId(employeeId);
-    for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
-      Optional<String> policyTaxDto =
-          policyRepository.getPolicyDtoByPolicyType(employeeTaxResponse.getPolicy_type());
-      if (policyTaxDto.isEmpty()) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
+    if (employeeTaxResponses.isEmpty()) {
+      return new ArrayList<>();
+    }
+    List<EmployeeTaxResponse> finalEmployeeTax = new ArrayList<>();
+    Optional<String> policyTaxDto =
+        policyRepository.getPolicyDtoByPolicyType(employeeTaxResponses.get(0).getPolicy_type());
+    if (policyTaxDto.isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
+    }
+    Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
+    int count = 0;
+    BigDecimal salaryLevel = BigDecimal.ZERO;
+    for (Map.Entry<String, String> i : hashMap) {
+      if (employeeTaxResponses.size() == count) {
+        break;
       }
-      Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
-      for (Map.Entry<String, String> i : hashMap) {
-        employeeTaxResponse.setTax_name(i.getKey());
+      if (i.getKey().equalsIgnoreCase("Salary_Level")) {
+        salaryLevel = BigDecimal.valueOf(Long.parseLong(i.getValue()));
+      } else {
         List<RangePolicy> rangePolicyList = splitRange(i.getValue());
         BigDecimal value = BigDecimal.ZERO;
+        Double taxValue = 0D;
         for (RangePolicy rangePolicy : rangePolicyList) {
-          if (BigDecimal.valueOf(rangePolicy.getMax()).compareTo(baseSalary) >= 0
-              && BigDecimal.valueOf(rangePolicy.getMin()).compareTo(baseSalary) <= 0) {
+          BigDecimal maxValue, minValue;
+          if (rangePolicy.getMax().equalsIgnoreCase("MAX")) {
+            maxValue = BigDecimal.valueOf(Long.MAX_VALUE);
+          } else {
+            maxValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMax()));
+          }
+          minValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMin()));
+
+          if (maxValue.compareTo(lastSalary.subtract(salaryLevel)) >= 0
+              && minValue.compareTo(lastSalary.subtract(salaryLevel)) < 0) {
             value =
-                baseSalary.multiply(
-                    rangePolicy.getValue().divide(BigDecimal.TEN).divide(BigDecimal.TEN));
-            employeeTaxResponse.setTax_value(rangePolicy.getValue().doubleValue());
+                lastSalary.multiply(
+                    BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue()))
+                        .divide(BigDecimal.TEN)
+                        .divide(BigDecimal.TEN));
+            taxValue = Double.parseDouble(rangePolicy.getValue());
             break;
           }
         }
+        EmployeeTaxResponse employeeTaxResponse = employeeTaxResponses.get(count);
+        employeeTaxResponse.setTax_value(taxValue);
+        employeeTaxResponse.setTax_name(i.getKey());
         employeeTaxResponse.setValue(value);
+        finalEmployeeTax.add(employeeTaxResponse);
+        count++;
       }
     }
-    return employeeTaxResponses;
+    return finalEmployeeTax;
   }
 
   public List<EmployeeInsuranceResponse> readInsuranceDataByEmployeeId(
@@ -304,8 +330,7 @@ public class GeneralFunction {
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
         employeeInsuranceRepository.getListInsuranceByEmployeeId(employeeId);
     if (employeeInsuranceResponses.isEmpty()) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not have any insurance of " + employeeId);
+      return new ArrayList<>();
     }
     List<EmployeeInsuranceResponse> finalEmployeeInsurance = new ArrayList<>();
     Optional<String> policyTaxDto =
@@ -389,15 +414,15 @@ public class GeneralFunction {
               || splitSeparator[ONE_NUMBER] == null) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
           }
-          rangePolicy.setValue(BigDecimal.valueOf(Double.parseDouble(splitSeparator[ONE_NUMBER])));
+          rangePolicy.setValue(splitSeparator[ONE_NUMBER]);
           String[] splitDash = splitSeparator[ZERO_NUMBER].split(DASH_CHARACTER, TWO_NUMBER);
           if (isInvalidSplit(splitDash)
               || splitDash[ZERO_NUMBER] == null
               || splitDash[ONE_NUMBER] == null) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid Data");
           }
-          rangePolicy.setMin(Long.parseLong(splitDash[ZERO_NUMBER]));
-          rangePolicy.setMax(Long.parseLong(splitDash[ONE_NUMBER]));
+          rangePolicy.setMin(splitDash[ZERO_NUMBER]);
+          rangePolicy.setMax(splitDash[ONE_NUMBER]);
           rangePolicyList.add(rangePolicy);
         }
       }

@@ -77,12 +77,13 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     for (String employeeId : employeeIdList) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
     }
-    if (!role.equalsIgnoreCase("MANAGER") || !role.equalsIgnoreCase("ADMIN")) {
+    if (role.equalsIgnoreCase("USER")) {
       condition = condition.and(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()));
     }
     conditions.add(condition);
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    System.out.println(getAllSalaryMonthly(conditions, sortFields, queryParam.pagination));
     List<SalaryMonthlyResponse> salaryMonthlyResponses =
         getAllSalaryMonthly(conditions, sortFields, queryParam.pagination)
             .fetchInto(SalaryMonthlyResponse.class);

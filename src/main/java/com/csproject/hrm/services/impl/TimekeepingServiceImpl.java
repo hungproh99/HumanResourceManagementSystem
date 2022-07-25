@@ -227,20 +227,13 @@ public class TimekeepingServiceImpl implements TimekeepingService {
               timekeepingRepository.getLastTimeCheckInByTimekeeping(currentDate, employeeId);
           if (firstTimeCheckIn.isAfter(workingTimeDataDto.getStartTime())) {
             Long rangeTime = MINUTES.between(firstTimeCheckIn, workingTimeDataDto.getStartTime());
-            for (RangePolicy rangePolicy : workingTimeDataDto.getListRange()) {
-              if (rangePolicy.getMin() < rangeTime && rangePolicy.getMax() > rangeTime) {
-                maxPointPerDay -=
-                    Double.parseDouble(String.valueOf(rangePolicy.getValue())) * maxPointPerDay;
-              }
-            }
+            maxPointPerDay =
+                getMaxPointPerDay(workingTimeDataDto.getListRange(), rangeTime, maxPointPerDay);
+
           } else if (lastTimeCheckOut.isBefore(workingTimeDataDto.getEndTime())) {
             Long rangeTime = MINUTES.between(lastTimeCheckOut, workingTimeDataDto.getEndTime());
-            for (RangePolicy rangePolicy : workingTimeDataDto.getListRange()) {
-              if (rangePolicy.getMin() < rangeTime && rangePolicy.getMax() > rangeTime) {
-                maxPointPerDay -=
-                    Double.parseDouble(String.valueOf(rangePolicy.getValue())) * maxPointPerDay;
-              }
-            }
+            maxPointPerDay =
+                getMaxPointPerDay(workingTimeDataDto.getListRange(), rangeTime, maxPointPerDay);
           }
           timekeepingDtoList.add(
               new TimekeepingDto(maxPointPerDay, pointOT, currentDate, employeeId));
@@ -266,5 +259,24 @@ public class TimekeepingServiceImpl implements TimekeepingService {
         timekeepingRepository.insertTimekeeping(timekeepingDto, ETimekeepingStatus.DAY_OFF.name());
       }
     }
+  }
+
+  private Double getMaxPointPerDay(
+      List<RangePolicy> listRange, Long rangeTime, Double maxPointPerDay) {
+    for (RangePolicy rangePolicy : listRange) {
+      Long minValue, maxValue;
+      if (rangePolicy.getMin().equalsIgnoreCase("MAX")) {
+        maxValue = Long.MAX_VALUE;
+      } else {
+        maxValue = Long.parseLong(rangePolicy.getMax());
+      }
+      minValue = Long.parseLong(rangePolicy.getMin());
+
+      if (minValue < rangeTime && maxValue >= rangeTime) {
+        maxPointPerDay -=
+            Double.parseDouble(String.valueOf(rangePolicy.getValue())) * maxPointPerDay;
+      }
+    }
+    return maxPointPerDay;
   }
 }
