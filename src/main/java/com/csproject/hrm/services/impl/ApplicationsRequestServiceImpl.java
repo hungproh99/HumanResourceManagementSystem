@@ -725,6 +725,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               {
                 if (checkLevelAndValueToApprove(applicationsRequest, "salary")) {
 
+                  applicationsRequest.setApprover(applicationsRequest.getEmployeeId());
                 } else {
                   applicationsRequest =
                       createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
@@ -735,10 +736,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               {
                 if (checkLevelAndValueToApprove(applicationsRequest, "bonus")) {
 
-                } else {
-                  applicationsRequest =
-                      createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
+                  applicationsRequest.setApprover(applicationsRequest.getEmployeeId());
                 }
+                applicationsRequest =
+                    createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
               }
           }
@@ -806,8 +807,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       if (type.equalsIgnoreCase(entry.getKey())) {
         List<RangePolicy> splitRange = generalFunction.splitRange(entry.getValue());
         for (RangePolicy rangePolicy : splitRange) {
-          if (rangePolicy.getMin() <= level && rangePolicy.getMax() >= level) {
-            return new BigDecimal(value).compareTo(rangePolicy.getValue()) != 1;
+          if (Integer.parseInt(rangePolicy.getMin()) <= level
+              && Integer.parseInt(rangePolicy.getMax()) >= level) {
+            return Long.valueOf(value).compareTo(Long.valueOf(rangePolicy.getValue())) > 0;
           }
         }
       }
