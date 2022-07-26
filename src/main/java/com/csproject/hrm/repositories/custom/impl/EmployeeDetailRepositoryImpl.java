@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
 import com.csproject.hrm.dto.dto.WorkingPlaceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
@@ -460,19 +461,26 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   @Override
   public Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
+
+    List<EmployeeInsuranceDto> list =
         dslContext
             .select(
-                EMPLOYEE.TAX_CODE,
-                EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
-                EMPLOYEE_INSURANCE.ADDRESS)
+                EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID.as("insuranceID"),
+                EMPLOYEE_INSURANCE.ADDRESS.as("address"),
+                POLICY_NAME.POLICY_NAME_.as("insuranceName"))
+            .from(EMPLOYEE_INSURANCE)
+            .leftJoin(POLICY_NAME)
+            .on(EMPLOYEE_INSURANCE.POLICY_NAME_ID.eq(POLICY_NAME.POLICY_NAME_ID))
+            .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(employeeID))
+            .fetchInto(EmployeeInsuranceDto.class);
+
+    final var query =
+        dslContext
+            .select(EMPLOYEE.TAX_CODE)
             .from(EMPLOYEE)
-            .leftJoin(EMPLOYEE_INSURANCE)
-            .on(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            //            .leftJoin(POLICY_TYPE)
-            //            .on(EMPLOYEE_INSURANCE.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
-    return query.fetchOptionalInto(TaxAndInsuranceResponse.class);
+    return Optional.ofNullable(
+        query.fetchOneInto(TaxAndInsuranceResponse.class).builder().insuranceDtos(list).build());
   }
 
   @Override

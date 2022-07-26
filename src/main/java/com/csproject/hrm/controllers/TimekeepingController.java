@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -29,7 +27,7 @@ public class TimekeepingController {
   @Autowired TimekeepingService timekeepingService;
 
   @GetMapping(URI_GET_LIST_TIMEKEEPING)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListAllTimekeeping(
       @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
@@ -39,7 +37,7 @@ public class TimekeepingController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_TIMEKEEPING)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadCsvTimekeeping(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
@@ -57,7 +55,7 @@ public class TimekeepingController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_TIMEKEEPING)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadExcelTimekeeping(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
@@ -74,7 +72,7 @@ public class TimekeepingController {
   }
 
   @GetMapping(URI_GET_DETAIL_TIMEKEEPING)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListDetailTimekeeping(
       @RequestParam String employeeID, @RequestParam String date) {
     Optional<TimekeepingDetailResponse> timekeeping =
