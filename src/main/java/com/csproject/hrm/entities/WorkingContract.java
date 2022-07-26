@@ -48,4 +48,8 @@ public class WorkingContract {
 
   @OneToMany(mappedBy = "workingContract", fetch = FetchType.LAZY)
   private List<WorkingPlace> workingPlace;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "leave_company_reason_id")
+  private LeaveCompanyReason leaveCompanyReason;
 }

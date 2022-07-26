@@ -5,16 +5,9 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -30,9 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -636,11 +627,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private void updateAdvanceRequest(
-      LocalDate date,
-      String description,
-      BigDecimal value,
-      String employeeId,
-      Long requestId) {
+      LocalDate date, String description, BigDecimal value, String employeeId, Long requestId) {
     if (date == null || description == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
@@ -698,6 +685,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               }
             case 2:
               {
+                Integer[] otTimeRemaining =
+                    getOTTimeRemaining(applicationsRequest.getCreateEmployeeId());
+                if (otTimeRemaining[0] < 1) {
+                  throw new CustomErrorException("Your OT time remaining in this year is over!");
+                }
+                if (otTimeRemaining[1] < 1) {
+                  throw new CustomErrorException("Your OT time remaining in this month is over!");
+                }
                 applicationsRequest = createRequestForWorkingScheduleAndOT(applicationsRequest);
               }
               break;
@@ -728,16 +723,22 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               }
             case 4:
               {
-                checkLevelAndValueToApprove(applicationsRequest, "salary");
-                applicationsRequest =
-                    createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
+                if (checkLevelAndValueToApprove(applicationsRequest, "salary")) {
+
+                } else {
+                  applicationsRequest =
+                      createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
+                }
                 break;
               }
             case 5:
               {
-                checkLevelAndValueToApprove(applicationsRequest, "bonus");
-                applicationsRequest =
-                    createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
+                if (checkLevelAndValueToApprove(applicationsRequest, "bonus")) {
+
+                } else {
+                  applicationsRequest =
+                      createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
+                }
                 break;
               }
           }
@@ -790,64 +791,28 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
   }
 
-  private void checkLevelAndValueToApprove(
+  private boolean checkLevelAndValueToApprove(
       ApplicationsRequestRequestC applicationsRequest, String type) {
     String data =
         applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
-    String[] splitData = getKeyInDescription(data);
+
+    HashMap<String, String> splitData = generalFunction.splitData(data);
 
     String employeeId = applicationsRequest.getCreateEmployeeId().trim();
-    long value = Long.parseLong(applicationsRequest.getValue().trim());
     int level = employeeDetailRepository.getLevelByEmployeeID(employeeId);
-
-    for (String data1 : splitData) {
-      if (data1.contains(type)) {
-        String[] data2 = getBonusAndSalary(data1);
-        switch (data2[1].length()) {
-          case 1:
-            {
-              if (Integer.parseInt(data2[1]) >= level) {
-                if (value <= Long.parseLong(data2[2])) {
-                  return;
-                } else {
-                  throw new CustomErrorException(
-                      "Please input " + type + " value under " + data2[2] + "!");
-                }
-              }
-              break;
-            }
-          case 2:
-            {
-              String[] data4 = data2[1].split("");
-              if (Integer.parseInt(data4[1]) < level) {
-                if (value <= Long.parseLong(data2[2])) {
-                  return;
-                } else {
-                  throw new CustomErrorException(
-                      "Please input " + type + " value under " + data2[2] + "!");
-                }
-              }
-              break;
-            }
-          case 3:
-            {
-              String[] data4 = data2[1].split("");
-              if ((Integer.parseInt(data4[0]) <= level && Integer.parseInt(data4[2]) >= level)) {
-                if (value <= Long.parseLong(data2[2])) {
-                  return;
-                } else {
-                  throw new CustomErrorException(
-                      "Please input " + type + " value under " + data2[2] + "!");
-                }
-              }
-              break;
-            }
-          default:
-            throw new CustomErrorException("You don't have permission to create request!");
+    String value = applicationsRequest.getValue();
+    Set<Map.Entry<String, String>> map = splitData.entrySet();
+    for (Map.Entry<String, String> entry : map) {
+      if (type.equalsIgnoreCase(entry.getKey())) {
+        List<RangePolicy> splitRange = generalFunction.splitRange(entry.getValue());
+        for (RangePolicy rangePolicy : splitRange) {
+          if (rangePolicy.getMin() <= level && rangePolicy.getMax() >= level) {
+            return new BigDecimal(value).compareTo(rangePolicy.getValue()) != 1;
+          }
         }
       }
     }
-    throw new CustomErrorException("You don't have permission to create request!");
+    return false;
   }
 
   private ApplicationsRequestRequestC setDescriptionAndData(
@@ -1087,14 +1052,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
-  public int getOTDTimeRemaining(String employeeId) {
-    //    int current = timekeepingRepository.countOvertimeOfEmployeeByYear(employeeId);
-    //
-    //    String data = applicationsRequestRepository.getDataOfPolicy(2L);
-    //    String[] splitData = getKeyInDescription(data);
-    //
-    //    return Integer.parseInt(splitData[1].split("\\|")[1]) - current;
-    return 0;
+  public Integer[] getOTTimeRemaining(String employeeId) {
+    Integer currentOTInYear = timekeepingRepository.countOvertimeOfEmployeeByYear(employeeId);
+    Integer currentOTInMonth = timekeepingRepository.countOvertimeOfEmployeeByMonth(employeeId);
+    OvertimeDataDto dataDto = generalFunction.readOvertimeData();
+
+    return new Integer[] {
+      dataDto.getYear() - currentOTInYear, dataDto.getMonth() - currentOTInMonth
+    };
   }
 
   private String[] getKeyInDescription(String description) {

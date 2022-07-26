@@ -1,16 +1,16 @@
 package com.csproject.hrm.dto.response;
 
+import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TaxAndInsuranceResponse {
   private Long tax_code;
-  private Long employee_insurance_id;
-  private String policy_type;
-  private Long policy_type_id;
-  private Long policy_category_id;
-  private String address;
+  private List<EmployeeInsuranceDto> insuranceDtos;
 }

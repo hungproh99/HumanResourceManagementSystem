@@ -40,7 +40,7 @@ public class WorkingPlaceRepositoryImpl implements WorkingPlaceRepositoryCustom 
   public List<AreaDto> getListArea() {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(AREA.AREA_ID, AREA.NAME)
+        .select(AREA.AREA_ID, AREA.NAME, AREA.MANAGER_ID)
         .from(AREA)
         .orderBy(AREA.AREA_ID.asc())
         .fetchInto(AreaDto.class);
