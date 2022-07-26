@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -42,4 +39,8 @@ public class Timekeeping {
 
   @OneToOne(mappedBy = "timekeeping", fetch = FetchType.LAZY)
   private Overtime overTime;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "paid_leave_reason_id")
+  private PaidLeaveReason paidLeaveReason;
 }

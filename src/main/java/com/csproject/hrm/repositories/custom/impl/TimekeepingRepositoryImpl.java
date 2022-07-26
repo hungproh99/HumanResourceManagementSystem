@@ -1,9 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -795,77 +793,61 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
+  public Integer countOvertimeOfEmployeeByMonth(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    Integer total = 0;
+
+    List<Integer> list =
+        dslContext
+            .select(
+                ((hour(OVERTIME.END_TIME).multiply(60).add(minute(OVERTIME.END_TIME)))
+                        .minus(
+                            (hour(OVERTIME.START_TIME))
+                                .multiply(60)
+                                .add(minute(OVERTIME.START_TIME))))
+                    .cast(SQLDataType.INTEGER))
+            .from(OVERTIME)
+            .leftJoin(TIMEKEEPING)
+            .on(OVERTIME.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeID))
+            .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
+            .and(month(TIMEKEEPING.DATE).eq(LocalDate.now().getMonthValue()))
+            .fetchInto(Integer.class);
+
+    for (Integer i : list) {
+      total = total + i;
+    }
+
+    return total;
+  }
+
+  @Override
   public Integer countOvertimeOfEmployeeByYear(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-    TableLike<?> rowNumberAsc =
+    Integer total = 0;
+
+    List<Integer> list =
         dslContext
             .select(
-                asterisk(),
-                rowNumber()
-                    .over()
-                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
-                    .as("rowNumber"))
-            .from(CHECKIN_CHECKOUT);
-
-    TableLike<?> rowNumberDesc =
-        dslContext
-            .select(
-                asterisk(),
-                rowNumber()
-                    .over()
-                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
-                    .as("rowNumber"))
-            .from(CHECKIN_CHECKOUT);
-
-    TableLike<?> firstTimeCheckIn =
-        dslContext
-            .select()
-            .from(rowNumberAsc)
-            .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1));
-    TableLike<?> lastTimeCheckOut =
-        dslContext
-            .select()
-            .from(rowNumberDesc)
-            .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
-
-    System.out.println(
-        dslContext
-            .select(TIMEKEEPING.TIMEKEEPING_ID)
-            .from(TIMEKEEPING)
-            .leftJoin(LIST_TIMEKEEPING_STATUS)
-            .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
-            .leftJoin(TIMEKEEPING_STATUS)
-            .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
-            .leftJoin(firstTimeCheckIn)
-            .on(
-                firstTimeCheckIn
-                    .field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-                    .eq(TIMEKEEPING.TIMEKEEPING_ID))
-            .leftJoin(lastTimeCheckOut)
-            .on(
-                lastTimeCheckOut
-                    .field(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-                    .eq(TIMEKEEPING.TIMEKEEPING_ID))
-            .where(TIMEKEEPING.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+                ((hour(OVERTIME.END_TIME).multiply(60).add(minute(OVERTIME.END_TIME)))
+                        .minus(
+                            (hour(OVERTIME.START_TIME))
+                                .multiply(60)
+                                .add(minute(OVERTIME.START_TIME))))
+                    .cast(SQLDataType.INTEGER))
+            .from(OVERTIME)
+            .leftJoin(TIMEKEEPING)
+            .on(OVERTIME.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeID))
             .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
-            .and(TIMEKEEPING_STATUS.NAME.eq("OVERTIME")));
-    return dslContext
-        .select(TIMEKEEPING.TIMEKEEPING_ID)
-        .from(TIMEKEEPING)
-        .leftJoin(LIST_TIMEKEEPING_STATUS)
-        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
-        .leftJoin(TIMEKEEPING_STATUS)
-        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
-        .leftJoin(firstTimeCheckIn)
-        .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
-        .leftJoin(lastTimeCheckOut)
-        .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
-        .where(TIMEKEEPING.EMPLOYEE_ID.equalIgnoreCase(employeeID))
-        .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
-        .and(TIMEKEEPING_STATUS.NAME.eq("OVERTIME"))
-        .fetchOneInto(Integer.class);
+            .fetchInto(Integer.class);
+
+    for (Integer i : list) {
+      total = total + i;
+    }
+
+    return total;
   }
 }

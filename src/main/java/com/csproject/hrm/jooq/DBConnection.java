@@ -18,7 +18,7 @@ public class DBConnection {
     try {
       connection =
           DriverManager.getConnection(
-              "jdbc:mysql://localhost:3306/human_resource_management?allowMultiQueries=true", "ndh4899", "hungnd");
+              "jdbc:mysql://localhost:3306/human_resource_management", "ndh4899", "hungnd");
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

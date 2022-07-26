@@ -1,5 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
+import com.csproject.hrm.dto.dto.WorkingPlaceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.DBConnection;
@@ -10,9 +12,8 @@ import org.jooq.codegen.maven.example.Tables;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -154,33 +155,33 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
   @Override
   public void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    dslContext
-        .update(EMPLOYEE)
-        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(taxAndInsurance.getEmployeeId()))
-        .execute();
+    //    final DSLContext dslContext = DSL.using(connection.getConnection());
+    //    dslContext
+    //        .update(EMPLOYEE)
+    //        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
+    //        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
+    //        .execute();
 
-//    dslContext
-//        .insertInto(
-//            EMPLOYEE_INSURANCE,
-//            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
-//            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
-//            EMPLOYEE_INSURANCE.ADDRESS,
-//            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
-//            EMPLOYEE_INSURANCE.POLICY_TYPE_ID)
-//        .values(
-//            taxAndInsurance.getInsuranceId(),
-//            taxAndInsurance.getEmployeeId(),
-//            taxAndInsurance.getInsuranceAddress(),
-//            taxAndInsurance.getInsuranceStatus(),
-//            taxAndInsurance.getPolicyTypeId())
-//        .onDuplicateKeyUpdate()
-//        .set(EMPLOYEE_INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
-//        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-//        .set(EMPLOYEE_INSURANCE.INSURANCE_STATUS, taxAndInsurance.getInsuranceStatus())
-//        .set(EMPLOYEE_INSURANCE.POLICY_TYPE_ID, taxAndInsurance.getPolicyTypeId())
-//        .execute();
+    //    dslContext
+    //        .insertInto(
+    //            EMPLOYEE_INSURANCE,
+    //            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
+    //            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
+    //            EMPLOYEE_INSURANCE.ADDRESS,
+    //            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
+    //            EMPLOYEE_INSURANCE.POLICY_TYPE_ID)
+    //        .values(
+    //            taxAndInsurance.getInsuranceId(),
+    //            taxAndInsurance.getEmployeeId(),
+    //            taxAndInsurance.getInsuranceAddress(),
+    //            taxAndInsurance.getInsuranceStatus(),
+    //            taxAndInsurance.getPolicyTypeId())
+    //        .onDuplicateKeyUpdate()
+    //        .set(EMPLOYEE_INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
+    //        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
+    //        .set(EMPLOYEE_INSURANCE.INSURANCE_STATUS, taxAndInsurance.getInsuranceStatus())
+    //        .set(EMPLOYEE_INSURANCE.POLICY_TYPE_ID, taxAndInsurance.getPolicyTypeId())
+    //        .execute();
   }
 
   @Override
@@ -195,7 +196,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         });
   }
 
-  public InsertOnDuplicateSetMoreStep<?> updateIdentityCard(
+  private InsertOnDuplicateSetMoreStep<?> updateIdentityCard(
       Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
     return DSL.using(configuration)
         .insertInto(
@@ -222,7 +223,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(IDENTITY_CARD.PROVIDE_PLACE, employeeAdditionalInfo.getProvidePlace());
   }
 
-  public Update<?> updateEmployeeAdditional(
+  private Update<?> updateEmployeeAdditional(
       Configuration configuration, EmployeeAdditionalInfoRequest employeeAdditionalInfo) {
     return DSL.using(configuration)
         .update(EMPLOYEE)
@@ -232,7 +233,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(EMPLOYEE.PHONE_NUMBER, employeeAdditionalInfo.getPhone_number())
         .set(EMPLOYEE.NICK_NAME, employeeAdditionalInfo.getNick_name())
         .set(EMPLOYEE.FACEBOOK, employeeAdditionalInfo.getFacebook())
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeAdditionalInfo.getEmployee_id()));
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeAdditionalInfo.getEmployee_id()));
   }
 
   @Override
@@ -242,43 +243,79 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext.transaction(
         configuration -> {
           queries.add(updateEmployee(configuration, employeeDetailRequest));
-          queries.add(updateWorkingPlace(configuration, employeeDetailRequest));
+          WorkingPlaceDto workingPlace =
+              getWorkingPlaceByContractID(employeeDetailRequest.getWorking_contract_id());
           queries.add(updateWorkingContract(configuration, employeeDetailRequest));
+          if (workingPlace.getJob_id().equals(employeeDetailRequest.getJob_id())
+              && workingPlace.getArea_id().equals(employeeDetailRequest.getArea_id())
+              && workingPlace.getOffice_id().equals(employeeDetailRequest.getOffice_id())
+              && workingPlace.getGrade_id().equals(employeeDetailRequest.getGrade_id())) {
+            queries.add(updateWorkingPlace(configuration, employeeDetailRequest));
+          } else {
+            employeeDetailRequest.setWorking_place_id(workingPlace.getWorking_place_id());
+            queries.add(insertWorkingPlace(configuration, employeeDetailRequest));
+          }
           DSL.using(configuration).batch(queries).execute();
         });
   }
 
-  public InsertOnDuplicateSetMoreStep<?> updateWorkingPlace(
+  private WorkingPlaceDto getWorkingPlaceByContractID(Long contractID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    System.out.println(
+        dslContext
+            .select()
+            .from(WORKING_PLACE)
+            .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(contractID))
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.eq(true)));
+    return dslContext
+        .select()
+        .from(WORKING_PLACE)
+        .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(contractID))
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.eq(true))
+        .fetchOneInto(WorkingPlaceDto.class);
+  }
+
+  private Insert<?> insertWorkingPlace(
       Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
+    DSL.using(configuration)
+        .update(WORKING_PLACE)
+        .set(WORKING_PLACE.WORKING_PLACE_STATUS, false)
+        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(employeeDetailRequest.getWorking_place_id()))
+        .execute();
     return DSL.using(configuration)
         .insertInto(
             WORKING_PLACE,
-            WORKING_PLACE.WORKING_PLACE_ID,
             WORKING_PLACE.WORKING_CONTRACT_ID,
             WORKING_PLACE.AREA_ID,
             WORKING_PLACE.JOB_ID,
             WORKING_PLACE.OFFICE_ID,
             WORKING_PLACE.GRADE_ID,
-            WORKING_PLACE.WORKING_PLACE_STATUS)
+            WORKING_PLACE.WORKING_PLACE_STATUS,
+            WORKING_PLACE.START_DATE)
         .values(
-            employeeDetailRequest.getWorking_place_id(),
             employeeDetailRequest.getWorking_contract_id(),
             employeeDetailRequest.getArea_id(),
-            employeeDetailRequest.getGrade_id(),
+            employeeDetailRequest.getJob_id(),
             employeeDetailRequest.getOffice_id(),
             employeeDetailRequest.getGrade_id(),
-            employeeDetailRequest.getWorking_place_status())
-        .onDuplicateKeyUpdate()
-        .set(WORKING_PLACE.WORKING_PLACE_ID, employeeDetailRequest.getWorking_place_id())
+            true,
+            LocalDate.now());
+  }
+
+  private Update<?> updateWorkingPlace(
+      Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
+    return DSL.using(configuration)
+        .update(WORKING_PLACE)
         .set(WORKING_PLACE.WORKING_CONTRACT_ID, employeeDetailRequest.getWorking_contract_id())
         .set(WORKING_PLACE.GRADE_ID, employeeDetailRequest.getGrade_id())
         .set(WORKING_PLACE.AREA_ID, employeeDetailRequest.getArea_id())
-        .set(WORKING_PLACE.JOB_ID, employeeDetailRequest.getGrade_id())
+        .set(WORKING_PLACE.JOB_ID, employeeDetailRequest.getJob_id())
         .set(WORKING_PLACE.OFFICE_ID, employeeDetailRequest.getOffice_id())
-        .set(WORKING_PLACE.WORKING_PLACE_STATUS, employeeDetailRequest.getWorking_place_status());
+        .set(WORKING_PLACE.START_DATE, employeeDetailRequest.getStart_date())
+        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(employeeDetailRequest.getWorking_place_id()));
   }
 
-  public InsertOnDuplicateSetMoreStep<?> updateWorkingContract(
+  private InsertOnDuplicateSetMoreStep<?> updateWorkingContract(
       Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
     return DSL.using(configuration)
         .insertInto(
@@ -302,7 +339,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(WORKING_CONTRACT.EMPLOYEE_ID, employeeDetailRequest.getEmployee_id());
   }
 
-  public Update<?> updateEmployee(
+  private Update<?> updateEmployee(
       Configuration configuration, EmployeeDetailRequest employeeDetailRequest) {
     return DSL.using(configuration)
         .update(EMPLOYEE)
@@ -314,7 +351,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(EMPLOYEE.GENDER, employeeDetailRequest.getGender())
         .set(EMPLOYEE.AVATAR, employeeDetailRequest.getAvatar())
         .set(EMPLOYEE.MARITAL_STATUS, employeeDetailRequest.getMarital_status())
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeDetailRequest.getEmployee_id()));
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeDetailRequest.getEmployee_id()));
   }
 
   @Override
@@ -335,7 +372,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(RELATIVE_INFORMATION.RELATIVE_TYPE.eq(RELATIVE_TYPE.TYPE_ID))
             .rightJoin(EMPLOYEE)
             .on(RELATIVE_INFORMATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(RelativeInformationResponse.class);
   }
 
@@ -360,7 +397,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(WORKING_HISTORY)
             .rightJoin(EMPLOYEE)
             .on(WORKING_HISTORY.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(WorkingHistoryResponse.class);
   }
 
@@ -379,7 +416,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EDUCATION)
             .rightJoin(EMPLOYEE)
             .on(EDUCATION.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchInto(EducationResponse.class);
   }
 
@@ -393,7 +430,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(BANK)
             .rightJoin(EMPLOYEE)
             .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchOptionalInto(BankResponse.class);
   }
 
@@ -417,29 +454,33 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(EMPLOYEE)
             .leftJoin(IDENTITY_CARD)
             .on(IDENTITY_CARD.CARD_ID.eq(EMPLOYEE.CARD_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
     return query.fetchOptionalInto(EmployeeAdditionalInfo.class);
   }
 
   @Override
   public Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
+
+    List<EmployeeInsuranceDto> list =
         dslContext
             .select(
-                EMPLOYEE.TAX_CODE,
-                EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
-                EMPLOYEE_INSURANCE.ADDRESS,
-                POLICY_TYPE.POLICY_TYPE_,
-                POLICY_TYPE.POLICY_TYPE_ID,
-                POLICY_TYPE.POLICY_CATEGORY_ID)
+                EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID.as("insuranceID"),
+                EMPLOYEE_INSURANCE.ADDRESS.as("address"),
+                POLICY_NAME.POLICY_NAME_.as("insuranceName"))
+            .from(EMPLOYEE_INSURANCE)
+            .leftJoin(POLICY_NAME)
+            .on(EMPLOYEE_INSURANCE.POLICY_NAME_ID.eq(POLICY_NAME.POLICY_NAME_ID))
+            .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(employeeID))
+            .fetchInto(EmployeeInsuranceDto.class);
+
+    final var query =
+        dslContext
+            .select(EMPLOYEE.TAX_CODE)
             .from(EMPLOYEE)
-            .leftJoin(EMPLOYEE_INSURANCE)
-            .on(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-//            .leftJoin(POLICY_TYPE)
-//            .on(EMPLOYEE_INSURANCE.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
-    return query.fetchOptionalInto(TaxAndInsuranceResponse.class);
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
+    return Optional.ofNullable(
+        query.fetchOneInto(TaxAndInsuranceResponse.class).builder().insuranceDtos(list).build());
   }
 
   @Override
@@ -492,7 +533,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
 
     return query.fetchOptionalInto(EmployeeDetailResponse.class);
   }
@@ -504,7 +545,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         dslContext
             .select(EMPLOYEE.EMPLOYEE_ID)
             .from(EMPLOYEE)
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID)));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID)));
   }
 
   @Override
@@ -515,13 +556,13 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         dslContext
             .select(EMPLOYEE.MANAGER_ID)
             .from(EMPLOYEE)
-            .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
             .fetchOneInto(String.class);
 
     return dslContext
         .select(EMPLOYEE.FULL_NAME.concat(" - ").concat(EMPLOYEE.EMPLOYEE_ID))
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(managerID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(managerID))
         .fetchOneInto(String.class);
   }
 
@@ -531,7 +572,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     return dslContext
         .select(EMPLOYEE.FULL_NAME.concat(" - ").concat(EMPLOYEE.EMPLOYEE_ID))
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
         .fetchOneInto(String.class);
   }
 
@@ -540,10 +581,9 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
     return dslContext
-        .select()
         .select(EMPLOYEE.LEVEL)
         .from(EMPLOYEE)
-        .where(EMPLOYEE.EMPLOYEE_ID.equalIgnoreCase(employeeID))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
         .fetchOneInto(Integer.class);
   }
 
