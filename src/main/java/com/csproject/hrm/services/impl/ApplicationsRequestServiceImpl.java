@@ -5,9 +5,17 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -23,7 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -109,6 +119,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         || updateApplicationRequestRequest.getRequestStatus() == null
         || updateApplicationRequestRequest.getApproverId() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    } else if (!applicationsRequestRepository.checkExistRequestId(
+        updateApplicationRequestRequest.getApplicationRequestId())) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "Not exist with request id " + updateApplicationRequestRequest.getApplicationRequestId());
+    } else if (!employeeDetailRepository.checkEmployeeIDIsExists(
+        updateApplicationRequestRequest.getApproverId())) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "Not exist with employee id " + updateApplicationRequestRequest.getApproverId());
     }
     LocalDateTime latestDate = LocalDateTime.now();
     applicationsRequestRepository.updateCheckedApplicationRequest(
@@ -153,14 +173,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return requestNameDtoList;
   }
 
-  @Override
-  public void updateIsRead(Long requestId) {
-    if (requestId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
-    }
-    boolean isRead = false;
-    applicationsRequestRepository.changeIsRead(isRead, requestId);
-  }
+//  @Override
+//  public void updateIsRead(Long requestId) {
+//    if (requestId == null) {
+//      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+//    }
+//    boolean isRead = false;
+//    applicationsRequestRepository.changeIsRead(isRead, requestId);
+//  }
 
   @Override
   public void updateApproveApplicationRequest(Long requestId) {
@@ -176,12 +196,20 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
-  public void updateRejectApplicationRequest(Long requestId) {
-    if (requestId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+  public void updateRejectApplicationRequest(
+      RejectApplicationRequestRequest rejectApplicationRequestRequest) {
+    if (rejectApplicationRequestRequest.getRequestId() == null) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          NO_DATA + "with " + rejectApplicationRequestRequest.getRequestId());
+    } else if (!applicationsRequestRepository.checkExistRequestId(
+        rejectApplicationRequestRequest.getRequestId())) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "Not exist with request id " + rejectApplicationRequestRequest.getRequestId());
     }
-    applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.REJECTED.name(), LocalDateTime.now());
+    applicationsRequestRepository.updateRejectApplicationRequest(
+        rejectApplicationRequestRequest, LocalDateTime.now());
   }
 
   @Override
@@ -784,7 +812,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequest.setDuration(LocalDateTime.now().plusDays(3));
     applicationsRequest.setIsBookmark(false);
     applicationsRequest.setIsRemind(false);
-    applicationsRequest.setIsRead(false);
 
     applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
 

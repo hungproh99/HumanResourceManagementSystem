@@ -115,6 +115,24 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
   @Override
   public Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByDeductionSalary(Long deductionSalaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    System.out.println(
+        dslContext
+            .select(
+                EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+                SALARY_MONTHLY.START_DATE.as("startDate"),
+                SALARY_MONTHLY.END_DATE.as("endDate"))
+            .from(EMPLOYEE)
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(SALARY_CONTRACT)
+            .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(SALARY_MONTHLY)
+            .on(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(SALARY_CONTRACT.SALARY_CONTRACT_ID))
+            .leftJoin(DEDUCTION_SALARY)
+            .on(DEDUCTION_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
+            .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue()));
     return dslContext
         .select(
             EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
@@ -130,6 +148,8 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
         .leftJoin(DEDUCTION_SALARY)
         .on(DEDUCTION_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
         .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryId))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
         .fetchOptionalInto(SalaryMonthlyInfoDto.class);
   }
 

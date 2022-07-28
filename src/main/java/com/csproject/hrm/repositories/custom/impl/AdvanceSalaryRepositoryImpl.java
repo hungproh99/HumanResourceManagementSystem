@@ -122,6 +122,8 @@ public class AdvanceSalaryRepositoryImpl implements AdvanceSalaryRepositoryCusto
         .leftJoin(ADVANCES_SALARY)
         .on(ADVANCES_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
         .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceSalaryId))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
         .fetchOptionalInto(SalaryMonthlyInfoDto.class);
   }
 

@@ -127,6 +127,8 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
         .leftJoin(BONUS_SALARY)
         .on(BONUS_SALARY.SALARY_ID.eq(SALARY_MONTHLY.SALARY_ID))
         .where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryId))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
         .fetchOptionalInto(SalaryMonthlyInfoDto.class);
   }
 

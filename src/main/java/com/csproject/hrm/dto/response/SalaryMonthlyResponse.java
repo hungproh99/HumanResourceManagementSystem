@@ -27,4 +27,5 @@ public class SalaryMonthlyResponse {
   private LocalDate startDate;
   private LocalDate endDate;
   private String salaryStatus;
+  private String comment;
 }

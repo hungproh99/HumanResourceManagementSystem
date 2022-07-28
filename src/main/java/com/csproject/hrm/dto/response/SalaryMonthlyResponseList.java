@@ -12,4 +12,5 @@ import java.util.List;
 public class SalaryMonthlyResponseList {
   private List<SalaryMonthlyResponse> salaryMonthlyResponses;
   private int total;
+  private String is_enough_level;
 }

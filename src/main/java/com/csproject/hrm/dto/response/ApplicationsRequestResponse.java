@@ -27,6 +27,6 @@ public class ApplicationsRequestResponse {
   private List<String> checked_by;
   private String is_bookmark;
   private String is_enough_level;
-  private String is_read;
   private String type;
+  private String comment;
 }
