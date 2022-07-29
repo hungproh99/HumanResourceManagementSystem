@@ -2,6 +2,7 @@ package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
@@ -110,12 +111,12 @@ public class ApplicationsRequestController {
         applicationsRequestService.getAllRequestNameByRequestTypeID(requestTypeID));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @PostMapping(URI_UPDATE_IS_READ)
-  public ResponseEntity<?> updateIsRead(@RequestParam Long requestId) {
-    applicationsRequestService.updateIsRead(requestId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
-  }
+//  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+//  @PostMapping(URI_UPDATE_IS_READ)
+//  public ResponseEntity<?> updateIsRead(@RequestParam Long requestId) {
+//    applicationsRequestService.updateIsRead(requestId);
+//    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+//  }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PostMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
@@ -126,8 +127,9 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PostMapping(URI_UPDATE_REJECT_APPLICATION_REQUEST)
-  public ResponseEntity<?> updateRejectApplicationRequest(@RequestParam Long requestId) {
-    applicationsRequestService.updateRejectApplicationRequest(requestId);
+  public ResponseEntity<?> updateRejectApplicationRequest(
+      @RequestBody RejectApplicationRequestRequest rejectApplicationRequestRequest) {
+    applicationsRequestService.updateRejectApplicationRequest(rejectApplicationRequestRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 

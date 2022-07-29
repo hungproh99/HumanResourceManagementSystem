@@ -44,7 +44,7 @@ public class Uri {
   public static final String URI_UPDATE_CHECK_APPLICATION_QUEST =
       "/update_checked_application_request";
 
-  public static final String URI_UPDATE_IS_READ = "/update_is_read";
+//  public static final String URI_UPDATE_IS_READ = "/update_is_read";
   public static final String URI_UPDATE_APPROVE_APPLICATION_REQUEST = "/update_approve_application_request";
   public static final String URI_UPDATE_REJECT_APPLICATION_REQUEST = "/update_reject_application_request";
 
@@ -54,15 +54,27 @@ public class Uri {
   public static final String URI_DOWNLOAD_CSV_REQUEST_RECEIVE = "/download_csv_request_receive";
   public static final String URI_DOWNLOAD_EXCEL_REQUEST_SEND = "/download_excel_request_send";
   public static final String URI_DOWNLOAD_CSV_REQUEST_SEND = "/download_csv_request_send";
-  public static final String URI_GET_ALL_SALARY_MONTHLY = "/get_all_salary_monthly";
+  public static final String URI_GET_ALL_PERSONAL_SALARY_MONTHLY =
+      "/get_all_personal_salary_monthly";
+  public static final String URI_GET_ALL_MANAGEMENT_SALARY_MONTHLY =
+      "/get_all_management_salary_monthly";
   public static final String URI_GET_SALARY_MONTHLY_DETAIL = "/get_salary_monthly_detail";
-  public static final String URI_DOWNLOAD_EXCEL_SALARY_MONTHLY = "/download_excel_salary_monthly";
-  public static final String URI_DOWNLOAD_CSV_SALARY_MONTHLY = "/download_csv_salary_monthly";
+  public static final String URI_DOWNLOAD_EXCEL_PERSONAL_SALARY_MONTHLY =
+      "/download_excel_personal_salary_monthly";
+  public static final String URI_DOWNLOAD_CSV_PERSONAL_SALARY_MONTHLY =
+      "/download_csv_personal_salary_monthly";
+
+  public static final String URI_DOWNLOAD_EXCEL_MANAGEMENT_SALARY_MONTHLY =
+      "/download_excel_management_salary_monthly";
+  public static final String URI_DOWNLOAD_CSV_MANAGEMENT_SALARY_MONTHLY =
+      "/download_csv_management_salary_monthly";
   public static final String URI_UPDATE_DEDUCTION_SALARY = "/update_deduction_salary";
   public static final String URI_DELETE_DEDUCTION_SALARY = "/delete_deduction_salary";
   public static final String URI_UPDATE_BONUS_SALARY = "/update_bonus_salary";
   public static final String URI_DELETE_BONUS_SALARY = "/delete_bonus_salary";
   public static final String URI_UPDATE_ADVANCE_SALARY = "/update_advance_salary";
   public static final String URI_DELETE_ADVANCE_SALARY = "/delete_advance_salary";
-  public static final String URI_UPDATE_STATUS_SALARY_MONTHLY = "/update_status_salary_monthly";
+  public static final String URI_UPDATE_APPROVE_SALARY_MONTHLY = "/update_approve_salary_monthly";
+  public static final String URI_UPDATE_REJECT_SALARY_MONTHLY = "/update_reject_salary_monthly";
+  public static final String URI_UPDATE_CHECKED_SALARY_MONTHLY = "/update_checked_salary_monthly";
 }

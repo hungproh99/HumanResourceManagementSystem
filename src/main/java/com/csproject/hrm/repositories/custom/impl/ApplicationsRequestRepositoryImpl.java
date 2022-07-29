@@ -7,6 +7,7 @@ import com.csproject.hrm.common.enums.ERequestType;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
 import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
 import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
 import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
@@ -28,10 +29,10 @@ import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.aspectj.util.LangUtil.isEmpty;
-import static org.jooq.codegen.maven.example.Tables.*;
+import static org.jooq.codegen.maven.example.Tables.POLICY_TYPE;
+import static org.jooq.codegen.maven.example.Tables.REVIEW_REQUEST;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
-import static org.jooq.codegen.maven.example.tables.Forwards.FORWARDS;
 import static org.jooq.codegen.maven.example.tables.Policy.POLICY;
 import static org.jooq.codegen.maven.example.tables.RequestName.REQUEST_NAME;
 import static org.jooq.codegen.maven.example.tables.RequestStatus.REQUEST_STATUS;
@@ -68,11 +69,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         getListApplicationRequestReceiveForward(
                 conditions, orderByList, queryParam.pagination, employeeId)
             .fetchInto(ApplicationsRequestResponse.class);
-
-    applicationsRequestResponseForwardList.forEach(
-        applicationsRequestResponse -> {
-          applicationsRequestResponse.setIs_read("True");
-        });
 
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         Stream.of(
@@ -154,7 +150,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                     .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
                 .as(IS_BOOKMARK),
-            APPLICATIONS_REQUEST.IS_READ)
+            APPLICATIONS_REQUEST.COMMENT)
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -177,9 +173,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       Pagination pagination,
       String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-
-    TableLike<?> selectForward =
-        dslContext.select(FORWARDS.APPLICATIONS_REQUEST_ID, FORWARDS.EMPLOYEE_ID).from(FORWARDS);
+    TableLike<?> selectReview =
+        dslContext
+            .select(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID, REVIEW_REQUEST.EMPLOYEE_ID)
+            .from(REVIEW_REQUEST);
 
     return dslContext
         .select(
@@ -197,7 +194,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                     .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
                 .as(IS_BOOKMARK),
-            APPLICATIONS_REQUEST.IS_READ)
+            APPLICATIONS_REQUEST.COMMENT)
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -207,13 +204,13 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
         .leftJoin(REQUEST_TYPE)
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-        .leftJoin(selectForward)
+        .leftJoin(selectReview)
         .on(
-            selectForward
-                .field(FORWARDS.APPLICATIONS_REQUEST_ID)
+            selectReview
+                .field(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
                 .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
         .where(conditions)
-        .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
+        .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId))
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
@@ -242,7 +239,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                     .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
                 .as(IS_BOOKMARK),
-            APPLICATIONS_REQUEST.IS_READ)
+            APPLICATIONS_REQUEST.COMMENT)
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -312,9 +309,31 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
               .execute();
           final var insertForwarder =
               dslContext
-                  .insertInto(FORWARDS, FORWARDS.EMPLOYEE_ID, FORWARDS.APPLICATIONS_REQUEST_ID)
-                  .values(employeeId, updateApplicationRequestRequest.getApplicationRequestId());
+                  .insertInto(
+                      REVIEW_REQUEST,
+                      REVIEW_REQUEST.EMPLOYEE_ID,
+                      REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
+                  .values(employeeId, updateApplicationRequestRequest.getApplicationRequestId())
+                  .execute();
         });
+  }
+
+  @Override
+  public void updateRejectApplicationRequest(
+      RejectApplicationRequestRequest rejectApplicationRequestRequest, LocalDateTime latestDate) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(APPLICATIONS_REQUEST)
+            .set(
+                APPLICATIONS_REQUEST.REQUEST_STATUS,
+                ERequestStatus.getValue(ERequestStatus.REJECTED.name()))
+            .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
+            .set(APPLICATIONS_REQUEST.COMMENT, rejectApplicationRequestRequest.getComment())
+            .where(
+                APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(
+                    rejectApplicationRequestRequest.getRequestId()))
+            .execute();
   }
 
   @Override
@@ -334,8 +353,10 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final List<Condition> conditions = getListConditionApplicationRequest(queryParam);
     final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
-    TableLike<?> selectForward =
-        dslContext.select(FORWARDS.APPLICATIONS_REQUEST_ID, FORWARDS.EMPLOYEE_ID).from(FORWARDS);
+    TableLike<?> selectReview =
+        dslContext
+            .select(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID, REVIEW_REQUEST.EMPLOYEE_ID)
+            .from(REVIEW_REQUEST);
 
     final var query =
         dslContext
@@ -364,13 +385,13 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                     .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
                     .leftJoin(REQUEST_TYPE)
                     .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-                    .leftJoin(selectForward)
+                    .leftJoin(selectReview)
                     .on(
-                        selectForward
-                            .field(FORWARDS.APPLICATIONS_REQUEST_ID)
+                        selectReview
+                            .field(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
                             .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
                     .where(conditions)
-                    .and(selectForward.field(FORWARDS.EMPLOYEE_ID).eq(employeeId))
+                    .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId))
                     .orderBy(orderByList));
     return dslContext.fetchCount(query);
   }
@@ -555,29 +576,29 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   private Select<?> getListForwarderByRequestId(Long requestId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(FORWARDS.EMPLOYEE_ID)
-        .from(FORWARDS)
-        .where(FORWARDS.APPLICATIONS_REQUEST_ID.eq(requestId));
+        .select(REVIEW_REQUEST.EMPLOYEE_ID)
+        .from(REVIEW_REQUEST)
+        .where(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID.eq(requestId));
   }
 
-  @Override
-  public void changeIsRead(boolean isRead, Long requestId) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var queryIsRead =
-        dslContext
-            .select(APPLICATIONS_REQUEST.IS_READ)
-            .from(APPLICATIONS_REQUEST)
-            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
-            .fetchOneInto(Boolean.class);
-    if (Boolean.TRUE.equals(queryIsRead)) {
-      final var query =
-          dslContext
-              .update(APPLICATIONS_REQUEST)
-              .set(APPLICATIONS_REQUEST.IS_READ, isRead)
-              .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
-              .execute();
-    }
-  }
+  //  @Override
+  //  public void changeIsRead(boolean isRead, Long requestId) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    final var queryIsRead =
+  //        dslContext
+  //            .select(APPLICATIONS_REQUEST.IS_READ)
+  //            .from(APPLICATIONS_REQUEST)
+  //            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+  //            .fetchOneInto(Boolean.class);
+  //    if (Boolean.TRUE.equals(queryIsRead)) {
+  //      final var query =
+  //          dslContext
+  //              .update(APPLICATIONS_REQUEST)
+  //              .set(APPLICATIONS_REQUEST.IS_READ, isRead)
+  //              .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+  //              .execute();
+  //    }
+  //  }
 
   @Override
   public Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId) {
@@ -610,11 +631,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         getListApplicationRequestReceiveForward(
                 conditions, orderByList, queryParam.pagination, employeeId)
             .fetchInto(ApplicationsRequestResponse.class);
-
-    applicationsRequestResponseForwardList.forEach(
-        applicationsRequestResponse -> {
-          applicationsRequestResponse.setIs_read("True");
-        });
 
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         Stream.of(
@@ -694,8 +710,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.DURATION,
             APPLICATIONS_REQUEST.DATA,
             APPLICATIONS_REQUEST.IS_REMIND,
-            APPLICATIONS_REQUEST.IS_BOOKMARK,
-            APPLICATIONS_REQUEST.IS_READ)
+            APPLICATIONS_REQUEST.IS_BOOKMARK)
         .values(
             applicationsRequest.getCreateEmployeeId(),
             applicationsRequest.getRequestNameId(),
@@ -707,8 +722,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             applicationsRequest.getDuration(),
             applicationsRequest.getData(),
             applicationsRequest.getIsRemind(),
-            applicationsRequest.getIsBookmark(),
-            applicationsRequest.getIsRead())
+            applicationsRequest.getIsBookmark())
         .execute();
   }
 
@@ -918,5 +932,15 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
         .where(REQUEST_NAME.REQUEST_NAME_ID.eq(requestNameId))
         .fetchOneInto(String.class);
+  }
+
+  @Override
+  public boolean checkExistRequestId(Long requestId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID)
+            .from(APPLICATIONS_REQUEST)
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId)));
   }
 }

@@ -1,6 +1,10 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
+import com.csproject.hrm.dto.dto.BonusSalaryDto;
+import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
+import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -18,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -31,22 +36,34 @@ public class SalaryMonthlyController {
   @Autowired SalaryMonthlyService salaryMonthlyService;
   @Autowired JwtUtils jwtUtils;
 
-  @GetMapping(URI_GET_ALL_SALARY_MONTHLY)
+  @GetMapping(URI_GET_ALL_PERSONAL_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> getListAllSalaryMonthly(
+  public ResponseEntity<?> getListAllPersonalSalaryMonthly(
       HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
-    String role =
-        request.isUserInRole("ADMIN")
-            ? "ADMIN"
-            : (request.isUserInRole("MANAGER") ? "MANAGER" : "USER");
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       return ResponseEntity.ok(
-          salaryMonthlyService.getAllSalaryMonthly(queryParam, employeeId, role));
+          salaryMonthlyService.getAllSalaryMonthlyForPersonal(queryParam, employeeId));
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
+  }
+
+  @GetMapping(URI_GET_ALL_MANAGEMENT_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> getListAllManagementSalaryMonthly(
+      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      return ResponseEntity.ok(
+          salaryMonthlyService.getAllSalaryMonthlyForManagement(queryParam, employeeId));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
   }
@@ -61,9 +78,10 @@ public class SalaryMonthlyController {
         salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryId));
   }
 
-  @PostMapping(value = URI_DOWNLOAD_CSV_SALARY_MONTHLY)
+  @PostMapping(value = URI_DOWNLOAD_CSV_PERSONAL_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> downloadCsvSalaryMonthly(
+  public ResponseEntity<?> downloadCsvPersonalSalaryMonthly(
+      HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
       @RequestParam Map<String, String> allRequestParams)
@@ -75,14 +93,21 @@ public class SalaryMonthlyController {
     servletResponse.addHeader(
         "Content-Disposition",
         "attachment; filename=\"Salary_Monthly_" + timestamp.getTime() + ".csv\"");
-    salaryMonthlyService.exportSalaryMonthlyToCsv(servletResponse.getWriter(), queryParam, listId);
-
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      salaryMonthlyService.exportPersonalSalaryMonthlyToCsv(
+          servletResponse.getWriter(), queryParam, listId, employeeId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export CSV");
   }
 
-  @PostMapping(value = URI_DOWNLOAD_EXCEL_SALARY_MONTHLY)
+  @PostMapping(value = URI_DOWNLOAD_EXCEL_PERSONAL_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> downloadExcelSalaryMonthly(
+  public ResponseEntity<?> downloadExcelPersonalSalaryMonthly(
+      HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
       @RequestParam Map<String, String> allRequestParams)
@@ -93,12 +118,69 @@ public class SalaryMonthlyController {
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
         "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
-    salaryMonthlyService.exportSalaryMonthlyExcel(servletResponse, queryParam, listId);
-
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      salaryMonthlyService.exportPersonalSalaryMonthlyExcel(
+          servletResponse, queryParam, listId, employeeId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export Excel");
   }
 
-  @PostMapping(value = URI_UPDATE_DEDUCTION_SALARY)
+  @PostMapping(value = URI_DOWNLOAD_CSV_MANAGEMENT_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> downloadCsvManagementSalaryMonthly(
+      HttpServletRequest request,
+      HttpServletResponse servletResponse,
+      @RequestBody List<Long> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    servletResponse.setContentType("text/csv; charset=UTF-8");
+    servletResponse.addHeader(
+        "Content-Disposition",
+        "attachment; filename=\"Salary_Monthly_" + timestamp.getTime() + ".csv\"");
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      salaryMonthlyService.exportManagementSalaryMonthlyToCsv(
+          servletResponse.getWriter(), queryParam, listId, employeeId);
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export CSV");
+  }
+
+  @PostMapping(value = URI_DOWNLOAD_EXCEL_MANAGEMENT_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> downloadExcelManagementSalaryMonthly(
+      HttpServletRequest request,
+      HttpServletResponse servletResponse,
+      @RequestBody List<Long> listId,
+      @RequestParam Map<String, String> allRequestParams)
+      throws IOException {
+    Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    servletResponse.setContentType("application/octet-stream");
+    servletResponse.addHeader(
+        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      salaryMonthlyService.exportManagementSalaryMonthlyExcel(
+          servletResponse, queryParam, listId, employeeId);
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export Excel");
+  }
+
+  @PutMapping(value = URI_UPDATE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateDeductionSalary(
       @RequestBody DeductionSalaryDto deductionSalaryDto) {
@@ -106,46 +188,77 @@ public class SalaryMonthlyController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PostMapping(value = URI_DELETE_DEDUCTION_SALARY)
+  @DeleteMapping(value = URI_DELETE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> deleteDeductionSalary(@RequestParam Long deductionId) {
     salaryMonthlyService.deleteDeductionSalary(deductionId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PostMapping(value = URI_UPDATE_BONUS_SALARY)
+  @PutMapping(value = URI_UPDATE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateBonusSalary(@RequestBody BonusSalaryDto bonusSalaryDto) {
     salaryMonthlyService.updateBonusSalary(bonusSalaryDto);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PostMapping(value = URI_DELETE_BONUS_SALARY)
+  @DeleteMapping(value = URI_DELETE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> deleteBonusSalary(@RequestParam Long bonusId) {
     salaryMonthlyService.deleteBonusSalary(bonusId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PostMapping(value = URI_UPDATE_ADVANCE_SALARY)
+  @PutMapping(value = URI_UPDATE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateAdvanceSalary(@RequestBody AdvanceSalaryDto advanceSalaryDto) {
     salaryMonthlyService.updateAdvanceSalary(advanceSalaryDto);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PostMapping(value = URI_DELETE_ADVANCE_SALARY)
+  @DeleteMapping(value = URI_DELETE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> deleteAdvanceSalary(@RequestParam Long advanceId) {
     salaryMonthlyService.deleteAdvanceSalary(advanceId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @PostMapping(value = URI_UPDATE_STATUS_SALARY_MONTHLY)
+  @PutMapping(value = URI_UPDATE_APPROVE_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateStatusSalaryMonthly(
-      @RequestBody UpdateStatusSalaryMonthlyDto updateStatusSalaryMonthlyDto) {
-    salaryMonthlyService.updateStatusSalaryMonthly(updateStatusSalaryMonthlyDto);
+  public ResponseEntity<?> updateApproveSalaryMonthly(@RequestParam Long salaryMonthlyId) {
+    salaryMonthlyService.updateApproveSalaryMonthly(salaryMonthlyId);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PutMapping(value = URI_UPDATE_CHECKED_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> updateCheckedSalaryMonthly(
+      HttpServletRequest request,
+      @RequestBody UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest) {
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      salaryMonthlyService.updateCheckedSalaryMonthly(updateSalaryMonthlyRequest, employeeId);
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    }
+    throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized this employee");
+  }
+
+  @PutMapping(value = URI_UPDATE_REJECT_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> updateRejectSalaryMonthly(
+      @RequestBody RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
+    salaryMonthlyService.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @GetMapping("/test")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> getTest() {
+    LocalDate startDate = LocalDate.of(2022, 10, 01);
+    LocalDate endDate = LocalDate.of(2022, 10, 31);
+    salaryMonthlyService.upsertSalaryMonthlyByEmployeeIdList(startDate, endDate);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

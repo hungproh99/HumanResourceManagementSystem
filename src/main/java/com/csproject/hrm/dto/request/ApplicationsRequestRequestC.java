@@ -23,7 +23,6 @@ public class ApplicationsRequestRequestC {
   private String data;
   private Boolean isBookmark;
   private Boolean isRemind;
-  private Boolean isRead;
   private String employeeId;
   private String employeeName;
   private LocalDate startDate;

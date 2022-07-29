@@ -1,7 +1,8 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
-import com.csproject.hrm.dto.dto.UpdateStatusSalaryMonthlyDto;
+import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
+import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -13,8 +14,10 @@ import java.util.Optional;
 
 @Repository
 public interface SalaryMonthlyRepositoryCustom {
-  SalaryMonthlyResponseList getAllSalaryMonthly(
-      QueryParam queryParam, List<String> employeeIdList, String role);
+  SalaryMonthlyResponseList getAllPersonalSalaryMonthly(QueryParam queryParam, String employeeId);
+
+  SalaryMonthlyResponseList getAllManagementSalaryMonthly(
+      QueryParam queryParam, String employeeId, String isEnoughLevel);
 
   Optional<SalaryMonthlyResponse> getSalaryMonthlyBySalaryId(Long salaryId);
 
@@ -23,11 +26,18 @@ public interface SalaryMonthlyRepositoryCustom {
 
   void updateSalaryMonthlyByListEmployee(List<SalaryMonthlyDto> salaryMonthlyDtoList);
 
-  List<SalaryMonthlyResponse> getListSalaryMonthlyToExport(
-      QueryParam queryParam, List<Long> list);
+  List<SalaryMonthlyResponse> getListPersonalSalaryMonthlyToExport(
+      QueryParam queryParam, List<Long> list, String employeeId);
 
-  void updateStatusSalaryMonthlyBySalaryMonthlyId(
-      UpdateStatusSalaryMonthlyDto updateStatusSalaryMonthlyDto);
+  List<SalaryMonthlyResponse> getListManagementSalaryMonthlyToExport(
+      QueryParam queryParam, List<Long> list, String employeeId);
+
+  void updateStatusSalaryMonthlyBySalaryMonthlyId(Long salaryMonthlyId, String statusSalary);
+
+  void updateCheckedSalaryMonthly(
+      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId);
+
+  void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest);
 
   boolean checkExistSalaryMonthly(Long salaryMonthlyId);
 }

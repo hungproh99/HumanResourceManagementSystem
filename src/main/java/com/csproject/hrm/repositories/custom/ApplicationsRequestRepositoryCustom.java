@@ -1,8 +1,13 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +35,9 @@ public interface ApplicationsRequestRepositoryCustom {
       String employeeId,
       LocalDateTime latestDate);
 
+  void updateRejectApplicationRequest(
+      RejectApplicationRequestRequest rejectApplicationRequestRequest, LocalDateTime latestDate);
+
   void updateStatusApplication(Long requestId, String status, LocalDateTime latestDate);
 
   int countListApplicationRequestReceive(QueryParam queryParam, String employeeId);
@@ -46,7 +54,7 @@ public interface ApplicationsRequestRepositoryCustom {
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
-  void changeIsRead(boolean isRead, Long requestId);
+//  void changeIsRead(boolean isRead, Long requestId);
 
   Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId);
 
@@ -75,4 +83,6 @@ public interface ApplicationsRequestRepositoryCustom {
   void updateAllApplicationRequestRemind(Long requestId, boolean isRemind);
 
   String getDataOfPolicy(Long requestNameId);
+
+  boolean checkExistRequestId(Long requestId);
 }

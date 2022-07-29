@@ -1,6 +1,9 @@
 package com.csproject.hrm.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -26,6 +29,9 @@ public class ApplicationsRequest {
   @Column(name = "description", length = 1000)
   private String description;
 
+  @Column(name = "comment", length = 1000)
+  private String comment;
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "request_name")
   private RequestName requestName;
@@ -50,7 +56,7 @@ public class ApplicationsRequest {
   private String data;
 
   @OneToMany(mappedBy = "applicationsRequest", fetch = FetchType.LAZY)
-  private List<Forwards> forwards;
+  private List<ReviewRequest> reviewRequests;
 
   @Column(name = "is_bookmark")
   @Type(type = "boolean")
@@ -59,8 +65,4 @@ public class ApplicationsRequest {
   @Column(name = "is_remind")
   @Type(type = "boolean")
   private Boolean isRemind;
-
-  @Column(name = "is_read")
-  @Type(type = "boolean")
-  private Boolean isRead;
 }

@@ -1,7 +1,12 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.dto.RequestNameDto;
+import com.csproject.hrm.dto.dto.RequestStatusDto;
+import com.csproject.hrm.dto.dto.RequestTypeDto;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
 import com.csproject.hrm.jooq.QueryParam;
 
@@ -28,11 +33,12 @@ public interface ApplicationsRequestService {
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
-  void updateIsRead(Long requestId);
+//  void updateIsRead(Long requestId);
 
   void updateApproveApplicationRequest(Long requestId);
 
-  void updateRejectApplicationRequest(Long requestId);
+  void updateRejectApplicationRequest(
+      RejectApplicationRequestRequest rejectApplicationRequestRequest);
 
   void exportApplicationRequestReceiveByExcel(
       HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list);

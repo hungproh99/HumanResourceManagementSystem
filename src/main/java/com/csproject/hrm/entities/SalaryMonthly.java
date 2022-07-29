@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -58,6 +59,22 @@ public class SalaryMonthly {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "salary_status_id")
   private SalaryStatus salaryStatus;
+
+  @Column(name = "is_remind")
+  @Type(type = "boolean")
+  private Boolean isRemind;
+
+  @Column(name = "approver")
+  private String approver;
+
+  @Column(name = "duration")
+  private LocalDate duration;
+
+  @Column(name = "comment", length = 1000)
+  private String comment;
+
+  @OneToMany(mappedBy = "salaryMonthly", fetch = FetchType.LAZY)
+  private List<ReviewSalary> reviewSalaries;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = SalaryContract.class)
   @JoinColumn(name = "salary_contract_id")

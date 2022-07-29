@@ -12,9 +12,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Forwards {
+@Table(name = "review_request")
+public class ReviewRequest {
   @Id
-  @Column(name = "forward_id")
+  @Column(name = "review_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 

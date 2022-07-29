@@ -3,7 +3,8 @@ package com.csproject.hrm.services;
 import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
 import com.csproject.hrm.dto.dto.BonusSalaryDto;
 import com.csproject.hrm.dto.dto.DeductionSalaryDto;
-import com.csproject.hrm.dto.dto.UpdateStatusSalaryMonthlyDto;
+import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
+import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
 import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -14,19 +15,34 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface SalaryMonthlyService {
-  SalaryMonthlyResponseList getAllSalaryMonthly(
-      QueryParam queryParam, String employeeId, String role);
+  SalaryMonthlyResponseList getAllSalaryMonthlyForPersonal(
+      QueryParam queryParam, String employeeId);
+
+  SalaryMonthlyResponseList getAllSalaryMonthlyForManagement(
+      QueryParam queryParam, String employeeId);
 
   SalaryMonthlyDetailResponse getSalaryMonthlyDetailBySalaryMonthlyId(Long salaryMonthlyId);
 
   void upsertSalaryMonthlyByEmployeeIdList(LocalDate startDate, LocalDate endDate);
 
-  void exportSalaryMonthlyToCsv(Writer writer, QueryParam queryParam, List<Long> list);
+  void exportPersonalSalaryMonthlyToCsv(
+      Writer writer, QueryParam queryParam, List<Long> list, String employeeId);
 
-  void exportSalaryMonthlyExcel(
-      HttpServletResponse response, QueryParam queryParam, List<Long> list);
+  void exportPersonalSalaryMonthlyExcel(
+      HttpServletResponse response, QueryParam queryParam, List<Long> list, String employeeId);
 
-  void updateStatusSalaryMonthly(UpdateStatusSalaryMonthlyDto updateStatusSalaryMonthlyDto);
+  void exportManagementSalaryMonthlyToCsv(
+      Writer writer, QueryParam queryParam, List<Long> list, String employeeId);
+
+  void exportManagementSalaryMonthlyExcel(
+      HttpServletResponse response, QueryParam queryParam, List<Long> list, String employeeId);
+
+  void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest);
+
+  void updateApproveSalaryMonthly(Long salaryMonthlyId);
+
+  void updateCheckedSalaryMonthly(
+      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId);
 
   void updateDeductionSalary(DeductionSalaryDto deductionSalaryDto);
 

@@ -212,9 +212,9 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/human_resource_management</url>
-                        <user>ndh4899</user>
-                        <password>hungnd</password>
+                        <url>jdbc:mysql://awseb-e-3tmtipzvke-stack-awsebrdsdatabase-eqfxaihqukay.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true</url>
+                        <user>root</user>
+                        <password>123456789</password>
                     </jdbc>
                     <generator>
                         <database>
