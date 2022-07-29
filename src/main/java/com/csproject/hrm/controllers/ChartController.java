@@ -3,6 +3,7 @@ package com.csproject.hrm.controllers;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.ChartService;
+import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
 @RequestMapping(REQUEST_MAPPING)
 public class ChartController {
   @Autowired ChartService chartService;
+  @Autowired EmployeeDetailService employeeDetailService;
   @Autowired JwtUtils jwtUtils;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
@@ -65,23 +67,22 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_paid_leave_reason_chart")
   public ResponseEntity<?> getPaidLeaveReasonByYear(
-      HttpServletRequest request, @RequestParam Integer year) {
-    String areaName = "";
+      HttpServletRequest request, @RequestParam Integer year, @RequestParam String employeeId) {
     String headerAuth = request.getHeader(AUTHORIZATION);
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
-      areaName =
-          Objects.requireNonNullElse(chartService.getAreaNameByEmployeeID(employeeId), areaName);
-    }
-
-    return ResponseEntity.ok(chartService.getPaidLeaveReasonByYearAndAreaName(year, areaName));
+    //    if ("".equals(employeeId.trim())) {
+    //      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+    //        String jwt = headerAuth.substring(7);
+    //        employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    //      }
+    //    }
+    return ResponseEntity.ok(
+        chartService.getPaidLeaveReasonByYearAndManagerID(headerAuth, year, employeeId.trim()));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_salary_structure_chart")
   public ResponseEntity<?> getSalaryStructureByDate(
-      HttpServletRequest request, @RequestParam String date) {
+      HttpServletRequest request, @RequestParam String date, @RequestParam String employeeId) {
     LocalDate date1;
     try {
       date1 = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -89,10 +90,11 @@ public class ChartController {
       throw new CustomErrorException("\"" + date + "\" must in format yyyy-MM-dd!");
     }
     String headerAuth = request.getHeader(AUTHORIZATION);
-    String employeeId = "";
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    if ("".equals(employeeId.trim())) {
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      }
     }
 
     return ResponseEntity.ok(chartService.getSalaryStructureByDateAndEmployeeID(date1, employeeId));
@@ -101,9 +103,12 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(
       value = "get_salary_history_chart",
-      params = {"type", "date"})
+      params = {"type", "date", "employeeId"})
   public ResponseEntity<?> getSalaryHistoryByDateAndType(
-      HttpServletRequest request, @RequestParam String type, @RequestParam String date) {
+      HttpServletRequest request,
+      @RequestParam String type,
+      @RequestParam String date,
+      @RequestParam String employeeId) {
     LocalDate date1;
     try {
       date1 = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -111,10 +116,11 @@ public class ChartController {
       throw new CustomErrorException(date + "must have format yyyy-MM-dd!");
     }
     String headerAuth = request.getHeader(AUTHORIZATION);
-    String employeeId = null;
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    if ("".equals(employeeId.trim())) {
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      }
     }
 
     return ResponseEntity.ok(
@@ -124,18 +130,32 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(
       value = "get_salary_history_chart",
-      params = {"type"})
+      params = {"type", "employeeId"})
   public ResponseEntity<?> getSalaryHistoryByDateAndType(
-      HttpServletRequest request, @RequestParam String type) {
+      HttpServletRequest request, @RequestParam String type, @RequestParam String employeeId) {
     String headerAuth = request.getHeader(AUTHORIZATION);
-    String employeeId = null;
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    if ("".equals(employeeId.trim())) {
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      }
     }
 
     return ResponseEntity.ok(
         chartService.getSalaryHistoryByDateAndEmployeeIDAndType(
             chartService.getStartDateOfContract(employeeId), employeeId, type));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping(value = "get_employee_by_manager")
+  public ResponseEntity<?> getAllEmployeeByManagerID(HttpServletRequest request) {
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    String employeeId = "";
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    }
+
+    return ResponseEntity.ok(employeeDetailService.getAllEmployeeByManagerID(employeeId));
   }
 }

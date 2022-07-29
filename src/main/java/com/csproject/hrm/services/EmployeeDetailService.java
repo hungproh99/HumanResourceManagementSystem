@@ -35,4 +35,6 @@ public interface EmployeeDetailService {
   Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
 
   Optional<EmployeeDetailResponse> findMainDetail(String employeeID);
+
+  List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId);
 }

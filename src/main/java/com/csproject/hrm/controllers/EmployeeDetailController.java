@@ -3,6 +3,7 @@ package com.csproject.hrm.controllers;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
+import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @RequestMapping(REQUEST_MAPPING + REQUEST_DETAIL_MAPPING)
 public class EmployeeDetailController {
   @Autowired EmployeeDetailService employeeDetailService;
+  @Autowired JwtUtils jwtUtils;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)

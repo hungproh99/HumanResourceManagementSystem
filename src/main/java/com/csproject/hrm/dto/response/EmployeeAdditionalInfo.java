@@ -2,8 +2,7 @@ package com.csproject.hrm.dto.response;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeAdditionalInfo {

@@ -20,7 +20,6 @@ public class EmployeeDetailRequest {
   private Long grade_id;
   private LocalDate birth_date;
   private String company_email;
-  private String personal_email;
   private String gender;
   private String marital_status;
   private Long office_id;

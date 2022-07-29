@@ -227,7 +227,7 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
 
   @Override
   public int countPaidLeaveReasonByDateAndReasonID(
-      LocalDate startDate, LocalDate endDate, Long reasonID, String areaName) {
+      LocalDate startDate, LocalDate endDate, Long reasonID, String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchCount(
         dslContext
@@ -243,7 +243,7 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
             .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
             .where(PAID_LEAVE_REASON.REASON_ID.eq(reasonID))
             .and(TIMEKEEPING.DATE.between(startDate, endDate))
-            .and(AREA.NAME.eq(areaName)));
+            .and(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeID)));
   }
 
   @Override
