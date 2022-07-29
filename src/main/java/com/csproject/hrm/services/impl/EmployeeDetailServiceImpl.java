@@ -10,8 +10,7 @@ import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -95,9 +94,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
-
-    if (employeeDetailRequest.getArea_id() == null) {}
-
     employeeDetailRepository.updateEmployeeDetail(employeeDetailRequest);
   }
 
@@ -155,9 +151,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
       throw new NullPointerException("Param employeeID is null!");
     }
     if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
-      Optional<TaxAndInsuranceResponse> taxAndInsuranceResponse =
-          employeeDetailRepository.findTaxAndInsurance(employeeID);
-      return taxAndInsuranceResponse;
+      return employeeDetailRepository.findTaxAndInsurance(employeeID);
     } else {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
@@ -189,5 +183,21 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
         .get()
         .setWorking_name(EWorkingType.getLabel(employeeDetailResponse.get().getWorking_name()));
     return employeeDetailResponse;
+  }
+
+  @Override
+  public List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId) {
+    List<EmployeeNameAndID> list = employeeDetailRepository.getAllEmployeeByManagerID(managerId);
+    if (list.size() <= 0) {
+      return list;
+    }
+    List<EmployeeNameAndID> list2 = new ArrayList<>();
+    for (EmployeeNameAndID employee : list) {
+      list2.addAll(getAllEmployeeByManagerID(employee.getEmployeeID()));
+    }
+    if (list2.size() > 0) {
+      list.addAll(list2);
+    }
+    return list;
   }
 }

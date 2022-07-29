@@ -14,7 +14,8 @@ public interface ChartService {
 
   List<LeaveCompanyChart> getLeaveCompanyReasonByYearAndAreaName(Integer year, String areaName);
 
-  List<PaidLeaveChart> getPaidLeaveReasonByYearAndAreaName(Integer year, String areaName);
+  List<PaidLeaveChart> getPaidLeaveReasonByYearAndManagerID(
+      String headerAuth, Integer year, String employeeID);
 
   List<GeneralSalaryChart> getSalaryStructureByDateAndEmployeeID(LocalDate date, String employeeID);
 
