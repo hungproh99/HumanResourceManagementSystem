@@ -70,6 +70,21 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>spring-mock-mvc</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-mockmvc</artifactId>
             <scope>test</scope>
@@ -212,7 +227,9 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://awseb-e-3tmtipzvke-stack-awsebrdsdatabase-eqfxaihqukay.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true</url>
+                        <url>
+                            jdbc:mysql://awseb-e-3tmtipzvke-stack-awsebrdsdatabase-eqfxaihqukay.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true
+                        </url>
                         <user>root</user>
                         <password>123456789</password>
                     </jdbc>
