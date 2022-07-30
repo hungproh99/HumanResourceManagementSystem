@@ -1,6 +1,8 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.common.enums.EBonus;
 import com.csproject.hrm.dto.dto.BonusSalaryDto;
+import com.csproject.hrm.dto.dto.BonusTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.BonusSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
@@ -58,20 +60,26 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
   @Override
   public List<BonusSalaryResponse> getListBonusMonthlyBySalaryMonthlyId(Long salaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext
-        .select(
-            BONUS_SALARY.BONUS_ID,
-            BONUS_SALARY.VALUE,
-            BONUS_TYPE.BONUS_TYPE_.as("bonus_name"),
-            BONUS_SALARY.DATE,
-            BONUS_SALARY.DESCRIPTION)
-        .from(BONUS_SALARY)
-        .leftJoin(BONUS_TYPE)
-        .on(BONUS_TYPE.BONUS_TYPE_ID.eq(BONUS_SALARY.BONUS_TYPE_ID))
-        .leftJoin(SALARY_MONTHLY)
-        .on(SALARY_MONTHLY.SALARY_ID.eq(BONUS_SALARY.SALARY_ID))
-        .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
-        .fetchInto(BonusSalaryResponse.class);
+    List<BonusSalaryResponse> bonusSalaryResponses =
+        dslContext
+            .select(
+                BONUS_SALARY.BONUS_ID,
+                BONUS_SALARY.VALUE,
+                BONUS_TYPE.BONUS_TYPE_.as("bonus_name"),
+                BONUS_SALARY.DATE,
+                BONUS_SALARY.DESCRIPTION)
+            .from(BONUS_SALARY)
+            .leftJoin(BONUS_TYPE)
+            .on(BONUS_TYPE.BONUS_TYPE_ID.eq(BONUS_SALARY.BONUS_TYPE_ID))
+            .leftJoin(SALARY_MONTHLY)
+            .on(SALARY_MONTHLY.SALARY_ID.eq(BONUS_SALARY.SALARY_ID))
+            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
+            .fetchInto(BonusSalaryResponse.class);
+    bonusSalaryResponses.forEach(
+        bonusSalaryResponse -> {
+          bonusSalaryResponse.setBonus_name(EBonus.getLabel(bonusSalaryResponse.getBonus_name()));
+        });
+    return bonusSalaryResponses;
   }
 
   @Override
@@ -137,5 +145,20 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchExists(
         dslContext.select().from(BONUS_SALARY).where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryId)));
+  }
+
+  @Override
+  public List<BonusTypeDto> getListBonusTypeDto() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<BonusTypeDto> bonusTypeDtos =
+        dslContext
+            .select(BONUS_TYPE.BONUS_TYPE_ID, BONUS_TYPE.BONUS_TYPE_.as("bonus_type_name"))
+            .from(BONUS_TYPE)
+            .fetchInto(BonusTypeDto.class);
+    bonusTypeDtos.forEach(
+        bonusTypeDto -> {
+          bonusTypeDto.setBonus_type_name(EBonus.getLabel(bonusTypeDto.getBonus_type_name()));
+        });
+    return bonusTypeDtos;
   }
 }

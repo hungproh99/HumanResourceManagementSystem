@@ -5,6 +5,7 @@ import com.csproject.hrm.dto.dto.EmployeeTypeDto;
 import com.csproject.hrm.dto.dto.RoleDto;
 import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.DBConnection;
@@ -657,14 +658,84 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
     List<OrderField<?>> sortFields = new ArrayList<>();
     sortFields.add(EMPLOYEE.EMPLOYEE_ID.desc());
-    HrmResponse hrmResponse =
-        findAllEmployee(conditions, sortFields, Pagination.defaultPage())
-            .fetchOneInto(HrmResponse.class);
-    hrmResponse.setArea_name(EArea.getLabel(hrmResponse.getArea_name()));
-    hrmResponse.setGrade(EGradeType.getLabel(hrmResponse.getGrade()));
-    hrmResponse.setPosition_name(EJob.getLabel(hrmResponse.getPosition_name()));
-    hrmResponse.setOffice_name(EOffice.getLabel(hrmResponse.getOffice_name()));
-    hrmResponse.setWorking_name(EWorkingType.getLabel(hrmResponse.getWorking_name()));
-    return Optional.of(hrmResponse);
+    return findAllEmployee(conditions, sortFields, Pagination.defaultPage())
+        .fetchOptionalInto(HrmResponse.class);
+  }
+
+  @Override
+  public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId, Integer level) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var area =
+        dslContext
+            .select(AREA.NAME)
+            .from(EMPLOYEE)
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(AREA)
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .fetchOneInto(String.class);
+
+    return dslContext
+        .select(EMPLOYEE.FULL_NAME.as("name"), EMPLOYEE.EMPLOYEE_ID.as("employeeID"))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .where(EMPLOYEE.EMPLOYEE_ID.notEqual(employeeId))
+        .and(EMPLOYEE.LEVEL.le(level))
+        .and(EMPLOYEE.LEVEL.gt(0))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+        .and(AREA.NAME.eq(area))
+        .fetchInto(EmployeeNameAndID.class);
+  }
+
+  @Override
+  public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId, Integer level) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var area =
+        dslContext
+            .select(AREA.NAME)
+            .from(EMPLOYEE)
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(AREA)
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .fetchOneInto(String.class);
+
+    return dslContext
+        .select(EMPLOYEE.FULL_NAME.as("name"), EMPLOYEE.EMPLOYEE_ID.as("employeeID"))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .where(EMPLOYEE.EMPLOYEE_ID.notEqual(employeeId))
+        .and(EMPLOYEE.LEVEL.ge(level))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+        .and(AREA.NAME.eq(area))
+        .fetchInto(EmployeeNameAndID.class);
+  }
+
+  @Override
+  public int getLevelOfEmployee(String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.LEVEL)
+        .from(EMPLOYEE)
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .fetchOneInto(Integer.class);
   }
 }

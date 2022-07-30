@@ -1,6 +1,7 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
@@ -177,7 +178,8 @@ public class HrmController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=\"employees_" + timestamp.getTime() + ".csv\"");
+        "Content-Disposition",
+        "attachment; filename=\"employees_" + timestamp.getTime() + ".csv\"");
     humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -197,5 +199,19 @@ public class HrmController {
         "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
     humanManagementService.exportEmployeeToExcel(servletResponse, queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @GetMapping(value = URI_GET_LIST_MANAGER_OF_AREA)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> getListManagerOfArea(HttpServletRequest request) {
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      List<EmployeeNameAndID> listManagerOfArea =
+          humanManagementService.getListManagerOfArea(employeeId);
+      return ResponseEntity.ok(listManagerOfArea);
+    }
+    throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
   }
 }

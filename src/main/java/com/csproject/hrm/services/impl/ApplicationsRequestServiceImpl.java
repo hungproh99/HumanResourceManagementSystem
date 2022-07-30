@@ -132,7 +132,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     LocalDateTime latestDate = LocalDateTime.now();
     applicationsRequestRepository.updateCheckedApplicationRequest(
-        updateApplicationRequestRequest, employeeId, latestDate);
+        updateApplicationRequestRequest, employeeId, Boolean.FALSE, latestDate);
   }
 
   @Override
@@ -173,14 +173,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return requestNameDtoList;
   }
 
-//  @Override
-//  public void updateIsRead(Long requestId) {
-//    if (requestId == null) {
-//      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
-//    }
-//    boolean isRead = false;
-//    applicationsRequestRepository.changeIsRead(isRead, requestId);
-//  }
+  //  @Override
+  //  public void updateIsRead(Long requestId) {
+  //    if (requestId == null) {
+  //      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+  //    }
+  //    boolean isRead = false;
+  //    applicationsRequestRepository.changeIsRead(isRead, requestId);
+  //  }
 
   @Override
   public void updateApproveApplicationRequest(Long requestId) {
@@ -616,9 +616,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
+    Double actualWorkingPoint =
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+            startDate, lastDate, employeeId);
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
+            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
     bonusSalaryRepository.insertBonusSalaryByEmployeeId(
         salaryId, date, description, bonusType, value);
 
@@ -642,9 +645,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
+    Double actualWorkingPoint =
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+            startDate, lastDate, employeeId);
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
+            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
     deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
         salaryId, date, description, deductionType, value);
     if (deductionType.equals(EDeduction.getValue("FIRE")))
@@ -661,9 +667,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     }
     LocalDate startDate = date.with(firstDayOfMonth());
     LocalDate lastDate = date.with(lastDayOfMonth());
+    Double actualWorkingPoint =
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+            startDate, lastDate, employeeId);
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, lastDate, ESalaryMonthly.PENDING.name());
+            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
     advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
 
     applicationsRequestRepository.updateStatusApplication(
@@ -1145,7 +1154,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         applicationRequestRemindResponse -> {
           String createName =
               applicationRequestRemindResponse.getFull_name()
-                  + " "
+                  + "-"
                   + applicationRequestRemindResponse.getEmployee_id();
 
           String approveName =

@@ -135,6 +135,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     EmployeeInsuranceResponseList employeeInsuranceResponseList =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary());
 
+    EmployeeAllowanceResponseList employeeAllowanceResponseList =
+        getEmployeeAllowanceResponseList(employeeId);
+
     return SalaryMonthlyDetailResponse.builder()
         .salary_monthly_id(salaryMonthlyId)
         .employee_id(employeeId)
@@ -145,11 +148,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .base_salary(salaryContractDto.get().getBase_salary())
         .final_salary(salaryMonthlyResponse.get().getFinalSalary())
         .standardPoint(standardPoint)
+        .salaryStatus(salaryMonthlyResponse.get().getSalaryStatus())
         .pointResponses(pointResponse)
         .otResponseList(otResponseList)
         .bonusSalaryResponseList(bonusSalaryResponseList)
         .deductionSalaryResponseList(deductionSalaryResponseList)
         .advanceSalaryResponseList(advanceSalaryResponseList)
+        .employeeAllowanceResponseList(employeeAllowanceResponseList)
         .employeeInsuranceResponseList(employeeInsuranceResponseList)
         .employeeTaxResponseList(employeeTaxResponseList)
         .build();
@@ -356,7 +361,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
           HttpStatus.BAD_REQUEST,
           "Not exist with employee id " + updateSalaryMonthlyRequest.getApproverId());
     }
-    salaryMonthlyRepository.updateCheckedSalaryMonthly(updateSalaryMonthlyRequest, employeeId);
+    salaryMonthlyRepository.updateCheckedSalaryMonthly(
+        updateSalaryMonthlyRequest, Boolean.FALSE, employeeId);
   }
 
   @Override
@@ -496,13 +502,63 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);
   }
 
+  @Override
+  public void updateAllSalaryRemind(LocalDate checkDate) {
+    List<SalaryMonthlyRemindResponse> salaryMonthlyRemindResponseList =
+        salaryMonthlyRepository.getAllSalaryMonthlyToRemind(checkDate);
+
+    salaryMonthlyRemindResponseList.forEach(
+        salaryMonthlyRemindResponse -> {
+          String createName =
+              salaryMonthlyRemindResponse.getFullName()
+                  + "-"
+                  + salaryMonthlyRemindResponse.getEmployeeId();
+
+          String approveName =
+              employeeRepository.getEmployeeNameByEmployeeId(
+                  salaryMonthlyRemindResponse.getApprover());
+
+          String approveEmail =
+              employeeRepository.getEmployeeEmailByEmployeeId(
+                  salaryMonthlyRemindResponse.getApprover());
+
+          generalFunction.sendEmailRemindSalary(
+              approveName,
+              createName,
+              salaryMonthlyRemindResponse.getStartDate().getMonth()
+                  + "-"
+                  + salaryMonthlyRemindResponse.getStartDate().getYear(),
+              salaryMonthlyRemindResponse.getCheckedBy(),
+              salaryMonthlyRemindResponse.getSalaryMonthlyId().toString(),
+              FROM_EMAIL,
+              TO_EMAIL,
+              "Remind Request");
+
+          salaryMonthlyRepository.updateAllSalaryMonthlyRemind(
+              salaryMonthlyRemindResponse.getSalaryMonthlyId(), Boolean.TRUE);
+        });
+  }
+
+  @Override
+  public List<DeductionTypeDto> getListDeductionTypeDto() {
+    return deductionSalaryRepository.getListDeductionTypeDto();
+  }
+
+  @Override
+  public List<BonusTypeDto> getListBonusTypeDto() {
+    return bonusSalaryRepository.getListBonusTypeDto();
+  }
+
   private SalaryMonthlyDto upsertSalaryMonthly(
       LocalDate startDate, LocalDate endDate, String employeeId) {
     Optional<SalaryContractDto> salaryContractDto =
         salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
+    Double actualWorkingPoint =
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
+
     Long salaryMonthlyId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, endDate, ESalaryMonthly.PENDING.name());
+            employeeId, startDate, endDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
     if (salaryContractDto.isEmpty()) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "Don't have salary contract of " + employeeId);
@@ -537,8 +593,6 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
 
     Double standardPoint = standardDayOfWork * maxPointPerDay;
 
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
     Double totalOTPoint =
         overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDate(
             startDate, endDate, employeeId);
@@ -555,6 +609,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal totalInsurance =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary())
             .getTotal();
+    BigDecimal totalAllowance = getEmployeeAllowanceResponseList(employeeId).getTotal();
     BigDecimal salaryPerDay =
         (salaryContractDto
                 .get()
@@ -565,14 +620,17 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         salaryContractDto
             .get()
             .getBase_salary()
-            .add(salaryContractDto.get().getAdditional_salary())
+            .add(
+                salaryPerDay.multiply(
+                    BigDecimal.valueOf(actualWorkingPoint != null ? actualWorkingPoint : 0D)))
             .add(
                 salaryPerDay.multiply(BigDecimal.valueOf(totalOTPoint != null ? totalOTPoint : 0D)))
             .add(totalBonus != null ? totalBonus : BigDecimal.ZERO)
             .subtract(totalDeduction != null ? totalDeduction : BigDecimal.ZERO)
             .subtract(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
             .subtract(totalTax != null ? totalTax : BigDecimal.ZERO)
-            .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO);
+            .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO)
+            .add(totalAllowance != null ? totalAllowance : BigDecimal.ZERO);
 
     return SalaryMonthlyDto.builder()
         .salaryMonthlyId(salaryMonthlyId)
@@ -637,10 +695,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
 
   private EmployeeTaxResponseList getEmployeeTaxResponseList(
       String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary) {
-    BigDecimal finalSalary = baseSalary.add(additionalSalary);
+    BigDecimal monthlySalary = baseSalary.add(additionalSalary);
     BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     List<EmployeeTaxResponse> employeeTaxResponses =
-        generalFunction.readTaxDataByEmployeeId(employeeId, baseSalary, totalInsurance);
+        generalFunction.readTaxDataByEmployeeId(employeeId, monthlySalary, totalInsurance);
     BigDecimal totalTax = BigDecimal.ZERO;
     if (employeeTaxResponses.isEmpty()) {
       return new EmployeeTaxResponseList(employeeTaxResponses, totalTax);
@@ -663,5 +721,18 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       totalInsurance = totalInsurance.add(employeeInsuranceResponse.getValue());
     }
     return new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);
+  }
+
+  private EmployeeAllowanceResponseList getEmployeeAllowanceResponseList(String employeeId) {
+    List<EmployeeAllowanceResponse> employeeAllowanceResponses =
+        generalFunction.readAllowanceData(employeeId);
+    BigDecimal totalAllowance = BigDecimal.ZERO;
+    if (employeeAllowanceResponses.isEmpty()) {
+      return new EmployeeAllowanceResponseList(employeeAllowanceResponses, totalAllowance);
+    }
+    for (EmployeeAllowanceResponse employeeAllowanceResponse : employeeAllowanceResponses) {
+      totalAllowance = totalAllowance.add(employeeAllowanceResponse.getValue());
+    }
+    return new EmployeeAllowanceResponseList(employeeAllowanceResponses, totalAllowance);
   }
 }

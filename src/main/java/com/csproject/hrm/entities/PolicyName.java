@@ -33,4 +33,7 @@ public class PolicyName {
 
   @OneToOne(mappedBy = "policyName", fetch = FetchType.LAZY)
   private EmployeeTax employeeTax;
+
+  @OneToOne(mappedBy = "policyName", fetch = FetchType.LAZY)
+  private EmployeeAllowance employeeAllowance;
 }

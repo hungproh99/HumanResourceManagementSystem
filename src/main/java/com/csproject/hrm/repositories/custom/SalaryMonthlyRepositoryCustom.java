@@ -3,6 +3,7 @@ package com.csproject.hrm.repositories.custom;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
+import com.csproject.hrm.dto.response.SalaryMonthlyRemindResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -22,7 +23,11 @@ public interface SalaryMonthlyRepositoryCustom {
   Optional<SalaryMonthlyResponse> getSalaryMonthlyBySalaryId(Long salaryId);
 
   Long getSalaryMonthlyIdByEmployeeIdAndDate(
-      String employeeId, LocalDate startDate, LocalDate endDate, String salaryStatus);
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      Double actualWorkingPoint,
+      String salaryStatus);
 
   void updateSalaryMonthlyByListEmployee(List<SalaryMonthlyDto> salaryMonthlyDtoList);
 
@@ -35,9 +40,13 @@ public interface SalaryMonthlyRepositoryCustom {
   void updateStatusSalaryMonthlyBySalaryMonthlyId(Long salaryMonthlyId, String statusSalary);
 
   void updateCheckedSalaryMonthly(
-      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId);
+      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, boolean isRemind, String employeeId);
 
   void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest);
 
   boolean checkExistSalaryMonthly(Long salaryMonthlyId);
+
+  List<SalaryMonthlyRemindResponse> getAllSalaryMonthlyToRemind(LocalDate checkDate);
+
+  void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind);
 }

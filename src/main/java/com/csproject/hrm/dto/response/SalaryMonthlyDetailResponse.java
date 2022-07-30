@@ -22,11 +22,13 @@ public class SalaryMonthlyDetailResponse {
   private BigDecimal base_salary;
   private BigDecimal final_salary;
   private Double standardPoint;
+  private String salaryStatus;
   private PointResponse pointResponses;
   private OTResponseList otResponseList;
   private BonusSalaryResponseList bonusSalaryResponseList;
   private DeductionSalaryResponseList deductionSalaryResponseList;
   private AdvanceSalaryResponseList advanceSalaryResponseList;
+  private EmployeeAllowanceResponseList employeeAllowanceResponseList;
   private EmployeeTaxResponseList employeeTaxResponseList;
   private EmployeeInsuranceResponseList employeeInsuranceResponseList;
 }

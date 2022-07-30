@@ -33,6 +33,7 @@ public interface ApplicationsRequestRepositoryCustom {
   void updateCheckedApplicationRequest(
       UpdateApplicationRequestRequest updateApplicationRequestRequest,
       String employeeId,
+      boolean isRemind,
       LocalDateTime latestDate);
 
   void updateRejectApplicationRequest(
@@ -54,7 +55,7 @@ public interface ApplicationsRequestRepositoryCustom {
 
   List<RequestNameDto> getAllRequestNameByRequestTypeID(Long requestTypeID);
 
-//  void changeIsRead(boolean isRead, Long requestId);
+  //  void changeIsRead(boolean isRead, Long requestId);
 
   Optional<ApplicationRequestDto> getApplicationRequestDtoByRequestId(Long requestId);
 

@@ -2,6 +2,7 @@ package com.csproject.hrm.services;
 
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -44,4 +45,6 @@ public interface HumanManagementService {
   void importExcelToEmployee(Workbook workBook);
 
   HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId);
+
+  List<EmployeeNameAndID> getListManagerOfArea(String employeeId);
 }

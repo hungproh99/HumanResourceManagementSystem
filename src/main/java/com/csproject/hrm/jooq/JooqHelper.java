@@ -127,6 +127,20 @@ public class JooqHelper {
   private Condition lt(Field<?> field, String value) {
     if (field.getDataType().isTimestamp()) {
       return field.cast(Timestamp.class).lt(new Timestamp(Long.valueOf(value)));
+    } else if (field.getDataType().isDate()) {
+      return field
+          .cast(LocalDate.class)
+          .lt(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate());
+    } else if (field.getDataType().isDateTime()) {
+      return field
+          .cast(LocalDateTime.class)
+          .lt(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDateTime());
     } else if (field.getDataType().isNumeric()) {
       return field.cast(Long.class).lt(Long.valueOf((value)));
     }
@@ -136,6 +150,20 @@ public class JooqHelper {
   private Condition ge(Field<?> field, String value) {
     if (field.getDataType().isTimestamp()) {
       return field.cast(Timestamp.class).ge(new Timestamp(Long.valueOf(value)));
+    } else if (field.getDataType().isDate()) {
+      return field
+          .cast(LocalDate.class)
+          .ge(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate());
+    } else if (field.getDataType().isDateTime()) {
+      return field
+          .cast(LocalDateTime.class)
+          .ge(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDateTime());
     } else if (field.getDataType().isNumeric()) {
       return field.cast(Long.class).ge(Long.valueOf((value)));
     }
@@ -145,6 +173,20 @@ public class JooqHelper {
   private Condition gt(Field<?> field, String value) {
     if (field.getDataType().isTimestamp()) {
       return field.cast(Timestamp.class).gt(new Timestamp(Long.valueOf(value)));
+    } else if (field.getDataType().isDate()) {
+      return field
+          .cast(LocalDate.class)
+          .gt(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate());
+    } else if (field.getDataType().isDateTime()) {
+      return field
+          .cast(LocalDateTime.class)
+          .gt(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDateTime());
     } else if (field.getDataType().isNumeric()) {
       return field.cast(Long.class).gt(Long.valueOf((value)));
     }
@@ -154,6 +196,20 @@ public class JooqHelper {
   private Condition le(Field<?> field, String value) {
     if (field.getDataType().isTimestamp()) {
       return field.cast(Timestamp.class).le(new Timestamp(Long.valueOf(value)));
+    } else if (field.getDataType().isDate()) {
+      return field
+          .cast(LocalDate.class)
+          .le(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate());
+    } else if (field.getDataType().isDateTime()) {
+      return field
+          .cast(LocalDateTime.class)
+          .le(
+              Instant.ofEpochMilli(Long.valueOf(value))
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDateTime());
     } else if (field.getDataType().isNumeric()) {
       return field.cast(Long.class).le(Long.valueOf((value)));
     }

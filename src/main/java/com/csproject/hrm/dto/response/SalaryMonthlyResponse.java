@@ -23,6 +23,7 @@ public class SalaryMonthlyResponse {
   private BigDecimal totalInsurance;
   private BigDecimal totalTax;
   private BigDecimal totalAdvance;
+  private BigDecimal totalAllowance;
   private BigDecimal finalSalary;
   private LocalDate startDate;
   private LocalDate endDate;

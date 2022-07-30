@@ -6,14 +6,20 @@ import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.HrmPojo;
 import com.csproject.hrm.dto.request.HrmRequest;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.repositories.WorkingPlaceRepository;
 import com.csproject.hrm.services.HumanManagementService;
-import org.apache.commons.csv.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -418,6 +424,12 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       }
     }
     insertMultiEmployee(hrmRequestList);
+  }
+
+  @Override
+  public List<EmployeeNameAndID> getListManagerOfArea(String employeeId) {
+    int level = employeeRepository.getLevelOfEmployee(employeeId);
+    return employeeRepository.getListManagerHigherOfArea(employeeId, level);
   }
 
   private Object getValue(Cell cell) {

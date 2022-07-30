@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.DEDUCTION_INVALID;
 
 public enum EDeduction {
-  LATE_WORK("Late work", 1);
+  LATE_WORK("Late work", 1),
+  LEAVE_SOON("Leave Soon", 2);
 
   private final String label;
   private final long value;

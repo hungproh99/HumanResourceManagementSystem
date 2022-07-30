@@ -34,13 +34,16 @@ public class EmployeeInsuranceRepositoryImpl implements EmployeeInsuranceReposit
     DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
-            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID, POLICY_TYPE.POLICY_TYPE_.as("policy_type"))
+            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
+            POLICY_TYPE.POLICY_TYPE_.as("policy_type"),
+            POLICY_NAME.POLICY_NAME_.as("insurance_name"))
         .from(EMPLOYEE_INSURANCE)
         .leftJoin(POLICY_NAME)
         .on(POLICY_NAME.POLICY_NAME_ID.eq(EMPLOYEE_INSURANCE.POLICY_NAME_ID))
         .leftJoin(POLICY_TYPE)
         .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY_NAME.POLICY_TYPE_ID))
         .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(employeeId))
+        .and(EMPLOYEE_INSURANCE.INSURANCE_STATUS.isTrue())
         .fetchInto(EmployeeInsuranceResponse.class);
   }
 }

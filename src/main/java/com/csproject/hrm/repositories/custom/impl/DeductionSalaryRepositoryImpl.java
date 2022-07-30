@@ -1,6 +1,8 @@
 package com.csproject.hrm.repositories.custom.impl;
 
+import com.csproject.hrm.common.enums.EDeduction;
 import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.dto.DeductionTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.DeductionSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
@@ -58,20 +60,27 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
   @Override
   public List<DeductionSalaryResponse> getListDeductionMonthlyBySalaryMonthlyId(Long salaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext
-        .select(
-            DEDUCTION_SALARY.DEDUCTION_ID,
-            DEDUCTION_SALARY.VALUE,
-            DEDUCTION_TYPE.DEDUCTION_TYPE_.as("deduction_name"),
-            DEDUCTION_SALARY.DATE,
-            DEDUCTION_SALARY.DESCRIPTION)
-        .from(DEDUCTION_SALARY)
-        .leftJoin(DEDUCTION_TYPE)
-        .on(DEDUCTION_TYPE.DEDUCTION_TYPE_ID.eq(DEDUCTION_SALARY.DEDUCTION_TYPE_ID))
-        .leftJoin(SALARY_MONTHLY)
-        .on(SALARY_MONTHLY.SALARY_ID.eq(DEDUCTION_SALARY.SALARY_ID))
-        .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
-        .fetchInto(DeductionSalaryResponse.class);
+    List<DeductionSalaryResponse> deductionSalaryResponses =
+        dslContext
+            .select(
+                DEDUCTION_SALARY.DEDUCTION_ID,
+                DEDUCTION_SALARY.VALUE,
+                DEDUCTION_TYPE.DEDUCTION_TYPE_.as("deduction_name"),
+                DEDUCTION_SALARY.DATE,
+                DEDUCTION_SALARY.DESCRIPTION)
+            .from(DEDUCTION_SALARY)
+            .leftJoin(DEDUCTION_TYPE)
+            .on(DEDUCTION_TYPE.DEDUCTION_TYPE_ID.eq(DEDUCTION_SALARY.DEDUCTION_TYPE_ID))
+            .leftJoin(SALARY_MONTHLY)
+            .on(SALARY_MONTHLY.SALARY_ID.eq(DEDUCTION_SALARY.SALARY_ID))
+            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
+            .fetchInto(DeductionSalaryResponse.class);
+    deductionSalaryResponses.forEach(
+        deductionSalaryResponse -> {
+          deductionSalaryResponse.setDeduction_name(
+              EDeduction.getLabel(deductionSalaryResponse.getDeduction_name()));
+        });
+    return deductionSalaryResponses;
   }
 
   @Override
@@ -113,7 +122,8 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
   }
 
   @Override
-  public Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByDeductionSalary(Long deductionSalaryId) {
+  public Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByDeductionSalary(
+      Long deductionSalaryId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     System.out.println(
         dslContext
@@ -161,5 +171,23 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
             .select()
             .from(DEDUCTION_SALARY)
             .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryId)));
+  }
+
+  @Override
+  public List<DeductionTypeDto> getListDeductionTypeDto() {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<DeductionTypeDto> deductionTypeDtos =
+        dslContext
+            .select(
+                DEDUCTION_TYPE.DEDUCTION_TYPE_ID,
+                DEDUCTION_TYPE.DEDUCTION_TYPE_.as("deduction_type_name"))
+            .from(DEDUCTION_TYPE)
+            .fetchInto(DeductionTypeDto.class);
+    deductionTypeDtos.forEach(
+        deductionTypeDto -> {
+          deductionTypeDto.setDeduction_type_name(
+              EDeduction.getLabel(deductionTypeDto.getDeduction_type_name()));
+        });
+    return deductionTypeDtos;
   }
 }

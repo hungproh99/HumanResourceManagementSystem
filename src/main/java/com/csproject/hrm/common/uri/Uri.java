@@ -6,6 +6,7 @@ public class Uri {
   public static final String URI_CHANGE_PASSWORD = "/change_password";
   public static final String URI_FORGOT_PASSWORD = "/forgot_password";
   public static final String URI_GET_ALL_EMPLOYEE = "/get_all_employee";
+  public static final String URI_GET_LIST_MANAGER_OF_AREA = "/get_list_manager_of_area";
   public static final String URI_INSERT_EMPLOYEE = "/add_employee";
   public static final String URI_INSERT_MULTI_EMPLOYEE_BY_CSV = "/import_csv_employee";
   public static final String URI_LIST_WORKING_TYPE = "/list_working_type";
@@ -44,9 +45,11 @@ public class Uri {
   public static final String URI_UPDATE_CHECK_APPLICATION_QUEST =
       "/update_checked_application_request";
 
-//  public static final String URI_UPDATE_IS_READ = "/update_is_read";
-  public static final String URI_UPDATE_APPROVE_APPLICATION_REQUEST = "/update_approve_application_request";
-  public static final String URI_UPDATE_REJECT_APPLICATION_REQUEST = "/update_reject_application_request";
+  //  public static final String URI_UPDATE_IS_READ = "/update_is_read";
+  public static final String URI_UPDATE_APPROVE_APPLICATION_REQUEST =
+      "/update_approve_application_request";
+  public static final String URI_UPDATE_REJECT_APPLICATION_REQUEST =
+      "/update_reject_application_request";
 
   public static final String URI_GET_LIST_EMPLOYEE_NAME_AND_ID = "/list_employee_name_id";
 
@@ -77,4 +80,6 @@ public class Uri {
   public static final String URI_UPDATE_APPROVE_SALARY_MONTHLY = "/update_approve_salary_monthly";
   public static final String URI_UPDATE_REJECT_SALARY_MONTHLY = "/update_reject_salary_monthly";
   public static final String URI_UPDATE_CHECKED_SALARY_MONTHLY = "/update_checked_salary_monthly";
+  public static final String URI_GET_LIST_DEDUCTION_TYPE = "/get_list_deduction_type";
+  public static final String URI_GET_LIST_BONUS_TYPE = "/get_list_bonus_type";
 }
