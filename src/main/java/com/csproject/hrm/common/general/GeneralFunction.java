@@ -183,8 +183,49 @@ public class GeneralFunction {
     MimeMessage message = emailSender.createMimeMessage();
     Resource resource = resourceLoader.getResource("classpath:email-remind-request.vm");
     boolean multipart = true;
-    String paragraph = null;
-    if (checkBy != null) {
+    String paragraph = "<span></span>";
+    if (checkBy.size() != 0) {
+      String check = null;
+      for (int i = 0; i < checkBy.size(); i++) {
+        if (i == checkBy.size() - 1) {
+          check += checkBy.get(i);
+        } else {
+          check += checkBy.get(i) + ", ";
+        }
+      }
+      paragraph = "<div>It already checked by:  <strong>" + check + "</strong></div>";
+    }
+    try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+      helper.setTo(to);
+      helper.setFrom(from);
+      helper.setSubject(subject);
+      message.setContent(
+          String.format(data, approveName, createName, createDate, paragraph, requestId),
+          "text/html");
+      emailSender.send(message);
+    } catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void sendEmailRemindSalary(
+      String approveName,
+      String createName,
+      String createDate,
+      List<String> checkBy,
+      String requestId,
+      String from,
+      String to,
+      String subject) {
+    MimeMessage message = emailSender.createMimeMessage();
+    Resource resource = resourceLoader.getResource("classpath:email-remind-salary.vm");
+    boolean multipart = true;
+    String paragraph = "<span></span>";
+    if (checkBy.size() != 0) {
       String check = null;
       for (int i = 0; i < checkBy.size(); i++) {
         if (i == checkBy.size() - 1) {

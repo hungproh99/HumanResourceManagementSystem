@@ -356,7 +356,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
           HttpStatus.BAD_REQUEST,
           "Not exist with employee id " + updateSalaryMonthlyRequest.getApproverId());
     }
-    salaryMonthlyRepository.updateCheckedSalaryMonthly(updateSalaryMonthlyRequest, employeeId);
+    salaryMonthlyRepository.updateCheckedSalaryMonthly(
+        updateSalaryMonthlyRequest, Boolean.FALSE, employeeId);
   }
 
   @Override
@@ -494,6 +495,43 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
             salaryMonthlyInfoDto.get().getEndDate(),
             salaryMonthlyInfoDto.get().getEmployeeId()));
     salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);
+  }
+
+  @Override
+  public void updateAllSalaryRemind(LocalDate checkDate) {
+    List<SalaryMonthlyRemindResponse> salaryMonthlyRemindResponseList =
+        salaryMonthlyRepository.getAllSalaryMonthlyToRemind(checkDate);
+
+    salaryMonthlyRemindResponseList.forEach(
+        salaryMonthlyRemindResponse -> {
+          String createName =
+              salaryMonthlyRemindResponse.getFullName()
+                  + "-"
+                  + salaryMonthlyRemindResponse.getEmployeeId();
+
+          String approveName =
+              employeeRepository.getEmployeeNameByEmployeeId(
+                  salaryMonthlyRemindResponse.getApprover());
+
+          String approveEmail =
+              employeeRepository.getEmployeeEmailByEmployeeId(
+                  salaryMonthlyRemindResponse.getApprover());
+
+          generalFunction.sendEmailRemindSalary(
+              approveName,
+              createName,
+              salaryMonthlyRemindResponse.getStartDate().getMonth()
+                  + "-"
+                  + salaryMonthlyRemindResponse.getStartDate().getYear(),
+              salaryMonthlyRemindResponse.getCheckedBy(),
+              salaryMonthlyRemindResponse.getSalaryMonthlyId().toString(),
+              FROM_EMAIL,
+              TO_EMAIL,
+              "Remind Request");
+
+          salaryMonthlyRepository.updateAllSalaryMonthlyRemind(
+              salaryMonthlyRemindResponse.getSalaryMonthlyId(), Boolean.TRUE);
+        });
   }
 
   private SalaryMonthlyDto upsertSalaryMonthly(

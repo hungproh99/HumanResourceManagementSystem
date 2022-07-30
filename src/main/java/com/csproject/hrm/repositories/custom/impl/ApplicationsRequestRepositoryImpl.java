@@ -292,6 +292,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   public void updateCheckedApplicationRequest(
       UpdateApplicationRequestRequest updateApplicationRequestRequest,
       String employeeId,
+      boolean isRemind,
       LocalDateTime latestDate) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext.transaction(
@@ -303,6 +304,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                   ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))
               .set(APPLICATIONS_REQUEST.LATEST_DATE, latestDate)
               .set(APPLICATIONS_REQUEST.APPROVER, updateApplicationRequestRequest.getApproverId())
+              .set(APPLICATIONS_REQUEST.IS_REMIND, isRemind)
               .where(
                   APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(
                       updateApplicationRequestRequest.getApplicationRequestId()))
@@ -763,7 +765,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(POLICY_TYPE.POLICY_TYPE_)
-//                , POLICY_TYPE.POLICY_NAME)
+        //                , POLICY_TYPE.POLICY_NAME)
         .from(REQUEST_NAME)
         .leftJoin(POLICY)
         .on(REQUEST_NAME.POLICY_ID.eq(POLICY.POLICY_ID))
@@ -829,26 +831,26 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   public void createApproveTaxEnrollment(EmployeeTaxDto employeeTaxDto) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-//    boolean check =
-//        dslContext.fetchExists(
-//            dslContext
-//                .select()
-//                .from(EMPLOYEE_TAX)
-//                .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
-//
-//    if (!check) {
-//      dslContext
-//          .insertInto(
-//              EMPLOYEE_TAX,
-//              EMPLOYEE_TAX.EMPLOYEE_ID,
-//              EMPLOYEE_TAX.POLICY_TYPE_ID,
-//              EMPLOYEE_TAX.TAX_STATUS)
-//          .values(
-//              employeeTaxDto.getEmployeeID(),
-//              employeeTaxDto.getTaxTypeID(),
-//              employeeTaxDto.getTaxStatus())
-//          .execute();
-//    }
+    //    boolean check =
+    //        dslContext.fetchExists(
+    //            dslContext
+    //                .select()
+    //                .from(EMPLOYEE_TAX)
+    //                .where(EMPLOYEE_TAX.POLICY_TYPE_ID.eq(employeeTaxDto.getTaxTypeID())));
+    //
+    //    if (!check) {
+    //      dslContext
+    //          .insertInto(
+    //              EMPLOYEE_TAX,
+    //              EMPLOYEE_TAX.EMPLOYEE_ID,
+    //              EMPLOYEE_TAX.POLICY_TYPE_ID,
+    //              EMPLOYEE_TAX.TAX_STATUS)
+    //          .values(
+    //              employeeTaxDto.getEmployeeID(),
+    //              employeeTaxDto.getTaxTypeID(),
+    //              employeeTaxDto.getTaxStatus())
+    //          .execute();
+    //    }
   }
 
   private String checkNotificationOrRequest(String employeeId, Long requestId) {

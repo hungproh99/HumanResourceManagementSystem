@@ -55,4 +55,6 @@ public interface SalaryMonthlyService {
   void updateAdvanceSalary(AdvanceSalaryDto advanceSalaryDto);
 
   void deleteAdvanceSalary(Long advanceSalaryId);
+
+  void updateAllSalaryRemind(LocalDate checkDate);
 }

@@ -11,8 +11,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExcelExportSalaryMonthly {
@@ -63,6 +65,12 @@ public class ExcelExportSalaryMonthly {
     } else if (value instanceof Date) {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
       cell.setCellValue(simpleDateFormat.format(value));
+    } else if (value instanceof Double) {
+      cell.setCellValue((Double) value);
+    } else if (value instanceof BigDecimal) {
+      cell.setCellValue(new BigDecimal(value.toString()).doubleValue());
+    } else if (value instanceof LocalDate) {
+      cell.setCellValue((LocalDate) value);
     } else {
       cell.setCellValue((String) value);
     }
