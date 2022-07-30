@@ -132,6 +132,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
             SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
             SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
+            SALARY_MONTHLY.TOTAL_ALLOWANCE.as("totalAllowance"),
             SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),
@@ -444,6 +445,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .set(SALARY_MONTHLY.TOTAL_DEDUCTION, salaryMonthlyDto.getTotalDeduction())
         .set(SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT, salaryMonthlyDto.getTotalInsurance())
         .set(SALARY_MONTHLY.TOTAL_TAX_PAYMENT, salaryMonthlyDto.getTotalTax())
+        .set(SALARY_MONTHLY.TOTAL_ALLOWANCE, salaryMonthlyDto.getTotalAllowance())
         .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyDto.getSalaryMonthlyId()));
   }
 
@@ -568,6 +570,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
             SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
             SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
+            SALARY_MONTHLY.TOTAL_ALLOWANCE.as("totalAllowance"),
             SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),
@@ -632,6 +635,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
             SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
             SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
+            SALARY_MONTHLY.TOTAL_ALLOWANCE.as("totalAllowance"),
             SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),
@@ -679,6 +683,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
             SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
             SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
+            SALARY_MONTHLY.TOTAL_ALLOWANCE.as("totalAllowance"),
             SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),

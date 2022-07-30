@@ -6,6 +6,7 @@ import com.csproject.hrm.dto.dto.OvertimePoint;
 import com.csproject.hrm.dto.dto.RangePolicy;
 import com.csproject.hrm.dto.dto.WorkingTimeDataDto;
 import com.csproject.hrm.dto.request.HrmPojo;
+import com.csproject.hrm.dto.response.AllowanceSalaryResponse;
 import com.csproject.hrm.dto.response.EmployeeInsuranceResponse;
 import com.csproject.hrm.dto.response.EmployeeTaxResponse;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -314,63 +315,60 @@ public class GeneralFunction {
     if (employeeTaxResponses.isEmpty()) {
       return new ArrayList<>();
     }
-    List<EmployeeTaxResponse> finalEmployeeTax = new ArrayList<>();
     Optional<String> policyTaxDto =
         policyRepository.getPolicyDtoByPolicyType(employeeTaxResponses.get(0).getPolicy_type());
     if (policyTaxDto.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
     }
     Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
-    int count = 0;
     int countNumberDependent = employeeDetailRepository.countNumberDependentRelative(employeeId);
     BigDecimal familyAllowancesPersonal = BigDecimal.ZERO;
     BigDecimal familyAllowancesDependent = BigDecimal.ZERO;
     for (Map.Entry<String, String> i : hashMap) {
-      if (employeeTaxResponses.size() == count) {
-        break;
-      }
       if (i.getKey().equalsIgnoreCase("Family_Allowances_Personal")) {
         familyAllowancesPersonal = BigDecimal.valueOf(Long.parseLong(i.getValue()));
       } else if (i.getKey().equalsIgnoreCase("Family_Allowances_Dependent")) {
         familyAllowancesDependent = BigDecimal.valueOf(Long.parseLong(i.getValue()));
-      } else {
-        List<RangePolicy> rangePolicyList = splitRange(i.getValue());
-        BigDecimal value = BigDecimal.ZERO;
-        Double taxValue = 0D;
-        for (RangePolicy rangePolicy : rangePolicyList) {
-          BigDecimal maxValue, minValue;
-          if (rangePolicy.getMax().equalsIgnoreCase("MAX")) {
-            maxValue = BigDecimal.valueOf(Long.MAX_VALUE);
-          } else {
-            maxValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMax()));
-          }
-          minValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMin()));
-          BigDecimal finalTax =
-              finalSalary.subtract(
-                  familyAllowancesPersonal
-                      .add(
-                          familyAllowancesDependent.multiply(
-                              BigDecimal.valueOf(countNumberDependent)))
-                      .add(totalInsurance));
-          if (maxValue.compareTo(finalTax) >= 0 && minValue.compareTo(finalTax) < 0) {
-            value =
-                finalSalary.multiply(
-                    BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue()))
-                        .divide(BigDecimal.TEN)
-                        .divide(BigDecimal.TEN));
-            taxValue = Double.parseDouble(rangePolicy.getValue());
-            break;
-          }
-        }
-        EmployeeTaxResponse employeeTaxResponse = employeeTaxResponses.get(count);
-        employeeTaxResponse.setTax_value(taxValue);
-        employeeTaxResponse.setTax_name(i.getKey());
-        employeeTaxResponse.setValue(value);
-        finalEmployeeTax.add(employeeTaxResponse);
-        count++;
       }
     }
-    return finalEmployeeTax;
+    if (finalSalary.compareTo(familyAllowancesPersonal) < 0) {
+      return new ArrayList<>();
+    }
+    BigDecimal finalTax =
+        finalSalary.subtract(
+            familyAllowancesPersonal
+                .add(familyAllowancesDependent.multiply(BigDecimal.valueOf(countNumberDependent)))
+                .add(totalInsurance));
+
+    for (Map.Entry<String, String> i : hashMap) {
+      for (EmployeeTaxResponse employeeTaxResponse : employeeTaxResponses) {
+        if (i.getKey().equalsIgnoreCase("VNP")
+            && i.getKey().equalsIgnoreCase(employeeTaxResponse.getTax_name())) {
+          List<RangePolicy> rangePolicyList = splitRange(i.getValue());
+          for (RangePolicy rangePolicy : rangePolicyList) {
+            BigDecimal maxValue, minValue;
+            if (rangePolicy.getMax().equalsIgnoreCase("MAX")) {
+              maxValue = BigDecimal.valueOf(Long.MAX_VALUE);
+            } else {
+              maxValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMax()));
+            }
+            minValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMin()));
+            if (maxValue.compareTo(finalTax) >= 0 && minValue.compareTo(finalTax) < 0) {
+              BigDecimal value =
+                  finalSalary.multiply(
+                      BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue()))
+                          .divide(BigDecimal.TEN)
+                          .divide(BigDecimal.TEN));
+              employeeTaxResponse.setTax_value(
+                  BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue())).doubleValue());
+              employeeTaxResponse.setValue(value);
+              break;
+            }
+          }
+        }
+      }
+    }
+    return employeeTaxResponses;
   }
 
   public List<EmployeeInsuranceResponse> readInsuranceDataByEmployeeId(
@@ -380,7 +378,6 @@ public class GeneralFunction {
     if (employeeInsuranceResponses.isEmpty()) {
       return new ArrayList<>();
     }
-    List<EmployeeInsuranceResponse> finalEmployeeInsurance = new ArrayList<>();
     Optional<String> policyTaxDto =
         policyRepository.getPolicyDtoByPolicyType(
             employeeInsuranceResponses.get(0).getPolicy_type());
@@ -388,23 +385,26 @@ public class GeneralFunction {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Policy tax is empty");
     }
     Set<Map.Entry<String, String>> hashMap = splitData(policyTaxDto.get()).entrySet();
-    int count = 0;
     for (Map.Entry<String, String> i : hashMap) {
-      if (employeeInsuranceResponses.size() == count) {
-        break;
+      for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
+        if (i.getKey().equalsIgnoreCase(employeeInsuranceResponse.getInsurance_name())) {
+          employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
+          employeeInsuranceResponse.setValue(
+              baseSalary
+                  .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
+                  .divide(BigDecimal.TEN)
+                  .divide(BigDecimal.TEN));
+          break;
+        }
       }
-      EmployeeInsuranceResponse employeeInsuranceResponse = employeeInsuranceResponses.get(count);
-      employeeInsuranceResponse.setInsurance_name(i.getKey());
-      employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
-      employeeInsuranceResponse.setValue(
-          baseSalary
-              .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
-              .divide(BigDecimal.TEN)
-              .divide(BigDecimal.TEN));
-      finalEmployeeInsurance.add(employeeInsuranceResponse);
-      count++;
     }
-    return finalEmployeeInsurance;
+    return employeeInsuranceResponses;
+  }
+
+  public List<AllowanceSalaryResponse> readAllowanceData() {
+    //    Optional<String> policyTaxDto =
+    //            policyRepository.getPolicyDtoByPolicyType(EPolicyType.ALLOWANCE);
+    return null;
   }
 
   public HashMap<String, String> splitData(String data) {

@@ -33,7 +33,10 @@ public class EmployeeTaxRepositoryImpl implements EmployeeTaxRepositoryCustom {
   public List<EmployeeTaxResponse> getListTaxByEmployeeId(String employeeId) {
     DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
-        .select(EMPLOYEE_TAX.EMPLOYEE_TAX_ID, POLICY_TYPE.POLICY_TYPE_.as("policy_type"))
+        .select(
+            EMPLOYEE_TAX.EMPLOYEE_TAX_ID,
+            POLICY_TYPE.POLICY_TYPE_.as("policy_type"),
+            POLICY_NAME.POLICY_NAME_.as("tax_name"))
         .from(EMPLOYEE_TAX)
         .leftJoin(POLICY_NAME)
         .on(POLICY_NAME.POLICY_NAME_ID.eq(EMPLOYEE_TAX.POLICY_NAME_ID))

@@ -50,6 +50,9 @@ public class SalaryMonthly {
   @Column(name = "total_advance")
   private BigDecimal totalAdvance;
 
+  @Column(name = "total_allowance")
+  private BigDecimal totalAllowance;
+
   @Column(name = "start_date")
   private LocalDate startDate;
 

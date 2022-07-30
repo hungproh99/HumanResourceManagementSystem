@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -22,5 +21,6 @@ public class SalaryMonthlyDto {
   private BigDecimal totalInsurance;
   private BigDecimal totalTax;
   private BigDecimal totalAdvance;
+  private BigDecimal totalAllowance;
   private BigDecimal finalSalary;
 }

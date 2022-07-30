@@ -4,6 +4,7 @@ import com.csproject.hrm.dto.dto.EmployeeTypeDto;
 import com.csproject.hrm.dto.dto.RoleDto;
 import com.csproject.hrm.dto.dto.WorkingTypeDto;
 import com.csproject.hrm.dto.request.HrmPojo;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -47,4 +48,10 @@ public interface EmployeeRepositoryCustom {
   List<String> getAllEmployeeIdActive();
 
   Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId);
+
+  List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId, Integer level);
+
+  List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId, Integer level);
+
+  int getLevelOfEmployee(String employeeId);
 }

@@ -145,6 +145,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .base_salary(salaryContractDto.get().getBase_salary())
         .final_salary(salaryMonthlyResponse.get().getFinalSalary())
         .standardPoint(standardPoint)
+        .salaryStatus(salaryMonthlyResponse.get().getSalaryStatus())
         .pointResponses(pointResponse)
         .otResponseList(otResponseList)
         .bonusSalaryResponseList(bonusSalaryResponseList)
@@ -678,7 +679,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal finalSalary = baseSalary.add(additionalSalary);
     BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     List<EmployeeTaxResponse> employeeTaxResponses =
-        generalFunction.readTaxDataByEmployeeId(employeeId, baseSalary, totalInsurance);
+        generalFunction.readTaxDataByEmployeeId(employeeId, finalSalary, totalInsurance);
     BigDecimal totalTax = BigDecimal.ZERO;
     if (employeeTaxResponses.isEmpty()) {
       return new EmployeeTaxResponseList(employeeTaxResponses, totalTax);

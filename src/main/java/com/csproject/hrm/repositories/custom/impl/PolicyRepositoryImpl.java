@@ -55,7 +55,7 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
             POLICY.CREATED_DATE,
             POLICY.EFFECTIVE_DATE,
             POLICY_TYPE.POLICY_TYPE_,
-//            POLICY_TYPE.POLICY_NAME,
+            //            POLICY_TYPE.POLICY_NAME,
             POLICY.DESCRIPTION,
             POLICY_CATEGORY.POLICY_CATEGORY_,
             (when(POLICY.POLICY_STATUS.isTrue(), "true")
@@ -119,6 +119,7 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
         .leftJoin(POLICY_TYPE)
         .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY.POLICY_TYPE_ID))
         .where(POLICY_TYPE.POLICY_TYPE_.eq(policyType))
+        .and(POLICY.POLICY_STATUS.isTrue())
         .fetchOptionalInto(String.class);
   }
 }
