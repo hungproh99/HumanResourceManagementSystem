@@ -2,8 +2,7 @@ package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.services.ChartService;
-import com.csproject.hrm.services.EmployeeDetailService;
+import com.csproject.hrm.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +25,7 @@ public class ChartController {
   @Autowired ChartService chartService;
   @Autowired EmployeeDetailService employeeDetailService;
   @Autowired JwtUtils jwtUtils;
+  @Autowired HolidayCalenderService holidayCalenderService;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_general_data_chart")
@@ -69,12 +69,6 @@ public class ChartController {
   public ResponseEntity<?> getPaidLeaveReasonByYear(
       HttpServletRequest request, @RequestParam Integer year, @RequestParam String employeeId) {
     String headerAuth = request.getHeader(AUTHORIZATION);
-    //    if ("".equals(employeeId.trim())) {
-    //      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-    //        String jwt = headerAuth.substring(7);
-    //        employeeId = jwtUtils.getIdFromJwtToken(jwt);
-    //      }
-    //    }
     return ResponseEntity.ok(
         chartService.getPaidLeaveReasonByYearAndManagerID(headerAuth, year, employeeId.trim()));
   }
@@ -157,5 +151,12 @@ public class ChartController {
     }
 
     return ResponseEntity.ok(employeeDetailService.getAllEmployeeByManagerID(employeeId));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @GetMapping(value = "get_all_holiday")
+  public ResponseEntity<?> getAllHolidayByYear(@RequestParam String year) {
+    LocalDate date = LocalDate.of(Integer.parseInt(year), 1, 1);
+    return ResponseEntity.ok(holidayCalenderService.getAllHolidayByYear(date));
   }
 }

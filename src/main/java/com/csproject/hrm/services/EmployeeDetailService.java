@@ -36,5 +36,7 @@ public interface EmployeeDetailService {
 
   Optional<EmployeeDetailResponse> findMainDetail(String employeeID);
 
+  WorkingInfoResponse findWorkingInfo(String employeeID);
+
   List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId);
 }

@@ -1,8 +1,6 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
-import com.csproject.hrm.dto.dto.BonusSalaryDto;
-import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -22,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +96,7 @@ public class SalaryMonthlyController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       salaryMonthlyService.exportPersonalSalaryMonthlyToCsv(
           servletResponse.getWriter(), queryParam, listId, employeeId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export CSV");
   }
@@ -124,7 +121,7 @@ public class SalaryMonthlyController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       salaryMonthlyService.exportPersonalSalaryMonthlyExcel(
           servletResponse, queryParam, listId, employeeId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export Excel");
   }
@@ -250,15 +247,6 @@ public class SalaryMonthlyController {
   public ResponseEntity<?> updateRejectSalaryMonthly(
       @RequestBody RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     salaryMonthlyService.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
-  }
-
-  @GetMapping("/test")
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> getTest() {
-    LocalDate startDate = LocalDate.of(2022, 10, 01);
-    LocalDate endDate = LocalDate.of(2022, 10, 31);
-    salaryMonthlyService.upsertSalaryMonthlyByEmployeeIdList(startDate, endDate);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }
