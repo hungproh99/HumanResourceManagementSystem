@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AllowanceSalaryResponse {
-  private String allowanceName;
-  private BigDecimal value;
+public class EmployeeAllowanceResponseList {
+  private List<EmployeeAllowanceResponse> employeeAllowanceResponseList;
+  private BigDecimal total;
 }

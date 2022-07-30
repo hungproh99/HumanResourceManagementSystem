@@ -28,7 +28,7 @@ public class SalaryMonthlyDetailResponse {
   private BonusSalaryResponseList bonusSalaryResponseList;
   private DeductionSalaryResponseList deductionSalaryResponseList;
   private AdvanceSalaryResponseList advanceSalaryResponseList;
-  private AllowanceSalaryResponseList allowanceSalaryResponseList;
+  private EmployeeAllowanceResponseList employeeAllowanceResponseList;
   private EmployeeTaxResponseList employeeTaxResponseList;
   private EmployeeInsuranceResponseList employeeInsuranceResponseList;
 }

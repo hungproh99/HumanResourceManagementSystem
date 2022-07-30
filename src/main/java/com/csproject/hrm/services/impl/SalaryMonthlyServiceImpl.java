@@ -135,6 +135,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     EmployeeInsuranceResponseList employeeInsuranceResponseList =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary());
 
+    EmployeeAllowanceResponseList employeeAllowanceResponseList =
+        getEmployeeAllowanceResponseList(employeeId);
+
     return SalaryMonthlyDetailResponse.builder()
         .salary_monthly_id(salaryMonthlyId)
         .employee_id(employeeId)
@@ -151,6 +154,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .bonusSalaryResponseList(bonusSalaryResponseList)
         .deductionSalaryResponseList(deductionSalaryResponseList)
         .advanceSalaryResponseList(advanceSalaryResponseList)
+        .employeeAllowanceResponseList(employeeAllowanceResponseList)
         .employeeInsuranceResponseList(employeeInsuranceResponseList)
         .employeeTaxResponseList(employeeTaxResponseList)
         .build();
@@ -535,6 +539,16 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         });
   }
 
+  @Override
+  public List<DeductionTypeDto> getListDeductionTypeDto() {
+    return deductionSalaryRepository.getListDeductionTypeDto();
+  }
+
+  @Override
+  public List<BonusTypeDto> getListBonusTypeDto() {
+    return bonusSalaryRepository.getListBonusTypeDto();
+  }
+
   private SalaryMonthlyDto upsertSalaryMonthly(
       LocalDate startDate, LocalDate endDate, String employeeId) {
     Optional<SalaryContractDto> salaryContractDto =
@@ -595,6 +609,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal totalInsurance =
         getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary())
             .getTotal();
+    BigDecimal totalAllowance = getEmployeeAllowanceResponseList(employeeId).getTotal();
     BigDecimal salaryPerDay =
         (salaryContractDto
                 .get()
@@ -605,14 +620,17 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         salaryContractDto
             .get()
             .getBase_salary()
-            .add(salaryContractDto.get().getAdditional_salary())
+            .add(
+                salaryPerDay.multiply(
+                    BigDecimal.valueOf(actualWorkingPoint != null ? actualWorkingPoint : 0D)))
             .add(
                 salaryPerDay.multiply(BigDecimal.valueOf(totalOTPoint != null ? totalOTPoint : 0D)))
             .add(totalBonus != null ? totalBonus : BigDecimal.ZERO)
             .subtract(totalDeduction != null ? totalDeduction : BigDecimal.ZERO)
             .subtract(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
             .subtract(totalTax != null ? totalTax : BigDecimal.ZERO)
-            .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO);
+            .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO)
+            .add(totalAllowance != null ? totalAllowance : BigDecimal.ZERO);
 
     return SalaryMonthlyDto.builder()
         .salaryMonthlyId(salaryMonthlyId)
@@ -677,10 +695,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
 
   private EmployeeTaxResponseList getEmployeeTaxResponseList(
       String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary) {
-    BigDecimal finalSalary = baseSalary.add(additionalSalary);
+    BigDecimal monthlySalary = baseSalary.add(additionalSalary);
     BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     List<EmployeeTaxResponse> employeeTaxResponses =
-        generalFunction.readTaxDataByEmployeeId(employeeId, finalSalary, totalInsurance);
+        generalFunction.readTaxDataByEmployeeId(employeeId, monthlySalary, totalInsurance);
     BigDecimal totalTax = BigDecimal.ZERO;
     if (employeeTaxResponses.isEmpty()) {
       return new EmployeeTaxResponseList(employeeTaxResponses, totalTax);
@@ -703,5 +721,18 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       totalInsurance = totalInsurance.add(employeeInsuranceResponse.getValue());
     }
     return new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);
+  }
+
+  private EmployeeAllowanceResponseList getEmployeeAllowanceResponseList(String employeeId) {
+    List<EmployeeAllowanceResponse> employeeAllowanceResponses =
+        generalFunction.readAllowanceData(employeeId);
+    BigDecimal totalAllowance = BigDecimal.ZERO;
+    if (employeeAllowanceResponses.isEmpty()) {
+      return new EmployeeAllowanceResponseList(employeeAllowanceResponses, totalAllowance);
+    }
+    for (EmployeeAllowanceResponse employeeAllowanceResponse : employeeAllowanceResponses) {
+      totalAllowance = totalAllowance.add(employeeAllowanceResponse.getValue());
+    }
+    return new EmployeeAllowanceResponseList(employeeAllowanceResponses, totalAllowance);
   }
 }

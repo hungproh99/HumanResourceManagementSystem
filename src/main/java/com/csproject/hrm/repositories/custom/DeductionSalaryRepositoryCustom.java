@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.dto.DeductionTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.DeductionSalaryResponse;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,8 @@ public interface DeductionSalaryRepositoryCustom {
   List<DeductionSalaryResponse> getListDeductionMonthlyBySalaryMonthlyId(Long salaryId);
 
   BigDecimal sumListDeductionMonthlyBySalaryMonthlyId(Long salaryId);
+
+  List<DeductionTypeDto> getListDeductionTypeDto();
 
   void updateDeductionSalaryByDeductionSalaryId(DeductionSalaryDto deductionSalaryDto);
 

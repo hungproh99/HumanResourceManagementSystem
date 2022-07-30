@@ -252,6 +252,18 @@ public class SalaryMonthlyController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
+  @GetMapping(value = URI_GET_LIST_DEDUCTION_TYPE)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> getListDeductionType() {
+    return ResponseEntity.ok(salaryMonthlyService.getListDeductionTypeDto());
+  }
+
+  @GetMapping(value = URI_GET_LIST_BONUS_TYPE)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> getListBonusType() {
+    return ResponseEntity.ok(salaryMonthlyService.getListBonusTypeDto());
+  }
+
   //  @GetMapping("/test")
   //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   //  public ResponseEntity<?> getTest() {

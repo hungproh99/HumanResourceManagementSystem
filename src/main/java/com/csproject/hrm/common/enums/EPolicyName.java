@@ -12,7 +12,10 @@ public enum EPolicyName {
   SI("Social Insurance", 4),
   UI("Unemployment Insurance", 5),
   PI("Pension Insurance", 6),
-  VNP("VN Progressive", 7);
+  VNP("Viet Nam Progressive", 7),
+  TRANSPORTATION_ALLOWANCE("Transportation Allowance", 8),
+  PHONE_ALLOWANCE("Phone Allowance", 9),
+  MEAL_ALLOWANCE("Meal Allowance", 10);
 
   private final String label;
   private final long value;

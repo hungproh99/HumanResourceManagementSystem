@@ -43,6 +43,7 @@ public class EmployeeInsuranceRepositoryImpl implements EmployeeInsuranceReposit
         .leftJoin(POLICY_TYPE)
         .on(POLICY_TYPE.POLICY_TYPE_ID.eq(POLICY_NAME.POLICY_TYPE_ID))
         .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(employeeId))
+        .and(EMPLOYEE_INSURANCE.INSURANCE_STATUS.isTrue())
         .fetchInto(EmployeeInsuranceResponse.class);
   }
 }
