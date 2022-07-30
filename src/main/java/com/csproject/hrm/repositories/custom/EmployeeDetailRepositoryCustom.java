@@ -48,4 +48,6 @@ public interface EmployeeDetailRepositoryCustom {
   Integer getLevelByEmployeeID(String employeeID);
 
   int countNumberDependentRelative(String employeeId);
+
+  List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId);
 }

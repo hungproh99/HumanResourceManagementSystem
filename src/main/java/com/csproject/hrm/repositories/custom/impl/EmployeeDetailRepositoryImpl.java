@@ -598,4 +598,14 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(EMPLOYEE.EMPLOYEE_ID.eq(RELATIVE_INFORMATION.EMPLOYEE_ID))
             .where(RELATIVE_INFORMATION.IS_DEPENDENT.isTrue()));
   }
+
+  @Override
+  public List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID.as("employeeID"), EMPLOYEE.FULL_NAME.as("name"))
+        .from(EMPLOYEE)
+        .where(EMPLOYEE.MANAGER_ID.eq(managerId))
+        .fetchInto(EmployeeNameAndID.class);
+  }
 }

@@ -31,12 +31,12 @@ public interface ChartRepositoryCustom {
   List<LeaveCompanyReasonDto> getAllLeaveCompanyReason();
 
   int countLeaveCompanyReasonByDateAndReasonID(
-      LocalDate startDate, LocalDate endDate, Long reasonID, String areaName);
+      LocalDate startDate, LocalDate endDate, Long reasonID, String employeeID);
 
   List<PaidLeaveReasonDto> getAllPaidLeaveReason();
 
   int countPaidLeaveReasonByDateAndReasonID(
-      LocalDate startDate, LocalDate endDate, Long reasonID, String areaName);
+      LocalDate startDate, LocalDate endDate, Long reasonID, String employeeID);
 
   List<SalaryMonthlyResponse> getSalaryHistoryByDateAndEmployeeIDAndType(
       LocalDate startDate, LocalDate endDate, String employeeID, String type);
