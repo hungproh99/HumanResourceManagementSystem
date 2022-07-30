@@ -59,6 +59,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     conditions.add(condition);
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    System.out.println(getAllPersonalSalaryMonthly(conditions, sortFields, queryParam.pagination));
     List<SalaryMonthlyResponse> salaryMonthlyResponses =
         getAllPersonalSalaryMonthly(conditions, sortFields, queryParam.pagination)
             .fetchInto(SalaryMonthlyResponse.class);
@@ -159,7 +160,11 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
 
   @Override
   public Long getSalaryMonthlyIdByEmployeeIdAndDate(
-      String employeeId, LocalDate startDate, LocalDate endDate, String salaryStatus) {
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      Double actualWorkingPoint,
+      String salaryStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     Long salaryContractId =
         dslContext
@@ -191,7 +196,14 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     boolean checkExist = checkExistSalaryMonthly(startDate, endDate, salaryContractId);
     if (!checkExist) {
       insertSalaryMonthlyByEmployee(
-              salaryContractId, startDate, endDate, salaryStatus, false, managerId, duration)
+              salaryContractId,
+              startDate,
+              endDate,
+              salaryStatus,
+              false,
+              managerId,
+              duration,
+              actualWorkingPoint)
           .execute();
     }
     return dslContext
@@ -409,7 +421,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
       String salaryStatus,
       boolean isRemind,
       String approver,
-      LocalDate duration) {
+      LocalDate duration,
+      Double actualWorkingPoint) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .insertInto(
@@ -420,7 +433,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.SALARY_STATUS_ID,
             SALARY_MONTHLY.IS_REMIND,
             SALARY_MONTHLY.APPROVER,
-            SALARY_MONTHLY.DURATION)
+            SALARY_MONTHLY.DURATION,
+            SALARY_MONTHLY.ACTUAL_POINT)
         .values(
             endDate,
             startDate,
@@ -428,7 +442,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             ESalaryMonthly.getValue(salaryStatus),
             isRemind,
             approver,
-            duration)
+            duration,
+            actualWorkingPoint)
         .onConflictDoNothing();
   }
 

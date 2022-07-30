@@ -34,6 +34,7 @@ public class ChartServiceImpl implements ChartService {
   @Autowired SalaryMonthlyService salaryMonthlyService;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
   @Autowired EmployeeRepository employeeRepository;
+  @Autowired TimekeepingRepository timekeepingRepository;
   @Autowired JwtUtils jwtUtils;
 
   @Override
@@ -298,10 +299,11 @@ public class ChartServiceImpl implements ChartService {
 
     LocalDate startDate = date.withDayOfMonth(1);
     LocalDate endDate = date.withDayOfMonth(date.getMonth().length(date.isLeapYear()));
-
+    Double actualWorkingPoint =
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeID);
     Long salaryID =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeID, startDate, endDate, ESalaryMonthly.APPROVED.name());
+            employeeID, startDate, endDate, actualWorkingPoint, ESalaryMonthly.APPROVED.name());
 
     SalaryMonthlyDetailResponse salaryMonthly =
         salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);

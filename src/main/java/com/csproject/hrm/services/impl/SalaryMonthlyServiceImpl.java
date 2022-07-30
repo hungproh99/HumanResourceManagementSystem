@@ -539,9 +539,12 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       LocalDate startDate, LocalDate endDate, String employeeId) {
     Optional<SalaryContractDto> salaryContractDto =
         salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
+    Double actualWorkingPoint =
+        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
+
     Long salaryMonthlyId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, endDate, ESalaryMonthly.PENDING.name());
+            employeeId, startDate, endDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
     if (salaryContractDto.isEmpty()) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "Don't have salary contract of " + employeeId);
@@ -576,8 +579,6 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
 
     Double standardPoint = standardDayOfWork * maxPointPerDay;
 
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
     Double totalOTPoint =
         overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDate(
             startDate, endDate, employeeId);

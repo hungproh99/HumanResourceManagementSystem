@@ -23,7 +23,11 @@ public interface SalaryMonthlyRepositoryCustom {
   Optional<SalaryMonthlyResponse> getSalaryMonthlyBySalaryId(Long salaryId);
 
   Long getSalaryMonthlyIdByEmployeeIdAndDate(
-      String employeeId, LocalDate startDate, LocalDate endDate, String salaryStatus);
+      String employeeId,
+      LocalDate startDate,
+      LocalDate endDate,
+      Double actualWorkingPoint,
+      String salaryStatus);
 
   void updateSalaryMonthlyByListEmployee(List<SalaryMonthlyDto> salaryMonthlyDtoList);
 
