@@ -7,6 +7,7 @@ import com.csproject.hrm.jooq.QueryParam;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,6 @@ public interface TimekeepingService {
       String employeeID, String date);
 
   void upsertPointPerDay(LocalDate currentDate);
+
+  void insertTimekeeping(String employeeId, LocalDate localDate, LocalTime localTime);
 }

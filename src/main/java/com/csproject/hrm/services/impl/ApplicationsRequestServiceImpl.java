@@ -619,6 +619,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     Double actualWorkingPoint =
         timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
             startDate, lastDate, employeeId);
+    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
@@ -648,6 +649,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     Double actualWorkingPoint =
         timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
             startDate, lastDate, employeeId);
+    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
@@ -670,6 +672,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     Double actualWorkingPoint =
         timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
             startDate, lastDate, employeeId);
+    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());

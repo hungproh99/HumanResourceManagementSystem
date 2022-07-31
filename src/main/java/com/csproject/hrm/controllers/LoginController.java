@@ -40,7 +40,8 @@ public class LoginController {
             .map(item -> item.getAuthority())
             .collect(Collectors.toList());
     return ResponseEntity.ok(
-        new JwtResponse(userDetails.getId(), userDetails.getEmail(), roles, jwt));
+        new JwtResponse(
+            userDetails.getId(), userDetails.getEmail(), userDetails.getFullName(), roles, jwt));
     //        return ResponseEntity.ok(passwordEncoder.encode(loginRequest.getPassword()));
   }
 

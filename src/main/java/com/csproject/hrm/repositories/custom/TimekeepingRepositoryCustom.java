@@ -1,7 +1,10 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.TimekeepingDto;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
+import com.csproject.hrm.dto.response.ListTimekeepingStatusResponse;
+import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
+import com.csproject.hrm.dto.response.TimekeepingResponses;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -45,11 +48,13 @@ public interface TimekeepingRepositoryCustom {
       LocalTime endTime,
       Long overtimeType);
 
-  void insertTimekeeping(TimekeepingDto timekeepingDto, String timekeepingStatus);
+  Long insertTimekeeping(TimekeepingDto timekeepingDto);
+
+  void insertListTimekeepingStatus(Long timekeepingId, String timekeepingStatus);
 
   LocalTime getFirstTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
-  LocalTime getLastTimeCheckInByTimekeeping(LocalDate date, String employeeId);
+  LocalTime getLastTimeCheckOutByTimekeeping(LocalDate date, String employeeId);
 
   int countPaidLeaveOfEmployeeByYear(String employeeID);
 

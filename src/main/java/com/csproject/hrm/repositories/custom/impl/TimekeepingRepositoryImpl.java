@@ -1,7 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -615,7 +617,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public void insertTimekeeping(TimekeepingDto timekeepingDto, String timekeepingStatus) {
+  public Long insertTimekeeping(TimekeepingDto timekeepingDto) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var insertTimekeeping =
         dslContext
@@ -632,15 +634,19 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 timekeepingDto.getEmployeeId())
             .returningResult(TIMEKEEPING.TIMEKEEPING_ID)
             .fetchOne();
+    return insertTimekeeping.getValue(TIMEKEEPING.TIMEKEEPING_ID);
+  }
+
+  @Override
+  public void insertListTimekeepingStatus(Long timekeepingId, String timekeepingStatus) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
     final var insertListTimekeepingStatus =
         dslContext
             .insertInto(
                 LIST_TIMEKEEPING_STATUS,
                 LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
                 LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID)
-            .values(
-                insertTimekeeping.getValue(TIMEKEEPING.TIMEKEEPING_ID),
-                ETimekeepingStatus.getValue(timekeepingStatus))
+            .values(timekeepingId, ETimekeepingStatus.getValue(timekeepingStatus))
             .execute();
   }
 
@@ -697,7 +703,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .fetchOneInto(LocalTime.class);
   }
 
-  public LocalTime getLastTimeCheckInByTimekeeping(LocalDate date, String employeeId) {
+  @Override
+  public LocalTime getLastTimeCheckOutByTimekeeping(LocalDate date, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     TableLike<?> rowNumberDesc =
         dslContext

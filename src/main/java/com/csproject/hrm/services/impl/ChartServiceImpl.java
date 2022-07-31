@@ -1,9 +1,16 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.EArea;
+import com.csproject.hrm.common.enums.ESalaryMonthly;
+import com.csproject.hrm.common.enums.EWorkingType;
 import com.csproject.hrm.dto.chart.*;
-import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.dto.AreaDto;
+import com.csproject.hrm.dto.dto.LeaveCompanyReasonDto;
+import com.csproject.hrm.dto.dto.PaidLeaveReasonDto;
+import com.csproject.hrm.dto.dto.WorkingTypeDto;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
+import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.repositories.*;
@@ -301,6 +308,7 @@ public class ChartServiceImpl implements ChartService {
     LocalDate endDate = date.withDayOfMonth(date.getMonth().length(date.isLeapYear()));
     Double actualWorkingPoint =
         timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeID);
+    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryID =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeID, startDate, endDate, actualWorkingPoint, ESalaryMonthly.APPROVED.name());

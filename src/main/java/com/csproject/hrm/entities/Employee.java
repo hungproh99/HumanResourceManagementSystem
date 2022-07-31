@@ -123,6 +123,6 @@ public class Employee {
   @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
   private List<EmployeeAllowance> employeeAllowanceList;
 
-  @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
-  private Area area;
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+  private List<Area> area;
 }

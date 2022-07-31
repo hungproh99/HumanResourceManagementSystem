@@ -41,4 +41,9 @@ public class ScheduledTasks {
     LocalDate startDate = endDate.with(firstDayOfMonth());
     salaryMonthlyService.upsertSalaryMonthlyByEmployeeIdList(startDate, endDate);
   }
+
+  @Scheduled(cron = "0 00 07 ? * * ")
+  public void logTest() {
+    log.info("Morning");
+  }
 }

@@ -35,6 +35,7 @@ public class Uri {
   public static final String URI_GET_LIST_TIMEKEEPING = "/list_all_timekeeping";
   public static final String URI_DOWNLOAD_CSV_TIMEKEEPING = "/download_csv_timekeeping";
   public static final String URI_GET_DETAIL_TIMEKEEPING = "/list_detail_timekeeping";
+  public static final String URI_GET_CHECKIN_CHECKOUT = "/checkin_checkout";
   public static final String URI_DOWNLOAD_EXCEL_EMPLOYEE = "/download_excel_employee";
   public static final String URI_DOWNLOAD_EXCEL_TIMEKEEPING = "/download_excel_timekeeping";
   public static final String URI_INSERT_MULTI_EMPLOYEE_BY_EXCEL = "/import_excel_employee";

@@ -1,9 +1,6 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EArea;
-import com.csproject.hrm.common.enums.EOvertime;
-import com.csproject.hrm.common.enums.ESalaryMonthly;
-import com.csproject.hrm.common.enums.EWorkingType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.common.excel.ExcelExportSalaryMonthly;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
@@ -556,7 +553,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
     Double actualWorkingPoint =
         timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeId);
-
+    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryMonthlyId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, endDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
@@ -677,17 +674,33 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       Double totalPointByType =
           overtimeRepository.sumListOTDetailResponseByEmployeeIdAndDateAndOtType(
               startDate, endDate, employeeId, EOvertime.getValue(otType));
-      otResponses.add(new OTResponse(otType, listOTDetail, totalPointByType));
+      totalPointByType = totalPointByType != null ? totalPointByType : 0D;
+      otResponses.add(new OTResponse(EOvertime.getLabel(otType), listOTDetail, totalPointByType));
     }
     return otResponses;
   }
 
   private List<BonusSalaryResponse> getBonusSalaryResponseList(Long salaryMonthlyId) {
-    return bonusSalaryRepository.getListBonusMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    List<BonusSalaryResponse> bonusSalaryResponses =
+        bonusSalaryRepository.getListBonusMonthlyBySalaryMonthlyId(salaryMonthlyId);
+
+    bonusSalaryResponses.forEach(
+        bonusSalaryResponse -> {
+          bonusSalaryResponse.setBonus_name(EBonus.getLabel(bonusSalaryResponse.getBonus_name()));
+        });
+    return bonusSalaryResponses;
   }
 
   private List<DeductionSalaryResponse> getDeductionSalaryResponseList(Long salaryMonthlyId) {
-    return deductionSalaryRepository.getListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
+    List<DeductionSalaryResponse> deductionSalaryResponses =
+        deductionSalaryRepository.getListDeductionMonthlyBySalaryMonthlyId(salaryMonthlyId);
+
+    deductionSalaryResponses.forEach(
+        deductionSalaryResponse -> {
+          deductionSalaryResponse.setDeduction_name(
+              EDeduction.getLabel(deductionSalaryResponse.getDeduction_name()));
+        });
+    return deductionSalaryResponses;
   }
 
   private List<AdvanceSalaryResponse> getAdvanceSalaryResponseList(Long salaryMonthlyId) {

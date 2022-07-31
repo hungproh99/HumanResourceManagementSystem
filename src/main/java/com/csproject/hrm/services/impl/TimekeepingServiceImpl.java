@@ -43,6 +43,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   @Autowired GeneralFunction generalFunction;
   @Autowired SalaryCalculator salaryCalculator;
   @Autowired SalaryContractRepository salaryContractRepository;
+  @Autowired CheckInCheckOutRepository checkInCheckOutRepository;
 
   @Override
   public TimekeepingResponsesList getListAllTimekeeping(QueryParam queryParam) {
@@ -164,7 +165,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
           }
         });
     updatePointPerDay(listUpdate, currentDate);
-    insertTimekeeping(listInsert, currentDate);
+    insertTimekeepingDayOff(listInsert, currentDate);
   }
 
   private void updatePointPerDay(List<String> employeeIdList, LocalDate currentDate) {
@@ -224,7 +225,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
           LocalTime firstTimeCheckIn =
               timekeepingRepository.getFirstTimeCheckInByTimekeeping(currentDate, employeeId);
           LocalTime lastTimeCheckOut =
-              timekeepingRepository.getLastTimeCheckInByTimekeeping(currentDate, employeeId);
+              timekeepingRepository.getLastTimeCheckOutByTimekeeping(currentDate, employeeId);
           if (firstTimeCheckIn.isAfter(workingTimeDataDto.getStartTime())) {
             Long rangeTime = MINUTES.between(firstTimeCheckIn, workingTimeDataDto.getStartTime());
             maxPointPerDay =
@@ -241,7 +242,34 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     timekeepingRepository.updatePointPerDay(timekeepingDtoList);
   }
 
-  public void insertTimekeeping(List<String> employeeIdList, LocalDate currentDate) {
+  @Override
+  public void insertTimekeeping(String employeeId, LocalDate localDate, LocalTime localTime) {
+    Optional<TimekeepingDetailResponse> timekeepingDetailResponse =
+        timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeId, localDate);
+    Long timekeepingId = null;
+    if (timekeepingDetailResponse.isEmpty()) {
+      TimekeepingDto timekeepingDto = new TimekeepingDto(0D, 0D, localDate, employeeId);
+      timekeepingId = timekeepingRepository.insertTimekeeping(timekeepingDto);
+    } else {
+      timekeepingId = timekeepingDetailResponse.get().getTimekeeping_id();
+    }
+    checkInCheckOutRepository.insertCheckInCheckOutByTimekeepingId(timekeepingId, localTime);
+    WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
+    if (localTime.isAfter(workingTimeDataDto.getStartTime())
+        && localTime.isAfter(workingTimeDataDto.getEndTime())) {
+      timekeepingRepository.insertListTimekeepingStatus(
+          timekeepingId, ETimekeepingStatus.WORK_LATE.name());
+    } else if (localTime.isBefore(workingTimeDataDto.getEndTime())
+        && localTime.isBefore(workingTimeDataDto.getEndTime())) {
+      timekeepingRepository.insertListTimekeepingStatus(
+          timekeepingId, ETimekeepingStatus.LEAVE_SOON.name());
+    } else {
+      timekeepingRepository.insertListTimekeepingStatus(
+          timekeepingId, ETimekeepingStatus.NORMAL.name());
+    }
+  }
+
+  private void insertTimekeepingDayOff(List<String> employeeIdList, LocalDate currentDate) {
     List<LocalDate> holidayList = salaryCalculator.getAllHolidayByYear(currentDate);
     List<LocalDate> weekendList = salaryCalculator.getAllWeekendByYear(currentDate);
     List<LocalDate> holidayAndWeekendList =
@@ -256,7 +284,9 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     if (!isHolidayOrWeekend) {
       for (String employee : employeeIdList) {
         TimekeepingDto timekeepingDto = new TimekeepingDto(0D, 0D, currentDate, employee);
-        timekeepingRepository.insertTimekeeping(timekeepingDto, ETimekeepingStatus.DAY_OFF.name());
+        Long timekeepingId = timekeepingRepository.insertTimekeeping(timekeepingDto);
+        timekeepingRepository.insertListTimekeepingStatus(
+            timekeepingId, ETimekeepingStatus.DAY_OFF.name());
       }
     }
   }

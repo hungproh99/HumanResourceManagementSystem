@@ -15,6 +15,7 @@ public class UserDetailsImpl implements UserDetails {
   private String id;
 
   private String email;
+  private String name;
 
   @JsonIgnore private String password;
 
@@ -23,10 +24,12 @@ public class UserDetailsImpl implements UserDetails {
   public UserDetailsImpl(
       String id,
       String email,
+      String name,
       String password,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.email = email;
+    this.name = name;
     this.password = password;
     this.authorities = authorities;
   }
@@ -36,7 +39,11 @@ public class UserDetailsImpl implements UserDetails {
         new ArrayList<>(
             Arrays.asList(new SimpleGrantedAuthority(employee.getRoleType().getERole().name())));
     return new UserDetailsImpl(
-        employee.getId(), employee.getCompanyEmail(), employee.getPassword(), authorities);
+        employee.getId(),
+        employee.getCompanyEmail(),
+        employee.getFullName(),
+        employee.getPassword(),
+        authorities);
   }
 
   public String getId() {
@@ -45,6 +52,10 @@ public class UserDetailsImpl implements UserDetails {
 
   public String getEmail() {
     return email;
+  }
+
+  public String getFullName() {
+    return name;
   }
 
   @Override

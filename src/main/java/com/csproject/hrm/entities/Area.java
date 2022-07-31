@@ -1,7 +1,10 @@
 package com.csproject.hrm.entities;
 
 import com.csproject.hrm.common.enums.EArea;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,7 +28,7 @@ public class Area {
   @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
   private List<WorkingPlace> workingPlace;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "manager_id")
   private Employee employee;
 }
