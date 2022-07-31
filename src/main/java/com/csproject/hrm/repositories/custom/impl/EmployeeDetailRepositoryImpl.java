@@ -539,6 +539,45 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
+  public WorkingInfoResponse findWorkingInfo(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .select(
+                (SALARY_CONTRACT.ADDITIONAL_SALARY.add(SALARY_CONTRACT.BASE_SALARY))
+                    .as("final_salary"),
+                SALARY_CONTRACT.BASE_SALARY,
+                OFFICE.NAME.as("office"),
+                AREA.NAME.as("area"),
+                JOB.POSITION,
+                WORKING_TYPE.NAME.as("working_type"),
+                WORKING_CONTRACT.START_DATE)
+            .from(WORKING_CONTRACT)
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(AREA)
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+            .leftJoin(OFFICE)
+            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+            .leftJoin(JOB)
+            .on(Tables.JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+            .leftJoin(GRADE_TYPE)
+            .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+            .leftJoin(WORKING_TYPE)
+            .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+            .leftJoin(SALARY_CONTRACT)
+            .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeID))
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
+
+    return query.fetchOneInto(WorkingInfoResponse.class);
+  }
+
+  @Override
   public boolean checkEmployeeIDIsExists(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchExists(

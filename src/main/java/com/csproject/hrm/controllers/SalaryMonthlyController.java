@@ -98,7 +98,7 @@ public class SalaryMonthlyController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       salaryMonthlyService.exportPersonalSalaryMonthlyToCsv(
           servletResponse.getWriter(), queryParam, listId, employeeId);
-      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export CSV");
   }
@@ -123,7 +123,7 @@ public class SalaryMonthlyController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       salaryMonthlyService.exportPersonalSalaryMonthlyExcel(
           servletResponse, queryParam, listId, employeeId);
-      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export Excel");
   }
