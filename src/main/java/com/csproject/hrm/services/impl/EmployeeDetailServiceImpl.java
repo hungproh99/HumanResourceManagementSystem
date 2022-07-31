@@ -186,6 +186,22 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
+  public WorkingInfoResponse findWorkingInfo(String employeeID) {
+    if (employeeID == null) {
+      throw new NullPointerException("Param employeeID is null!");
+    }
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
+    WorkingInfoResponse workingInfo = employeeDetailRepository.findWorkingInfo(employeeID);
+    workingInfo.setArea(EArea.getLabel(workingInfo.getArea()));
+    workingInfo.setOffice(EOffice.getLabel(workingInfo.getOffice()));
+    workingInfo.setPosition(EJob.getLabel(workingInfo.getPosition()));
+    workingInfo.setWorking_type(EWorkingType.getLabel(workingInfo.getWorking_type()));
+    return workingInfo;
+  }
+
+  @Override
   public List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId) {
     List<EmployeeNameAndID> list = employeeDetailRepository.getAllEmployeeByManagerID(managerId);
     if (list.size() <= 0) {
