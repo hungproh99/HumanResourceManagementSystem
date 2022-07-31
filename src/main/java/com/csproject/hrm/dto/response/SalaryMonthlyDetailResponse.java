@@ -17,6 +17,7 @@ public class SalaryMonthlyDetailResponse {
   private String employee_id;
   private String full_name;
   private String position;
+  private String approverId;
   private LocalDate start_date;
   private LocalDate end_date;
   private BigDecimal base_salary;

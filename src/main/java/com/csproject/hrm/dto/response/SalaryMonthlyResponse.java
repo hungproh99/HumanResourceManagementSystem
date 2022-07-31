@@ -15,6 +15,7 @@ public class SalaryMonthlyResponse {
   private String employeeId;
   private String fullName;
   private String position;
+  private String approverId;
   private Double standardPoint;
   private Double actualPoint;
   private Double otPoint;

@@ -125,6 +125,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
             EMPLOYEE.FULL_NAME.as("fullName"),
             JOB.POSITION.as("position"),
+            SALARY_MONTHLY.APPROVER.as("approverId"),
             SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
             SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
             SALARY_MONTHLY.OT_POINT.as("otPoint"),
@@ -251,6 +252,18 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   @Override
   public void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var managerId =
+        dslContext
+            .select(EMPLOYEE.MANAGER_ID)
+            .from(SALARY_MONTHLY)
+            .leftJoin(SALARY_CONTRACT)
+            .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+            .where(SALARY_MONTHLY.SALARY_ID.eq(rejectSalaryMonthlyRequest.getSalaryMonthlyId()))
+            .fetchOneInto(String.class);
     final var query =
         dslContext
             .update(SALARY_MONTHLY)
@@ -258,6 +271,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
                 SALARY_MONTHLY.SALARY_STATUS_ID,
                 ESalaryMonthly.getValue(ESalaryMonthly.REJECTED.name()))
             .set(SALARY_MONTHLY.COMMENT, rejectSalaryMonthlyRequest.getComment())
+            .set(SALARY_MONTHLY.APPROVER, managerId)
             .where(SALARY_MONTHLY.SALARY_ID.eq(rejectSalaryMonthlyRequest.getSalaryMonthlyId()))
             .execute();
   }
@@ -577,6 +591,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
             EMPLOYEE.FULL_NAME.as("fullName"),
             JOB.POSITION.as("position"),
+            SALARY_MONTHLY.APPROVER.as("approverId"),
             SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
             SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
             SALARY_MONTHLY.OT_POINT.as("otPoint"),
@@ -642,6 +657,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
             EMPLOYEE.FULL_NAME.as("fullName"),
             JOB.POSITION.as("position"),
+            SALARY_MONTHLY.APPROVER.as("approverId"),
             SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
             SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
             SALARY_MONTHLY.OT_POINT.as("otPoint"),
@@ -690,6 +706,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
             EMPLOYEE.FULL_NAME.as("fullName"),
             JOB.POSITION.as("position"),
+            SALARY_MONTHLY.APPROVER.as("approverId"),
             SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
             SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
             SALARY_MONTHLY.OT_POINT.as("otPoint"),

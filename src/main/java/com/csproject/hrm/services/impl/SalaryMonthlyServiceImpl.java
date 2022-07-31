@@ -142,6 +142,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .salary_monthly_id(salaryMonthlyId)
         .employee_id(employeeId)
         .full_name(salaryMonthlyResponse.get().getFullName())
+        .approverId(salaryMonthlyResponse.get().getApproverId())
         .position(salaryMonthlyResponse.get().getPosition())
         .start_date(startDate)
         .end_date(endDate)
