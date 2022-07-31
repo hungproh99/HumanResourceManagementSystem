@@ -20,5 +20,5 @@ public class PaidLeaveReason {
   private String reasonName;
 
   @OneToOne(mappedBy = "paidLeaveReason", fetch = FetchType.LAZY)
-  private Timekeeping timekeeping;
+  private PaidLeave paidLeave;
 }

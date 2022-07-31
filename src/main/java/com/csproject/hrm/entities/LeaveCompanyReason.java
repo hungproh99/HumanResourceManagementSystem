@@ -20,5 +20,5 @@ public class LeaveCompanyReason {
   private String reasonName;
 
   @OneToOne(mappedBy = "leaveCompanyReason", fetch = FetchType.LAZY)
-  private WorkingContract workingContract;
+  private LeaveCompany leaveCompany;
 }
