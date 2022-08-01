@@ -638,19 +638,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public void insertListTimekeepingStatus(Long timekeepingId, String timekeepingStatus) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var insertListTimekeepingStatus =
-        dslContext
-            .insertInto(
-                LIST_TIMEKEEPING_STATUS,
-                LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID,
-                LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID)
-            .values(timekeepingId, ETimekeepingStatus.getValue(timekeepingStatus))
-            .execute();
-  }
-
-  @Override
   public void updatePointPerDay(List<TimekeepingDto> timekeepingDtoList) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var queries =

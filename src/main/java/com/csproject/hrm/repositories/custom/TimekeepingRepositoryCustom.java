@@ -50,8 +50,6 @@ public interface TimekeepingRepositoryCustom {
 
   Long insertTimekeeping(TimekeepingDto timekeepingDto);
 
-  void insertListTimekeepingStatus(Long timekeepingId, String timekeepingStatus);
-
   LocalTime getFirstTimeCheckInByTimekeeping(LocalDate date, String employeeId);
 
   LocalTime getLastTimeCheckOutByTimekeeping(LocalDate date, String employeeId);

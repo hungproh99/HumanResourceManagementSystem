@@ -104,7 +104,7 @@ public class LoginControllerTest {
     //            .andExpect(jsonPath("$", notNullValue()))
     //            .andExpect(jsonPath("$.name", is("Rayven Zambo")));
 
-    JwtResponse jwtResponse =
-        new JwtResponse(userDetails.getId(), userDetails.getEmail(), roles, jwt);
+//    JwtResponse jwtResponse =
+//        new JwtResponse(userDetails.getId(), userDetails.getEmail(), roles, jwt);
   }
 }

@@ -30,34 +30,28 @@ public class CheckInCheckOutRepositoryImpl implements CheckInCheckOutRepositoryC
   @Autowired private final DBConnection connection;
 
   @Override
-  public void insertCheckInCheckOutByTimekeepingId(Long timekeepingId, LocalTime localTime) {
+  public void insertCheckInByTimekeepingId(Long timekeepingId, LocalTime localTime) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    Optional<CheckInCheckOutDto> checkInCheckOutDto =
-        getLastCheckInCheckOutByTimekeeping(timekeepingId);
-    if (checkInCheckOutDto.isEmpty()) {
-      dslContext
-          .insertInto(CHECKIN_CHECKOUT, CHECKIN_CHECKOUT.CHECKIN, CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-          .values(localTime, timekeepingId)
-          .execute();
-    } else {
-      if (checkInCheckOutDto.get().getCheckin() != null
-          && checkInCheckOutDto.get().getCheckout() != null) {
+    final var query =
         dslContext
             .insertInto(CHECKIN_CHECKOUT, CHECKIN_CHECKOUT.CHECKIN, CHECKIN_CHECKOUT.TIMEKEEPING_ID)
             .values(localTime, timekeepingId)
             .execute();
-      } else if (checkInCheckOutDto.get().getCheckin() != null
-          && checkInCheckOutDto.get().getCheckout() == null) {
-        dslContext
-            .insertInto(
-                CHECKIN_CHECKOUT, CHECKIN_CHECKOUT.CHECKOUT, CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-            .values(localTime, timekeepingId)
-            .execute();
-      }
-    }
   }
 
-  private Optional<CheckInCheckOutDto> getLastCheckInCheckOutByTimekeeping(Long timekeepingId) {
+  @Override
+  public void updateCheckOutByTimekeepingId(Long checkInCheckOutId, LocalTime localTime) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext
+            .update(CHECKIN_CHECKOUT)
+            .set(CHECKIN_CHECKOUT.CHECKOUT, localTime)
+            .where(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.eq(checkInCheckOutId))
+            .execute();
+  }
+
+  @Override
+  public Optional<CheckInCheckOutDto> getLastCheckInCheckOutByTimekeeping(Long timekeepingId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(

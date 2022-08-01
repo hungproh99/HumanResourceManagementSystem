@@ -90,14 +90,14 @@ public class TimekeepingController {
 
   @GetMapping(URI_GET_CHECKIN_CHECKOUT)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> checkInCheckOutByEmployee(HttpServletRequest request) {
+  public ResponseEntity<?> checkInByEmployee(HttpServletRequest request) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       LocalDate localDate = LocalDate.now();
       LocalTime localTime = LocalTime.now();
-      timekeepingService.insertTimekeeping(employeeId, localDate, localTime);
+      timekeepingService.insertTimekeepingCheckInCheckOut(employeeId, localDate, localTime);
     }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
