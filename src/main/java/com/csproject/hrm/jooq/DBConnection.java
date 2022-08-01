@@ -20,7 +20,7 @@ public class DBConnection {
     try {
       connection =
           DriverManager.getConnection(
-              "jdbc:mysql://awseb-e-3tmtipzvke-stack-awsebrdsdatabase-eqfxaihqukay.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true",
+              "jdbc:mysql://aa1dmgc55y2abdh.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true",
               "root",
               "123456789");
     } catch (SQLException e) {
