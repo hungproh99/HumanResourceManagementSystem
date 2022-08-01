@@ -40,7 +40,6 @@ public class Timekeeping {
   @OneToOne(mappedBy = "timekeeping", fetch = FetchType.LAZY)
   private Overtime overTime;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "paid_leave_reason_id")
-  private PaidLeaveReason paidLeaveReason;
+  @OneToOne(mappedBy = "timekeeping", fetch = FetchType.LAZY)
+  private PaidLeave paidLeave;
 }
