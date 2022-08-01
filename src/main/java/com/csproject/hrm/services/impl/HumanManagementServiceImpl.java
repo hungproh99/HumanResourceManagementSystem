@@ -13,6 +13,7 @@ import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.repositories.EmployeeDetailRepository;
 import com.csproject.hrm.repositories.EmployeeRepository;
 import com.csproject.hrm.repositories.WorkingPlaceRepository;
 import com.csproject.hrm.services.HumanManagementService;
@@ -39,34 +40,16 @@ import static com.csproject.hrm.common.constant.Constants.*;
 @Service
 public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired EmployeeRepository employeeRepository;
+  @Autowired EmployeeDetailRepository employeeDetailRepository;
   @Autowired WorkingPlaceRepository contractRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
-
-  private static int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
-    int numOfNonEmptyCells = 0;
-    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      if (row != null) {
-        Cell cell = row.getCell(columnIndex);
-        if (cell != null && cell.getCellType() != CellType.BLANK) {
-          numOfNonEmptyCells++;
-        }
-      }
-    }
-    return numOfNonEmptyCells;
-  }
 
   @Override
   public HrmResponseList getListHumanResource(QueryParam queryParam) {
     List<HrmResponse> hrmResponses = employeeRepository.findAllEmployee(queryParam);
     int total = employeeRepository.countAllEmployeeByCondition(queryParam);
     return new HrmResponseList(hrmResponses, total);
-  }
-
-  @Override
-  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId) {
-    return employeeRepository.findAllEmployeeOfManager(queryParam, managerId);
   }
 
   @Override
@@ -274,94 +257,22 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     }
   }
 
-  @Override
-  public List<String> getListManagerByName(String name) {
-    if (name == null) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    }
-    return employeeRepository.getListManagerByName(name);
-  }
+  //  @Override
+  //  public List<String> getListManagerByName(String name) {
+  //    if (name == null) {
+  //      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+  //    }
+  //    return employeeRepository.getListManagerByName(name);
+  //  }
 
   @Override
-  public List<String> getListEmployeeByNameAndId(String name) {
-    if (name == null) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+  public List<EmployeeNameAndID> getListEmployeeByManagement(String managerId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
     }
-    return employeeRepository.getListEmployeeByNameAndId(name);
-  }
-
-  private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
-    List<HrmPojo> hrmPojos = new ArrayList<>();
-    hrmRequestList.forEach(
-        hrmRequest -> {
-          if (hrmRequest.getFullName() == null
-              || hrmRequest.getRole() == null
-              || hrmRequest.getPhone() == null
-              || hrmRequest.getGender() == null
-              || hrmRequest.getBirthDate() == null
-              || hrmRequest.getGrade() == null
-              || hrmRequest.getPosition() == null
-              || hrmRequest.getOffice() == null
-              || hrmRequest.getArea() == null
-              || hrmRequest.getWorkingType() == null
-              || hrmRequest.getManagerId() == null
-              || hrmRequest.getEmployeeType() == null
-              || hrmRequest.getPersonalEmail() == null) {
-            throw new CustomParameterConstraintException(CSV_NULL_DATA);
-          } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
-            throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
-          }
-          HrmPojo hrmPojo = createHrmPojo(hrmRequest);
-          int countList = 0;
-          for (HrmPojo hrm : hrmPojos) {
-            if (hrmPojo.getFullName().equalsIgnoreCase(hrm.getFullName())) {
-              countList++;
-            }
-          }
-          String employeeId =
-              generalFunction.generateIdEmployee(hrmRequest.getFullName(), countList);
-          String companyEmail = generalFunction.generateEmailEmployee(employeeId);
-          hrmPojo.setEmployeeId(employeeId);
-          hrmPojo.setCompanyEmail(companyEmail);
-          hrmPojos.add(hrmPojo);
-        });
-    //    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL,
-    // SEND_PASSWORD_SUBJECT);
-    for (HrmPojo hrmPojo : hrmPojos) {
-      hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
-    }
-    employeeRepository.insertMultiEmployee(hrmPojos);
-  }
-
-  private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
-    String password = generalFunction.generateCommonLangPassword();
-    String companyName = "HRM";
-
-    HrmPojo hrmPojo =
-        HrmPojo.builder()
-            .password(password)
-            .workStatus(true)
-            .contractStatus(true)
-            .placeStatus(true)
-            .companyName(companyName)
-            .fullName(hrmRequest.getFullName())
-            .role(hrmRequest.getRole())
-            .phone(hrmRequest.getPhone())
-            .gender(hrmRequest.getGender())
-            .birthDate(hrmRequest.getBirthDate())
-            .grade(hrmRequest.getGrade())
-            .position(hrmRequest.getPosition())
-            .office(hrmRequest.getOffice())
-            .area(hrmRequest.getArea())
-            .workingType(hrmRequest.getWorkingType())
-            .managerId(hrmRequest.getManagerId())
-            .employeeType(hrmRequest.getEmployeeType())
-            .personalEmail(hrmRequest.getPersonalEmail())
-            .startDate(hrmRequest.getStartDate())
-            .endDate(hrmRequest.getEndDate())
-            .build();
-
-    return hrmPojo;
+    //    return employeeRepository.getListEmployeeByNameAndId(name);
+    return null;
   }
 
   @Override
@@ -427,9 +338,127 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<EmployeeNameAndID> getListManagerOfArea(String employeeId) {
-    int level = employeeRepository.getLevelOfEmployee(employeeId);
-    return employeeRepository.getListManagerHigherOfArea(employeeId, level);
+  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+    }
+    return employeeRepository.findAllEmployeeOfManager(queryParam, managerId);
+  }
+
+  @Override
+  public List<EmployeeNameAndID> getListManagerHigherOfArea(String managerId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+    }
+    int level = employeeRepository.getLevelOfEmployee(managerId);
+    return employeeRepository.getListManagerHigherOfArea(managerId, level);
+  }
+
+  @Override
+  public List<EmployeeNameAndID> getListManagerLowerOfArea(String managerId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+    }
+    int level = employeeRepository.getLevelOfEmployee(managerId);
+    return employeeRepository.getListManagerLowerOfArea(managerId, level);
+  }
+
+  private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
+    List<HrmPojo> hrmPojos = new ArrayList<>();
+    hrmRequestList.forEach(
+        hrmRequest -> {
+          if (hrmRequest.getFullName() == null
+              || hrmRequest.getRole() == null
+              || hrmRequest.getPhone() == null
+              || hrmRequest.getGender() == null
+              || hrmRequest.getBirthDate() == null
+              || hrmRequest.getGrade() == null
+              || hrmRequest.getPosition() == null
+              || hrmRequest.getOffice() == null
+              || hrmRequest.getArea() == null
+              || hrmRequest.getWorkingType() == null
+              || hrmRequest.getManagerId() == null
+              || hrmRequest.getEmployeeType() == null
+              || hrmRequest.getPersonalEmail() == null) {
+            throw new CustomParameterConstraintException(CSV_NULL_DATA);
+          } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
+            throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+          }
+          HrmPojo hrmPojo = createHrmPojo(hrmRequest);
+          int countList = 0;
+          for (HrmPojo hrm : hrmPojos) {
+            if (hrmPojo.getFullName().equalsIgnoreCase(hrm.getFullName())) {
+              countList++;
+            }
+          }
+          String employeeId =
+              generalFunction.generateIdEmployee(hrmRequest.getFullName(), countList);
+          String companyEmail = generalFunction.generateEmailEmployee(employeeId);
+          hrmPojo.setEmployeeId(employeeId);
+          hrmPojo.setCompanyEmail(companyEmail);
+          hrmPojos.add(hrmPojo);
+        });
+    //    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL,
+    // SEND_PASSWORD_SUBJECT);
+    for (HrmPojo hrmPojo : hrmPojos) {
+      hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
+    }
+    employeeRepository.insertMultiEmployee(hrmPojos);
+  }
+
+  private HrmPojo createHrmPojo(HrmRequest hrmRequest) {
+    String password = generalFunction.generateCommonLangPassword();
+    String companyName = "HRM";
+    int level = 0;
+    if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_MANAGER.name()))) {
+      level = employeeRepository.getLevelOfEmployee(hrmRequest.getManagerId()) - 1;
+    } else if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_USER.name()))) {
+      level = -1;
+    }
+
+    HrmPojo hrmPojo =
+        HrmPojo.builder()
+            .password(password)
+            .workStatus(true)
+            .contractStatus(true)
+            .placeStatus(true)
+            .level(level)
+            .companyName(companyName)
+            .fullName(hrmRequest.getFullName())
+            .role(hrmRequest.getRole())
+            .phone(hrmRequest.getPhone())
+            .gender(hrmRequest.getGender())
+            .birthDate(hrmRequest.getBirthDate())
+            .grade(hrmRequest.getGrade())
+            .position(hrmRequest.getPosition())
+            .office(hrmRequest.getOffice())
+            .area(hrmRequest.getArea())
+            .workingType(hrmRequest.getWorkingType())
+            .managerId(hrmRequest.getManagerId())
+            .employeeType(hrmRequest.getEmployeeType())
+            .personalEmail(hrmRequest.getPersonalEmail())
+            .startDate(hrmRequest.getStartDate())
+            .endDate(hrmRequest.getEndDate())
+            .build();
+
+    return hrmPojo;
+  }
+
+  private int getNumberOfNonEmptyCells(Sheet sheet, int columnIndex) {
+    int numOfNonEmptyCells = 0;
+    for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      if (row != null) {
+        Cell cell = row.getCell(columnIndex);
+        if (cell != null && cell.getCellType() != CellType.BLANK) {
+          numOfNonEmptyCells++;
+        }
+      }
+    }
+    return numOfNonEmptyCells;
   }
 
   private Object getValue(Cell cell) {

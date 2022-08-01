@@ -35,9 +35,9 @@ public interface HumanManagementService {
 
   void importCsvToEmployee(InputStream inputStream);
 
-  List<String> getListManagerByName(String name);
+  //  List<String> getListManagerByName(String name);
 
-  List<String> getListEmployeeByNameAndId(String name);
+  List<EmployeeNameAndID> getListEmployeeByManagement(String employeeId);
 
   void exportEmployeeToExcel(
       HttpServletResponse response, QueryParam queryParam, List<String> list);
@@ -46,5 +46,7 @@ public interface HumanManagementService {
 
   HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId);
 
-  List<EmployeeNameAndID> getListManagerOfArea(String employeeId);
+  List<EmployeeNameAndID> getListManagerHigherOfArea(String managerId);
+
+  List<EmployeeNameAndID> getListManagerLowerOfArea(String managerId);
 }

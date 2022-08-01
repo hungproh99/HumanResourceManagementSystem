@@ -2,10 +2,12 @@ package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
 import com.csproject.hrm.dto.response.TimekeepingResponsesList;
+import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.jwt.JwtUtils;
+import com.csproject.hrm.services.EmployeeDetailService;
 import com.csproject.hrm.services.TimekeepingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,17 +37,24 @@ public class TimekeepingController {
   @Autowired JwtUtils jwtUtils;
 
   @GetMapping(URI_GET_LIST_TIMEKEEPING)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> getListAllTimekeeping(
-      @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
-    TimekeepingResponsesList timekeeping = timekeepingService.getListAllTimekeeping(queryParam);
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      TimekeepingResponsesList timekeeping =
+          timekeepingService.getListTimekeepingByManagement(queryParam, employeeId);
     return ResponseEntity.ok(timekeeping);
+    }
+    throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_TIMEKEEPING)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> downloadCsvTimekeeping(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
@@ -63,7 +72,7 @@ public class TimekeepingController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_TIMEKEEPING)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> downloadExcelTimekeeping(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
@@ -89,7 +98,7 @@ public class TimekeepingController {
   }
 
   @GetMapping(URI_GET_CHECKIN_CHECKOUT)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> checkInByEmployee(HttpServletRequest request) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {

@@ -54,7 +54,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   @Autowired private final DBConnection connection;
 
   @Override
-  public List<TimekeepingResponses> getListAllTimekeeping(QueryParam queryParam) {
+  public List<TimekeepingResponses> getListTimekeepingByManagement(
+      QueryParam queryParam, List<EmployeeNameAndID> employeeNameAndIDList) {
     final List<Condition> conditions = new ArrayList<>();
     final List<Condition> conditionsTimekeeping = new ArrayList<>();
     final var mergeFilters =
@@ -90,11 +91,17 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           conditions.add(condition);
           conditionsTimekeeping.add(timekeepingCondition);
         });
+    Condition condition = noCondition();
+    for (EmployeeNameAndID employeeNameAndID : employeeNameAndIDList) {
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeNameAndID.getEmployeeID()));
+    }
+    conditions.add(condition);
+
     List<OrderField<?>> sortFields = new ArrayList<>();
     sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
 
     List<TimekeepingResponses> timekeepingResponses =
-        getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination)
+        getEmployeeByManagementForTimekeeping(conditions, sortFields, queryParam.pagination)
             .fetchInto(TimekeepingResponses.class);
     timekeepingResponses.forEach(
         timekeepingResponse -> {
@@ -171,7 +178,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     conditions.add(condition);
 
     List<TimekeepingResponses> timekeepingResponses =
-        getAllEmployeeForTimekeeping(conditions, sortFields, queryParam.pagination)
+        getEmployeeByManagementForTimekeeping(conditions, sortFields, queryParam.pagination)
             .fetchInto(TimekeepingResponses.class);
     timekeepingResponses.forEach(
         timekeepingResponse -> {
@@ -323,7 +330,8 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public int countListAllTimekeeping(QueryParam queryParam) {
+  public int countListTimekeepingByManagement(
+      QueryParam queryParam, List<EmployeeNameAndID> employeeNameAndIDList) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final List<Condition> conditions = new ArrayList<>();
     final List<Condition> conditionsTimekeeping = new ArrayList<>();
@@ -360,6 +368,12 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           conditions.add(condition);
           conditionsTimekeeping.add(timekeepingCondition);
         });
+
+    Condition condition = noCondition();
+    for (EmployeeNameAndID employeeNameAndID : employeeNameAndIDList) {
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeNameAndID.getEmployeeID()));
+    }
+    conditions.add(condition);
 
     return dslContext.fetchCount(getCountAllEmployeeForTimekeeping(conditions));
   }
@@ -479,7 +493,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
   }
 
-  private Select<?> getAllEmployeeForTimekeeping(
+  private Select<?> getEmployeeByManagementForTimekeeping(
       List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 

@@ -47,10 +47,18 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   @Autowired ListTimekeepingStatusRepository listTimekeepingStatusRepository;
 
   @Override
-  public TimekeepingResponsesList getListAllTimekeeping(QueryParam queryParam) {
+  public TimekeepingResponsesList getListTimekeepingByManagement(
+      QueryParam queryParam, String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+    }
+    List<EmployeeNameAndID> employeeNameAndIDList = getAllEmployeeByManagerID(employeeId);
+
     List<TimekeepingResponses> timekeepingResponsesList =
-        timekeepingRepository.getListAllTimekeeping(queryParam);
-    int total = timekeepingRepository.countListAllTimekeeping(queryParam);
+        timekeepingRepository.getListTimekeepingByManagement(queryParam, employeeNameAndIDList);
+    int total =
+        timekeepingRepository.countListTimekeepingByManagement(queryParam, employeeNameAndIDList);
 
     return TimekeepingResponsesList.builder()
         .timekeepingResponsesList(timekeepingResponsesList)
@@ -317,5 +325,20 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       }
     }
     return maxPointPerDay;
+  }
+
+  private List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId) {
+    List<EmployeeNameAndID> list = employeeDetailRepository.getAllEmployeeByManagerID(managerId);
+    if (list.size() <= 0) {
+      return list;
+    }
+    List<EmployeeNameAndID> list2 = new ArrayList<>();
+    for (EmployeeNameAndID employee : list) {
+      list2.addAll(getAllEmployeeByManagerID(employee.getEmployeeID()));
+    }
+    if (list2.size() > 0) {
+      list.addAll(list2);
+    }
+    return list;
   }
 }

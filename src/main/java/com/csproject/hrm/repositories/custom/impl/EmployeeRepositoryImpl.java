@@ -214,81 +214,81 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .fetchInto(HrmResponse.class);
   }
 
-  @Override
-  public List<String> getListManagerByName(String name) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    if (name.contains("-")) {
-      String split[] = name.split("-");
-      return dslContext
-          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-          .from(EMPLOYEE)
-          .leftJoin(ROLE_TYPE)
-          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-          .where(
-              EMPLOYEE
-                  .FULL_NAME
-                  .upper()
-                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
-          .and(
-              EMPLOYEE
-                  .EMPLOYEE_ID
-                  .upper()
-                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
-          .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
-          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-          .fetchInto(String.class);
-    }
-    return dslContext
-        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-        .from(EMPLOYEE)
-        .leftJoin(ROLE_TYPE)
-        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-        .where(
-            EMPLOYEE
-                .FULL_NAME
-                .upper()
-                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
-        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
-        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-        .fetchInto(String.class);
-  }
+//  @Override
+//  public List<String> getListManagerByName(String name) {
+//    final DSLContext dslContext = DSL.using(connection.getConnection());
+//    if (name.contains("-")) {
+//      String split[] = name.split("-");
+//      return dslContext
+//          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+//          .from(EMPLOYEE)
+//          .leftJoin(ROLE_TYPE)
+//          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+//          .where(
+//              EMPLOYEE
+//                  .FULL_NAME
+//                  .upper()
+//                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
+//          .and(
+//              EMPLOYEE
+//                  .EMPLOYEE_ID
+//                  .upper()
+//                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
+//          .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+//          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+//          .fetchInto(String.class);
+//    }
+//    return dslContext
+//        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+//        .from(EMPLOYEE)
+//        .leftJoin(ROLE_TYPE)
+//        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+//        .where(
+//            EMPLOYEE
+//                .FULL_NAME
+//                .upper()
+//                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
+//        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+//        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+//        .fetchInto(String.class);
+//  }
 
-  @Override
-  public List<String> getListEmployeeByNameAndId(String name) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    if (name.contains("-")) {
-      String split[] = name.split("-");
-      return dslContext
-          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-          .from(EMPLOYEE)
-          .leftJoin(ROLE_TYPE)
-          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-          .where(
-              EMPLOYEE
-                  .FULL_NAME
-                  .upper()
-                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
-          .and(
-              EMPLOYEE
-                  .EMPLOYEE_ID
-                  .upper()
-                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
-          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-          .fetchInto(String.class);
-    }
-    return dslContext
-        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-        .from(EMPLOYEE)
-        .leftJoin(ROLE_TYPE)
-        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-        .where(
-            EMPLOYEE
-                .FULL_NAME
-                .upper()
-                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
-        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-        .fetchInto(String.class);
-  }
+//  @Override
+//  public List<String> getListEmployeeByNameAndId(String name) {
+//    final DSLContext dslContext = DSL.using(connection.getConnection());
+//    if (name.contains("-")) {
+//      String split[] = name.split("-");
+//      return dslContext
+//          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+//          .from(EMPLOYEE)
+//          .leftJoin(ROLE_TYPE)
+//          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+//          .where(
+//              EMPLOYEE
+//                  .FULL_NAME
+//                  .upper()
+//                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
+//          .and(
+//              EMPLOYEE
+//                  .EMPLOYEE_ID
+//                  .upper()
+//                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
+//          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+//          .fetchInto(String.class);
+//    }
+//    return dslContext
+//        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+//        .from(EMPLOYEE)
+//        .leftJoin(ROLE_TYPE)
+//        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+//        .where(
+//            EMPLOYEE
+//                .FULL_NAME
+//                .upper()
+//                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
+//        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+//        .fetchInto(String.class);
+//  }
 
   public Select<?> countAllEmployee(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
@@ -652,15 +652,15 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .fetchInto(String.class);
   }
 
-  @Override
-  public Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId) {
-    List<Condition> conditions = new ArrayList<>();
-    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
-    List<OrderField<?>> sortFields = new ArrayList<>();
-    sortFields.add(EMPLOYEE.EMPLOYEE_ID.desc());
-    return findAllEmployee(conditions, sortFields, Pagination.defaultPage())
-        .fetchOptionalInto(HrmResponse.class);
-  }
+//  @Override
+//  public Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId) {
+//    List<Condition> conditions = new ArrayList<>();
+//    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+//    List<OrderField<?>> sortFields = new ArrayList<>();
+//    sortFields.add(EMPLOYEE.EMPLOYEE_ID.desc());
+//    return findAllEmployee(conditions, sortFields, Pagination.defaultPage())
+//        .fetchOptionalInto(HrmResponse.class);
+//  }
 
   @Override
   public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId, Integer level) {
@@ -687,12 +687,15 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
         .leftJoin(AREA)
         .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(ROLE_TYPE)
+        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
         .where(EMPLOYEE.EMPLOYEE_ID.notEqual(employeeId))
         .and(EMPLOYEE.LEVEL.le(level))
         .and(EMPLOYEE.LEVEL.gt(0))
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(AREA.NAME.eq(area))
+        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
         .fetchInto(EmployeeNameAndID.class);
   }
 
@@ -721,11 +724,14 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
         .leftJoin(AREA)
         .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(ROLE_TYPE)
+        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
         .where(EMPLOYEE.EMPLOYEE_ID.notEqual(employeeId))
         .and(EMPLOYEE.LEVEL.ge(level))
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(AREA.NAME.eq(area))
+        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
         .fetchInto(EmployeeNameAndID.class);
   }
 

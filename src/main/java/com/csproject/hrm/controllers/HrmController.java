@@ -53,6 +53,8 @@ public class HrmController {
         HrmResponseList hrmResponseList =
             humanManagementService.getListHumanResourceOfManager(queryParam, employeeId);
         return ResponseEntity.ok(hrmResponseList);
+      } else {
+        throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
       }
     }
     HrmResponseList hrmResponseList = humanManagementService.getListHumanResource(queryParam);
@@ -67,7 +69,7 @@ public class HrmController {
   }
 
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE_BY_CSV)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> importCsvToEmployee(@RequestParam MultipartFile multipartFile) {
     if (multipartFile.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
@@ -86,7 +88,7 @@ public class HrmController {
   }
 
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE_BY_EXCEL)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> importExcelToEmployee(@RequestParam MultipartFile multipartFile) {
     if (multipartFile.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
@@ -112,62 +114,62 @@ public class HrmController {
   }
 
   @GetMapping(URI_LIST_WORKING_TYPE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListWorkingType() {
     return ResponseEntity.ok(humanManagementService.getListWorkingType());
   }
 
   @GetMapping(URI_LIST_EMPLOYEE_TYPE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListEmployeeType() {
     return ResponseEntity.ok(humanManagementService.getListEmployeeType());
   }
 
   @GetMapping(URI_LIST_AREA)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListArea() {
     return ResponseEntity.ok(humanManagementService.getListArea());
   }
 
   @GetMapping(URI_LIST_JOB)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListJob() {
     return ResponseEntity.ok(humanManagementService.getListPosition());
   }
 
   @GetMapping(URI_LIST_GRADE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListGrade(@PathVariable Long job_id) {
     return ResponseEntity.ok(humanManagementService.getListGradeByPosition(job_id));
   }
 
   @GetMapping(URI_LIST_OFFICE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListOffice() {
     return ResponseEntity.ok(humanManagementService.getListOffice());
   }
 
   @GetMapping(URI_LIST_ROLE_TYPE)
-  @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListRoleType(HttpServletRequest request) {
     boolean isAdmin = request.isUserInRole("ADMIN");
     return ResponseEntity.ok(humanManagementService.getListRoleType(isAdmin));
   }
 
-  @GetMapping(URI_GET_LIST_MANAGER)
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> getListManager(@RequestParam String name) {
-    return ResponseEntity.ok(humanManagementService.getListManagerByName(name));
-  }
+  //  @GetMapping(URI_GET_LIST_MANAGER)
+  //  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  //  public ResponseEntity<?> getListManager(@RequestParam String name) {
+  //    return ResponseEntity.ok(humanManagementService.getListManagerByName(name));
+  //  }
 
   @GetMapping(URI_GET_LIST_EMPLOYEE_NAME_AND_ID)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getListEmployee(@RequestParam String name) {
-    return ResponseEntity.ok(humanManagementService.getListEmployeeByNameAndId(name));
+    return ResponseEntity.ok(humanManagementService.getListEmployeeByManagement(name));
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_EMPLOYEE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> downloadCsvEmployee(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
@@ -185,7 +187,7 @@ public class HrmController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_EMPLOYEE)
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> downloadExcelEmployee(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
@@ -201,15 +203,29 @@ public class HrmController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
-  @GetMapping(value = URI_GET_LIST_MANAGER_OF_AREA)
+  @GetMapping(value = URI_GET_LIST_MANAGER_HIGHER_OF_AREA)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> getListManagerOfArea(HttpServletRequest request) {
+  public ResponseEntity<?> getListManagerHigherOfArea(HttpServletRequest request) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       List<EmployeeNameAndID> listManagerOfArea =
-          humanManagementService.getListManagerOfArea(employeeId);
+          humanManagementService.getListManagerHigherOfArea(employeeId);
+      return ResponseEntity.ok(listManagerOfArea);
+    }
+    throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+  }
+
+  @GetMapping(value = URI_GET_LIST_MANAGER_LOWER_OF_AREA)
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<?> getListManagerLowerOfArea(HttpServletRequest request) {
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      List<EmployeeNameAndID> listManagerOfArea =
+          humanManagementService.getListManagerLowerOfArea(employeeId);
       return ResponseEntity.ok(listManagerOfArea);
     }
     throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
