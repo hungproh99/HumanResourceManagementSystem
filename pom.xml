@@ -228,7 +228,7 @@
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
                         <url>
-                            jdbc:mysql://aa1dmgc55y2abdh.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true
+                            jdbc:mysql://awseb-e-3tmtipzvke-stack-awsebrdsdatabase-eqfxaihqukay.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true
                         </url>
                         <user>root</user>
                         <password>123456789</password>
