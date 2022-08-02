@@ -162,11 +162,11 @@ public class HrmController {
   //    return ResponseEntity.ok(humanManagementService.getListManagerByName(name));
   //  }
 
-  @GetMapping(URI_GET_LIST_EMPLOYEE_NAME_AND_ID)
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> getListEmployee(@RequestParam String name) {
-    return ResponseEntity.ok(humanManagementService.getListEmployeeByManagement(name));
-  }
+  //  @GetMapping(URI_GET_LIST_EMPLOYEE_NAME_AND_ID)
+  //  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  //  public ResponseEntity<?> getListEmployee(@RequestParam String name) {
+  //    return ResponseEntity.ok(humanManagementService.getListEmployeeByManagement(name));
+  //  }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")

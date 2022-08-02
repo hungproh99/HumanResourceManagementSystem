@@ -71,6 +71,12 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
+      for (String employeeId : list) {
+        if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+        }
+      }
       List<TimekeepingResponses> timekeepingResponses =
           timekeepingRepository.getListTimekeepingToExport(queryParam, list);
       try (CSVPrinter csvPrinter =
@@ -111,6 +117,12 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
+      for (String employeeId : list) {
+        if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+        }
+      }
       try {
         List<TimekeepingResponses> timekeepingResponses =
             timekeepingRepository.getListTimekeepingToExport(queryParam, list);

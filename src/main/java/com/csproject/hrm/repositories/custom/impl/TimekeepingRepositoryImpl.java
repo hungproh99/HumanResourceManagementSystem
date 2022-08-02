@@ -469,130 +469,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .execute();
   }
 
-  private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-
-    return dslContext
-        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
-        .from(EMPLOYEE)
-        .leftJoin(WORKING_CONTRACT)
-        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-        .leftJoin(WORKING_PLACE)
-        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-        .leftJoin(AREA)
-        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-        .leftJoin(OFFICE)
-        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
-        .leftJoin(JOB)
-        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-        .leftJoin(GRADE_TYPE)
-        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
-        .where(conditions)
-        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
-        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
-  }
-
-  private Select<?> getEmployeeByManagementForTimekeeping(
-      List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-
-    return dslContext
-        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
-        .from(EMPLOYEE)
-        .leftJoin(WORKING_CONTRACT)
-        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-        .leftJoin(WORKING_PLACE)
-        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-        .leftJoin(AREA)
-        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-        .leftJoin(OFFICE)
-        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
-        .leftJoin(JOB)
-        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-        .leftJoin(GRADE_TYPE)
-        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
-        .where(conditions)
-        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
-        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-        .orderBy(sortFields)
-        .limit(pagination.limit)
-        .offset(pagination.offset);
-  }
-
-  private Select<?> getAllTimekeepingByEmployeeId(
-      String employeeId, List<Condition> conditions, List<OrderField<?>> sortFields) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    sortFields.add(TIMEKEEPING.DATE.asc());
-    TableLike<?> rowNumberAsc =
-        dslContext
-            .select(
-                asterisk(),
-                rowNumber()
-                    .over()
-                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
-                    .as("rowNumber"))
-            .from(CHECKIN_CHECKOUT);
-
-    TableLike<?> rowNumberDesc =
-        dslContext
-            .select(
-                asterisk(),
-                rowNumber()
-                    .over()
-                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
-                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
-                    .as("rowNumber"))
-            .from(CHECKIN_CHECKOUT);
-
-    TableLike<?> firstTimeCheckIn =
-        dslContext
-            .select()
-            .from(rowNumberAsc)
-            .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1));
-    TableLike<?> lastTimeCheckOut =
-        dslContext
-            .select()
-            .from(rowNumberDesc)
-            .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
-    return dslContext
-        .select(
-            TIMEKEEPING.TIMEKEEPING_ID,
-            TIMEKEEPING.DATE.as(CURRENT_DATE),
-            firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
-            lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
-        .from(TIMEKEEPING)
-        .leftJoin(EMPLOYEE)
-        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
-        .leftJoin(firstTimeCheckIn)
-        .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
-        .leftJoin(lastTimeCheckOut)
-        .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
-        .where(conditions)
-        .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
-        .orderBy(sortFields);
-  }
-
-  private Select<?> getAllTimekeepingStatusByTimekeepingId(
-      long timekeepingId, List<Condition> conditions, List<OrderField<?>> sortFields) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext
-        .select(
-            LIST_TIMEKEEPING_STATUS.LIST_ID,
-            TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS))
-        .from(LIST_TIMEKEEPING_STATUS)
-        .leftJoin(TIMEKEEPING_STATUS)
-        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
-        .leftJoin(TIMEKEEPING)
-        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
-        .leftJoin(EMPLOYEE)
-        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
-        .where(conditions)
-        .and(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
-        .orderBy(sortFields);
-  }
-
   @Override
   public void insertOvertimeByEmployeeIdAndRangeDate(
       String employeeId,
@@ -857,5 +733,139 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     }
 
     return total;
+  }
+
+  //  @Override
+  //  public boolean checkExistTimekeepingByTimekeepingId(Long timekeepingId) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    return dslContext.fetchExists(
+  //        dslContext
+  //            .select(TIMEKEEPING.TIMEKEEPING_ID)
+  //            .from(TIMEKEEPING)
+  //            .where(TIMEKEEPING.TIMEKEEPING_ID.eq((timekeepingId))));
+  //  }
+
+  private Select<?> getAllTimekeepingStatusByTimekeepingId(
+      long timekeepingId, List<Condition> conditions, List<OrderField<?>> sortFields) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            LIST_TIMEKEEPING_STATUS.LIST_ID,
+            TIMEKEEPING_STATUS.NAME.as(Constants.TIMEKEEPING_STATUS))
+        .from(LIST_TIMEKEEPING_STATUS)
+        .leftJoin(TIMEKEEPING_STATUS)
+        .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
+        .leftJoin(TIMEKEEPING)
+        .on(TIMEKEEPING.TIMEKEEPING_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID))
+        .leftJoin(EMPLOYEE)
+        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
+        .where(conditions)
+        .and(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_ID.eq(timekeepingId))
+        .orderBy(sortFields);
+  }
+
+  private Select<?> getCountAllEmployeeForTimekeeping(List<Condition> conditions) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc());
+  }
+
+  private Select<?> getEmployeeByManagementForTimekeeping(
+      List<Condition> conditions, List<OrderField<?>> sortFields, Pagination pagination) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID, EMPLOYEE.FULL_NAME, JOB.POSITION, GRADE_TYPE.NAME.as(GRADE))
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .leftJoin(WORKING_PLACE)
+        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+        .leftJoin(AREA)
+        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+        .leftJoin(OFFICE)
+        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+        .leftJoin(JOB)
+        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+        .leftJoin(GRADE_TYPE)
+        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+        .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+        .orderBy(sortFields)
+        .limit(pagination.limit)
+        .offset(pagination.offset);
+  }
+
+  private Select<?> getAllTimekeepingByEmployeeId(
+      String employeeId, List<Condition> conditions, List<OrderField<?>> sortFields) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    sortFields.add(TIMEKEEPING.DATE.asc());
+    TableLike<?> rowNumberAsc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.asc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    TableLike<?> rowNumberDesc =
+        dslContext
+            .select(
+                asterisk(),
+                rowNumber()
+                    .over()
+                    .partitionBy(CHECKIN_CHECKOUT.TIMEKEEPING_ID)
+                    .orderBy(CHECKIN_CHECKOUT.CHECKIN_CHECKOUT_ID.desc())
+                    .as("rowNumber"))
+            .from(CHECKIN_CHECKOUT);
+
+    TableLike<?> firstTimeCheckIn =
+        dslContext
+            .select()
+            .from(rowNumberAsc)
+            .where(rowNumberAsc.field("rowNumber").cast(Integer.class).eq(1));
+    TableLike<?> lastTimeCheckOut =
+        dslContext
+            .select()
+            .from(rowNumberDesc)
+            .where(rowNumberDesc.field("rowNumber").cast(Integer.class).eq(1));
+    return dslContext
+        .select(
+            TIMEKEEPING.TIMEKEEPING_ID,
+            TIMEKEEPING.DATE.as(CURRENT_DATE),
+            firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
+            lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
+        .from(TIMEKEEPING)
+        .leftJoin(EMPLOYEE)
+        .on(EMPLOYEE.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
+        .leftJoin(firstTimeCheckIn)
+        .on(firstTimeCheckIn.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
+        .leftJoin(lastTimeCheckOut)
+        .on(lastTimeCheckOut.field(CHECKIN_CHECKOUT.TIMEKEEPING_ID).eq(TIMEKEEPING.TIMEKEEPING_ID))
+        .where(conditions)
+        .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+        .orderBy(sortFields);
   }
 }

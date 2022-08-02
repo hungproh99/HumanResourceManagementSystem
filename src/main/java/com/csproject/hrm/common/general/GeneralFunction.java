@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -209,6 +210,49 @@ public class GeneralFunction {
       helper.setSubject(subject);
       message.setContent(
           String.format(data, approveName, createName, createDate, paragraph, requestId),
+          "text/html");
+      emailSender.send(message);
+    } catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void sendEmailUpdateRequest(
+      String employeeName,
+      String requestTitle,
+      String requestStatus,
+      String comment,
+      String latestDate,
+      String approverName,
+      String requestId,
+      String from,
+      String to,
+      String subject) {
+    MimeMessage message = emailSender.createMimeMessage();
+    Resource resource = resourceLoader.getResource("classpath:email-update-request.vm");
+    boolean multipart = true;
+    String paragraph = "<span></span>";
+    if (comment != null) {
+      paragraph = "<div>With comment:  <strong>" + comment + "</strong></div>";
+    }
+    try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+      helper.setTo(to);
+      helper.setFrom(from);
+      helper.setSubject(subject);
+      message.setContent(
+          String.format(
+              data,
+              employeeName,
+              requestTitle,
+              requestStatus,
+              latestDate,
+              approverName,
+              paragraph,
+              requestId),
           "text/html");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {

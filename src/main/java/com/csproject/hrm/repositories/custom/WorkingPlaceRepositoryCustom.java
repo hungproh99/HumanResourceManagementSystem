@@ -16,6 +16,8 @@ public interface WorkingPlaceRepositoryCustom {
 
   List<GradeDto> getListGradeByPosition(Long jodId);
 
+  boolean checkExistJobId(Long jodId);
+
   void insertNewWorkingPlace(
       String employeeId,
       Long area,

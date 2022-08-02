@@ -41,7 +41,7 @@ import static com.csproject.hrm.common.constant.Constants.*;
 public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired EmployeeRepository employeeRepository;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
-  @Autowired WorkingPlaceRepository contractRepository;
+  @Autowired WorkingPlaceRepository workingPlaceRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
 
@@ -116,7 +116,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
 
   @Override
   public List<OfficeDto> getListOffice() {
-    List<OfficeDto> officeDto = contractRepository.getListOffice();
+    List<OfficeDto> officeDto = workingPlaceRepository.getListOffice();
     officeDto.forEach(
         office -> {
           office.setName(EOffice.getLabel(office.getName()));
@@ -127,7 +127,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
 
   @Override
   public List<AreaDto> getListArea() {
-    List<AreaDto> areaDto = contractRepository.getListArea();
+    List<AreaDto> areaDto = workingPlaceRepository.getListArea();
     areaDto.forEach(
         area -> {
           area.setName(EArea.getLabel(area.getName()));
@@ -137,7 +137,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
 
   @Override
   public List<JobDto> getListPosition() {
-    List<JobDto> jobDto = contractRepository.getListPosition();
+    List<JobDto> jobDto = workingPlaceRepository.getListPosition();
     jobDto.forEach(
         job -> {
           job.setPosition(EJob.getLabel(job.getPosition()));
@@ -149,8 +149,10 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<GradeDto> getListGradeByPosition(Long id) {
     if (id == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
+    } else if (!workingPlaceRepository.checkExistJobId(id)) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not exist job id " + id);
     }
-    List<GradeDto> gradeDto = contractRepository.getListGradeByPosition(id);
+    List<GradeDto> gradeDto = workingPlaceRepository.getListGradeByPosition(id);
     gradeDto.forEach(
         grade -> {
           grade.setName(EGradeType.getLabel(grade.getName()));
@@ -163,6 +165,12 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
+      for (String employeeId : list) {
+        if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+        }
+      }
       List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
@@ -265,15 +273,14 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   //    return employeeRepository.getListManagerByName(name);
   //  }
 
-  @Override
-  public List<EmployeeNameAndID> getListEmployeeByManagement(String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
-    }
-    //    return employeeRepository.getListEmployeeByNameAndId(name);
-    return null;
-  }
+  //  @Override
+  //  public List<EmployeeNameAndID> getListEmployeeByManagement(String managerId) {
+  //    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  //      throw new CustomErrorException(
+  //          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+  //    }
+  //    return employeeRepository.getListEmployeeByNameAndId(name);
+  //  }
 
   @Override
   public void exportEmployeeToExcel(
@@ -281,6 +288,12 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
+      for (String employeeId : list) {
+        if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+        }
+      }
       try {
         List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
         ExcelExportEmployee excelExportEmployee = new ExcelExportEmployee(hrmResponses);

@@ -71,4 +71,6 @@ public interface TimekeepingRepositoryCustom {
 
   Double countPointDayWorkPerMonthByEmployeeId(
       LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  //  boolean checkExistTimekeepingByTimekeepingId(Long timekeepingId);
 }

@@ -208,8 +208,32 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           HttpStatus.BAD_REQUEST,
           "Not exist with request id " + rejectApplicationRequestRequest.getRequestId());
     }
+    Optional<ApplicationRequestDto> applicationRequestDto =
+        applicationsRequestRepository.getApplicationRequestDtoByRequestId(
+            rejectApplicationRequestRequest.getRequestId());
+    String requestName = applicationRequestDto.get().getRequestName();
+    String employeeId = applicationRequestDto.get().getEmployeeId();
+    String employeeName = employeeRepository.getEmployeeNameByEmployeeId(employeeId);
+    String approveId = applicationRequestDto.get().getApproveId();
+    String approverName = employeeRepository.getEmployeeNameByEmployeeId(approveId);
+    String requestTitle =
+        applicationRequestDto.get().getRequestType()
+            + " - "
+            + applicationRequestDto.get().getRequestName();
+    String requestStatus = ERequestStatus.getLabel(ERequestStatus.REJECTED.name());
     applicationsRequestRepository.updateRejectApplicationRequest(
         rejectApplicationRequestRequest, LocalDateTime.now());
+    generalFunction.sendEmailUpdateRequest(
+        employeeName,
+        requestTitle,
+        requestStatus,
+        applicationRequestDto.get().getComment(),
+        applicationRequestDto.get().getLatestDate().toString(),
+        approverName,
+        applicationRequestDto.get().getRequestId().toString(),
+        FROM_EMAIL,
+        TO_EMAIL,
+        "Reject Request");
   }
 
   @Override
@@ -363,6 +387,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         generalFunction.splitData(requestDto.getData()).entrySet();
     String requestName = requestDto.getRequestName();
     String employeeId = requestDto.getEmployeeId();
+    String employeeName = employeeRepository.getEmployeeNameByEmployeeId(employeeId);
+    String approveId = requestDto.getApproveId();
+    String approverName = employeeRepository.getEmployeeNameByEmployeeId(approveId);
+    String requestTitle = requestDto.getRequestType() + " - " + requestDto.getRequestName();
+    String requestStatus = ERequestStatus.getLabel(ERequestStatus.APPROVED.name());
     LocalDate currentDate = LocalDate.now();
     LocalDate startDate = null, endDate = null, date = null;
     LocalTime startTime = null, endTime = null;
@@ -464,6 +493,17 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         updateAdvanceRequest(date, description, value, employeeId, requestId);
         break;
     }
+    generalFunction.sendEmailUpdateRequest(
+        employeeName,
+        requestTitle,
+        requestStatus,
+        requestDto.getComment(),
+        requestDto.getLatestDate().toString(),
+        approverName,
+        requestDto.getRequestId().toString(),
+        FROM_EMAIL,
+        TO_EMAIL,
+        "Approve Request");
   }
 
   private void updateWorkingTime(
