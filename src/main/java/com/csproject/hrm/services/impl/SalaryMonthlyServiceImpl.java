@@ -570,8 +570,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .equalsIgnoreCase(EWorkingType.PART_TIME.name())) {
       maxPointPerDay = 0.5D;
     }
-    List<LocalDate> getListHoliday = salaryCalculator.getAllHolidayByYear(startDate);
-    List<LocalDate> getListWeekend = salaryCalculator.getAllWeekendByYear(startDate);
+    List<LocalDate> getListHoliday = salaryCalculator.getAllHolidayByRange(startDate, endDate);
+    List<LocalDate> getListWeekend = salaryCalculator.getAllWeekendByRange(startDate, endDate);
     int countHolidayInMonth = 0, countWeekendInMonth = 0;
     for (LocalDate date : getListHoliday) {
       if (date.isAfter(startDate) && date.isBefore(endDate)) {

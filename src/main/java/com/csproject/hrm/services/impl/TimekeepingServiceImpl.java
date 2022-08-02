@@ -33,6 +33,8 @@ import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 @Service
 public class TimekeepingServiceImpl implements TimekeepingService {
@@ -299,8 +301,12 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   }
 
   private void insertTimekeepingDayOff(List<String> employeeIdList, LocalDate currentDate) {
-    List<LocalDate> holidayList = salaryCalculator.getAllHolidayByYear(currentDate);
-    List<LocalDate> weekendList = salaryCalculator.getAllWeekendByYear(currentDate);
+    List<LocalDate> holidayList =
+        salaryCalculator.getAllHolidayByRange(
+            currentDate.with(firstDayOfMonth()), currentDate.with(lastDayOfMonth()));
+    List<LocalDate> weekendList =
+        salaryCalculator.getAllWeekendByRange(
+            currentDate.with(firstDayOfMonth()), currentDate.with(lastDayOfMonth()));
     List<LocalDate> holidayAndWeekendList =
         Stream.of(holidayList, weekendList).flatMap(x -> x.stream()).collect(Collectors.toList());
     boolean isHolidayOrWeekend = false;

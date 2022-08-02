@@ -400,7 +400,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         desiredPosition = null,
         desiredArea = null,
         desiredOffice = null,
-        desiredGrade = null;
+        desiredGrade = null,
+        reason = null;
     BigDecimal value = BigDecimal.ZERO;
     String description = null;
     if (employeeId == null || requestName == null) {
@@ -447,6 +448,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         case "Description":
           description = i.getValue();
           break;
+        case "Reason":
+          reason = Long.parseLong(i.getValue());
+          break;
       }
     }
     switch (requestName) {
@@ -454,7 +458,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       case "WORK_LATE":
         updateWorkingTime(date, employeeId, requestName, requestId);
         break;
-      case "OVERTIME":
+      case "OT":
         updateOvertime(
             startDate,
             endDate,
@@ -462,11 +466,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             endTime,
             currentDate,
             employeeId,
-            requestName,
             requestId);
         break;
       case "PAID_LEAVE":
-        updatePaidLeave(startDate, endDate, employeeId, requestName, requestId);
+        updatePaidLeave(startDate, endDate, employeeId, requestName, requestId, reason);
         break;
       case "PROMOTION":
         updatePromotion(
@@ -525,7 +528,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       LocalTime endTime,
       LocalDate currentDate,
       String employeeId,
-      String requestName,
       Long requestId) {
     if (startDate == null
         || endDate == null
@@ -534,30 +536,35 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
-    List<LocalDate> holidayList = salaryCalculator.getAllHolidayByYear(currentDate);
-    List<LocalDate> weekendList = salaryCalculator.getAllWeekendByYear(currentDate);
-    boolean isHoliday = false;
-    boolean isWeekend = false;
-    Long overtimeType = null;
-    for (LocalDate date : holidayList) {
-      if (currentDate.equals(date)) {
-        isHoliday = true;
-        break;
-      }
-    }
-    for (LocalDate date : weekendList) {
-      if (currentDate.equals(date)) {
-        isWeekend = true;
-        break;
-      }
-    }
-    if (isHoliday) {
-      overtimeType = EOvertime.getValue(EOvertime.HOLIDAY.name());
-    } else if (isWeekend) {
-      overtimeType = EOvertime.getValue(EOvertime.WEEKEND.name());
-    } else {
-      overtimeType = EOvertime.getValue(EOvertime.IN_WEEK.name());
-    }
+    List<LocalDate> holidayList = salaryCalculator.getAllHolidayByRange(startDate, endDate);
+    List<LocalDate> weekendList = salaryCalculator.getAllWeekendByRange(startDate, endDate);
+    List<TimekeepingIdOvertimeTypeDto> timekeepingIdOvertimeTypeDtoList =
+        timekeepingRepository.getListTimekeepingIdOvertimeTypeDto(employeeId, startDate, endDate);
+
+    timekeepingIdOvertimeTypeDtoList.forEach(
+        timekeepingIdOvertimeTypeDto -> {
+          boolean isHoliday = false;
+          boolean isWeekend = false;
+          for (LocalDate date : holidayList) {
+            if (currentDate.equals(date)) {
+              isHoliday = true;
+              break;
+            }
+          }
+          for (LocalDate date : weekendList) {
+            if (currentDate.equals(date)) {
+              isWeekend = true;
+              break;
+            }
+          }
+          if ((isHoliday && !isWeekend) || (isHoliday && isWeekend)) {
+            timekeepingIdOvertimeTypeDto.setOtType(EOvertime.getValue(EOvertime.HOLIDAY.name()));
+          } else if (isWeekend && !isHoliday) {
+            timekeepingIdOvertimeTypeDto.setOtType(EOvertime.getValue(EOvertime.WEEKEND.name()));
+          } else {
+            timekeepingIdOvertimeTypeDto.setOtType(EOvertime.getValue(EOvertime.IN_WEEK.name()));
+          }
+        });
 
     if (endDate.isAfter(currentDate)) {
       timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, currentDate, endDate);
@@ -566,11 +573,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         employeeId,
         startDate,
         endDate,
-        ETimekeepingStatus.getValue(requestName),
-        ETimekeepingStatus.getValue(requestName));
+        null,
+        ETimekeepingStatus.getValue(ETimekeepingStatus.OVERTIME.name()),
+        ETimekeepingStatus.getValue(ETimekeepingStatus.OVERTIME.name()));
 
     timekeepingRepository.insertOvertimeByEmployeeIdAndRangeDate(
-        employeeId, startDate, endDate, startTime, endTime, overtimeType);
+        timekeepingIdOvertimeTypeDtoList, startTime, endTime);
 
     applicationsRequestRepository.updateStatusApplication(
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
@@ -581,7 +589,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       LocalDate endDate,
       String employeeId,
       String requestName,
-      Long requestId) {
+      Long requestId,
+      Long reason) {
     if (startDate == null || endDate == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
@@ -589,6 +598,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         employeeId,
         startDate,
         endDate,
+        reason,
         ETimekeepingStatus.getValue("DAY_OFF"),
         ETimekeepingStatus.getValue(requestName));
 

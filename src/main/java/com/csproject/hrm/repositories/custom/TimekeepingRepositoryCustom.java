@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.TimekeepingDto;
+import com.csproject.hrm.dto.dto.TimekeepingIdOvertimeTypeDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
@@ -33,6 +34,7 @@ public interface TimekeepingRepositoryCustom {
       String employeeId,
       LocalDate startDate,
       LocalDate endDate,
+      Long reason,
       long oldTimekeepingStatus,
       long newTimekeepingStatus);
 
@@ -40,12 +42,9 @@ public interface TimekeepingRepositoryCustom {
       String employeeId, LocalDate date, long oldTimekeepingStatus);
 
   void insertOvertimeByEmployeeIdAndRangeDate(
-      String employeeId,
-      LocalDate startDate,
-      LocalDate endDate,
+      List<TimekeepingIdOvertimeTypeDto> timekeepingIdOvertimeTypeDtoList,
       LocalTime startTime,
-      LocalTime endTime,
-      Long overtimeType);
+      LocalTime endTime);
 
   Long insertTimekeeping(TimekeepingDto timekeepingDto);
 
@@ -73,4 +72,7 @@ public interface TimekeepingRepositoryCustom {
       LocalDate firstDate, LocalDate lastDate, String employeeId);
 
   //  boolean checkExistTimekeepingByTimekeepingId(Long timekeepingId);
+
+  List<TimekeepingIdOvertimeTypeDto> getListTimekeepingIdOvertimeTypeDto(
+      String employeeId, LocalDate startDate, LocalDate endDate);
 }

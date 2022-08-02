@@ -10,15 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.time.temporal.TemporalAdjusters.*;
 
 @Component
 @Data
@@ -32,22 +26,20 @@ public class SalaryCalculator {
 
   @Autowired OvertimeRepository overtimeRepository;
 
-  public Double getStandardPointPerMonth(LocalDate currentDate, LocalDate lastDateOfMonth) {
-    List<LocalDate> totalDate =
-        lastDateOfMonth.datesUntil(currentDate).collect(Collectors.toList());
-    List<LocalDate> holidayAndWeekendList =
-        Stream.of(getAllHolidayByYear(currentDate), getAllWeekendByYear(currentDate))
-            .flatMap(x -> x.stream())
-            .collect(Collectors.toList());
-    Set<LocalDate> setDate = new LinkedHashSet<>(totalDate);
-    setDate.addAll(holidayAndWeekendList);
-    List<LocalDate> standardDateList = new ArrayList<>(setDate);
-    return Double.parseDouble(String.valueOf(standardDateList.size()));
-  }
+  //  public Double getStandardPointPerMonth(LocalDate currentDate, LocalDate lastDateOfMonth) {
+  //    List<LocalDate> totalDate =
+  //        lastDateOfMonth.datesUntil(currentDate).collect(Collectors.toList());
+  //    List<LocalDate> holidayAndWeekendList =
+  //        Stream.of(getAllHolidayByYear(currentDate), getAllWeekendByYear(currentDate))
+  //            .flatMap(x -> x.stream())
+  //            .collect(Collectors.toList());
+  //    Set<LocalDate> setDate = new LinkedHashSet<>(totalDate);
+  //    setDate.addAll(holidayAndWeekendList);
+  //    List<LocalDate> standardDateList = new ArrayList<>(setDate);
+  //    return Double.parseDouble(String.valueOf(standardDateList.size()));
+  //  }
 
-  public List<LocalDate> getAllHolidayByYear(LocalDate currDate) {
-    LocalDate firstDate = currDate.with(firstDayOfYear());
-    LocalDate lastDate = currDate.with(lastDayOfYear());
+  public List<LocalDate> getAllHolidayByRange(LocalDate firstDate, LocalDate lastDate) {
     List<LocalDate> localDateList = new ArrayList<>();
     List<HolidayCalenderDto> holidayCalenderDtoList =
         holidayCalenderRepository.getAllHolidayInYear(firstDate, lastDate);
@@ -67,20 +59,12 @@ public class SalaryCalculator {
     return localDateList;
   }
 
-  public List<LocalDate> getAllWeekendByYear(LocalDate currDate) {
-    LocalDate firstDate = currDate.with(firstDayOfYear());
+  public List<LocalDate> getAllWeekendByRange(LocalDate firstDate, LocalDate lastDate) {
     List<LocalDate> localDateList = new ArrayList<>();
-    LocalDate firstSunday = firstDate.with(firstInMonth(DayOfWeek.SUNDAY));
-    LocalDate firstSaturday = firstDate.with(firstInMonth(DayOfWeek.SATURDAY));
-
-    while (firstSunday.getYear() == currDate.getYear()) {
-      localDateList.add(firstSunday);
-      firstSunday = firstSunday.plus(Period.ofDays(7));
-    }
-
-    while (firstSaturday.getYear() == currDate.getYear()) {
-      localDateList.add(firstSaturday);
-      firstSaturday = firstSaturday.plus(Period.ofDays(7));
+    for (LocalDate date = firstDate; date.isBefore(lastDate.plusDays(1)); date = date.plusDays(1)) {
+      if (date.getDayOfWeek() == DayOfWeek.SUNDAY || date.getDayOfWeek() == DayOfWeek.SATURDAY) {
+        localDateList.add(date);
+      }
     }
     return localDateList;
   }

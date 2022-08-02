@@ -5,6 +5,7 @@ import com.csproject.hrm.common.enums.EGradeType;
 import com.csproject.hrm.common.enums.EJob;
 import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.dto.TimekeepingDto;
+import com.csproject.hrm.dto.dto.TimekeepingIdOvertimeTypeDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.OVERTIME;
+import static org.jooq.codegen.maven.example.Tables.PAID_LEAVE;
 import static org.jooq.codegen.maven.example.tables.Area.AREA;
 import static org.jooq.codegen.maven.example.tables.CheckinCheckout.CHECKIN_CHECKOUT;
 import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
@@ -402,6 +404,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
       String employeeId,
       LocalDate startDate,
       LocalDate endDate,
+      Long reason,
       long oldTimekeepingStatus,
       long newTimekeepingStatus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
@@ -419,6 +422,16 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
         configuration -> {
           timekeepingIdList.forEach(
               timekeepingId -> {
+                if (reason != null) {
+                  queries.add(
+                      dslContext
+                          .insertInto(
+                              PAID_LEAVE,
+                              PAID_LEAVE.PAID_LEAVE_REASON_ID,
+                              PAID_LEAVE.TIMEKEEPING_ID)
+                          .values(reason, timekeepingId));
+                }
+
                 boolean checkExist =
                     dslContext.fetchExists(
                         select(LIST_TIMEKEEPING_STATUS.LIST_ID)
@@ -471,27 +484,16 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
 
   @Override
   public void insertOvertimeByEmployeeIdAndRangeDate(
-      String employeeId,
-      LocalDate startDate,
-      LocalDate endDate,
+      List<TimekeepingIdOvertimeTypeDto> timekeepingIdOvertimeTypeDtoList,
       LocalTime startTime,
-      LocalTime endTime,
-      Long overtimeType) {
+      LocalTime endTime) {
     List<Query> queries = new ArrayList<>();
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<Long> timekeepingIdList =
-        dslContext
-            .select(TIMEKEEPING.TIMEKEEPING_ID)
-            .from(TIMEKEEPING)
-            .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
-            .and(TIMEKEEPING.DATE.ge(startDate))
-            .and(TIMEKEEPING.DATE.le(endDate))
-            .fetchInto(Long.class);
 
     dslContext.transaction(
         configuration -> {
-          timekeepingIdList.forEach(
-              timekeepingId -> {
+          timekeepingIdOvertimeTypeDtoList.forEach(
+              timekeepingIdOvertimeTypeDto -> {
                 queries.add(
                     dslContext
                         .insertInto(
@@ -500,7 +502,11 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                             OVERTIME.START_TIME,
                             OVERTIME.END_TIME,
                             OVERTIME.OVERTIME_TYPE_ID)
-                        .values(timekeepingId, startTime, endTime, overtimeType));
+                        .values(
+                            timekeepingIdOvertimeTypeDto.getTimekeepingId(),
+                            startTime,
+                            endTime,
+                            timekeepingIdOvertimeTypeDto.getOtType()));
               });
           DSL.using(configuration).batch(queries).execute();
         });
@@ -733,6 +739,19 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
     }
 
     return total;
+  }
+
+  @Override
+  public List<TimekeepingIdOvertimeTypeDto> getListTimekeepingIdOvertimeTypeDto(
+      String employeeId, LocalDate startDate, LocalDate endDate) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(TIMEKEEPING.TIMEKEEPING_ID.as("timekeepingId"), TIMEKEEPING.DATE.as("currDate"))
+        .from(TIMEKEEPING)
+        .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeId))
+        .and(TIMEKEEPING.DATE.ge(startDate))
+        .and(TIMEKEEPING.DATE.le(endDate))
+        .fetchInto(TimekeepingIdOvertimeTypeDto.class);
   }
 
   //  @Override
