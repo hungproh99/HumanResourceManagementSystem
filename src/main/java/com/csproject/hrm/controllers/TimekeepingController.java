@@ -19,8 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -104,9 +103,9 @@ public class TimekeepingController {
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
-      LocalDate localDate = LocalDate.now();
-      LocalTime localTime = LocalTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-      timekeepingService.insertTimekeepingCheckInCheckOut(employeeId, localDate, localTime);
+      LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+      timekeepingService.insertTimekeepingCheckInCheckOut(
+          employeeId, localDateTime.toLocalDate(), localDateTime.toLocalTime());
     }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }

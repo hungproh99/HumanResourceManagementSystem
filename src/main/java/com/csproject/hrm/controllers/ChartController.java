@@ -27,7 +27,7 @@ public class ChartController {
   @Autowired JwtUtils jwtUtils;
   @Autowired HolidayCalenderService holidayCalenderService;
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @GetMapping("get_general_data_chart")
   public ResponseEntity<?> getGeneralEmployeeDataForChart(HttpServletRequest request) {
     String areaName = "";
@@ -48,7 +48,7 @@ public class ChartController {
     return ResponseEntity.ok(chartService.getOrganizational());
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @GetMapping("get_leave_company_reason_chart")
   public ResponseEntity<?> getLeaveCompanyReasonByYear(
       HttpServletRequest request, @RequestParam Integer year) {
@@ -140,7 +140,7 @@ public class ChartController {
             chartService.getStartDateOfContract(employeeId), employeeId, type));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @GetMapping(value = "get_employee_by_manager")
   public ResponseEntity<?> getAllEmployeeByManagerID(HttpServletRequest request) {
     String headerAuth = request.getHeader(AUTHORIZATION);

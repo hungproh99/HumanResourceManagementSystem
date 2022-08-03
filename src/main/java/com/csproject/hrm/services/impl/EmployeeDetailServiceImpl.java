@@ -40,6 +40,12 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!relativeInformation.getContact().matches(PHONE_VALIDATION)) {
       throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
     }
+    if (relativeInformation.getParentName() == null
+        || relativeInformation.getRelativeTypeId() == null
+        || relativeInformation.getStatus() == null
+        || relativeInformation.getBirthDate() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
     employeeDetailRepository.updateRelativeInfo(relativeInformation);
   }
 
@@ -48,6 +54,12 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     String employeeID = workingHistory.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
+    if (workingHistory.getCompanyName() == null
+        || workingHistory.getPosition() == null
+        || workingHistory.getStartDate() == null
+        || workingHistory.getEndDate() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
     employeeDetailRepository.updateWorkingHistory(workingHistory);
   }
@@ -58,6 +70,13 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
+    if (education.getNameSchool() == null
+        || education.getCertificate() == null
+        || education.getStartDate() == null
+        || education.getEndDate() == null
+        || education.getStatus() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
     employeeDetailRepository.updateEducationInfo(education);
   }
 
@@ -66,6 +85,12 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     String employeeID = bank.getEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
+    if (bank.getNameBank() == null
+        || bank.getAddress() == null
+        || bank.getAccountNumber() == null
+        || bank.getAccountName() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
     employeeDetailRepository.updateBankInfo(bank);
   }
@@ -85,6 +110,21 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
+    if (!employeeAdditionalInfo.getPhone_number().matches(PHONE_VALIDATION)) {
+      throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+    }
+    if (!employeeAdditionalInfo.getPersonal_email().matches(EMAIL_VALIDATION)) {
+      throw new CustomParameterConstraintException(INVALID_EMAIL_FORMAT);
+    }
+    if (employeeAdditionalInfo.getAddress() == null
+        || employeeAdditionalInfo.getPlace_of_origin() == null
+        || employeeAdditionalInfo.getPlace_of_residence() == null
+        || employeeAdditionalInfo.getNationality() == null
+        || employeeAdditionalInfo.getCard_id() == null
+        || employeeAdditionalInfo.getProvidePlace() == null
+        || employeeAdditionalInfo.getProvideDate() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
     employeeDetailRepository.updateAdditionalInfo(employeeAdditionalInfo);
   }
 
@@ -93,6 +133,26 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     String employeeID = employeeDetailRequest.getEmployee_id();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
+    if (!employeeDetailRequest.getPhone_number().matches(PHONE_VALIDATION)) {
+      throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+    }
+    if (!employeeDetailRequest.getCompany_email().matches(EMAIL_VALIDATION)) {
+      throw new CustomParameterConstraintException(INVALID_EMAIL_FORMAT);
+    }
+    if (employeeDetailRequest.getFull_name() == null
+        || employeeDetailRequest.getGender() == null
+        || employeeDetailRequest.getBirth_date() == null
+        || employeeDetailRequest.getWorking_status() == null
+        || employeeDetailRequest.getAvatar() == null
+        || employeeDetailRequest.getWorking_contract_id() == null
+        || employeeDetailRequest.getStart_date() == null
+        || employeeDetailRequest.getEnd_date() == null
+        || employeeDetailRequest.getArea_id() == null
+        || employeeDetailRequest.getOffice_id() == null
+        || employeeDetailRequest.getJob_id() == null
+        || employeeDetailRequest.getGrade_id() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
     employeeDetailRepository.updateEmployeeDetail(employeeDetailRequest);
   }

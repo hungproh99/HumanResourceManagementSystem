@@ -99,22 +99,36 @@ public class DataSample {
           "",
           "End",
           "huynq100");
-  public static final String EMPLOYEE_DETAIL_RESPONSE_JSON =
-      "{\"full_name\":\"Nguyen Quang Huy\",\"employee_id\":\"huynq100\",\"company_email\":\"huynq100@fpt.edu.vn\","
-          + "\"seniority\":\"3 year 7 month 26 day \",\"start_date\":[2019,1,2],\"working_status\":\"Active\","
-          + "\"contract_url\":\"url\",\"phone_number\":\"0912345678\",\"grade\":\"Marketing 2\","
-          + "\"birth_date\":[2000,12,8],\"gender\":\"Male\",\"marital_status\":\"Alone\","
-          + "\"office_name\":\"Hà Nội Office\",\"position_name\":\"Marketing\",\"area_name\":\"Back Office\","
-          + "\"avatar\":\"https://haycafe.vn/wp-content/uploads/2022/03/Avatar-hai-doc-600x600.jpg\","
-          + "\"working_name\":\"Full Time\",\"working_contract_id\":1,\"working_place_id\":1}";
-  public static final String TAX_AND_INSURANCE_RESPONSE_JSON =
-      "{\"tax_code\":null,\"insuranceDtos\":[{\"insuranceID\":1,\"insuranceName\":\"HI\",\"address\":null},"
-          + "{\"insuranceID\":2,\"insuranceName\":\"SI\",\"address\":null},{\"insuranceID\":3,"
-          + "\"insuranceName\":\"UI\",\"address\":null},{\"insuranceID\":4,\"insuranceName\":\"PI\","
-          + "\"address\":null}]}";
-  public static final String EMPLOYEE_ADDITIONAL_INFO_RESPONSE_JSON =
-      "{\"address\":null,\"place_of_residence\":\"Thạch Thất, Hà Nội\",\"place_of_origin\":\"Thạch Thất, Hà Nội\","
-          + "\"nationality\":\"Viet Nam\",\"card_id\":\"03251837462\",\"provideDate\":\"2021-09-01\","
-          + "\"providePlace\":\"Thạch Thất, Hà Nội\",\"personal_email\":null,\"phone_number\":\"0912345678\","
-          + "\"nick_name\":null,\"facebook\":null}";
+  public static final ApplicationsRequestRequestC APPLICATIONS_REQUEST_TIMEKEEPING =
+      new ApplicationsRequestRequestC(
+          null,
+          "lienpt1",
+          1L,
+          1L,
+          null,
+          "test",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          DateUtils.convert("2022-09-12"),
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null);
 }

@@ -25,9 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -140,8 +138,8 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   @Override
   public Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(
       String employeeID, String date) {
-    if (employeeID == null || date == null) {
-      throw new NullPointerException("Had param is null!");
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
     LocalDate localDate;
     try {
@@ -153,7 +151,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       Optional<TimekeepingDetailResponse> list =
           timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeID, localDate);
       if (list.isEmpty()) {
-        return null;
+        return Optional.empty();
       }
       Long timekeepingID = list.get().getTimekeeping_id();
       list.get()
@@ -161,12 +159,11 @@ public class TimekeepingServiceImpl implements TimekeepingService {
               timekeepingRepository.getCheckInCheckOutByTimekeepingID(timekeepingID));
       List<ListTimekeepingStatusResponse> listTimekeepingStatusResponse =
           timekeepingRepository.getListTimekeepingStatus(timekeepingID);
-      listTimekeepingStatusResponse.stream()
-          .forEach(
-              listTimekeepingStatusResponse1 ->
-                  listTimekeepingStatusResponse1.setTimekeeping_status(
-                      ETimekeepingStatus.getLabel(
-                          listTimekeepingStatusResponse1.getTimekeeping_status())));
+      listTimekeepingStatusResponse.forEach(
+          listTimekeepingStatusResponse1 ->
+              listTimekeepingStatusResponse1.setTimekeeping_status(
+                  ETimekeepingStatus.getLabel(
+                      listTimekeepingStatusResponse1.getTimekeeping_status())));
       list.get().setTimekeeping_status(listTimekeepingStatusResponse);
       return list;
     } else {

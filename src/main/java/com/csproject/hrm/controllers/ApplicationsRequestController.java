@@ -1,9 +1,6 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -11,6 +8,7 @@ import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.repositories.TimekeepingRepository;
 import com.csproject.hrm.services.ApplicationsRequestService;
+import com.csproject.hrm.services.ChartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +33,7 @@ public class ApplicationsRequestController {
   @Autowired ApplicationsRequestService applicationsRequestService;
   @Autowired TimekeepingRepository timekeepingRepository;
   @Autowired JwtUtils jwtUtils;
+  @Autowired ChartService chartService;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_LIST_APPLICATION_REQUEST_RECEIVE)
@@ -111,12 +110,12 @@ public class ApplicationsRequestController {
         applicationsRequestService.getAllRequestNameByRequestTypeID(requestTypeID));
   }
 
-//  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-//  @PostMapping(URI_UPDATE_IS_READ)
-//  public ResponseEntity<?> updateIsRead(@RequestParam Long requestId) {
-//    applicationsRequestService.updateIsRead(requestId);
-//    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
-//  }
+  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  //  @PostMapping(URI_UPDATE_IS_READ)
+  //  public ResponseEntity<?> updateIsRead(@RequestParam Long requestId) {
+  //    applicationsRequestService.updateIsRead(requestId);
+  //    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  //  }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PostMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
@@ -243,5 +242,11 @@ public class ApplicationsRequestController {
           servletResponse, queryParam, employeeId, listId);
     }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+  }
+
+  @PostMapping(value = "get_all_paid_leave_reason")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> getAllPaidLeaveReason() {
+    return ResponseEntity.ok(chartService.getAllPaidLeaveReason());
   }
 }
