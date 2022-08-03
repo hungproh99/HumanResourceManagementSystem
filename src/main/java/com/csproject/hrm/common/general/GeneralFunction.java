@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -119,7 +118,7 @@ public class GeneralFunction {
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      message.setContent(String.format(data, id, password), "text/html");
+      message.setContent(String.format(data, id, password), "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -148,7 +147,7 @@ public class GeneralFunction {
                 hrmPojos.get(i).getFullName(),
                 hrmPojos.get(i).getCompanyName(),
                 hrmPojos.get(i).getPassword()),
-            "text/html");
+            "text/html; charset=utf-8");
       }
       emailSender.send(messages);
     } catch (MessagingException | IOException e) {
@@ -169,7 +168,7 @@ public class GeneralFunction {
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      message.setContent(String.format(data, receiveId, createId), "text/html");
+      message.setContent(String.format(data, receiveId, createId), "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -210,7 +209,7 @@ public class GeneralFunction {
       helper.setSubject(subject);
       message.setContent(
           String.format(data, approveName, createName, createDate, paragraph, requestId),
-          "text/html");
+          "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -253,7 +252,7 @@ public class GeneralFunction {
               approverName,
               paragraph,
               requestId),
-          "text/html");
+          "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -294,7 +293,7 @@ public class GeneralFunction {
       helper.setSubject(subject);
       message.setContent(
           String.format(data, approveName, createName, createDate, paragraph, requestId),
-          "text/html");
+          "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
