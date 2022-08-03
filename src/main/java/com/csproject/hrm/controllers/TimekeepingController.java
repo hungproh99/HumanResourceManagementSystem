@@ -7,7 +7,6 @@ import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.services.EmployeeDetailService;
 import com.csproject.hrm.services.TimekeepingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +48,7 @@ public class TimekeepingController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       TimekeepingResponsesList timekeeping =
           timekeepingService.getListTimekeepingByManagement(queryParam, employeeId);
-    return ResponseEntity.ok(timekeeping);
+      return ResponseEntity.ok(timekeeping);
     }
     throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
   }
@@ -105,7 +105,7 @@ public class TimekeepingController {
       String jwt = headerAuth.substring(7);
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       LocalDate localDate = LocalDate.now();
-      LocalTime localTime = LocalTime.now();
+      LocalTime localTime = LocalTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
       timekeepingService.insertTimekeepingCheckInCheckOut(employeeId, localDate, localTime);
     }
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
