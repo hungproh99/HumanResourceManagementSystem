@@ -1,26 +1,21 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.common.enums.EEmployeeType;
-import com.csproject.hrm.common.enums.ERole;
-import com.csproject.hrm.common.enums.EWorkingType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.request.LoginRequest;
 import com.csproject.hrm.dto.response.JwtResponse;
-import com.csproject.hrm.entities.Employee;
-import com.csproject.hrm.entities.EmployeeType;
-import com.csproject.hrm.entities.RoleType;
-import com.csproject.hrm.entities.WorkingType;
+import com.csproject.hrm.entities.*;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.jwt.UserDetailsImpl;
 import com.csproject.hrm.services.LoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -33,7 +28,12 @@ import java.util.stream.Collectors;
 @WebAppConfiguration
 public class LoginControllerTest {
   @Autowired ObjectMapper mapper;
-  @Autowired JwtUtils jwtUtils;
+
+  @MockBean
+  @Qualifier("jwtUtils")
+  @Autowired
+  JwtUtils jwtUtils;
+
   @MockBean LoginService loginService;
 
   EmployeeType employeeTypeRecord1 =
@@ -44,8 +44,10 @@ public class LoginControllerTest {
   RoleType roleTypeRecord1 = RoleType.builder().id(1L).ERole(ERole.ROLE_ADMIN).build();
   RoleType roleTypeRecord2 = RoleType.builder().id(2L).ERole(ERole.ROLE_MANAGER).build();
 
-  WorkingType workingTypeRecord1 = WorkingType.builder().id(1L).eWorkingType(EWorkingType.FULL_TIME).build();
-  WorkingType workingTypeRecord2 = WorkingType.builder().id(1L).eWorkingType(EWorkingType.FULL_TIME).build();
+  WorkingType workingTypeRecord1 =
+      WorkingType.builder().id(1L).eWorkingType(EWorkingType.FULL_TIME).build();
+  WorkingType workingTypeRecord2 =
+      WorkingType.builder().id(1L).eWorkingType(EWorkingType.FULL_TIME).build();
 
   Employee record1 =
       Employee.builder()

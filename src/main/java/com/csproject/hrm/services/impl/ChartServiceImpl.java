@@ -1,17 +1,11 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EArea;
-import com.csproject.hrm.common.enums.ESalaryMonthly;
-import com.csproject.hrm.common.enums.EWorkingType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.chart.*;
-import com.csproject.hrm.dto.dto.AreaDto;
-import com.csproject.hrm.dto.dto.LeaveCompanyReasonDto;
-import com.csproject.hrm.dto.dto.PaidLeaveReasonDto;
-import com.csproject.hrm.dto.dto.WorkingTypeDto;
-import com.csproject.hrm.dto.response.EmployeeNameAndID;
-import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
-import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
+import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ChartService;
@@ -21,12 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.csproject.hrm.common.constant.Constants.BEARER;
 import static com.csproject.hrm.common.constant.Constants.NO_EMPLOYEE_WITH_ID;
@@ -40,12 +34,14 @@ public class ChartServiceImpl implements ChartService {
   @Autowired SalaryMonthlyRepository salaryMonthlyRepository;
   @Autowired SalaryMonthlyService salaryMonthlyService;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
-  @Autowired EmployeeRepository employeeRepository;
   @Autowired TimekeepingRepository timekeepingRepository;
   @Autowired JwtUtils jwtUtils;
 
   @Override
   public String getAreaNameByEmployeeID(String employeeID) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
     return chartRepository.getAreaNameByEmployeeID(employeeID);
   }
 
@@ -190,6 +186,9 @@ public class ChartServiceImpl implements ChartService {
   }
 
   private List<EmployeeChart> getEmployeeByManagerID(String managerID, String areaName) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerID)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + managerID);
+    }
     List<EmployeeChart> list = chartRepository.getEmployeeByManagerID(managerID);
     AtomicInteger i = new AtomicInteger(1);
 
@@ -208,15 +207,15 @@ public class ChartServiceImpl implements ChartService {
     List<LeaveCompanyChart> list = new ArrayList<>();
     List<LeaveCompanyReasonDto> LeaveCompanyReasonList = chartRepository.getAllLeaveCompanyReason();
 
-    for (int i = 0; i <= 2; i++) {
+    for (int i = 0; i <= 3; i++) {
       LeaveCompanyChart chart = new LeaveCompanyChart();
       chart.setLabel("Q" + (i + 1) + " " + year);
 
       List<LeaveCompanyChartList> leaveCompanyChartList = new ArrayList<>();
-      int finalI = i * 4;
+      int finalI = i * 3;
       LeaveCompanyReasonList.forEach(
           leaveCompanyReason -> {
-            Month month = Month.of(finalI + 4);
+            Month month = Month.of(finalI + 3);
             LocalDate startDate = LocalDate.of(year, finalI + 1, 1);
             LocalDate endDate = LocalDate.of(year, month, month.length(startDate.isLeapYear()));
 
@@ -240,23 +239,22 @@ public class ChartServiceImpl implements ChartService {
   public List<PaidLeaveChart> getPaidLeaveReasonByYearAndManagerID(
       String headerAuth, Integer year, String employeeId) {
     if (employeeId == null) {
-      throw new NullPointerException("Param employeeID is null!");
+      throw new NullPointerException("Param employeeId is null!");
     }
     List<PaidLeaveChart> list = new ArrayList<>();
+
+    List<PaidLeaveReasonDto> paidLeaveReasonList = chartRepository.getAllPaidLeaveReason();
     for (int i = 1; i <= 12; i++) {
       PaidLeaveChart chart = new PaidLeaveChart();
       chart.setLabel(
           Month.of(i).getDisplayName(TextStyle.SHORT_STANDALONE, Locale.US) + " " + year);
 
-      List<PaidLeaveReasonDto> paidLeaveReasonList = chartRepository.getAllPaidLeaveReason();
-
       List<PaidLeaveChartList> paidLeaveChartList = new ArrayList<>();
 
-      int finalI = i;
       for (PaidLeaveReasonDto paidLeaveReason : paidLeaveReasonList) {
-        LocalDate startDate = LocalDate.of(year, finalI, 1);
+        LocalDate startDate = LocalDate.of(year, i, 1);
         LocalDate endDate =
-            LocalDate.of(year, finalI, startDate.getMonth().length(startDate.isLeapYear()));
+            LocalDate.of(year, i, startDate.getMonth().length(startDate.isLeapYear()));
 
         PaidLeaveChartList paidLeaveChart = new PaidLeaveChartList();
 
@@ -274,6 +272,7 @@ public class ChartServiceImpl implements ChartService {
                 chartRepository.countPaidLeaveReasonByDateAndReasonID(
                     startDate, endDate, paidLeaveReason.getReason_id(), employee.getEmployeeID());
           }
+          employeeId = "";
         } else {
           if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
             throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
@@ -349,68 +348,90 @@ public class ChartServiceImpl implements ChartService {
     LocalDate endDate = date.with(lastDayOfYear());
     if ("yearly".equalsIgnoreCase(type)) {
       endDate = LocalDate.now().with(lastDayOfYear());
+    } else if ("monthly".equalsIgnoreCase(type)) {
+      String year = String.valueOf(startDate.getYear());
+      map.put("Jan " + year, BigDecimal.ZERO);
+      map.put("Feb " + year, BigDecimal.ZERO);
+      map.put("Mar " + year, BigDecimal.ZERO);
+      map.put("Apr " + year, BigDecimal.ZERO);
+      map.put("May " + year, BigDecimal.ZERO);
+      map.put("Jun " + year, BigDecimal.ZERO);
+      map.put("Jul " + year, BigDecimal.ZERO);
+      map.put("Aug " + year, BigDecimal.ZERO);
+      map.put("Sep " + year, BigDecimal.ZERO);
+      map.put("Oct " + year, BigDecimal.ZERO);
+      map.put("Nov " + year, BigDecimal.ZERO);
+      map.put("Dec " + year, BigDecimal.ZERO);
+    } else {
+      throw new CustomErrorException("Type is not valid!");
     }
-
     List<SalaryMonthlyResponse> monthlyResponses =
         chartRepository.getSalaryHistoryByDateAndEmployeeIDAndType(
             startDate, endDate, employeeID, type);
+    BigDecimal value = BigDecimal.ZERO;
+    int count = 0;
+    int currentYear = 0;
+    for (SalaryMonthlyResponse data : monthlyResponses) {
+      LocalDate date1 = data.getStartDate();
+      if ("yearly".equalsIgnoreCase(type)) {
+        if (currentYear == 0) {
+          value = (data.getFinalSalary());
+          currentYear = (date1.getYear());
+          count = (1);
 
-    AtomicReference<BigDecimal> value = new AtomicReference<>(BigDecimal.ZERO);
-    AtomicInteger count = new AtomicInteger();
-    AtomicInteger currentYear = new AtomicInteger();
-    monthlyResponses.forEach(
-        data -> {
-          LocalDate date1 = data.getStartDate();
-          GeneralSalaryChart chart = new GeneralSalaryChart();
-          if ("yearly".equalsIgnoreCase(type)) {
-            if (currentYear.get() == 0) {
-              value.set(data.getFinalSalary());
-              currentYear.set(date1.getYear());
-              count.set(1);
+          map.put(String.valueOf(currentYear), value);
+        } else if (currentYear == date1.getYear()) {
+          value = (value.add(data.getFinalSalary()));
+          currentYear = (date1.getYear());
+          count++;
 
-              map.put(String.valueOf(currentYear), value.get());
-            } else if (currentYear.get() == date1.getYear()) {
-              value.set(value.get().add(data.getFinalSalary()));
-              currentYear.set(date1.getYear());
-              count.getAndIncrement();
+          map.put(
+              String.valueOf(currentYear),
+              value.divide(BigDecimal.valueOf(count), RoundingMode.HALF_DOWN));
+        } else if (currentYear != date1.getYear()) {
+          map.put(
+              String.valueOf(currentYear),
+              value.divide(BigDecimal.valueOf(count), RoundingMode.HALF_DOWN));
 
-              map.put(
-                  String.valueOf(currentYear), value.get().divide(BigDecimal.valueOf(count.get())));
-            } else if (currentYear.get() != date1.getYear()) {
-              map.put(
-                  String.valueOf(currentYear), value.get().divide(BigDecimal.valueOf(count.get())));
+          value = (data.getFinalSalary());
+          currentYear = (date1.getYear());
+          count = (1);
 
-              value.set(data.getFinalSalary());
-              currentYear.set(date1.getYear());
-              count.set(1);
-
-              map.put(String.valueOf(currentYear), value.get());
-            }
-          } else if ("monthly".equalsIgnoreCase(type)) {
-            chart.setLabel(
-                Month.of(date1.getMonthValue())
-                        .getDisplayName(TextStyle.SHORT_STANDALONE, Locale.US)
-                    + " "
-                    + date1.getYear());
-            chart.setValue(data.getFinalSalary());
-            list.add(chart);
-          }
-        });
-    if ("yearly".equalsIgnoreCase(type)) {
-      map.forEach(
-          (k, v) -> {
-            GeneralSalaryChart chart = new GeneralSalaryChart();
-            chart.setLabel(k);
-            chart.setValue(v);
-            list.add(chart);
-          });
+          map.put(String.valueOf(currentYear), value);
+        }
+      } else if ("monthly".equalsIgnoreCase(type)) {
+        String label =
+            Month.of(date1.getMonthValue()).getDisplayName(TextStyle.SHORT_STANDALONE, Locale.US)
+                + " "
+                + date1.getYear();
+        map.put(label, map.get(label).add(data.getFinalSalary()));
+      }
     }
+
+    map.forEach(
+        (k, v) -> {
+          GeneralSalaryChart chart = new GeneralSalaryChart();
+          chart.setLabel(k);
+          chart.setValue(v);
+          list.add(chart);
+        });
 
     return list;
   }
 
   @Override
   public LocalDate getStartDateOfContract(String employeeID) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
     return chartRepository.getStartDateOfContract(employeeID);
+  }
+
+  @Override
+  public List<PaidLeaveReasonDto> getAllPaidLeaveReason() {
+    List<PaidLeaveReasonDto> list = chartRepository.getAllPaidLeaveReason();
+    list.forEach(
+        reason -> reason.setReason_name(EPaidLeaveReason.getLabel(reason.getReason_name())));
+    return list;
   }
 }
