@@ -3,20 +3,17 @@ package com.csproject.hrm.controllers;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.errors.ErrorResponse;
-import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
-import static com.csproject.hrm.common.constant.Constants.*;
+import static com.csproject.hrm.common.constant.Constants.REQUEST_SUCCESS;
 import static com.csproject.hrm.common.uri.Uri.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -24,7 +21,8 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @RequestMapping(REQUEST_MAPPING + REQUEST_DETAIL_MAPPING)
 public class EmployeeDetailController {
   @Autowired EmployeeDetailService employeeDetailService;
-  @Autowired JwtUtils jwtUtils;
+
+  //  @Autowired JwtUtils jwtUtils;
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)
@@ -34,18 +32,18 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(employeeDetail);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("working_info")
-  public ResponseEntity<?> findWorkingInfo(HttpServletRequest request) {
-    String employeeID = "";
-    String headerAuth = request.getHeader(AUTHORIZATION);
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      employeeID = jwtUtils.getIdFromJwtToken(jwt);
-    }
-    WorkingInfoResponse workingInfo = employeeDetailService.findWorkingInfo(employeeID);
-    return ResponseEntity.ok(workingInfo);
-  }
+  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  //  @GetMapping("working_info")
+  //  public ResponseEntity<?> findWorkingInfo(HttpServletRequest request) {
+  //    String employeeID = "";
+  //    String headerAuth = request.getHeader(AUTHORIZATION);
+  //    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+  //      String jwt = headerAuth.substring(7);
+  //      employeeID = jwtUtils.getIdFromJwtToken(jwt);
+  //    }
+  //    WorkingInfoResponse workingInfo = employeeDetailService.findWorkingInfo(employeeID);
+  //    return ResponseEntity.ok(workingInfo);
+  //  }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_TAX_AND_INSURANCE)
@@ -94,7 +92,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(relatives);
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_MAIN_DETAIL)
   public ResponseEntity<?> updateEmployeeDetail(
       @RequestBody EmployeeDetailRequest employeeDetailRequest) {

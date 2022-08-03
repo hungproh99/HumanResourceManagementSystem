@@ -1,6 +1,7 @@
 package com.csproject.hrm.services;
 
 import com.csproject.hrm.dto.chart.*;
+import com.csproject.hrm.dto.dto.PaidLeaveReasonDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,4 +24,6 @@ public interface ChartService {
       LocalDate date, String employeeID, String type);
 
   LocalDate getStartDateOfContract(String employeeID);
+
+  List<PaidLeaveReasonDto> getAllPaidLeaveReason();
 }

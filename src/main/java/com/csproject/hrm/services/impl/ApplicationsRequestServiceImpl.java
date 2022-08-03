@@ -5,17 +5,9 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -31,9 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -54,9 +44,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Autowired BonusSalaryRepository bonusSalaryRepository;
   @Autowired DeductionSalaryRepository deductionSalaryRepository;
   @Autowired AdvanceSalaryRepository advanceSalaryRepository;
-  @Autowired PolicyRepository policyRepository;
+  @Autowired WorkingContractRepository workingContractRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired SalaryCalculator salaryCalculator;
+  @Autowired ChartRepository chartRepository;
 
   @Override
   public ListApplicationsRequestResponse getAllApplicationRequestReceive(
@@ -698,8 +689,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (requestTypeId == null || requestNameId == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
-    if (!applicationsRequestRepository.getAllRequestNameByRequestTypeID(requestTypeId).stream()
-        .anyMatch(requestNameDto -> requestNameDto.getRequest_name_id().equals(requestNameId))) {
+    if (applicationsRequestRepository.getAllRequestNameByRequestTypeID(requestTypeId).stream()
+        .noneMatch(requestNameDto -> requestNameDto.getRequest_name_id().equals(requestNameId))) {
       throw new CustomDataNotFoundException("Request Type or Request Name does not existed!");
     }
     if (!applicationsRequestRepository.checkPermissionToCreate(createEmployeeId, requestNameId)) {
@@ -741,15 +732,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         }
       case 2:
         {
-          switch (requestNameId.intValue()) {
-            case 6:
-              {
-                if (getPaidLeaveDayRemaining(applicationsRequest.getCreateEmployeeId()) < 1) {
-                  throw new CustomErrorException("Your paid leave remaining is over!");
-                }
-                applicationsRequest = createRequestForPairLeave(applicationsRequest);
-                break;
-              }
+          if (requestNameId.intValue() == 6) {
+            if (getPaidLeaveDayRemaining(applicationsRequest.getCreateEmployeeId()) < 1) {
+              throw new CustomErrorException("Your paid leave remaining is over!");
+            }
+            applicationsRequest = createRequestForPaidLeave(applicationsRequest);
           }
           break;
         }
@@ -766,10 +753,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                 if (checkLevelAndValueToApprove(applicationsRequest, "salary")) {
 
                   applicationsRequest.setApprover(applicationsRequest.getEmployeeId());
-                } else {
-                  applicationsRequest =
-                      createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 }
+                applicationsRequest =
+                    createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
               }
             case 5:
@@ -777,6 +763,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                 if (checkLevelAndValueToApprove(applicationsRequest, "bonus")) {
 
                   applicationsRequest.setApprover(applicationsRequest.getEmployeeId());
+                  applicationsRequest =
+                      createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 }
                 applicationsRequest =
                     createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
@@ -794,23 +782,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         }
       case 7:
         {
-          switch (requestNameId.intValue()) {
-            case 12:
-              {
-                applicationsRequest = createRequestForAdvances(applicationsRequest);
-                break;
-              }
+          if (requestNameId.intValue() == 12) {
+            applicationsRequest = createRequestForAdvances(applicationsRequest);
           }
           break;
         }
       case 8:
         {
-          switch (requestNameId.intValue()) {
-            case 13:
-              {
-                applicationsRequest = createRequestForTaxEnrollment(applicationsRequest);
-                break;
-              }
+          if (requestNameId.intValue() == 13) {
+            applicationsRequest = createRequestForTaxEnrollment(applicationsRequest);
           }
           break;
         }
@@ -856,9 +836,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return false;
   }
 
-  private ApplicationsRequestRequestC setDescriptionAndData(
+  private ApplicationsRequestRequestC setDescription(
       ApplicationsRequestRequestC applicationsRequest, String[] valueArray) {
-    String data = "";
+    StringBuilder data = new StringBuilder();
     String description =
         applicationsRequestRepository.getDescriptionByRequestNameID(
             applicationsRequest.getRequestNameId());
@@ -866,16 +846,24 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     for (int i = 0; i < keyArray.length; i++) {
       description = description.replaceAll("\\[" + keyArray[i] + "\\]", "[" + valueArray[i] + "]");
     }
-    for (int i = 1; i < keyArray.length - 1; i++) {
-      data = data + "[" + keyArray[i] + "|" + valueArray[i] + "]";
-    }
 
-    System.out.println(description);
-    System.out.println(data);
-
-    applicationsRequest.setData(data);
     applicationsRequest.setDescription(
         description + "P/S: " + applicationsRequest.getDescription());
+    return applicationsRequest;
+  }
+
+  private ApplicationsRequestRequestC setData(
+      ApplicationsRequestRequestC applicationsRequest, String[] valueArray) {
+    StringBuilder data = new StringBuilder();
+    String description =
+        applicationsRequestRepository.getDescriptionByRequestNameID(
+            applicationsRequest.getRequestNameId());
+    String[] keyArray = getKeyInDescription(description);
+    for (int i = 1; i < keyArray.length - 1; i++) {
+      data.append("[").append(keyArray[i]).append("|").append(valueArray[i]).append("]");
+    }
+
+    applicationsRequest.setData(data.toString());
     return applicationsRequest;
   }
 
@@ -890,7 +878,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String[] valueArray = {approver, date, employee};
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
   private ApplicationsRequestRequestC createRequestForWorkingScheduleAndOT(
@@ -914,15 +902,23 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String[] valueArray = {approver, startDate, endDate, startTime, endTime, employee};
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForPairLeave(
+  private ApplicationsRequestRequestC createRequestForPaidLeave(
       ApplicationsRequestRequestC applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
     String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
-    String reason = checkStringNull(applicationsRequest.getReason());
+    String reasonName = "";
+    Long reasonID = checkLongNull(applicationsRequest.getReason());
+
+    List<PaidLeaveReasonDto> list = chartRepository.getAllPaidLeaveReason();
+    for (PaidLeaveReasonDto reasonDto : list) {
+      if (reasonDto.getReason_id().equals(reasonID)) {
+        reasonName = reasonDto.getReason_name();
+      }
+    }
     String employee =
         checkStringNull(
             employeeDetailRepository.getEmployeeInfoByEmployeeID(
@@ -932,9 +928,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomErrorException("Please choose end date after start date!");
     }
 
-    String[] valueArray = {approver, startDate, endDate, reason, employee};
+    String[] valueArray = {approver, startDate, endDate, reasonName, employee};
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(
+        setData(
+            applicationsRequest,
+            new String[] {approver, startDate, endDate, String.valueOf(reasonID), employee}),
+        valueArray);
   }
 
   private ApplicationsRequestRequestC createRequestForAdvances(
@@ -948,7 +948,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String[] valueArray = {approver, value, employee};
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
   private ApplicationsRequestRequestC createRequestForTaxEnrollment(
@@ -963,7 +963,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String[] valueArray = {approver, taxType, employee};
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
   private ApplicationsRequestRequestC createRequestForNominationAndPromotion(
@@ -994,7 +994,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       desiredOffice
     };
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
   private ApplicationsRequestRequestC createRequestForNominationAndSalaryIncreaseOrBonus(
@@ -1009,7 +1009,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String employeeName = checkStringNull(applicationsRequest.getEmployeeName());
     String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
     String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
-    String value = checkStringNull(applicationsRequest.getValue());
+    BigDecimal value = checkBigDecimalNull(applicationsRequest.getValue());
+    if (applicationsRequest.getRequestNameId().intValue() == 4) {
+      BigDecimal currSalary = workingContractRepository.getBaseSalaryByEmployeeID(employeeId);
+      if (value.compareTo(currSalary) == -1) {
+        throw new CustomErrorException("Increase salary must larger current salary!");
+      }
+    }
+
     String employee =
         checkStringNull(
             employeeDetailRepository.getEmployeeInfoByEmployeeID(
@@ -1018,10 +1025,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String type = checkStringNull(applicationsRequest.getType());
 
     String[] valueArray = {
-      approver, employeeName + " - " + employeeId, currentTitle, currentArea, value, type, employee
+      approver,
+      employeeName + " - " + employeeId,
+      currentTitle,
+      currentArea,
+      String.valueOf(value),
+      type,
+      employee
     };
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
   private ApplicationsRequestRequestC createRequestForPenalise(
@@ -1055,7 +1068,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       value
     };
 
-    return setDescriptionAndData(applicationsRequest, valueArray);
+    return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
   private String checkStringNull(String value) {
@@ -1071,6 +1084,30 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     } else {
       return value;
+    }
+  }
+
+  private Long checkLongNull(String value) {
+    if (value == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    } else {
+      try {
+        return Long.parseLong(value);
+      } catch (Exception e) {
+        throw new CustomErrorException("Please input number only!");
+      }
+    }
+  }
+
+  private BigDecimal checkBigDecimalNull(String value) {
+    if (value == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    } else {
+      try {
+        return new BigDecimal(value);
+      } catch (Exception e) {
+        throw new CustomErrorException("Please input number only!");
+      }
     }
   }
 
@@ -1107,10 +1144,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return StringUtils.substringsBetween(description, "[", "]");
   }
 
-  private String[] getBonusAndSalary(String data) {
-    return data.split("\\|");
-  }
-
   @Override
   public List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
@@ -1129,23 +1162,23 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Override
   public void createApproveTaxEnrollment(List<String> taxNameList, String employeeId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
-    }
-    if (taxNameList == null || taxNameList.get(0) == null) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    }
-
-    EmployeeTaxDto employeeTaxDto;
-    for (String taxName : taxNameList) {
-      employeeTaxDto = new EmployeeTaxDto();
-      employeeTaxDto.setTaxTypeID(policyRepository.getTaxPolicyTypeIDByTaxName(taxName));
-      employeeTaxDto.setEmployeeID(employeeId);
-      employeeTaxDto.setTaxStatus(true);
-      employeeTaxDto.setTaxTypeName(taxName);
-      System.out.println(employeeTaxDto);
-      //      applicationsRequestRepository.createApproveTaxEnrollment(employeeTaxDto);
-    }
+    //    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
+    //      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
+    //    }
+    //    if (taxNameList == null || taxNameList.get(0) == null) {
+    //      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    //    }
+    //
+    //    EmployeeTaxDto employeeTaxDto;
+    //    for (String taxName : taxNameList) {
+    //      employeeTaxDto = new EmployeeTaxDto();
+    //      employeeTaxDto.setTaxTypeID(policyRepository.getTaxPolicyTypeIDByTaxName(taxName));
+    //      employeeTaxDto.setEmployeeID(employeeId);
+    //      employeeTaxDto.setTaxStatus(true);
+    //      employeeTaxDto.setTaxTypeName(taxName);
+    //      System.out.println(employeeTaxDto);
+    //      applicationsRequestRepository.createApproveTaxEnrollment(employeeTaxDto);
+    //    }
   }
 
   @Override

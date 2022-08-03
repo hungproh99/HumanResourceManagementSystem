@@ -208,6 +208,10 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
             .on(LEAVE_COMPANY.LEAVE_COMPANY_REASON_ID.eq(LEAVE_COMPANY_REASON.REASON_ID))
             .leftJoin(WORKING_CONTRACT)
             .on(LEAVE_COMPANY.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(AREA)
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
             .where(LEAVE_COMPANY_REASON.REASON_ID.eq(reasonID))
             .and(WORKING_CONTRACT.END_DATE.between(startDate, endDate))
             .and(WORKING_CONTRACT.CONTRACT_STATUS.isFalse())
@@ -265,7 +269,6 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
             .and(SALARY_MONTHLY.SALARY_STATUS_ID.eq(2L))
             .and(SALARY_MONTHLY.START_DATE.between(startDate, endDate))
             .orderBy(SALARY_MONTHLY.START_DATE);
-
     return query.fetchInto(SalaryMonthlyResponse.class);
   }
 

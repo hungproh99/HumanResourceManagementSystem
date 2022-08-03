@@ -18,15 +18,15 @@ public class PolicyServiceImpl implements PolicyService {
 
   @Override
   public ListPolicyResponse getListPolicyByCategoryID(QueryParam queryParam) {
-    List<PolicyResponse> policyRespons = policyRepository.getListPolicyByCategoryID(queryParam);
-    policyRespons.forEach(
+    List<PolicyResponse> policyResponses = policyRepository.getListPolicyByCategoryID(queryParam);
+    policyResponses.forEach(
         policyResponse -> {
           policyResponse.setPolicy_type(EPolicyType.getLabel(policyResponse.getPolicy_type()));
           policyResponse.setPolicy_category(
               EPolicyCategory.getLabel(policyResponse.getPolicy_category()));
         });
     int total = policyRepository.getTotalPolicyByCategoryID(queryParam);
-    return ListPolicyResponse.builder().policyResponseList(policyRespons).total(total).build();
+    return ListPolicyResponse.builder().policyResponseList(policyResponses).total(total).build();
   }
 
   @Override
@@ -34,10 +34,9 @@ public class PolicyServiceImpl implements PolicyService {
     List<PolicyCategoryResponse> policyCategoryResponseList =
         policyRepository.getAllPolicyCategory();
     policyCategoryResponseList.forEach(
-        policyCategoryResponse -> {
-          policyCategoryResponse.setPolicy_category(
-              EPolicyCategory.getLabel(policyCategoryResponse.getPolicy_category()));
-        });
+        policyCategoryResponse ->
+            policyCategoryResponse.setPolicy_category(
+                EPolicyCategory.getLabel(policyCategoryResponse.getPolicy_category())));
     return policyCategoryResponseList;
   }
 }

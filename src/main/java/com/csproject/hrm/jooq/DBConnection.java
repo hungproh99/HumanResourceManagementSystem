@@ -3,9 +3,7 @@ package com.csproject.hrm.jooq;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Component
 @Data
