@@ -5,10 +5,11 @@ import com.csproject.hrm.dto.response.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface EmployeeDetailRepositoryCustom {
+  TaxAndInsuranceResponse findTaxAndInsurance(String employeeID);
+
   void updateRelativeInfo(RelativeInformationRequest relativeInformation);
 
   void updateWorkingHistory(WorkingHistoryRequest workingHistory);
@@ -25,19 +26,17 @@ public interface EmployeeDetailRepositoryCustom {
 
   List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID);
 
-  Optional<CareerHistoryResponse> findCareerHistoryByEmployeeID(String employeeID);
+  CareerHistoryResponse findCareerHistoryByEmployeeID(String employeeID);
 
   List<WorkingHistoryResponse> findWorkingHistoryByEmployeeID(String employeeID);
 
   List<EducationResponse> findEducationByEmployeeID(String employeeID);
 
-  Optional<BankResponse> findBankByEmployeeID(String employeeID);
+  BankResponse findBankByEmployeeID(String employeeID);
 
-  Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID);
+  EmployeeAdditionalInfo findAdditionalInfo(String employeeID);
 
-  Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID);
-
-  Optional<EmployeeDetailResponse> findMainDetail(String employeeID);
+  EmployeeDetailResponse findMainDetail(String employeeID);
 
   WorkingInfoResponse findWorkingInfo(String employeeID);
 

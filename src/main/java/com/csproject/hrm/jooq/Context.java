@@ -5,10 +5,7 @@ import org.springframework.http.HttpStatus;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -30,6 +27,10 @@ public class Context {
         filter = entry.getValue();
       } else if (entry.getKey().equals(ORDER_BY)) {
         orderBy = entry.getValue();
+      } else if (entry.getKey().isBlank()) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Blank key param!");
+      } else {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Invalid key param!");
       }
     }
 

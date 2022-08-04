@@ -14,10 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -29,6 +32,7 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping(REQUEST_MAPPING)
+@Validated
 public class ApplicationsRequestController {
   @Autowired ApplicationsRequestService applicationsRequestService;
   @Autowired TimekeepingRepository timekeepingRepository;
@@ -98,14 +102,16 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_all_request_type")
-  public ResponseEntity<?> getAllRequestType(@RequestParam String employeeId) {
+  public ResponseEntity<?> getAllRequestType(
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     return ResponseEntity.ok(
         applicationsRequestService.getAllRequestTypeByEmployeeLevel(employeeId));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_all_request_name_by_id")
-  public ResponseEntity<?> getAllRequestNameByRequestTypeID(@RequestParam Long requestTypeID) {
+  public ResponseEntity<?> getAllRequestNameByRequestTypeID(
+      @NotBlank(message = "RequestTypeID must not be blank!") @RequestParam Long requestTypeID) {
     return ResponseEntity.ok(
         applicationsRequestService.getAllRequestNameByRequestTypeID(requestTypeID));
   }
@@ -135,14 +141,15 @@ public class ApplicationsRequestController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PostMapping("create_request")
   public ResponseEntity<?> createApplicationsRequest(
-      @RequestBody ApplicationsRequestRequestC applicationsRequest) {
+      @Valid @RequestBody ApplicationsRequestRequestC applicationsRequest) {
     applicationsRequestService.createApplicationsRequest(applicationsRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_paid_leave_remaining")
-  public ResponseEntity<?> getPaidLeaveDayRemaining(@RequestParam String employeeId) {
+  public ResponseEntity<?> getPaidLeaveDayRemaining(
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     return ResponseEntity.ok(applicationsRequestService.getPaidLeaveDayRemaining(employeeId));
   }
 

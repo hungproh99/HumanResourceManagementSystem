@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 @Component
 public class JwtUtils {
@@ -35,6 +34,11 @@ public class JwtUtils {
 
   public String getIdFromJwtToken(String token) {
     return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+  }
+
+  public LinkedHashMap getClaimFromJwtToken(String token) {
+    return (LinkedHashMap)
+        Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().get("User_Data");
   }
 
   public boolean validateJwtToken(String authToken) {

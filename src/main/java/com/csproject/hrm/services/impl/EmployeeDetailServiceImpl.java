@@ -10,7 +10,8 @@ import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -182,7 +183,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
-  public Optional<BankResponse> findBankByEmployeeID(String employeeID) {
+  public BankResponse findBankByEmployeeID(String employeeID) {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
@@ -194,7 +195,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
-  public Optional<EmployeeAdditionalInfo> findAdditionalInfo(String employeeID) {
+  public EmployeeAdditionalInfo findAdditionalInfo(String employeeID) {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
@@ -206,7 +207,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
-  public Optional<TaxAndInsuranceResponse> findTaxAndInsurance(String employeeID) {
+  public TaxAndInsuranceResponse findTaxAndInsurance(String employeeID) {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
@@ -218,30 +219,23 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
-  public Optional<EmployeeDetailResponse> findMainDetail(String employeeID) {
+  public EmployeeDetailResponse findMainDetail(String employeeID) {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
-    Optional<EmployeeDetailResponse> employeeDetailResponse =
+    EmployeeDetailResponse employeeDetailResponse =
         employeeDetailRepository.findMainDetail(employeeID);
-    employeeDetailResponse
-        .get()
-        .setArea_name(EArea.getLabel(employeeDetailResponse.get().getArea_name()));
-    employeeDetailResponse
-        .get()
-        .setOffice_name(EOffice.getLabel(employeeDetailResponse.get().getOffice_name()));
-    employeeDetailResponse
-        .get()
-        .setPosition_name(EJob.getLabel(employeeDetailResponse.get().getPosition_name()));
-    employeeDetailResponse
-        .get()
-        .setGrade(EGradeType.getLabel(employeeDetailResponse.get().getGrade()));
-    employeeDetailResponse
-        .get()
-        .setWorking_name(EWorkingType.getLabel(employeeDetailResponse.get().getWorking_name()));
+    employeeDetailResponse.setArea_name(EArea.getLabel(employeeDetailResponse.getArea_name()));
+    employeeDetailResponse.setOffice_name(
+        EOffice.getLabel(employeeDetailResponse.getOffice_name()));
+    employeeDetailResponse.setPosition_name(
+        EJob.getLabel(employeeDetailResponse.getPosition_name()));
+    employeeDetailResponse.setGrade(EGradeType.getLabel(employeeDetailResponse.getGrade()));
+    employeeDetailResponse.setWorking_name(
+        EWorkingType.getLabel(employeeDetailResponse.getWorking_name()));
     return employeeDetailResponse;
   }
 

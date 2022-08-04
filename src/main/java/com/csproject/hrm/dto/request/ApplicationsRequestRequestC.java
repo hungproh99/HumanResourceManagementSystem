@@ -2,6 +2,8 @@ package com.csproject.hrm.dto.request;
 
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.*;
 import java.util.List;
 
@@ -11,11 +13,21 @@ import java.util.List;
 @Builder
 public class ApplicationsRequestRequestC {
   private Long applicationRequestId;
+
+  @NotBlank(message = "createEmployeeId must not be blank!")
   private String createEmployeeId;
+
+  @Positive(message = "requestNameId must be a positive number!")
   private Long requestNameId;
+
   private Long requestStatusId;
+
+  @Positive(message = "requestTypeId must be a positive number!")
   private Long requestTypeId;
+
+  @NotBlank(message = "description must not be blank!")
   private String description;
+
   private LocalDateTime createDate;
   private LocalDateTime latestDate;
   private LocalDateTime duration;

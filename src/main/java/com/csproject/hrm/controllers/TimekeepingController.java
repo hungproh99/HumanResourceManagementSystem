@@ -17,13 +17,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -50,6 +49,25 @@ public class TimekeepingController {
       return ResponseEntity.ok(timekeeping);
     }
     throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+  }
+
+  @GetMapping("get_list_timekeeping_by_month")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> getTimekeepingByMonth(
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
+    Context context = new Context();
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    String employeeId = "";
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    }
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    TimekeepingResponsesList timekeeping =
+        timekeepingService.getListTimekeepingByManagement(queryParam, employeeId);
+    return ResponseEntity.ok(timekeeping);
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_TIMEKEEPING)
@@ -90,10 +108,11 @@ public class TimekeepingController {
   @GetMapping(URI_GET_DETAIL_TIMEKEEPING)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListDetailTimekeeping(
-      @RequestParam String employeeID, @RequestParam String date) {
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID,
+      @NotBlank(message = "Date must not be blank!") @RequestParam String date) {
     Optional<TimekeepingDetailResponse> timekeeping =
         timekeepingService.getTimekeepingByEmployeeIDAndDate(employeeID, date);
-    return ResponseEntity.ok(timekeeping);
+    return ResponseEntity.ok(timekeeping.orElse(null));
   }
 
   @GetMapping(URI_GET_CHECKIN_CHECKOUT)
