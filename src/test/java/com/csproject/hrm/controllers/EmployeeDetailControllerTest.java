@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import static com.csproject.hrm.common.uri.Uri.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,7 +48,7 @@ public class EmployeeDetailControllerTest {
     EmployeeDetailResponse response = DataSample.DETAIL_RESPONSE;
 
     Mockito.when(employeeDetailService.findMainDetail(response.getEmployee_id()))
-        .thenReturn(Optional.of(response));
+        .thenReturn(response);
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(REQUEST_MAPPING + URI_GET_MAIN_DETAIL + "?employeeID=huynq100")
@@ -77,8 +76,7 @@ public class EmployeeDetailControllerTest {
   void testFindTaxAndInsurance_Normal() throws Exception {
     TaxAndInsuranceResponse response = DataSample.TAX_AND_INSURANCE_RESPONSE;
 
-    Mockito.when(employeeDetailService.findTaxAndInsurance("huynq100"))
-        .thenReturn(Optional.of(response));
+    Mockito.when(employeeDetailService.findTaxAndInsurance("huynq100")).thenReturn(response);
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(
@@ -108,8 +106,7 @@ public class EmployeeDetailControllerTest {
   void testFindAdditionalInfo_Normal() throws Exception {
     EmployeeAdditionalInfo response = DataSample.EMPLOYEE_ADDITIONAL_INFO;
 
-    Mockito.when(employeeDetailService.findAdditionalInfo("huynq100"))
-        .thenReturn(Optional.of(response));
+    Mockito.when(employeeDetailService.findAdditionalInfo("huynq100")).thenReturn(response);
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(

@@ -1,9 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -16,8 +14,7 @@ import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -782,7 +779,9 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .leftJoin(TIMEKEEPING_STATUS)
             .on(TIMEKEEPING_STATUS.TYPE_ID.eq(LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID))
             .where(TIMEKEEPING.EMPLOYEE_ID.equalIgnoreCase(employeeID))
-            .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
+            .and(
+                year(TIMEKEEPING.DATE)
+                    .eq(Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate().getYear()))
             .and(TIMEKEEPING_STATUS.NAME.eq("PAID_LEAVE")));
   }
 
@@ -805,8 +804,12 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .leftJoin(TIMEKEEPING)
             .on(OVERTIME.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
             .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeID))
-            .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
-            .and(month(TIMEKEEPING.DATE).eq(LocalDate.now().getMonthValue()))
+            .and(
+                year(TIMEKEEPING.DATE)
+                    .eq(Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate().getYear()))
+            .and(
+                month(TIMEKEEPING.DATE)
+                    .eq(Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate().getMonthValue()))
             .fetchInto(Integer.class);
 
     for (Integer i : list) {
@@ -835,7 +838,9 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
             .leftJoin(TIMEKEEPING)
             .on(OVERTIME.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
             .where(TIMEKEEPING.EMPLOYEE_ID.eq(employeeID))
-            .and(year(TIMEKEEPING.DATE).eq(LocalDate.now().getYear()))
+            .and(
+                year(TIMEKEEPING.DATE)
+                    .eq(Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate().getYear()))
             .fetchInto(Integer.class);
 
     for (Integer i : list) {

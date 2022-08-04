@@ -1,5 +1,6 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.*;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.AUTHORIZATION;
 import static com.csproject.hrm.common.constant.Constants.BEARER;
@@ -107,7 +108,7 @@ public class ChartController {
     try {
       date1 = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     } catch (Exception e) {
-      throw new CustomErrorException(date + "must have format yyyy-MM-dd!");
+      throw new CustomErrorException("\"" + date + "\" must in format yyyy-MM-dd!");
     }
     String headerAuth = request.getHeader(AUTHORIZATION);
     if ("".equals(employeeId.trim())) {
@@ -145,12 +146,20 @@ public class ChartController {
   public ResponseEntity<?> getAllEmployeeByManagerID(HttpServletRequest request) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     String employeeId = "";
+    LinkedHashMap userDetails = new LinkedHashMap<>();
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      userDetails = jwtUtils.getClaimFromJwtToken(jwt);
     }
+    EmployeeNameAndID employee =
+        new EmployeeNameAndID((String) userDetails.get("id"), (String) userDetails.get("fullName"));
 
-    return ResponseEntity.ok(employeeDetailService.getAllEmployeeByManagerID(employeeId));
+    List<EmployeeNameAndID> employeeList =
+        employeeDetailService.getAllEmployeeByManagerID(employeeId);
+
+    employeeList.add(0, employee);
+    return ResponseEntity.ok(employeeList);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")

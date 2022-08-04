@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.NO_EMPLOYEE_WITH_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,8 +26,8 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindMainDetail_Normal() {
     EmployeeDetailResponse expected = DataSample.DETAIL_RESPONSE;
-    Optional<EmployeeDetailResponse> actual = employeeDetailService.findMainDetail("huynq100");
-    assertEquals(expected, actual.orElse(null));
+    EmployeeDetailResponse actual = employeeDetailService.findMainDetail("huynq100");
+    assertEquals(expected, actual);
   }
 
   @DisplayName("Test findMainDetail EmployeeID Is null")
@@ -52,9 +51,8 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindTaxAndInsurance_Normal() {
     TaxAndInsuranceResponse expected = DataSample.TAX_AND_INSURANCE_RESPONSE;
-    Optional<TaxAndInsuranceResponse> actual =
-        employeeDetailService.findTaxAndInsurance("huynq100");
-    assertEquals(expected, actual.orElse(null));
+    TaxAndInsuranceResponse actual = employeeDetailService.findTaxAndInsurance("huynq100");
+    assertEquals(expected, actual);
   }
 
   @DisplayName("Test findTaxAndInsurance EmployeeID Is null")
@@ -78,8 +76,8 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindAdditionalInfo_Normal() {
     EmployeeAdditionalInfo expected = DataSample.EMPLOYEE_ADDITIONAL_INFO;
-    Optional<EmployeeAdditionalInfo> actual = employeeDetailService.findAdditionalInfo("huynq100");
-    assertEquals(expected, actual.orElse(null));
+    EmployeeAdditionalInfo actual = employeeDetailService.findAdditionalInfo("huynq100");
+    assertEquals(expected, actual);
   }
 
   @DisplayName("Test findAdditionalInfo EmployeeID Is null")
@@ -104,8 +102,8 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindBankInfo_Normal() {
     BankResponse expected = DataSample.BANK_RESPONSE;
-    Optional<BankResponse> actual = employeeDetailService.findBankByEmployeeID("huynq100");
-    assertEquals(expected, actual.orElse(null));
+    BankResponse actual = employeeDetailService.findBankByEmployeeID("huynq100");
+    assertEquals(expected, actual);
   }
 
   @DisplayName("Test findBankByEmployeeID EmployeeID Is null")

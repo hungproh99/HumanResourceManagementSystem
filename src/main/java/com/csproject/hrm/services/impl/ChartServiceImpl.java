@@ -16,8 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.Month;
+import java.time.*;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -347,7 +346,7 @@ public class ChartServiceImpl implements ChartService {
     LocalDate startDate = date.withDayOfYear(1);
     LocalDate endDate = date.with(lastDayOfYear());
     if ("yearly".equalsIgnoreCase(type)) {
-      endDate = LocalDate.now().with(lastDayOfYear());
+      endDate = Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate().with(lastDayOfYear());
     } else if ("monthly".equalsIgnoreCase(type)) {
       String year = String.valueOf(startDate.getYear());
       map.put("Jan " + year, BigDecimal.ZERO);

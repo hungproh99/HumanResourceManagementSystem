@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static com.csproject.hrm.common.uri.Uri.*;
@@ -39,6 +37,23 @@ public class TimekeepingController {
   public ResponseEntity<?> getListAllTimekeeping(
       @RequestParam Map<String, String> allRequestParams) {
     Context context = new Context();
+    QueryParam queryParam = context.queryParam(allRequestParams);
+    TimekeepingResponsesList timekeeping = timekeepingService.getListAllTimekeeping(queryParam);
+    return ResponseEntity.ok(timekeeping);
+  }
+
+  @GetMapping("get_timekeeping")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> getTimekeeping(
+      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+    Context context = new Context();
+    String headerAuth = request.getHeader(AUTHORIZATION);
+    String employeeId = "";
+    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+      String jwt = headerAuth.substring(7);
+      employeeId = jwtUtils.getIdFromJwtToken(jwt);
+    }
+    allRequestParams.put("filter", allRequestParams.get("filter") + ",employeeId:AEQ" + employeeId);
     QueryParam queryParam = context.queryParam(allRequestParams);
     TimekeepingResponsesList timekeeping = timekeepingService.getListAllTimekeeping(queryParam);
     return ResponseEntity.ok(timekeeping);
@@ -85,7 +100,7 @@ public class TimekeepingController {
       @RequestParam String employeeID, @RequestParam String date) {
     Optional<TimekeepingDetailResponse> timekeeping =
         timekeepingService.getTimekeepingByEmployeeIDAndDate(employeeID, date);
-    return ResponseEntity.ok(timekeeping);
+    return ResponseEntity.ok(timekeeping.orElse(null));
   }
 
   @GetMapping(URI_GET_CHECKIN_CHECKOUT)
