@@ -452,20 +452,20 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId) {
+  public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String employeeId) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
     conditions.add(EMPLOYEE.WORKING_STATUS.isTrue());
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     List<HrmResponse> hrmResponses =
-        findAllEmployeeOfManager(conditions, sortFields, queryParam.pagination, managerId)
+        findAllEmployeeOfManager(conditions, sortFields, queryParam.pagination, employeeId)
             .fetchInto(HrmResponse.class);
 
     List<HrmResponse> hrmResponseList =
         getListHrmResponse(hrmResponses, conditions, sortFields, queryParam.pagination);
 
     List<HrmResponse> hrmResponsesCount =
-        countAllEmployeeOfManager(conditions, managerId).fetchInto(HrmResponse.class);
+        countAllEmployeeOfManager(conditions, employeeId).fetchInto(HrmResponse.class);
 
     List<HrmResponse> hrmResponsesCountList =
         getCountListHrmResponse(hrmResponsesCount, conditions);
@@ -495,7 +495,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
   }
 
-  public Select<?> countAllEmployeeOfManager(List<Condition> conditions, String managerId) {
+  public Select<?> countAllEmployeeOfManager(List<Condition> conditions, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(EMPLOYEE.EMPLOYEE_ID)
@@ -515,14 +515,14 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
-        .and(EMPLOYEE.MANAGER_ID.eq(managerId));
+        .and(EMPLOYEE.MANAGER_ID.eq(employeeId));
   }
 
   public Select<?> findAllEmployeeOfManager(
       List<Condition> conditions,
       List<OrderField<?>> sortFields,
       Pagination pagination,
-      String managerId) {
+      String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -564,7 +564,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
-        .and(EMPLOYEE.MANAGER_ID.eq(managerId))
+        .and(EMPLOYEE.MANAGER_ID.eq(employeeId))
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);

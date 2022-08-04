@@ -44,9 +44,9 @@ public interface HumanManagementService {
 
   void importExcelToEmployee(Workbook workBook);
 
-  HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId);
+  HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String employeeId);
 
-  List<EmployeeNameAndID> getListManagerHigherOfArea(String managerId);
+  List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId);
 
-  List<EmployeeNameAndID> getListManagerLowerOfArea(String managerId);
+  List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId);
 }

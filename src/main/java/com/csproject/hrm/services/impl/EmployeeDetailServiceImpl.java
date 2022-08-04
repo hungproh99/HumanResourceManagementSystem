@@ -256,8 +256,8 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
   }
 
   @Override
-  public List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId) {
-    List<EmployeeNameAndID> list = employeeDetailRepository.getAllEmployeeByManagerID(managerId);
+  public List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID) {
+    List<EmployeeNameAndID> list = employeeDetailRepository.getAllEmployeeByManagerID(employeeID);
     if (list.size() <= 0) {
       return list;
     }
