@@ -1,6 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
+import com.csproject.hrm.dto.request.AdvanceSalaryRequest;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.AdvanceSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
@@ -82,15 +82,15 @@ public class AdvanceSalaryRepositoryImpl implements AdvanceSalaryRepositoryCusto
   }
 
   @Override
-  public void updateAdvanceSalaryByAdvanceId(AdvanceSalaryDto advanceSalaryDto) {
+  public void updateAdvanceSalaryByAdvanceId(AdvanceSalaryRequest advanceSalaryRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .update(ADVANCES_SALARY)
-            .set(ADVANCES_SALARY.VALUE, advanceSalaryDto.getValue())
-            .set(ADVANCES_SALARY.DESCRIPTION, advanceSalaryDto.getDescription())
-            .set(ADVANCES_SALARY.DATE, advanceSalaryDto.getDate())
-            .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceSalaryDto.getAdvanceId()))
+            .set(ADVANCES_SALARY.VALUE, advanceSalaryRequest.getValue())
+            .set(ADVANCES_SALARY.DESCRIPTION, advanceSalaryRequest.getDescription())
+            .set(ADVANCES_SALARY.DATE, advanceSalaryRequest.getDate())
+            .where(ADVANCES_SALARY.ADVANCES_ID.eq(advanceSalaryRequest.getAdvanceId()))
             .execute();
   }
 

@@ -1,8 +1,8 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
-import com.csproject.hrm.dto.dto.BonusSalaryDto;
-import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.request.AdvanceSalaryRequest;
+import com.csproject.hrm.dto.request.BonusSalaryRequest;
+import com.csproject.hrm.dto.request.DeductionSalaryRequest;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
 import com.csproject.hrm.exception.CustomErrorException;
@@ -182,8 +182,8 @@ public class SalaryMonthlyController {
   @PutMapping(value = URI_UPDATE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateDeductionSalary(
-      @RequestBody DeductionSalaryDto deductionSalaryDto) {
-    salaryMonthlyService.updateDeductionSalary(deductionSalaryDto);
+      @RequestBody DeductionSalaryRequest deductionSalaryRequest) {
+    salaryMonthlyService.updateDeductionSalary(deductionSalaryRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
@@ -196,8 +196,8 @@ public class SalaryMonthlyController {
 
   @PutMapping(value = URI_UPDATE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateBonusSalary(@RequestBody BonusSalaryDto bonusSalaryDto) {
-    salaryMonthlyService.updateBonusSalary(bonusSalaryDto);
+  public ResponseEntity<?> updateBonusSalary(@RequestBody BonusSalaryRequest bonusSalaryRequest) {
+    salaryMonthlyService.updateBonusSalary(bonusSalaryRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
@@ -210,8 +210,8 @@ public class SalaryMonthlyController {
 
   @PutMapping(value = URI_UPDATE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateAdvanceSalary(@RequestBody AdvanceSalaryDto advanceSalaryDto) {
-    salaryMonthlyService.updateAdvanceSalary(advanceSalaryDto);
+  public ResponseEntity<?> updateAdvanceSalary(@RequestBody AdvanceSalaryRequest advanceSalaryRequest) {
+    salaryMonthlyService.updateAdvanceSalary(advanceSalaryRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 

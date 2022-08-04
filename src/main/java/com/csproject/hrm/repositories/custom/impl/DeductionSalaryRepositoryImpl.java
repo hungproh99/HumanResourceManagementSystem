@@ -1,7 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.EDeduction;
-import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.request.DeductionSalaryRequest;
 import com.csproject.hrm.dto.dto.DeductionTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.DeductionSalaryResponse;
@@ -98,16 +98,16 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
   }
 
   @Override
-  public void updateDeductionSalaryByDeductionSalaryId(DeductionSalaryDto deductionSalaryDto) {
+  public void updateDeductionSalaryByDeductionSalaryId(DeductionSalaryRequest deductionSalaryRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .update(DEDUCTION_SALARY)
-            .set(DEDUCTION_SALARY.VALUE, deductionSalaryDto.getValue())
-            .set(DEDUCTION_SALARY.DESCRIPTION, deductionSalaryDto.getDescription())
-            .set(DEDUCTION_SALARY.DATE, deductionSalaryDto.getDate())
-            .set(DEDUCTION_SALARY.DEDUCTION_TYPE_ID, deductionSalaryDto.getDeductionTypeId())
-            .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryDto.getDeductionSalaryId()))
+            .set(DEDUCTION_SALARY.VALUE, deductionSalaryRequest.getValue())
+            .set(DEDUCTION_SALARY.DESCRIPTION, deductionSalaryRequest.getDescription())
+            .set(DEDUCTION_SALARY.DATE, deductionSalaryRequest.getDate())
+            .set(DEDUCTION_SALARY.DEDUCTION_TYPE_ID, deductionSalaryRequest.getDeductionTypeId())
+            .where(DEDUCTION_SALARY.DEDUCTION_ID.eq(deductionSalaryRequest.getDeductionSalaryId()))
             .execute();
   }
 

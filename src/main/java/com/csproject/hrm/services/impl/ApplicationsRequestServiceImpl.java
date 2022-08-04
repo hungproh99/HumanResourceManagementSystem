@@ -58,6 +58,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Autowired GeneralFunction generalFunction;
   @Autowired SalaryCalculator salaryCalculator;
   @Autowired ChartRepository chartRepository;
+  @Autowired RequestStatusRepository requestStatusRepository;
+  @Autowired RequestNameRepository requestNameRepository;
 
   @Override
   public ListApplicationsRequestResponse getAllApplicationRequestReceive(
@@ -94,17 +96,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Override
   public void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest) {
     if (employeeRepository.findById(applicationsRequest.getEmployeeId()).isEmpty()) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + applicationsRequest.getEmployeeId());
-    }
-    if (applicationsRequest.getEmployeeId() == null
-        || applicationsRequest.getRequestNameId() == null
-        || applicationsRequest.getRequestStatusId() == null
-        || applicationsRequest.getFullName() == null
-        || applicationsRequest.getDescription() == null
-        || applicationsRequest.getApprover() == null
-        || applicationsRequest.getIsBookmark()) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeId not exist");
+    } else if (employeeRepository.findById(applicationsRequest.getApprover()).isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "approver not exist");
+    } else if (!requestStatusRepository.existsById(applicationsRequest.getRequestStatusId())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestStatus not exist");
+    } else if (!requestNameRepository.existsById(applicationsRequest.getRequestNameId())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestName not exist");
     }
     LocalDateTime createdDate = LocalDateTime.now();
     LocalDateTime latestDate = LocalDateTime.now();
@@ -116,20 +114,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Override
   public void updateCheckedApplicationRequest(
       UpdateApplicationRequestRequest updateApplicationRequestRequest, String employeeId) {
-    if (updateApplicationRequestRequest.getApplicationRequestId() == null
-        || updateApplicationRequestRequest.getRequestStatus() == null
-        || updateApplicationRequestRequest.getApproverId() == null) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    } else if (!applicationsRequestRepository.checkExistRequestId(
+    if (!applicationsRequestRepository.checkExistRequestId(
         updateApplicationRequestRequest.getApplicationRequestId())) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST,
-          "Not exist with request id " + updateApplicationRequestRequest.getApplicationRequestId());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestId not exist!");
     } else if (!employeeDetailRepository.checkEmployeeIDIsExists(
         updateApplicationRequestRequest.getApproverId())) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST,
-          "Not exist with employee id " + updateApplicationRequestRequest.getApproverId());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "approverId not exist!");
+    } else if (!requestStatusRepository.existsById(
+        ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestStatus not exist!");
     }
     LocalDateTime latestDate = LocalDateTime.now();
     applicationsRequestRepository.updateCheckedApplicationRequest(
@@ -187,6 +180,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   public void updateApproveApplicationRequest(Long requestId) {
     if (requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
+    } else if (!applicationsRequestRepository.checkExistRequestId(requestId)) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestId not exist");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
@@ -199,20 +194,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Override
   public void updateRejectApplicationRequest(
       RejectApplicationRequestRequest rejectApplicationRequestRequest) {
-    if (rejectApplicationRequestRequest.getRequestId() == null) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST,
-          NO_DATA + "with " + rejectApplicationRequestRequest.getRequestId());
-    } else if (!applicationsRequestRepository.checkExistRequestId(
+    if (applicationsRequestRepository.checkExistRequestId(
         rejectApplicationRequestRequest.getRequestId())) {
-      throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST,
-          "Not exist with request id " + rejectApplicationRequestRequest.getRequestId());
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestId not exist");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(
             rejectApplicationRequestRequest.getRequestId());
-    String requestName = applicationRequestDto.get().getRequestName();
     String employeeId = applicationRequestDto.get().getEmployeeId();
     String employeeName = employeeRepository.getEmployeeNameByEmployeeId(employeeId);
     String approveId = applicationRequestDto.get().getApproveId();
@@ -242,6 +230,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
+    } else if (!employeeRepository.existsById(employeeId)) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
     } else {
       try {
         List<ApplicationsRequestResponse> applicationsRequestResponseList =
@@ -261,6 +251,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       HttpServletResponse response, QueryParam queryParam, String employeeId, List<Long> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
+    } else if (!employeeRepository.existsById(employeeId)) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
     } else {
       try {
         List<ApplicationsRequestResponse> applicationsRequestResponseList =
@@ -280,6 +272,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       Writer writer, QueryParam queryParam, String employeeId, List<Long> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
+    } else if (!employeeRepository.existsById(employeeId)) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
     } else {
       List<ApplicationsRequestResponse> applicationsRequestResponseList =
           applicationsRequestRepository.getListApplicationRequestReceiveByListId(
@@ -334,6 +328,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       Writer writer, QueryParam queryParam, String employeeId, List<Long> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
+    } else if (!employeeRepository.existsById(employeeId)) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
     } else {
       List<ApplicationsRequestResponse> applicationsRequestResponseList =
           applicationsRequestRepository.getListApplicationRequestSendByListId(
