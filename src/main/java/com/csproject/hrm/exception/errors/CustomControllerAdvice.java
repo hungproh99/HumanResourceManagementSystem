@@ -3,16 +3,26 @@ package com.csproject.hrm.exception.errors;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class CustomControllerAdvice {
+public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
   @ExceptionHandler(CustomDataNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleCustomDataNotFoundExceptions(Exception e) {
     HttpStatus status = HttpStatus.NOT_FOUND;
@@ -51,5 +61,39 @@ public class CustomControllerAdvice {
     e.printStackTrace(printWriter);
     String stackTrace = stringWriter.toString();
     return new ResponseEntity<>(new ErrorResponse(status, e.getMessage(), stackTrace), status);
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
+    List<String> errors =
+        ex.getBindingResult().getFieldErrors().stream()
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .collect(Collectors.toList());
+
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.BAD_REQUEST, errors.toString()));
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<?> constraintViolationException(
+      ConstraintViolationException ex, WebRequest request) {
+    List<String> errors = new ArrayList<>();
+    ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
+
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.BAD_REQUEST, errors.toString()));
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleMissingServletRequestParameter(
+      MissingServletRequestParameterException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
+    return ResponseEntity.ok(
+        new ErrorResponse(
+            HttpStatus.BAD_REQUEST, "Missing " + ex.getParameterName() + " in request param"));
   }
 }

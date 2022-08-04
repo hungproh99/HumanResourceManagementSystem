@@ -33,9 +33,9 @@ public interface EmployeeRepositoryCustom {
 
   List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list);
 
-  List<String> getListManagerByName(String name);
+//  List<String> getListManagerByName(String name);
 
-  List<String> getListEmployeeByNameAndId(String name);
+//  List<EmployeeNameAndID> getListEmployeeByNameAndId(String name);
 
   HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId);
 
@@ -47,7 +47,7 @@ public interface EmployeeRepositoryCustom {
 
   List<String> getAllEmployeeIdActive();
 
-  Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId);
+//  Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId);
 
   List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId, Integer level);
 

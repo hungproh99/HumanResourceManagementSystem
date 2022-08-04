@@ -1,10 +1,8 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.TimekeepingDto;
-import com.csproject.hrm.dto.response.CheckInCheckOutResponse;
-import com.csproject.hrm.dto.response.ListTimekeepingStatusResponse;
-import com.csproject.hrm.dto.response.TimekeepingDetailResponse;
-import com.csproject.hrm.dto.response.TimekeepingResponses;
+import com.csproject.hrm.dto.dto.TimekeepingIdOvertimeTypeDto;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface TimekeepingRepositoryCustom {
-  List<TimekeepingResponses> getListAllTimekeeping(QueryParam queryParam);
+  List<TimekeepingResponses> getListTimekeepingByManagement(
+      QueryParam queryParam, List<EmployeeNameAndID> employeeNameAndIDList);
 
   List<TimekeepingResponses> getListTimekeepingToExport(QueryParam queryParam, List<String> list);
 
@@ -26,7 +25,8 @@ public interface TimekeepingRepositoryCustom {
 
   List<CheckInCheckOutResponse> getCheckInCheckOutByTimekeepingID(Long timekeepingID);
 
-  int countListAllTimekeeping(QueryParam queryParam);
+  int countListTimekeepingByManagement(
+      QueryParam queryParam, List<EmployeeNameAndID> employeeNameAndIDList);
 
   void insertTimekeepingByEmployeeId(String employeeId, LocalDate startDate, LocalDate endDate);
 
@@ -34,6 +34,7 @@ public interface TimekeepingRepositoryCustom {
       String employeeId,
       LocalDate startDate,
       LocalDate endDate,
+      Long reason,
       long oldTimekeepingStatus,
       long newTimekeepingStatus);
 
@@ -41,12 +42,9 @@ public interface TimekeepingRepositoryCustom {
       String employeeId, LocalDate date, long oldTimekeepingStatus);
 
   void insertOvertimeByEmployeeIdAndRangeDate(
-      String employeeId,
-      LocalDate startDate,
-      LocalDate endDate,
+      List<TimekeepingIdOvertimeTypeDto> timekeepingIdOvertimeTypeDtoList,
       LocalTime startTime,
-      LocalTime endTime,
-      Long overtimeType);
+      LocalTime endTime);
 
   Long insertTimekeeping(TimekeepingDto timekeepingDto);
 
@@ -72,4 +70,9 @@ public interface TimekeepingRepositoryCustom {
 
   Double countPointDayWorkPerMonthByEmployeeId(
       LocalDate firstDate, LocalDate lastDate, String employeeId);
+
+  //  boolean checkExistTimekeepingByTimekeepingId(Long timekeepingId);
+
+  List<TimekeepingIdOvertimeTypeDto> getListTimekeepingIdOvertimeTypeDto(
+      String employeeId, LocalDate startDate, LocalDate endDate);
 }

@@ -28,4 +28,13 @@ public enum ERole {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, ROLE_INVALID);
   }
+
+  public static Long getValue(String role) {
+    for (ERole eRole : ERole.values()) {
+      if (eRole.name().equalsIgnoreCase(role)) {
+        return eRole.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, ROLE_INVALID);
+  }
 }

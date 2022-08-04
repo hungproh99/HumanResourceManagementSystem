@@ -607,12 +607,19 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
+            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.as("requestId"),
             APPLICATIONS_REQUEST.EMPLOYEE_ID.as("employeeId"),
             REQUEST_NAME.NAME.as("requestName"),
+            REQUEST_TYPE.NAME.as("requestType"),
+            APPLICATIONS_REQUEST.COMMENT,
+            APPLICATIONS_REQUEST.LATEST_DATE.as("latestDate"),
+            APPLICATIONS_REQUEST.APPROVER.as("approveId"),
             APPLICATIONS_REQUEST.DATA)
         .from(APPLICATIONS_REQUEST)
         .leftJoin(REQUEST_NAME)
         .on(REQUEST_NAME.REQUEST_NAME_ID.eq(APPLICATIONS_REQUEST.REQUEST_NAME))
+        .leftJoin(REQUEST_TYPE)
+        .on(REQUEST_TYPE.TYPE_ID.eq(REQUEST_NAME.REQUEST_TYPE_ID))
         .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
         .fetchOptionalInto(ApplicationRequestDto.class);
   }

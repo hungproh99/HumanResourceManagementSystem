@@ -68,6 +68,13 @@ public class WorkingPlaceRepositoryImpl implements WorkingPlaceRepositoryCustom 
   }
 
   @Override
+  public boolean checkExistJobId(Long jodId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext.select(JOB.JOB_ID).from(JOB).where(JOB.JOB_ID.eq(jodId)));
+  }
+
+  @Override
   public void insertNewWorkingPlace(
       String employeeId,
       Long area,

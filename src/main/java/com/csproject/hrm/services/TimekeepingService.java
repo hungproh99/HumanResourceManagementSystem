@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TimekeepingService {
-  TimekeepingResponsesList getListAllTimekeeping(QueryParam queryParam);
+  TimekeepingResponsesList getListTimekeepingByManagement(QueryParam queryParam, String employeeId);
 
   void exportTimekeepingToCsv(Writer writer, QueryParam queryParam, List<String> list);
 

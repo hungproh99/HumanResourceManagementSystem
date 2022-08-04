@@ -118,7 +118,7 @@ public class GeneralFunction {
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      message.setContent(String.format(data, id, password), "text/html");
+      message.setContent(String.format(data, id, password), "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -147,7 +147,7 @@ public class GeneralFunction {
                 hrmPojos.get(i).getFullName(),
                 hrmPojos.get(i).getCompanyName(),
                 hrmPojos.get(i).getPassword()),
-            "text/html");
+            "text/html; charset=utf-8");
       }
       emailSender.send(messages);
     } catch (MessagingException | IOException e) {
@@ -168,7 +168,7 @@ public class GeneralFunction {
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      message.setContent(String.format(data, receiveId, createId), "text/html");
+      message.setContent(String.format(data, receiveId, createId), "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -209,7 +209,50 @@ public class GeneralFunction {
       helper.setSubject(subject);
       message.setContent(
           String.format(data, approveName, createName, createDate, paragraph, requestId),
-          "text/html");
+          "text/html; charset=utf-8");
+      emailSender.send(message);
+    } catch (MessagingException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void sendEmailUpdateRequest(
+      String employeeName,
+      String requestTitle,
+      String requestStatus,
+      String comment,
+      String latestDate,
+      String approverName,
+      String requestId,
+      String from,
+      String to,
+      String subject) {
+    MimeMessage message = emailSender.createMimeMessage();
+    Resource resource = resourceLoader.getResource("classpath:email-update-request.vm");
+    boolean multipart = true;
+    String paragraph = "<span></span>";
+    if (comment != null) {
+      paragraph = "<div>With comment:  <strong>" + comment + "</strong></div>";
+    }
+    try {
+      InputStream inputStream = resource.getInputStream();
+      byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
+      String data = new String(bdata, StandardCharsets.UTF_8);
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
+      helper.setTo(to);
+      helper.setFrom(from);
+      helper.setSubject(subject);
+      message.setContent(
+          String.format(
+              data,
+              employeeName,
+              requestTitle,
+              requestStatus,
+              latestDate,
+              approverName,
+              paragraph,
+              requestId),
+          "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
@@ -250,7 +293,7 @@ public class GeneralFunction {
       helper.setSubject(subject);
       message.setContent(
           String.format(data, approveName, createName, createDate, paragraph, requestId),
-          "text/html");
+          "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);

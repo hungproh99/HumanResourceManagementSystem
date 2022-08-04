@@ -17,4 +17,5 @@ public class HrmPojo extends HrmRequest {
   private String companyName;
   private boolean contractStatus;
   private boolean placeStatus;
+  private int level;
 }
