@@ -450,14 +450,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         updateWorkingTime(date, employeeId, requestName, requestId);
         break;
       case "OT":
-        updateOvertime(
-            startDate,
-            endDate,
-            startTime,
-            endTime,
-            currentDate,
-            employeeId,
-            requestId);
+        updateOvertime(startDate, endDate, startTime, endTime, currentDate, employeeId, requestId);
         break;
       case "PAID_LEAVE":
         updatePaidLeave(startDate, endDate, employeeId, requestName, requestId, reason);
@@ -844,6 +837,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           }
           break;
         }
+      default:
+        {
+          throw new CustomErrorException("err");
+        }
     }
 
     applicationsRequest.setApprover(applicationsRequest.getApprover().split("-")[1].trim());
@@ -855,10 +852,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequest.setIsBookmark(false);
     applicationsRequest.setIsRemind(false);
 
-    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
-
-    generalFunction.sendEmailCreateRequest(
-        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+    //    applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
+    //
+    //    generalFunction.sendEmailCreateRequest(
+    //        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
   }
 
   private boolean checkLevelAndValueToApprove(

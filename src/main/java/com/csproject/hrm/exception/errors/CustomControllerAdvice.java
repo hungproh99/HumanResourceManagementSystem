@@ -1,12 +1,10 @@
 package com.csproject.hrm.exception.errors;
 
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.exception.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -95,5 +93,19 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
     return ResponseEntity.ok(
         new ErrorResponse(
             HttpStatus.BAD_REQUEST, "Missing " + ex.getParameterName() + " in request param"));
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
+    return ResponseEntity.ok(
+        new ErrorResponse(
+            HttpStatus.BAD_REQUEST,
+            "Invalid format for field "
+                + StringUtils.substringsBetween(ex.getCause().getMessage(), "[", "]")[1].replaceAll(
+                    "\\\"", "")));
   }
 }

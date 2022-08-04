@@ -33,20 +33,30 @@ public class EmployeeDetailController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_MAIN_DETAIL)
   public ResponseEntity<?> findMainDetail(
-      @NotBlank(message = "Please input employeeID!") @RequestParam String employeeID) {
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     EmployeeDetailResponse employeeDetail = employeeDetailService.findMainDetail(employeeID);
     return ResponseEntity.ok(employeeDetail);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("working_info")
-  @Validated
-  public ResponseEntity<?> findWorkingInfo(HttpServletRequest request) {
-    String employeeID = "";
-    String headerAuth = request.getHeader(AUTHORIZATION);
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      employeeID = jwtUtils.getIdFromJwtToken(jwt);
+  public ResponseEntity<?> findWorkingInfo(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
     }
     WorkingInfoResponse workingInfo = employeeDetailService.findWorkingInfo(employeeID);
     return ResponseEntity.ok(workingInfo);
@@ -54,32 +64,64 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_TAX_AND_INSURANCE)
-  @Validated
-  public ResponseEntity<?> findTaxAndInsurance(@RequestParam String employeeID) {
+  public ResponseEntity<?> findTaxAndInsurance(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     TaxAndInsuranceResponse taxAndInsurance = employeeDetailService.findTaxAndInsurance(employeeID);
     return ResponseEntity.ok(taxAndInsurance);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_ADDITIONAL_INFO)
-  @Validated
-  public ResponseEntity<?> findAdditionalInfo(@RequestParam String employeeID) {
+  public ResponseEntity<?> findAdditionalInfo(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     EmployeeAdditionalInfo additionalInfo = employeeDetailService.findAdditionalInfo(employeeID);
     return ResponseEntity.ok(additionalInfo);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_BANK_INFO)
-  @Validated
-  public ResponseEntity<?> findBankInfo(@RequestParam String employeeID) {
+  public ResponseEntity<?> findBankInfo(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     BankResponse bank = employeeDetailService.findBankByEmployeeID(employeeID);
     return ResponseEntity.ok(bank);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_EDU_INFO)
-  @Validated
-  public ResponseEntity<?> findEducationInfo(@RequestParam String employeeID) {
+  public ResponseEntity<?> findEducationInfo(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     List<EducationResponse> educations =
         employeeDetailService.findEducationByEmployeeID(employeeID);
     return ResponseEntity.ok(educations);
@@ -87,8 +129,16 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_WORKING_HISTORY_INFO)
-  @Validated
-  public ResponseEntity<?> findWorkingHistoryByEmployeeID(@RequestParam String employeeID) {
+  public ResponseEntity<?> findWorkingHistoryByEmployeeID(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     List<WorkingHistoryResponse> workingHistories =
         employeeDetailService.findWorkingHistoryByEmployeeID(employeeID);
     return ResponseEntity.ok(workingHistories);
@@ -96,8 +146,16 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_RELATIVE_INFO)
-  @Validated
-  public ResponseEntity<?> findRelativeByEmployeeID(@RequestParam String employeeID) {
+  public ResponseEntity<?> findRelativeByEmployeeID(
+      HttpServletRequest request,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeID) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeID = jwtUtils.getIdFromJwtToken(jwt);
+      }
+    }
     List<RelativeInformationResponse> relatives =
         employeeDetailService.findRelativeByEmployeeID(employeeID);
     return ResponseEntity.ok(relatives);
@@ -105,7 +163,6 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_MAIN_DETAIL)
-  @Validated
   public ResponseEntity<?> updateEmployeeDetail(
       @Valid @RequestBody EmployeeDetailRequest employeeDetailRequest) {
     employeeDetailService.updateEmployeeDetail(employeeDetailRequest);
@@ -114,16 +171,22 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PutMapping("/add_info/update")
-  @Validated
   public ResponseEntity<?> updateAdditionalInfo(
+      HttpServletRequest request,
       @Valid @RequestBody EmployeeAdditionalInfoRequest employeeAdditionalInfoRequest) {
+    if (request.isUserInRole("USER")) {
+      String headerAuth = request.getHeader(AUTHORIZATION);
+      if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+        String jwt = headerAuth.substring(7);
+        employeeAdditionalInfoRequest.setEmployee_id(jwtUtils.getIdFromJwtToken(jwt));
+      }
+    }
     employeeDetailService.updateAdditionalInfo(employeeAdditionalInfoRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_TAX_AND_INSURANCE)
-  @Validated
   public ResponseEntity<?> updateTaxAndInsurance(
       @Valid @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
     employeeDetailService.updateTaxAndInsurance(taxAndInsurance);
@@ -132,7 +195,6 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_BANK_INFO)
-  @Validated
   public ResponseEntity<?> updateBankInfo(@Valid @RequestBody BankRequest bank) {
     employeeDetailService.updateBankInfo(bank);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
@@ -140,7 +202,6 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_WORKING_HISTORY_INFO)
-  @Validated
   public ResponseEntity<?> updateWorkingHistory(
       @Valid @RequestBody WorkingHistoryRequest workingHistory) {
     employeeDetailService.updateWorkingHistory(workingHistory);
@@ -149,7 +210,6 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_RELATIVE_INFO)
-  @Validated
   public ResponseEntity<?> updateRelativeInfo(
       @Valid @RequestBody RelativeInformationRequest relativeInformation) {
     employeeDetailService.updateRelativeInfo(relativeInformation);
@@ -158,7 +218,6 @@ public class EmployeeDetailController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_EDUCATION_INFO)
-  @Validated
   public ResponseEntity<?> updateEducationInfo(@Valid @RequestBody EducationRequest education) {
     employeeDetailService.updateEducationInfo(education);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));

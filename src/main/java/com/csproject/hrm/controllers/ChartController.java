@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -22,6 +24,7 @@ import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping(REQUEST_MAPPING)
+@Validated
 public class ChartController {
   @Autowired ChartService chartService;
   @Autowired EmployeeDetailService employeeDetailService;
@@ -52,7 +55,8 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @GetMapping("get_leave_company_reason_chart")
   public ResponseEntity<?> getLeaveCompanyReasonByYear(
-      HttpServletRequest request, @RequestParam Integer year) {
+      HttpServletRequest request,
+      @NotBlank(message = "Year must not be blank!") @RequestParam Integer year) {
     String areaName = "";
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
@@ -68,7 +72,9 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_paid_leave_reason_chart")
   public ResponseEntity<?> getPaidLeaveReasonByYear(
-      HttpServletRequest request, @RequestParam Integer year, @RequestParam String employeeId) {
+      HttpServletRequest request,
+      @NotBlank(message = "Year must not be blank!") @RequestParam Integer year,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     return ResponseEntity.ok(
         chartService.getPaidLeaveReasonByYearAndManagerID(headerAuth, year, employeeId.trim()));
@@ -77,7 +83,9 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_salary_structure_chart")
   public ResponseEntity<?> getSalaryStructureByDate(
-      HttpServletRequest request, @RequestParam String date, @RequestParam String employeeId) {
+      HttpServletRequest request,
+      @NotBlank(message = "Date must not be blank!") @RequestParam String date,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     LocalDate date1;
     try {
       date1 = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -101,9 +109,9 @@ public class ChartController {
       params = {"type", "date", "employeeId"})
   public ResponseEntity<?> getSalaryHistoryByDateAndType(
       HttpServletRequest request,
-      @RequestParam String type,
-      @RequestParam String date,
-      @RequestParam String employeeId) {
+      @NotBlank(message = "Type must not be blank!") @RequestParam String type,
+      @NotBlank(message = "Date must not be blank!") @RequestParam String date,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     LocalDate date1;
     try {
       date1 = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
@@ -127,7 +135,9 @@ public class ChartController {
       value = "get_salary_history_chart",
       params = {"type", "employeeId"})
   public ResponseEntity<?> getSalaryHistoryByDateAndType(
-      HttpServletRequest request, @RequestParam String type, @RequestParam String employeeId) {
+      HttpServletRequest request,
+      @NotBlank(message = "Type must not be blank!") @RequestParam String type,
+      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     if ("".equals(employeeId.trim())) {
       if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
@@ -164,7 +174,8 @@ public class ChartController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(value = "get_all_holiday")
-  public ResponseEntity<?> getAllHolidayByYear(@RequestParam String year) {
+  public ResponseEntity<?> getAllHolidayByYear(
+      @NotBlank(message = "Year must not be blank!") @RequestParam String year) {
     LocalDate date = LocalDate.of(Integer.parseInt(year), 1, 1);
     return ResponseEntity.ok(holidayCalenderService.getAllHolidayByYear(date));
   }
