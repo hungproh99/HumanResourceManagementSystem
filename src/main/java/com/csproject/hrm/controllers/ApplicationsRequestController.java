@@ -110,8 +110,7 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_all_request_name_by_id")
-  public ResponseEntity<?> getAllRequestNameByRequestTypeID(
-      @NotBlank(message = "RequestTypeID must not be blank!") @RequestParam Long requestTypeID) {
+  public ResponseEntity<?> getAllRequestNameByRequestTypeID(@RequestParam Long requestTypeID) {
     return ResponseEntity.ok(
         applicationsRequestService.getAllRequestNameByRequestTypeID(requestTypeID));
   }
