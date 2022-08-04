@@ -51,5 +51,5 @@ public interface EmployeeDetailRepositoryCustom {
 
   int countNumberDependentRelative(String employeeId);
 
-  List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId);
+  List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID);
 }

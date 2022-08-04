@@ -274,10 +274,10 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   //  }
 
   //  @Override
-  //  public List<EmployeeNameAndID> getListEmployeeByManagement(String managerId) {
-  //    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  //  public List<EmployeeNameAndID> getListEmployeeByManagement(String employeeId) {
+  //    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
   //      throw new CustomErrorException(
-  //          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+  //          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
   //    }
   //    return employeeRepository.getListEmployeeByNameAndId(name);
   //  }
@@ -351,32 +351,32 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
     }
-    return employeeRepository.findAllEmployeeOfManager(queryParam, managerId);
+    return employeeRepository.findAllEmployeeOfManager(queryParam, employeeId);
   }
 
   @Override
-  public List<EmployeeNameAndID> getListManagerHigherOfArea(String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
     }
-    int level = employeeRepository.getLevelOfEmployee(managerId);
-    return employeeRepository.getListManagerHigherOfArea(managerId, level);
+    int level = employeeRepository.getLevelOfEmployee(employeeId);
+    return employeeRepository.getListManagerHigherOfArea(employeeId, level);
   }
 
   @Override
-  public List<EmployeeNameAndID> getListManagerLowerOfArea(String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
     }
-    int level = employeeRepository.getLevelOfEmployee(managerId);
-    return employeeRepository.getListManagerLowerOfArea(managerId, level);
+    int level = employeeRepository.getLevelOfEmployee(employeeId);
+    return employeeRepository.getListManagerLowerOfArea(employeeId, level);
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {

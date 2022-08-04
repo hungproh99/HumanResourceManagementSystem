@@ -639,12 +639,12 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
-  public List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId) {
+  public List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(EMPLOYEE.EMPLOYEE_ID.as("employeeID"), EMPLOYEE.FULL_NAME.as("name"))
         .from(EMPLOYEE)
-        .where(EMPLOYEE.MANAGER_ID.eq(managerId))
+        .where(EMPLOYEE.MANAGER_ID.eq(employeeID))
         .fetchInto(EmployeeNameAndID.class);
   }
 }
