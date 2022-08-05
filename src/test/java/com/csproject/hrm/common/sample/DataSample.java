@@ -5,7 +5,10 @@ import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 
+import java.sql.Date;
 import java.util.Arrays;
+
+import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
 public class DataSample {
   public static final EmployeeDetailResponse DETAIL_RESPONSE =
@@ -133,5 +136,36 @@ public class DataSample {
           null);
 
   public static final LoginRequest LOGIN_REQUEST =
-      new LoginRequest("huynq100@fpt.edu.vn", "huy123456789");
+      new LoginRequest("huynq100@fpt.edu.vn", "HUy123456789!");
+
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST =
+      new ChangePasswordRequest(
+          "huynq100@fpt.edu.vn", "HUy123456789!", "HUy123456789@", "HUy123456789@");
+
+  public static final JwtResponse JWT_RESPONSE =
+      new JwtResponse(
+          "huynq100",
+          "huynq100@fpt.edu.vn",
+          "Nguyen Quang Huy",
+          Arrays.asList(ROLE_MANAGER.name()),
+          "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NTk3MTkyMjMsImV4cCI6MTY1OTgwNTYyM30.vPn7J72tTFwpJ0cKtSbLYpuwM41ZdIo5z6pjMpkktU7BN7EMHpCarEhRs-rjC4XJUzq9sRW6lTH_OxQQF5M0Vg");
+
+  public static final HrmResponseList HRM_RESPONSE_LIST =
+      new HrmResponseList(
+          Arrays.asList(
+              new HrmResponse(
+                  "HungPV1",
+                  "Phạm Văn Hùng",
+                  "HungPV1@fpt.edu.vn",
+                  "Active",
+                  "0385822476",
+                  "Female",
+                  Date.valueOf("2000-02-13"),
+                  "Develop 1",
+                  "Hồ Chí Minh Office",
+                  "Back Office",
+                  "2 year 8 month 24 day ",
+                  "IT",
+                  "Full Time")),
+          1);
 }
