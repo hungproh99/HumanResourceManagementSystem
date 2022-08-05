@@ -1,11 +1,12 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.common.enums.EArea;
 import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.response.SalaryMonthlyRemindResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.SalaryMonthlyRepositoryCustom;
@@ -16,6 +17,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -181,15 +183,21 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .from(EMPLOYEE)
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
             .fetchOneInto(String.class);
-    String hrmManagerId =
+    String highestManagerId =
         dslContext
             .select(AREA.MANAGER_ID)
             .from(AREA)
-            .where(AREA.NAME.eq(EArea.HR.name()))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.AREA_ID.eq(AREA.AREA_ID))
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_PLACE.WORKING_CONTRACT_ID))
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
             .fetchOneInto(String.class);
     LocalDate duration = endDate.plusDays(3);
     if (managerId == null) {
-      managerId = hrmManagerId;
+      managerId = highestManagerId;
       duration = endDate.plusDays(7);
     }
     boolean checkExist = checkExistSalaryMonthly(startDate, endDate, salaryContractId);
@@ -202,7 +210,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
               false,
               managerId,
               duration,
-              actualWorkingPoint)
+              actualWorkingPoint,
+              0D,
+              0D,
+              BigDecimal.ZERO,
+              BigDecimal.ZERO,
+              BigDecimal.ZERO,
+              BigDecimal.ZERO,
+              BigDecimal.ZERO,
+              BigDecimal.ZERO,
+              BigDecimal.ZERO)
           .execute();
     }
     return dslContext
@@ -434,7 +451,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
       boolean isRemind,
       String approver,
       LocalDate duration,
-      Double actualWorkingPoint) {
+      Double actualWorkingPoint,
+      Double otPoint,
+      Double standardPoint,
+      BigDecimal finalSalary,
+      BigDecimal totalAdvance,
+      BigDecimal totalDeduction,
+      BigDecimal totalBonus,
+      BigDecimal totalInsurance,
+      BigDecimal totalTax,
+      BigDecimal totalAllowance) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .insertInto(
@@ -446,7 +472,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.IS_REMIND,
             SALARY_MONTHLY.APPROVER,
             SALARY_MONTHLY.DURATION,
-            SALARY_MONTHLY.ACTUAL_POINT)
+            SALARY_MONTHLY.ACTUAL_POINT,
+            SALARY_MONTHLY.OT_POINT,
+            SALARY_MONTHLY.STANDARD_POINT,
+            SALARY_MONTHLY.FINAL_SALARY,
+            SALARY_MONTHLY.TOTAL_ADVANCE,
+            SALARY_MONTHLY.TOTAL_DEDUCTION,
+            SALARY_MONTHLY.TOTAL_BONUS,
+            SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT,
+            SALARY_MONTHLY.TOTAL_TAX_PAYMENT,
+            SALARY_MONTHLY.TOTAL_ALLOWANCE)
         .values(
             endDate,
             startDate,
@@ -455,7 +490,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             isRemind,
             approver,
             duration,
-            actualWorkingPoint)
+            actualWorkingPoint,
+            otPoint,
+            standardPoint,
+            finalSalary,
+            totalAdvance,
+            totalDeduction,
+            totalBonus,
+            totalInsurance,
+            totalTax,
+            totalAllowance)
         .onConflictDoNothing();
   }
 

@@ -3,6 +3,9 @@ package com.csproject.hrm.common.constant;
 public class Constants {
   public static final String EMAIL_VALIDATION =
       "^[A-Za-z][A-Za-z0-9_\\.]{3,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
+  public static final String PASSWORD_VALIDATION =
+      "^(?=.+\\d)(?=.+[a-z])(?=.+[A-Z])(?=.+[!@#$%^&*()_+]).{8,32}$";
+  public static final String ALPHANUMERIC_VALIDATION = "[a-zA-Z]+";
   public static final String FROM_EMAIL = "huynq08120@gmail.com";
   public static final String TO_EMAIL = "hihihd37@gmail.com";
   public static final String NOT_EMPTY_EMAIL = "Email can't not empty";
@@ -14,10 +17,7 @@ public class Constants {
   public static final String NOT_SAME_OLD_PASSWORD = "New-password don't same old-password";
   public static final String SPECIAL_CHARACTER = "!@#$%^&*()_+";
   public static final String SEND_PASSWORD_SUBJECT = "SEND NEW PASSWORD";
-  public static final String SEND_PASSWORD_TEXT =
-      "<p style=\"color:black;\">Hello <strong>%s</strong> this is new reset password after you forgot <strong>%s</strong>"
-          + "<br>Please don't send it for anyone"
-          + "<br>You can change password in this link <a href=\"http://localhost:3000/forgot\">Change Password</a></p>";
+
   public static final String REQUEST_FAIL = "This request is failed";
   public static final String REQUEST_SUCCESS = "This request is successful";
   public static final String ORDER_BY_INVALID = "Invalid OrderBy";

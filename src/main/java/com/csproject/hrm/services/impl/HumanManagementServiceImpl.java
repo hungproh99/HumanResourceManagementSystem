@@ -13,9 +13,7 @@ import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
-import com.csproject.hrm.repositories.EmployeeDetailRepository;
-import com.csproject.hrm.repositories.EmployeeRepository;
-import com.csproject.hrm.repositories.WorkingPlaceRepository;
+import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.HumanManagementService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -44,6 +42,13 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired WorkingPlaceRepository workingPlaceRepository;
   @Autowired GeneralFunction generalFunction;
   @Autowired PasswordEncoder passwordEncoder;
+  @Autowired RoleRepository roleRepository;
+  @Autowired AreaRepository areaRepository;
+  @Autowired OfficeRepository officeRepository;
+  @Autowired GradeRepository gradeRepository;
+  @Autowired JobRepository jobRepository;
+  @Autowired WorkingTypeRepository workingTypeRepository;
+  @Autowired EmployeeTypeRepository employeeTypeRepository;
 
   @Override
   public HrmResponseList getListHumanResource(QueryParam queryParam) {
@@ -54,22 +59,25 @@ public class HumanManagementServiceImpl implements HumanManagementService {
 
   @Override
   public void insertEmployee(HrmRequest hrmRequest) {
-    if (hrmRequest.getFullName() == null
-        || hrmRequest.getRole() == null
-        || hrmRequest.getPhone() == null
-        || hrmRequest.getGender() == null
-        || hrmRequest.getBirthDate() == null
-        || hrmRequest.getGrade() == null
-        || hrmRequest.getPosition() == null
-        || hrmRequest.getOffice() == null
-        || hrmRequest.getArea() == null
-        || hrmRequest.getWorkingType() == null
-        || hrmRequest.getManagerId() == null
-        || hrmRequest.getEmployeeType() == null
-        || hrmRequest.getPersonalEmail() == null) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
-      throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+    if (!roleRepository.existsById(hrmRequest.getRole())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
+    } else if (!hrmRequest.getGender().equalsIgnoreCase("Male")
+        || !hrmRequest.getGender().equalsIgnoreCase("Female")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be female/male");
+    } else if (!areaRepository.existsById(hrmRequest.getArea())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
+    } else if (!officeRepository.existsById(hrmRequest.getOffice())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "office not exist");
+    } else if (!gradeRepository.existsById(hrmRequest.getGrade())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "grade not exist");
+    } else if (!jobRepository.existsById(hrmRequest.getPosition())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "position not exist");
+    } else if (!workingTypeRepository.existsById(hrmRequest.getWorkingType())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "workingType not exist");
+    } else if (!employeeRepository.existsById(hrmRequest.getManagerId())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
+    } else if (!employeeTypeRepository.existsById(hrmRequest.getEmployeeType())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
     String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName(), 0);
@@ -274,10 +282,10 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   //  }
 
   //  @Override
-  //  public List<EmployeeNameAndID> getListEmployeeByManagement(String managerId) {
-  //    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  //  public List<EmployeeNameAndID> getListEmployeeByManagement(String employeeId) {
+  //    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
   //      throw new CustomErrorException(
-  //          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+  //          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
   //    }
   //    return employeeRepository.getListEmployeeByNameAndId(name);
   //  }
@@ -351,32 +359,32 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
     }
-    return employeeRepository.findAllEmployeeOfManager(queryParam, managerId);
+    return employeeRepository.findAllEmployeeOfManager(queryParam, employeeId);
   }
 
   @Override
-  public List<EmployeeNameAndID> getListManagerHigherOfArea(String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
     }
-    int level = employeeRepository.getLevelOfEmployee(managerId);
-    return employeeRepository.getListManagerHigherOfArea(managerId, level);
+    int level = employeeRepository.getLevelOfEmployee(employeeId);
+    return employeeRepository.getListManagerHigherOfArea(employeeId, level);
   }
 
   @Override
-  public List<EmployeeNameAndID> getListManagerLowerOfArea(String managerId) {
-    if (!employeeDetailRepository.checkEmployeeIDIsExists(managerId)) {
+  public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId) {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + managerId);
+          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
     }
-    int level = employeeRepository.getLevelOfEmployee(managerId);
-    return employeeRepository.getListManagerLowerOfArea(managerId, level);
+    int level = employeeRepository.getLevelOfEmployee(employeeId);
+    return employeeRepository.getListManagerLowerOfArea(employeeId, level);
   }
 
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {

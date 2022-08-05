@@ -1,7 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.EBonus;
-import com.csproject.hrm.dto.dto.BonusSalaryDto;
+import com.csproject.hrm.dto.request.BonusSalaryRequest;
 import com.csproject.hrm.dto.dto.BonusTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.BonusSalaryResponse;
@@ -97,16 +97,16 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
   }
 
   @Override
-  public void updateBonusSalaryByBonusSalaryId(BonusSalaryDto bonusSalaryDto) {
+  public void updateBonusSalaryByBonusSalaryId(BonusSalaryRequest bonusSalaryRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .update(BONUS_SALARY)
-            .set(BONUS_SALARY.VALUE, bonusSalaryDto.getValue())
-            .set(BONUS_SALARY.DESCRIPTION, bonusSalaryDto.getDescription())
-            .set(BONUS_SALARY.DATE, bonusSalaryDto.getDate())
-            .set(BONUS_SALARY.BONUS_TYPE_ID, bonusSalaryDto.getBonusTypeId())
-            .where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryDto.getBonusSalaryId()))
+            .set(BONUS_SALARY.VALUE, bonusSalaryRequest.getValue())
+            .set(BONUS_SALARY.DESCRIPTION, bonusSalaryRequest.getDescription())
+            .set(BONUS_SALARY.DATE, bonusSalaryRequest.getDate())
+            .set(BONUS_SALARY.BONUS_TYPE_ID, bonusSalaryRequest.getBonusTypeId())
+            .where(BONUS_SALARY.BONUS_ID.eq(bonusSalaryRequest.getBonusSalaryId()))
             .execute();
   }
 

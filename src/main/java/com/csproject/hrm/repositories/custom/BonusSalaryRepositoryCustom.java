@@ -1,6 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.BonusSalaryDto;
+import com.csproject.hrm.dto.request.BonusSalaryRequest;
 import com.csproject.hrm.dto.dto.BonusTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.BonusSalaryResponse;
@@ -22,7 +22,7 @@ public interface BonusSalaryRepositoryCustom {
 
   List<BonusTypeDto> getListBonusTypeDto();
 
-  void updateBonusSalaryByBonusSalaryId(BonusSalaryDto bonusSalaryDto);
+  void updateBonusSalaryByBonusSalaryId(BonusSalaryRequest bonusSalaryRequest);
 
   void deleteBonusSalaryByBonusSalaryId(Long bonusSalaryId);
 

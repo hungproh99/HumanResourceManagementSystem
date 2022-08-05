@@ -1,6 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.DeductionSalaryDto;
+import com.csproject.hrm.dto.request.DeductionSalaryRequest;
 import com.csproject.hrm.dto.dto.DeductionTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.DeductionSalaryResponse;
@@ -22,7 +22,7 @@ public interface DeductionSalaryRepositoryCustom {
 
   List<DeductionTypeDto> getListDeductionTypeDto();
 
-  void updateDeductionSalaryByDeductionSalaryId(DeductionSalaryDto deductionSalaryDto);
+  void updateDeductionSalaryByDeductionSalaryId(DeductionSalaryRequest deductionSalaryRequest);
 
   void deleteDeductionSalaryByDeductionSalaryId(Long deductionSalaryId);
 

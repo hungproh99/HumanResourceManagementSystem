@@ -1,8 +1,7 @@
 package com.csproject.hrm.services;
 
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
-import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.jooq.QueryParam;
@@ -42,15 +41,15 @@ public interface SalaryMonthlyService {
   void updateCheckedSalaryMonthly(
       UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId);
 
-  void updateDeductionSalary(DeductionSalaryDto deductionSalaryDto);
+  void updateDeductionSalary(DeductionSalaryRequest deductionSalaryRequest);
 
   void deleteDeductionSalary(Long deductionSalaryId);
 
-  void updateBonusSalary(BonusSalaryDto bonusSalaryDto);
+  void updateBonusSalary(BonusSalaryRequest bonusSalaryRequest);
 
   void deleteBonusSalary(Long bonusSalaryId);
 
-  void updateAdvanceSalary(AdvanceSalaryDto advanceSalaryDto);
+  void updateAdvanceSalary(AdvanceSalaryRequest advanceSalaryRequest);
 
   void deleteAdvanceSalary(Long advanceSalaryId);
 

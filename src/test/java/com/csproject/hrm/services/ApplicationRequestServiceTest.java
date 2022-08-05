@@ -1,7 +1,7 @@
 package com.csproject.hrm.services;
 
 import com.csproject.hrm.common.sample.DataSample;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class ApplicationRequestServiceTest {
 
   @Test
   void testCreateTimekeepingRequest_Normal() {
-    ApplicationsRequestRequestC record = DataSample.APPLICATIONS_REQUEST_TIMEKEEPING;
+    ApplicationsRequestCreateRequest record = DataSample.APPLICATIONS_REQUEST_TIMEKEEPING;
     record.setEmployeeId("");
     Throwable exception =
         assertThrows(

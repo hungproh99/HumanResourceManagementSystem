@@ -37,5 +37,5 @@ public interface EmployeeDetailService {
 
   WorkingInfoResponse findWorkingInfo(String employeeID);
 
-  List<EmployeeNameAndID> getAllEmployeeByManagerID(String managerId);
+  List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID);
 }

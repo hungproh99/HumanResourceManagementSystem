@@ -169,7 +169,7 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
   }
 
   @Override
-  public List<EmployeeChart> getEmployeeByManagerID(String managerID) {
+  public List<EmployeeChart> getEmployeeByManagerIDAndAreaID(String managerID, long areaID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -184,6 +184,7 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
         .where(EMPLOYEE.MANAGER_ID.eq(managerID))
         .and(EMPLOYEE.WORKING_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+        .and(AREA.AREA_ID.eq(areaID))
         .fetchInto(EmployeeChart.class);
   }
 

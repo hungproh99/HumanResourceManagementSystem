@@ -1,6 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.dto.AdvanceSalaryDto;
+import com.csproject.hrm.dto.request.AdvanceSalaryRequest;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
 import com.csproject.hrm.dto.response.AdvanceSalaryResponse;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ public interface AdvanceSalaryRepositoryCustom {
 
   BigDecimal sumListAdvanceMonthlyBySalaryMonthlyId(Long salaryId);
 
-  void updateAdvanceSalaryByAdvanceId(AdvanceSalaryDto advanceSalaryDto);
+  void updateAdvanceSalaryByAdvanceId(AdvanceSalaryRequest advanceSalaryRequest);
 
   void deleteAdvanceSalaryByAdvanceId(Long advanceId);
 

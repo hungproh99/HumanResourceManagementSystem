@@ -11,7 +11,6 @@ import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface EmployeeRepositoryCustom {
@@ -37,7 +36,7 @@ public interface EmployeeRepositoryCustom {
 
 //  List<EmployeeNameAndID> getListEmployeeByNameAndId(String name);
 
-  HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String managerId);
+  HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String employeeId);
 
   void updateStatusEmployee(String employeeId, boolean status);
 

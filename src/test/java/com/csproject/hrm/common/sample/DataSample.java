@@ -99,8 +99,8 @@ public class DataSample {
           "",
           "End",
           "huynq100");
-  public static final ApplicationsRequestRequestC APPLICATIONS_REQUEST_TIMEKEEPING =
-      new ApplicationsRequestRequestC(
+  public static final ApplicationsRequestCreateRequest APPLICATIONS_REQUEST_TIMEKEEPING =
+      new ApplicationsRequestCreateRequest(
           null,
           "lienpt1",
           1L,
