@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ApplicationsRequestRequestC {
+public class ApplicationsRequestCreateRequest {
   private Long applicationRequestId;
 
   @NotBlank(message = "createEmployeeId must not be blank!")

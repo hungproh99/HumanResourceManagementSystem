@@ -178,24 +178,26 @@ public class ChartServiceImpl implements ChartService {
           EmployeeChart employee = chartRepository.getManagerByManagerID(area.getManager_id());
           employee.setTitle(EArea.getLabel(area.getName()));
           employee.setChildren(
-              getEmployeeByManagerID(employee.getEmployeeID(), EArea.getLabel(area.getName())));
+              getEmployeeByManagerID(
+                  employee.getEmployeeID(), EArea.getLabel(area.getName()), area.getArea_id()));
           list.add(employee);
         });
     return list;
   }
 
-  private List<EmployeeChart> getEmployeeByManagerID(String managerID, String areaName) {
+  private List<EmployeeChart> getEmployeeByManagerID(
+      String managerID, String areaName, long areaID) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(managerID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + managerID);
     }
-    List<EmployeeChart> list = chartRepository.getEmployeeByManagerID(managerID);
+    List<EmployeeChart> list = chartRepository.getEmployeeByManagerIDAndAreaID(managerID, areaID);
     AtomicInteger i = new AtomicInteger(1);
 
     list.forEach(
         employee -> {
           employee.setTitle(areaName + "-" + i.getAndIncrement());
           employee.setChildren(
-              getEmployeeByManagerID(employee.getEmployeeID(), employee.getTitle()));
+              getEmployeeByManagerID(employee.getEmployeeID(), employee.getTitle(), areaID));
         });
     return list;
   }
@@ -314,12 +316,27 @@ public class ChartServiceImpl implements ChartService {
     SalaryMonthlyDetailResponse salaryMonthly =
         salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);
 
-    map.put("Base", salaryMonthly.getBase_salary());
-    map.put("Bonus", salaryMonthly.getBonusSalaryResponseList().getTotal());
-    map.put("Deduction", salaryMonthly.getDeductionSalaryResponseList().getTotal());
-    map.put("Advance", salaryMonthly.getAdvanceSalaryResponseList().getTotal());
-    map.put("Tax", salaryMonthly.getEmployeeTaxResponseList().getTotal());
-    map.put("Insurance", salaryMonthly.getEmployeeInsuranceResponseList().getTotal());
+    map.put("Base", Objects.requireNonNullElse(salaryMonthly.getBase_salary(), BigDecimal.ZERO));
+    map.put(
+        "Bonus",
+        Objects.requireNonNullElse(
+            salaryMonthly.getBonusSalaryResponseList().getTotal(), BigDecimal.ZERO));
+    map.put(
+        "Deduction",
+        Objects.requireNonNullElse(
+            salaryMonthly.getDeductionSalaryResponseList().getTotal(), BigDecimal.ZERO));
+    map.put(
+        "Advance",
+        Objects.requireNonNullElse(
+            salaryMonthly.getAdvanceSalaryResponseList().getTotal(), BigDecimal.ZERO));
+    map.put(
+        "Tax",
+        Objects.requireNonNullElse(
+            salaryMonthly.getEmployeeTaxResponseList().getTotal(), BigDecimal.ZERO));
+    map.put(
+        "Insurance",
+        Objects.requireNonNullElse(
+            salaryMonthly.getEmployeeInsuranceResponseList().getTotal(), BigDecimal.ZERO));
 
     map.forEach(
         (k, v) -> {
@@ -387,7 +404,7 @@ public class ChartServiceImpl implements ChartService {
           map.put(
               String.valueOf(currentYear),
               value.divide(BigDecimal.valueOf(count), RoundingMode.HALF_DOWN));
-        } else if (currentYear != date1.getYear()) {
+        } else {
           map.put(
               String.valueOf(currentYear),
               value.divide(BigDecimal.valueOf(count), RoundingMode.HALF_DOWN));

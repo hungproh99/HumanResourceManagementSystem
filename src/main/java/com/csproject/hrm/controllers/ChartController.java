@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -56,7 +57,7 @@ public class ChartController {
   @GetMapping("get_leave_company_reason_chart")
   public ResponseEntity<?> getLeaveCompanyReasonByYear(
       HttpServletRequest request,
-      @NotBlank(message = "Year must not be blank!") @RequestParam Integer year) {
+      @Positive(message = "Year must be a positive number!") @RequestParam Integer year) {
     String areaName = "";
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
@@ -73,7 +74,7 @@ public class ChartController {
   @GetMapping("get_paid_leave_reason_chart")
   public ResponseEntity<?> getPaidLeaveReasonByYear(
       HttpServletRequest request,
-      @NotBlank(message = "Year must not be blank!") @RequestParam Integer year,
+      @Positive(message = "Year must be a positive number!") @RequestParam Integer year,
       @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     return ResponseEntity.ok(
@@ -175,8 +176,8 @@ public class ChartController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(value = "get_all_holiday")
   public ResponseEntity<?> getAllHolidayByYear(
-      @NotBlank(message = "Year must not be blank!") @RequestParam String year) {
-    LocalDate date = LocalDate.of(Integer.parseInt(year), 1, 1);
+      @Positive(message = "Year must be a positive number!") @RequestParam Integer year) {
+    LocalDate date = LocalDate.of(year, 1, 1);
     return ResponseEntity.ok(holidayCalenderService.getAllHolidayByYear(date));
   }
 }

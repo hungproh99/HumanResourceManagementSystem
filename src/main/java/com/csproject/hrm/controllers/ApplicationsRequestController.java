@@ -145,7 +145,7 @@ public class ApplicationsRequestController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PostMapping("create_request")
   public ResponseEntity<?> createApplicationsRequest(
-      @Valid @RequestBody ApplicationsRequestRequestC applicationsRequest) {
+      @Valid @RequestBody ApplicationsRequestCreateRequest applicationsRequest) {
     applicationsRequestService.createApplicationsRequest(applicationsRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
