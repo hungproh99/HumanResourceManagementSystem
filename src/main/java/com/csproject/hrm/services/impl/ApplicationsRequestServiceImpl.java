@@ -5,17 +5,9 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -31,9 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -728,7 +718,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   @Override
   @Transactional
-  public void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest) {
+  public void createApplicationsRequest(ApplicationsRequestCreateRequest applicationsRequest) {
     String createEmployeeId = applicationsRequest.getCreateEmployeeId();
     if (!employeeDetailRepository.checkEmployeeIDIsExists(createEmployeeId)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + createEmployeeId);
@@ -865,7 +855,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   private boolean checkLevelAndValueToApprove(
-      ApplicationsRequestRequestC applicationsRequest, String type) {
+      ApplicationsRequestCreateRequest applicationsRequest, String type) {
     String data =
         applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
 
@@ -889,8 +879,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return false;
   }
 
-  private ApplicationsRequestRequestC setDescription(
-      ApplicationsRequestRequestC applicationsRequest, String[] valueArray) {
+  private ApplicationsRequestCreateRequest setDescription(
+      ApplicationsRequestCreateRequest applicationsRequest, String[] valueArray) {
     StringBuilder data = new StringBuilder();
     String description =
         applicationsRequestRepository.getDescriptionByRequestNameID(
@@ -905,8 +895,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return applicationsRequest;
   }
 
-  private ApplicationsRequestRequestC setData(
-      ApplicationsRequestRequestC applicationsRequest, String[] valueArray) {
+  private ApplicationsRequestCreateRequest setData(
+      ApplicationsRequestCreateRequest applicationsRequest, String[] valueArray) {
     StringBuilder data = new StringBuilder();
     String description =
         applicationsRequestRepository.getDescriptionByRequestNameID(
@@ -920,8 +910,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return applicationsRequest;
   }
 
-  private ApplicationsRequestRequestC createRequestForWorkingTime(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForWorkingTime(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String date = checkLocalDateNull(applicationsRequest.getDate()).toString();
     String employee =
@@ -934,8 +924,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForWorkingScheduleAndOT(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForWorkingScheduleAndOT(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String startTime = checkLocalTimeNull(applicationsRequest.getStartTime()).toString();
     String endTime = checkLocalTimeNull(applicationsRequest.getEndTime()).toString();
@@ -958,8 +948,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForPaidLeave(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForPaidLeave(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String startDate = checkLocalDateNull(applicationsRequest.getStartDate()).toString();
     String endDate = checkLocalDateNull(applicationsRequest.getEndDate()).toString();
@@ -990,8 +980,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForAdvances(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForAdvances(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String value = checkStringNull(applicationsRequest.getValue());
     String employee =
@@ -1004,8 +994,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForTaxEnrollment(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForTaxEnrollment(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     List<String> taxTypes = applicationsRequest.getTaxType();
     String taxType = StringUtils.join(taxTypes, ",");
@@ -1019,8 +1009,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForNominationAndPromotion(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForNominationAndPromotion(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
 
     String employeeId = applicationsRequest.getEmployeeId();
@@ -1050,8 +1040,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForNominationAndSalaryIncreaseOrBonus(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForNominationAndSalaryIncreaseOrBonus(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
 
     String employeeId = applicationsRequest.getEmployeeId();
@@ -1090,8 +1080,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
 
-  private ApplicationsRequestRequestC createRequestForPenalise(
-      ApplicationsRequestRequestC applicationsRequest) {
+  private ApplicationsRequestCreateRequest createRequestForPenalise(
+      ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
 
     String employeeId = applicationsRequest.getEmployeeId();

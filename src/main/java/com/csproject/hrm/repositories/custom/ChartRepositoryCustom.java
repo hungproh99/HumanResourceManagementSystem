@@ -26,7 +26,7 @@ public interface ChartRepositoryCustom {
 
   EmployeeChart getManagerByManagerID(String managerID);
 
-  List<EmployeeChart> getEmployeeByManagerID(String managerID);
+  List<EmployeeChart> getEmployeeByManagerIDAndAreaID(String managerID, long areaID);
 
   List<LeaveCompanyReasonDto> getAllLeaveCompanyReason();
 

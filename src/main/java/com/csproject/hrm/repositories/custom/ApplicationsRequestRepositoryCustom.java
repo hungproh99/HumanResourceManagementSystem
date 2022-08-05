@@ -1,13 +1,8 @@
 package com.csproject.hrm.repositories.custom;
 
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequestC;
-import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -65,7 +60,7 @@ public interface ApplicationsRequestRepositoryCustom {
   List<ApplicationsRequestResponse> getListApplicationRequestSendByListId(
       QueryParam queryParam, String employeeId, List<Long> list);
 
-  void createApplicationsRequest(ApplicationsRequestRequestC applicationsRequest);
+  void createApplicationsRequest(ApplicationsRequestCreateRequest applicationsRequest);
 
   List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
 
