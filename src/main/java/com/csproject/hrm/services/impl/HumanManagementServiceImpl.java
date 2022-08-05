@@ -176,7 +176,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
         }
       }
       List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
@@ -299,7 +299,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
         }
       }
       try {
@@ -362,7 +362,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     return employeeRepository.findAllEmployeeOfManager(queryParam, employeeId);
   }
@@ -371,7 +371,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     int level = employeeRepository.getLevelOfEmployee(employeeId);
     return employeeRepository.getListManagerHigherOfArea(employeeId, level);
@@ -381,7 +381,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist this employee id " + employeeId);
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     int level = employeeRepository.getLevelOfEmployee(employeeId);
     return employeeRepository.getListManagerLowerOfArea(employeeId, level);

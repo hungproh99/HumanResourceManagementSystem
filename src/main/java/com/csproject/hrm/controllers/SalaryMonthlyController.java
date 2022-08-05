@@ -1,10 +1,6 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.AdvanceSalaryRequest;
-import com.csproject.hrm.dto.request.BonusSalaryRequest;
-import com.csproject.hrm.dto.request.DeductionSalaryRequest;
-import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
-import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -16,10 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -31,6 +30,7 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping(REQUEST_MAPPING)
+@Validated
 public class SalaryMonthlyController {
   @Autowired SalaryMonthlyService salaryMonthlyService;
   @Autowired JwtUtils jwtUtils;
@@ -38,7 +38,9 @@ public class SalaryMonthlyController {
   @GetMapping(URI_GET_ALL_PERSONAL_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListAllPersonalSalaryMonthly(
-      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
@@ -54,7 +56,9 @@ public class SalaryMonthlyController {
   @GetMapping(URI_GET_ALL_MANAGEMENT_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListAllManagementSalaryMonthly(
-      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
@@ -69,7 +73,8 @@ public class SalaryMonthlyController {
 
   @GetMapping(URI_GET_SALARY_MONTHLY_DETAIL)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> getSalaryMonthlyDetail(@RequestParam Long salaryId) {
+  public ResponseEntity<?> getSalaryMonthlyDetail(
+      @NotBlank(message = "salaryId must not be blank!") @RequestParam Long salaryId) {
     if (salaryId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_PARAMETER);
     }
@@ -83,7 +88,8 @@ public class SalaryMonthlyController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -98,7 +104,7 @@ public class SalaryMonthlyController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       salaryMonthlyService.exportPersonalSalaryMonthlyToCsv(
           servletResponse.getWriter(), queryParam, listId, employeeId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export CSV");
   }
@@ -109,7 +115,8 @@ public class SalaryMonthlyController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -123,7 +130,7 @@ public class SalaryMonthlyController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       salaryMonthlyService.exportPersonalSalaryMonthlyExcel(
           servletResponse, queryParam, listId, employeeId);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Can't export Excel");
   }
@@ -134,7 +141,8 @@ public class SalaryMonthlyController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -160,7 +168,8 @@ public class SalaryMonthlyController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -182,49 +191,56 @@ public class SalaryMonthlyController {
   @PutMapping(value = URI_UPDATE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateDeductionSalary(
-      @RequestBody DeductionSalaryRequest deductionSalaryRequest) {
+      @Valid @RequestBody DeductionSalaryRequest deductionSalaryRequest) {
     salaryMonthlyService.updateDeductionSalary(deductionSalaryRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @DeleteMapping(value = URI_DELETE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteDeductionSalary(@RequestParam Long deductionId) {
+  public ResponseEntity<?> deleteDeductionSalary(
+      @NotBlank(message = "deductionId must not be blank!") @RequestParam Long deductionId) {
     salaryMonthlyService.deleteDeductionSalary(deductionId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateBonusSalary(@RequestBody BonusSalaryRequest bonusSalaryRequest) {
+  public ResponseEntity<?> updateBonusSalary(
+      @Valid @RequestBody BonusSalaryRequest bonusSalaryRequest) {
     salaryMonthlyService.updateBonusSalary(bonusSalaryRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @DeleteMapping(value = URI_DELETE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteBonusSalary(@RequestParam Long bonusId) {
+  public ResponseEntity<?> deleteBonusSalary(
+      @NotBlank(message = "bonusId must not be blank!") @RequestParam Long bonusId) {
     salaryMonthlyService.deleteBonusSalary(bonusId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateAdvanceSalary(@RequestBody AdvanceSalaryRequest advanceSalaryRequest) {
+  public ResponseEntity<?> updateAdvanceSalary(
+      @Valid @RequestBody AdvanceSalaryRequest advanceSalaryRequest) {
     salaryMonthlyService.updateAdvanceSalary(advanceSalaryRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @DeleteMapping(value = URI_DELETE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteAdvanceSalary(@RequestParam Long advanceId) {
+  public ResponseEntity<?> deleteAdvanceSalary(
+      @NotBlank(message = "advanceId must not be blank!") @RequestParam Long advanceId) {
     salaryMonthlyService.deleteAdvanceSalary(advanceId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_APPROVE_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateApproveSalaryMonthly(@RequestParam Long salaryMonthlyId) {
+  public ResponseEntity<?> updateApproveSalaryMonthly(
+      @NotBlank(message = "salaryMonthlyId must not be blank!") @RequestParam
+          Long salaryMonthlyId) {
     salaryMonthlyService.updateApproveSalaryMonthly(salaryMonthlyId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -233,7 +249,7 @@ public class SalaryMonthlyController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateCheckedSalaryMonthly(
       HttpServletRequest request,
-      @RequestBody UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest) {
+      @Valid @RequestBody UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
@@ -247,7 +263,7 @@ public class SalaryMonthlyController {
   @PutMapping(value = URI_UPDATE_REJECT_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> updateRejectSalaryMonthly(
-      @RequestBody RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
+      @Valid @RequestBody RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     salaryMonthlyService.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }

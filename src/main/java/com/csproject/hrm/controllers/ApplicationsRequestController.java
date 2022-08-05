@@ -42,7 +42,9 @@ public class ApplicationsRequestController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_LIST_APPLICATION_REQUEST_RECEIVE)
   public ResponseEntity<?> getListApplicationsRequestReceive(
-      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
@@ -58,7 +60,9 @@ public class ApplicationsRequestController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping(URI_GET_LIST_APPLICATION_REQUEST_SEND)
   public ResponseEntity<?> getListApplicationsRequestSend(
-      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
@@ -74,7 +78,7 @@ public class ApplicationsRequestController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PostMapping("create_application_request")
   public ResponseEntity<?> insertApplicationRequest(
-      @RequestBody ApplicationsRequestRequest applicationsRequest) {
+      @Valid @RequestBody ApplicationsRequestRequest applicationsRequest) {
     applicationsRequestService.insertApplicationRequest(applicationsRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -83,7 +87,7 @@ public class ApplicationsRequestController {
   @PostMapping(URI_UPDATE_CHECK_APPLICATION_QUEST)
   public ResponseEntity<?> updateCheckedApplicationRequest(
       HttpServletRequest request,
-      @RequestBody UpdateApplicationRequestRequest updateApplicationRequestRequest) {
+      @Valid @RequestBody UpdateApplicationRequestRequest updateApplicationRequestRequest) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
@@ -124,7 +128,8 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PostMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
-  public ResponseEntity<?> updateApproveApplicationRequest(@RequestParam Long requestId) {
+  public ResponseEntity<?> updateApproveApplicationRequest(
+      @NotBlank(message = "requestId must not be blank!") @RequestParam Long requestId) {
     applicationsRequestService.updateApproveApplicationRequest(requestId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -132,7 +137,7 @@ public class ApplicationsRequestController {
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PostMapping(URI_UPDATE_REJECT_APPLICATION_REQUEST)
   public ResponseEntity<?> updateRejectApplicationRequest(
-      @RequestBody RejectApplicationRequestRequest rejectApplicationRequestRequest) {
+      @Valid @RequestBody RejectApplicationRequestRequest rejectApplicationRequestRequest) {
     applicationsRequestService.updateRejectApplicationRequest(rejectApplicationRequestRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -158,7 +163,8 @@ public class ApplicationsRequestController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -183,7 +189,8 @@ public class ApplicationsRequestController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -207,7 +214,8 @@ public class ApplicationsRequestController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -232,7 +240,8 @@ public class ApplicationsRequestController {
       HttpServletRequest request,
       HttpServletResponse servletResponse,
       @RequestBody List<Long> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);

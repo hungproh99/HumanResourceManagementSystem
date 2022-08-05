@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping(REQUEST_MAPPING)
+@Validated
 public class TimekeepingController {
   @Autowired TimekeepingService timekeepingService;
   @Autowired JwtUtils jwtUtils;
@@ -37,7 +39,9 @@ public class TimekeepingController {
   @GetMapping(URI_GET_LIST_TIMEKEEPING)
   @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> getListAllTimekeeping(
-      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     String headerAuth = request.getHeader(AUTHORIZATION);
@@ -75,7 +79,8 @@ public class TimekeepingController {
   public ResponseEntity<?> downloadCsvTimekeeping(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -93,7 +98,8 @@ public class TimekeepingController {
   public ResponseEntity<?> downloadExcelTimekeeping(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);

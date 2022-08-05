@@ -65,7 +65,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   public ListApplicationsRequestResponse getAllApplicationRequestReceive(
       QueryParam queryParam, String employeeId) {
     if (employeeRepository.findById(employeeId).isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         applicationsRequestRepository.getListApplicationRequestReceive(queryParam, employeeId);
@@ -81,7 +82,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   public ListApplicationsRequestResponse getAllApplicationRequestSend(
       QueryParam queryParam, String employeeId) {
     if (employeeRepository.findById(employeeId).isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + employeeId);
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         applicationsRequestRepository.getListApplicationRequestSend(queryParam, employeeId);
@@ -96,13 +98,21 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Override
   public void insertApplicationRequest(ApplicationsRequestRequest applicationsRequest) {
     if (employeeRepository.findById(applicationsRequest.getEmployeeId()).isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "employeeId \"" + applicationsRequest.getEmployeeId() + "\" not exist");
     } else if (employeeRepository.findById(applicationsRequest.getApprover()).isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "approver not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "approver \"" + applicationsRequest.getApprover() + "\" not exist");
     } else if (!requestStatusRepository.existsById(applicationsRequest.getRequestStatusId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestStatus not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "requestStatus \"" + applicationsRequest.getRequestStatusId() + "\" not exist");
     } else if (!requestNameRepository.existsById(applicationsRequest.getRequestNameId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestName not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "requestName \"" + applicationsRequest.getRequestNameId() + "\" not exist");
     }
     LocalDateTime createdDate = LocalDateTime.now();
     LocalDateTime latestDate = LocalDateTime.now();
@@ -116,13 +126,23 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       UpdateApplicationRequestRequest updateApplicationRequestRequest, String employeeId) {
     if (!applicationsRequestRepository.checkExistRequestId(
         updateApplicationRequestRequest.getApplicationRequestId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestId not exist!");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "requestId \""
+              + updateApplicationRequestRequest.getApplicationRequestId()
+              + "\" not exist!");
     } else if (!employeeDetailRepository.checkEmployeeIDIsExists(
         updateApplicationRequestRequest.getApproverId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "approverId not exist!");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "approverId \"" + updateApplicationRequestRequest.getApproverId() + "\" not exist!");
     } else if (!requestStatusRepository.existsById(
         ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestStatus not exist!");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "requestStatus \""
+              + updateApplicationRequestRequest.getRequestStatus()
+              + "\" not exist!");
     }
     LocalDateTime latestDate = LocalDateTime.now();
     applicationsRequestRepository.updateCheckedApplicationRequest(
@@ -181,7 +201,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     } else if (!applicationsRequestRepository.checkExistRequestId(requestId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\"  not exist");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
@@ -196,7 +217,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       RejectApplicationRequestRequest rejectApplicationRequestRequest) {
     if (applicationsRequestRepository.checkExistRequestId(
         rejectApplicationRequestRequest.getRequestId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "requestId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "requestId \"" + rejectApplicationRequestRequest.getRequestId() + "\" not exist");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(
@@ -231,9 +254,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
       try {
+        for (Long requestId : list) {
+          if (!applicationsRequestRepository.existsById(requestId)) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+          }
+        }
         List<ApplicationsRequestResponse> applicationsRequestResponseList =
             applicationsRequestRepository.getListApplicationRequestReceiveByListId(
                 queryParam, employeeId, list);
@@ -252,9 +282,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
       try {
+        for (Long requestId : list) {
+          if (!applicationsRequestRepository.existsById(requestId)) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+          }
+        }
         List<ApplicationsRequestResponse> applicationsRequestResponseList =
             applicationsRequestRepository.getListApplicationRequestSendByListId(
                 queryParam, employeeId, list);
@@ -273,8 +310,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
+      for (Long requestId : list) {
+        if (!applicationsRequestRepository.existsById(requestId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+        }
+      }
       List<ApplicationsRequestResponse> applicationsRequestResponseList =
           applicationsRequestRepository.getListApplicationRequestReceiveByListId(
               queryParam, employeeId, list);
@@ -329,8 +373,15 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
+      for (Long requestId : list) {
+        if (!applicationsRequestRepository.existsById(requestId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+        }
+      }
       List<ApplicationsRequestResponse> applicationsRequestResponseList =
           applicationsRequestRepository.getListApplicationRequestSendByListId(
               queryParam, employeeId, list);

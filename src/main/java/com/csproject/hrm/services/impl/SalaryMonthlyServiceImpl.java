@@ -54,7 +54,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   public SalaryMonthlyResponseList getAllSalaryMonthlyForPersonal(
       QueryParam queryParam, String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not exist employee " + employeeId);
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     return salaryMonthlyRepository.getAllPersonalSalaryMonthly(queryParam, employeeId);
   }
@@ -64,7 +65,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       QueryParam queryParam, String employeeId) {
     List<AreaDto> areaDtoList = workingPlaceRepository.getListArea();
     if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     String isEnoughLevel = "False";
     for (AreaDto areaDto : areaDtoList) {
@@ -82,7 +84,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     Optional<SalaryMonthlyResponse> salaryMonthlyResponse =
         salaryMonthlyRepository.getSalaryMonthlyBySalaryId(salaryMonthlyId);
     if (salaryMonthlyResponse.isEmpty()) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NOT_EXIST_USER_WITH + salaryMonthlyId);
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "salaryMonthlyId \"" + salaryMonthlyId + "\" not exist");
     }
     String employeeId = salaryMonthlyResponse.get().getEmployeeId();
     LocalDate startDate = salaryMonthlyResponse.get().getStartDate();
@@ -179,8 +182,15 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     } else {
+      for (Long salaryId : list) {
+        if (!salaryMonthlyRepository.existsById(salaryId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "salaryId \"" + salaryId + "\" not exist");
+        }
+      }
       List<SalaryMonthlyResponse> salaryMonthlyResponses =
           salaryMonthlyRepository.getListPersonalSalaryMonthlyToExport(
               queryParam, list, employeeId);
@@ -235,9 +245,16 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
       try {
+        for (Long salaryId : list) {
+          if (!salaryMonthlyRepository.existsById(salaryId)) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "salaryId \"" + salaryId + "\" not exist");
+          }
+        }
         List<SalaryMonthlyResponse> salaryMonthlyResponses =
             salaryMonthlyRepository.getListPersonalSalaryMonthlyToExport(
                 queryParam, list, employeeId);
@@ -256,8 +273,15 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
+      for (Long salaryId : list) {
+        if (!salaryMonthlyRepository.existsById(salaryId)) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "salaryId \"" + salaryId + "\" not exist");
+        }
+      }
       List<SalaryMonthlyResponse> salaryMonthlyResponses =
           salaryMonthlyRepository.getListManagementSalaryMonthlyToExport(
               queryParam, list, employeeId);
@@ -312,9 +336,16 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employee not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
     } else {
       try {
+        for (Long salaryId : list) {
+          if (!salaryMonthlyRepository.existsById(salaryId)) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "salaryId \"" + salaryId + "\" not exist");
+          }
+        }
         List<SalaryMonthlyResponse> salaryMonthlyResponses =
             salaryMonthlyRepository.getListManagementSalaryMonthlyToExport(
                 queryParam, list, employeeId);
@@ -331,7 +362,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   public void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     if (!salaryMonthlyRepository.checkExistSalaryMonthly(
         rejectSalaryMonthlyRequest.getSalaryMonthlyId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "salaryId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "salaryId \"" + rejectSalaryMonthlyRequest.getSalaryMonthlyId() + "\" not exist");
     }
     salaryMonthlyRepository.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
   }
@@ -342,7 +375,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + " " + salaryMonthlyId);
     } else if (!salaryMonthlyRepository.checkExistSalaryMonthly(salaryMonthlyId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "Not exist with salary id " + salaryMonthlyId);
+          HttpStatus.BAD_REQUEST, "salaryId \"" + salaryMonthlyId + "\" not exist");
     }
     salaryMonthlyRepository.updateStatusSalaryMonthlyBySalaryMonthlyId(
         salaryMonthlyId, ESalaryMonthly.APPROVED.name());
@@ -351,15 +384,24 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Override
   public void updateCheckedSalaryMonthly(
       UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId) {
-    if (!salaryMonthlyRepository.checkExistSalaryMonthly(
+    if (!employeeRepository.existsById(employeeId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
+    } else if (!salaryMonthlyRepository.checkExistSalaryMonthly(
         updateSalaryMonthlyRequest.getSalaryMonthlyId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "salaryId not exist!");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "salaryId \"" + updateSalaryMonthlyRequest.getSalaryMonthlyId() + "\" not exist!");
     } else if (!employeeDetailRepository.checkEmployeeIDIsExists(
         updateSalaryMonthlyRequest.getApproverId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "approverId not exist!");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "approverId \"" + updateSalaryMonthlyRequest.getApproverId() + "\" not exist!");
     } else if (!salaryStatusRepository.existsById(
         ESalaryMonthly.getValue(updateSalaryMonthlyRequest.getSalaryStatus()))) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "salaryStatus not exist!");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "salaryStatus \"" + updateSalaryMonthlyRequest.getSalaryStatus() + "\" not exist!");
     }
     salaryMonthlyRepository.updateCheckedSalaryMonthly(
         updateSalaryMonthlyRequest, Boolean.FALSE, employeeId);
@@ -370,9 +412,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
     if (!deductionSalaryRepository.checkExistDeductionSalary(
         deductionSalaryRequest.getDeductionSalaryId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "deductionSalaryId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "deductionSalaryId \"" + deductionSalaryRequest.getDeductionSalaryId() + "\" not exist");
     } else if (!deductionTypeRepository.existsById(deductionSalaryRequest.getDeductionTypeId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "deductionTypeId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "deductionTypeId \"" + deductionSalaryRequest.getDeductionTypeId() + "\" not exist");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         deductionSalaryRepository.getSalaryMonthlyInfoByDeductionSalary(
@@ -389,10 +435,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Override
   public void deleteDeductionSalary(Long deductionSalaryId) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
-    if (deductionSalaryId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_PARAMETER);
-    } else if (!deductionSalaryRepository.checkExistDeductionSalary(deductionSalaryId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "deductionSalaryId not exist");
+    if (!deductionSalaryRepository.checkExistDeductionSalary(deductionSalaryId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "deductionSalaryId \"" + deductionSalaryId + "\" not exist");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         deductionSalaryRepository.getSalaryMonthlyInfoByDeductionSalary(deductionSalaryId);
@@ -409,9 +454,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   public void updateBonusSalary(BonusSalaryRequest bonusSalaryRequest) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
     if (!bonusSalaryRepository.checkExistBonusSalary(bonusSalaryRequest.getBonusSalaryId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "bonusSalaryId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "bonusSalaryId \"" + bonusSalaryRequest.getBonusSalaryId() + "\" not exist");
     } else if (!bonusTypeRepository.existsById(bonusSalaryRequest.getBonusTypeId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "bonusTypeId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "bonusTypeId \"" + bonusSalaryRequest.getBonusTypeId() + "\" not exist");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         bonusSalaryRepository.getSalaryMonthlyInfoByBonusSalary(
@@ -428,10 +477,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Override
   public void deleteBonusSalary(Long bonusSalaryId) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
-    if (bonusSalaryId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_PARAMETER);
-    } else if (!bonusSalaryRepository.checkExistBonusSalary(bonusSalaryId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "bonusSalaryId not exist");
+    if (!bonusSalaryRepository.checkExistBonusSalary(bonusSalaryId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "bonusSalaryId \"" + bonusSalaryId + "\" not exist");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         bonusSalaryRepository.getSalaryMonthlyInfoByBonusSalary(bonusSalaryId);
@@ -448,7 +496,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   public void updateAdvanceSalary(AdvanceSalaryRequest advanceSalaryRequest) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
     if (!advanceSalaryRepository.checkExistAdvanceSalary(advanceSalaryRequest.getAdvanceId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "advanceId not exist");
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "advanceId \"" + advanceSalaryRequest.getAdvanceId() + "\" not exist");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         advanceSalaryRepository.getSalaryMonthlyInfoByAdvanceSalary(
@@ -465,10 +515,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Override
   public void deleteAdvanceSalary(Long advanceSalaryId) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
-    if (advanceSalaryId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_PARAMETER);
-    } else if (!advanceSalaryRepository.checkExistAdvanceSalary(advanceSalaryId)) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "advanceId not exist");
+    if (!advanceSalaryRepository.checkExistAdvanceSalary(advanceSalaryId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "advanceId \"" + advanceSalaryId + "\" not exist");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         advanceSalaryRepository.getSalaryMonthlyInfoByAdvanceSalary(advanceSalaryId);

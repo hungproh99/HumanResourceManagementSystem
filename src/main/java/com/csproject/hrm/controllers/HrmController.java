@@ -17,11 +17,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -34,6 +37,7 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping(REQUEST_MAPPING)
+@Validated
 public class HrmController {
 
   @Autowired HumanManagementService humanManagementService;
@@ -42,7 +46,9 @@ public class HrmController {
   @GetMapping(URI_GET_ALL_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> getAllEmployee(
-      HttpServletRequest request, @RequestParam Map<String, String> allRequestParams) {
+      HttpServletRequest request,
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
     if (request.isUserInRole("MANAGER")) {
@@ -63,7 +69,7 @@ public class HrmController {
 
   @PostMapping(URI_INSERT_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> addEmployee(@RequestBody HrmRequest hrmRequest) {
+  public ResponseEntity<?> addEmployee(@Valid @RequestBody HrmRequest hrmRequest) {
     humanManagementService.insertEmployee(hrmRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -173,7 +179,8 @@ public class HrmController {
   public ResponseEntity<?> downloadCsvEmployee(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
@@ -191,7 +198,8 @@ public class HrmController {
   public ResponseEntity<?> downloadExcelEmployee(
       HttpServletResponse servletResponse,
       @RequestBody List<String> listId,
-      @RequestParam Map<String, String> allRequestParams)
+      @RequestParam
+          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
       throws IOException {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
