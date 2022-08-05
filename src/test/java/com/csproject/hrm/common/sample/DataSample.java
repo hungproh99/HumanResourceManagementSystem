@@ -131,4 +131,7 @@ public class DataSample {
           null,
           null,
           null);
+
+  public static final LoginRequest LOGIN_REQUEST =
+      new LoginRequest("huynq100@fpt.edu.vn", "huy123456789");
 }
