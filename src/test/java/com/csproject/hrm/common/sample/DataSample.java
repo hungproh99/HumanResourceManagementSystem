@@ -6,6 +6,7 @@ import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
@@ -168,4 +169,22 @@ public class DataSample {
                   "IT",
                   "Full Time")),
           1);
+
+  public static final HrmRequest HRM_REQUEST =
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          1L,
+          "0385822476",
+          "Male",
+          LocalDate.parse("2000-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-02-13"),
+          LocalDate.parse("2000-02-13"));
 }
