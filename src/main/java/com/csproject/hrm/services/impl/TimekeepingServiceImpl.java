@@ -25,7 +25,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,6 +56,12 @@ public class TimekeepingServiceImpl implements TimekeepingService {
           HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
     }
     List<EmployeeNameAndID> employeeNameAndIDList = getAllEmployeeByManagerID(employeeId);
+    if (employeeNameAndIDList.isEmpty()) {
+      return TimekeepingResponsesList.builder()
+          .timekeepingResponsesList(new ArrayList<>())
+          .total(0)
+          .build();
+    }
 
     List<TimekeepingResponses> timekeepingResponsesList =
         timekeepingRepository.getListTimekeepingByManagement(queryParam, employeeNameAndIDList);

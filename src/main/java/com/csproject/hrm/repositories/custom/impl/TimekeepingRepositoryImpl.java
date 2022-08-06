@@ -1,7 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.EGradeType;
+import com.csproject.hrm.common.enums.EJob;
+import com.csproject.hrm.common.enums.ETimekeepingStatus;
 import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.dto.TimekeepingIdOvertimeTypeDto;
 import com.csproject.hrm.dto.response.*;
@@ -15,7 +17,10 @@ import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -90,7 +95,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
           conditions.add(condition);
           conditionsTimekeeping.add(timekeepingCondition);
         });
-    Condition condition = noCondition();
+    Condition condition = DSL.noCondition();
     for (EmployeeNameAndID employeeNameAndID : employeeNameAndIDList) {
       condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(employeeNameAndID.getEmployeeID()));
     }
