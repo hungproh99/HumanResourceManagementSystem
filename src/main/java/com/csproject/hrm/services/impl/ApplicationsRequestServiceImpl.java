@@ -5,9 +5,17 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -23,8 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
@@ -193,6 +204,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     } else if (!applicationsRequestRepository.checkExistRequestId(requestId)) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\"  not exist");
+    } else if (applicationsRequestRepository.checkAlreadyApproveOrReject(requestId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\"  already approve or reject");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
@@ -200,6 +214,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
     updateApproveInformation(applicationRequestDto.get(), requestId);
+
   }
 
   @Override
@@ -210,6 +225,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
           "requestId \"" + rejectApplicationRequestRequest.getRequestId() + "\" not exist");
+    } else if (applicationsRequestRepository.checkAlreadyApproveOrReject(
+        rejectApplicationRequestRequest.getRequestId())) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "requestId \""
+              + rejectApplicationRequestRequest.getRequestId()
+              + "\"  already approve or reject");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(
@@ -597,9 +619,19 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           }
         });
 
-    if (endDate.isAfter(currentDate)) {
-      timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, currentDate, endDate);
+    List<LocalDate> localDateList = new ArrayList<>();
+    if (startDate.equals(endDate)) {
+      localDateList.add(startDate);
+    } else {
+      List<LocalDate> rangeDates = startDate.datesUntil(endDate).collect(Collectors.toList());
+      for (LocalDate date : rangeDates) {
+        if (!timekeepingRepository.checkExistDateInTimekeeping(date, employeeId)) {
+          localDateList.add(date);
+        }
+      }
     }
+    timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, localDateList);
+
     timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
         employeeId,
         startDate,
@@ -625,6 +657,19 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (startDate == null || endDate == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
+    List<LocalDate> localDateList = new ArrayList<>();
+    if (startDate.equals(endDate)) {
+      localDateList.add(startDate);
+    } else {
+      List<LocalDate> rangeDates = startDate.datesUntil(endDate).collect(Collectors.toList());
+      for (LocalDate date : rangeDates) {
+        if (!timekeepingRepository.checkExistDateInTimekeeping(date, employeeId)) {
+          localDateList.add(date);
+        }
+      }
+    }
+    timekeepingRepository.insertTimekeepingByEmployeeId(employeeId, localDateList);
+
     timekeepingRepository.upsertTimekeepingStatusByEmployeeIdAndRangeDate(
         employeeId,
         startDate,

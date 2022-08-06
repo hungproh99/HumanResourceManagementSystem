@@ -446,13 +446,12 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
 
   @Override
   public void insertTimekeepingByEmployeeId(
-      String employeeId, LocalDate startDate, LocalDate endDate) {
+      String employeeId, List<LocalDate> localDateList) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<LocalDate> listOfDates = startDate.datesUntil(endDate).collect(Collectors.toList());
     List<Query> queries = new ArrayList<>();
     dslContext.transaction(
         configuration -> {
-          listOfDates.forEach(
+          localDateList.forEach(
               date -> {
                 queries.add(
                     dslContext
@@ -513,7 +512,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                           .and(
                               LIST_TIMEKEEPING_STATUS.TIMEKEEPING_STATUS_ID.eq(
                                   oldTimekeepingStatus)));
-                } else if (!checkExist && oldTimekeepingStatus == newTimekeepingStatus) {
+                } else if (!checkExist) {
                   queries.add(
                       dslContext
                           .insertInto(

@@ -406,6 +406,23 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .execute();
   }
 
+  @Override
+  public boolean checkAlreadyApproveOrReject(Long salaryMonthlyId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select(SALARY_MONTHLY.SALARY_ID)
+            .from(SALARY_MONTHLY)
+            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyId))
+            .and(
+                SALARY_MONTHLY
+                    .SALARY_STATUS_ID
+                    .eq(ESalaryMonthly.getValue(ESalaryMonthly.REJECTED.name()))
+                    .or(
+                        SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                            ESalaryMonthly.getValue(ESalaryMonthly.APPROVED.name())))));
+  }
+
   private Select<?> getListSalaryMonthlyRemind(LocalDate checkDate) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext

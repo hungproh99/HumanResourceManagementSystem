@@ -49,4 +49,6 @@ public interface SalaryMonthlyRepositoryCustom {
   List<SalaryMonthlyRemindResponse> getAllSalaryMonthlyToRemind(LocalDate checkDate);
 
   void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind);
+
+  boolean checkAlreadyApproveOrReject(Long salaryMonthlyId);
 }

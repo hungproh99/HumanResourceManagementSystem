@@ -75,10 +75,6 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
             .on(SALARY_MONTHLY.SALARY_ID.eq(BONUS_SALARY.SALARY_ID))
             .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
             .fetchInto(BonusSalaryResponse.class);
-    bonusSalaryResponses.forEach(
-        bonusSalaryResponse -> {
-          bonusSalaryResponse.setBonus_name(EBonus.getLabel(bonusSalaryResponse.getBonus_name()));
-        });
     return bonusSalaryResponses;
   }
 

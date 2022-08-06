@@ -1,10 +1,17 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.common.enums.ERequestName;
+import com.csproject.hrm.common.enums.ERequestStatus;
+import com.csproject.hrm.common.enums.ERequestType;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.ApplicationsRequestRepositoryCustom;
@@ -944,5 +951,22 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             .select(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID)
             .from(APPLICATIONS_REQUEST)
             .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId)));
+  }
+
+  @Override
+  public boolean checkAlreadyApproveOrReject(Long requestId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID)
+            .from(APPLICATIONS_REQUEST)
+            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+            .and(
+                APPLICATIONS_REQUEST
+                    .REQUEST_STATUS
+                    .eq(ERequestStatus.getValue(ERequestStatus.REJECTED.name()))
+                    .or(
+                        APPLICATIONS_REQUEST.REQUEST_STATUS.eq(
+                            ERequestStatus.getValue(ERequestStatus.APPROVED.name())))));
   }
 }

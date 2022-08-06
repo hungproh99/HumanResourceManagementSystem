@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -36,7 +37,7 @@ public class SalaryMonthlyController {
   @Autowired JwtUtils jwtUtils;
 
   @GetMapping(URI_GET_ALL_PERSONAL_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListAllPersonalSalaryMonthly(
       HttpServletRequest request,
       @RequestParam
@@ -54,7 +55,7 @@ public class SalaryMonthlyController {
   }
 
   @GetMapping(URI_GET_ALL_MANAGEMENT_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> getListAllManagementSalaryMonthly(
       HttpServletRequest request,
       @RequestParam
@@ -72,17 +73,15 @@ public class SalaryMonthlyController {
   }
 
   @GetMapping(URI_GET_SALARY_MONTHLY_DETAIL)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> getSalaryMonthlyDetail(@RequestParam Long salaryId) {
-    if (salaryId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_PARAMETER);
-    }
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
+  public ResponseEntity<?> getSalaryMonthlyDetail(
+      @Positive(message = "salaryId must be a positive number!") @RequestParam Long salaryId) {
     return ResponseEntity.ok(
         salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryId));
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_PERSONAL_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadCsvPersonalSalaryMonthly(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -109,7 +108,7 @@ public class SalaryMonthlyController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_PERSONAL_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadExcelPersonalSalaryMonthly(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -135,7 +134,7 @@ public class SalaryMonthlyController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_MANAGEMENT_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadCsvManagementSalaryMonthly(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -162,7 +161,7 @@ public class SalaryMonthlyController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_MANAGEMENT_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadExcelManagementSalaryMonthly(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -188,7 +187,7 @@ public class SalaryMonthlyController {
   }
 
   @PutMapping(value = URI_UPDATE_DEDUCTION_SALARY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> updateDeductionSalary(
       @Valid @RequestBody DeductionSalaryRequest deductionSalaryRequest) {
     salaryMonthlyService.updateDeductionSalary(deductionSalaryRequest);
@@ -196,14 +195,16 @@ public class SalaryMonthlyController {
   }
 
   @DeleteMapping(value = URI_DELETE_DEDUCTION_SALARY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteDeductionSalary(@RequestParam Long deductionId) {
+  @PreAuthorize(value = "hasRole('MANAGER')")
+  public ResponseEntity<?> deleteDeductionSalary(
+      @Positive(message = "deductionId must be a positive number!") @RequestParam
+          Long deductionId) {
     salaryMonthlyService.deleteDeductionSalary(deductionId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_BONUS_SALARY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> updateBonusSalary(
       @Valid @RequestBody BonusSalaryRequest bonusSalaryRequest) {
     salaryMonthlyService.updateBonusSalary(bonusSalaryRequest);
@@ -211,14 +212,15 @@ public class SalaryMonthlyController {
   }
 
   @DeleteMapping(value = URI_DELETE_BONUS_SALARY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteBonusSalary(@RequestParam Long bonusId) {
+  @PreAuthorize(value = "hasRole('MANAGER')")
+  public ResponseEntity<?> deleteBonusSalary(
+      @Positive(message = "bonusId must be a positive number!") @RequestParam Long bonusId) {
     salaryMonthlyService.deleteBonusSalary(bonusId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_ADVANCE_SALARY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> updateAdvanceSalary(
       @Valid @RequestBody AdvanceSalaryRequest advanceSalaryRequest) {
     salaryMonthlyService.updateAdvanceSalary(advanceSalaryRequest);
@@ -226,21 +228,24 @@ public class SalaryMonthlyController {
   }
 
   @DeleteMapping(value = URI_DELETE_ADVANCE_SALARY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteAdvanceSalary(@RequestParam Long advanceId) {
+  @PreAuthorize(value = "hasRole('MANAGER')")
+  public ResponseEntity<?> deleteAdvanceSalary(
+      @Positive(message = "advanceId must be a positive number!") @RequestParam Long advanceId) {
     salaryMonthlyService.deleteAdvanceSalary(advanceId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_APPROVE_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateApproveSalaryMonthly(@RequestParam Long salaryMonthlyId) {
+  @PreAuthorize(value = "hasRole('MANAGER')")
+  public ResponseEntity<?> updateApproveSalaryMonthly(
+      @Positive(message = "salaryMonthlyId must be a positive number!") @RequestParam
+          Long salaryMonthlyId) {
     salaryMonthlyService.updateApproveSalaryMonthly(salaryMonthlyId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_CHECKED_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> updateCheckedSalaryMonthly(
       HttpServletRequest request,
       @Valid @RequestBody UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest) {
@@ -255,7 +260,7 @@ public class SalaryMonthlyController {
   }
 
   @PutMapping(value = URI_UPDATE_REJECT_SALARY_MONTHLY)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> updateRejectSalaryMonthly(
       @Valid @RequestBody RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     salaryMonthlyService.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
@@ -263,13 +268,13 @@ public class SalaryMonthlyController {
   }
 
   @GetMapping(value = URI_GET_LIST_DEDUCTION_TYPE)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> getListDeductionType() {
     return ResponseEntity.ok(salaryMonthlyService.getListDeductionTypeDto());
   }
 
   @GetMapping(value = URI_GET_LIST_BONUS_TYPE)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> getListBonusType() {
     return ResponseEntity.ok(salaryMonthlyService.getListBonusTypeDto());
   }

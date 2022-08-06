@@ -81,4 +81,6 @@ public interface ApplicationsRequestRepositoryCustom {
   String getDataOfPolicy(Long requestNameId);
 
   boolean checkExistRequestId(Long requestId);
+
+  boolean checkAlreadyApproveOrReject(Long requestId);
 }

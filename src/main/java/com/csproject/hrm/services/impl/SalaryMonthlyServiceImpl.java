@@ -131,16 +131,17 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
             getAdvanceSalaryResponseList(salaryMonthlyId),
             salaryMonthlyResponse.get().getTotalAdvance());
 
-    BigDecimal baseSalary = salaryContractDto.get().getBase_salary();
-    BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
-    EmployeeTaxResponseList employeeTaxResponseList =
-        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary);
-
-    EmployeeInsuranceResponseList employeeInsuranceResponseList =
-        getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary());
-
     EmployeeAllowanceResponseList employeeAllowanceResponseList =
         getEmployeeAllowanceResponseList(employeeId);
+    BigDecimal allowance = employeeAllowanceResponseList.getTotal();
+    BigDecimal baseSalary = salaryContractDto.get().getBase_salary();
+    BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
+
+    EmployeeTaxResponseList employeeTaxResponseList =
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary, allowance);
+
+    EmployeeInsuranceResponseList employeeInsuranceResponseList =
+        getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, allowance);
 
     return SalaryMonthlyDetailResponse.builder()
         .salary_monthly_id(salaryMonthlyId)
@@ -365,6 +366,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
           "salaryId \"" + rejectSalaryMonthlyRequest.getSalaryMonthlyId() + "\" not exist");
+    } else if (salaryMonthlyRepository.checkAlreadyApproveOrReject(
+        rejectSalaryMonthlyRequest.getSalaryMonthlyId())) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          "salaryId \""
+              + rejectSalaryMonthlyRequest.getSalaryMonthlyId()
+              + "\" already approve or reject");
     }
     salaryMonthlyRepository.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
   }
@@ -376,6 +384,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     } else if (!salaryMonthlyRepository.checkExistSalaryMonthly(salaryMonthlyId)) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "salaryId \"" + salaryMonthlyId + "\" not exist");
+    } else if (salaryMonthlyRepository.checkAlreadyApproveOrReject(salaryMonthlyId)) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "salaryId \"" + salaryMonthlyId + "\" already approve or reject");
     }
     salaryMonthlyRepository.updateStatusSalaryMonthlyBySalaryMonthlyId(
         salaryMonthlyId, ESalaryMonthly.APPROVED.name());
@@ -632,12 +643,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         advanceSalaryRepository.sumListAdvanceMonthlyBySalaryMonthlyId(salaryMonthlyId);
     BigDecimal baseSalary = salaryContractDto.get().getBase_salary();
     BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
-    BigDecimal totalTax =
-        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary).getTotal();
-    BigDecimal totalInsurance =
-        getEmployeeInsuranceResponseList(employeeId, salaryContractDto.get().getBase_salary())
-            .getTotal();
     BigDecimal totalAllowance = getEmployeeAllowanceResponseList(employeeId).getTotal();
+    BigDecimal totalTax =
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary, totalAllowance)
+            .getTotal();
+    BigDecimal totalInsurance =
+        getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, totalAllowance)
+            .getTotal();
     BigDecimal salaryPerDay =
         (salaryContractDto
                 .get()
@@ -738,9 +750,11 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private EmployeeTaxResponseList getEmployeeTaxResponseList(
-      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary) {
+      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary, BigDecimal allowance) {
     BigDecimal monthlySalary = baseSalary.add(additionalSalary);
-    BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
+    BigDecimal totalInsurance =
+        getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, allowance)
+            .getTotal();
     List<EmployeeTaxResponse> employeeTaxResponses =
         generalFunction.readTaxDataByEmployeeId(employeeId, monthlySalary, totalInsurance);
     BigDecimal totalTax = BigDecimal.ZERO;
@@ -754,9 +768,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private EmployeeInsuranceResponseList getEmployeeInsuranceResponseList(
-      String employeeId, BigDecimal baseSalary) {
+      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary, BigDecimal allowance) {
+    BigDecimal salaryForInsurance = baseSalary.add(additionalSalary).add(allowance);
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
-        generalFunction.readInsuranceDataByEmployeeId(employeeId, baseSalary);
+        generalFunction.readInsuranceDataByEmployeeId(employeeId, salaryForInsurance);
     BigDecimal totalInsurance = BigDecimal.ZERO;
     if (employeeInsuranceResponses.isEmpty()) {
       return new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);

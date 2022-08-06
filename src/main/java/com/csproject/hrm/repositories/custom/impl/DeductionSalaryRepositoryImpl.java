@@ -1,9 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.EDeduction;
-import com.csproject.hrm.dto.request.DeductionSalaryRequest;
 import com.csproject.hrm.dto.dto.DeductionTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
+import com.csproject.hrm.dto.request.DeductionSalaryRequest;
 import com.csproject.hrm.dto.response.DeductionSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -75,11 +75,6 @@ public class DeductionSalaryRepositoryImpl implements DeductionSalaryRepositoryC
             .on(SALARY_MONTHLY.SALARY_ID.eq(DEDUCTION_SALARY.SALARY_ID))
             .where(SALARY_MONTHLY.SALARY_ID.eq(salaryId))
             .fetchInto(DeductionSalaryResponse.class);
-    deductionSalaryResponses.forEach(
-        deductionSalaryResponse -> {
-          deductionSalaryResponse.setDeduction_name(
-              EDeduction.getLabel(deductionSalaryResponse.getDeduction_name()));
-        });
     return deductionSalaryResponses;
   }
 
