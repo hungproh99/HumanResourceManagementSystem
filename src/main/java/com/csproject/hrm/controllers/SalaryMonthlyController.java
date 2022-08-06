@@ -73,8 +73,7 @@ public class SalaryMonthlyController {
 
   @GetMapping(URI_GET_SALARY_MONTHLY_DETAIL)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> getSalaryMonthlyDetail(
-      @NotBlank(message = "salaryId must not be blank!") @RequestParam Long salaryId) {
+  public ResponseEntity<?> getSalaryMonthlyDetail(@RequestParam Long salaryId) {
     if (salaryId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NULL_PARAMETER);
     }
@@ -198,8 +197,7 @@ public class SalaryMonthlyController {
 
   @DeleteMapping(value = URI_DELETE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteDeductionSalary(
-      @NotBlank(message = "deductionId must not be blank!") @RequestParam Long deductionId) {
+  public ResponseEntity<?> deleteDeductionSalary(@RequestParam Long deductionId) {
     salaryMonthlyService.deleteDeductionSalary(deductionId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -214,8 +212,7 @@ public class SalaryMonthlyController {
 
   @DeleteMapping(value = URI_DELETE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteBonusSalary(
-      @NotBlank(message = "bonusId must not be blank!") @RequestParam Long bonusId) {
+  public ResponseEntity<?> deleteBonusSalary(@RequestParam Long bonusId) {
     salaryMonthlyService.deleteBonusSalary(bonusId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -230,17 +227,14 @@ public class SalaryMonthlyController {
 
   @DeleteMapping(value = URI_DELETE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> deleteAdvanceSalary(
-      @NotBlank(message = "advanceId must not be blank!") @RequestParam Long advanceId) {
+  public ResponseEntity<?> deleteAdvanceSalary(@RequestParam Long advanceId) {
     salaryMonthlyService.deleteAdvanceSalary(advanceId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PutMapping(value = URI_UPDATE_APPROVE_SALARY_MONTHLY)
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> updateApproveSalaryMonthly(
-      @NotBlank(message = "salaryMonthlyId must not be blank!") @RequestParam
-          Long salaryMonthlyId) {
+  public ResponseEntity<?> updateApproveSalaryMonthly(@RequestParam Long salaryMonthlyId) {
     salaryMonthlyService.updateApproveSalaryMonthly(salaryMonthlyId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }

@@ -68,14 +68,14 @@ public class HrmController {
   }
 
   @PostMapping(URI_INSERT_EMPLOYEE)
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> addEmployee(@Valid @RequestBody HrmRequest hrmRequest) {
     humanManagementService.insertEmployee(hrmRequest);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE_BY_CSV)
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> importCsvToEmployee(@RequestParam MultipartFile multipartFile) {
     if (multipartFile.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);

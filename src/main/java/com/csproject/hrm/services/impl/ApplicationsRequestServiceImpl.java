@@ -205,7 +205,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   @Override
   public void updateRejectApplicationRequest(
       RejectApplicationRequestRequest rejectApplicationRequestRequest) {
-    if (applicationsRequestRepository.checkExistRequestId(
+    if (!applicationsRequestRepository.checkExistRequestId(
         rejectApplicationRequestRequest.getRequestId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
