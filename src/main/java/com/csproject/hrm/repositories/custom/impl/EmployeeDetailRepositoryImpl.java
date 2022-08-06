@@ -585,7 +585,8 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 EMPLOYEE_TYPE.NAME.as("employee_type"),
                 SALARY_CONTRACT.SALARY_CONTRACT_ID,
                 WORKING_CONTRACT.WORKING_CONTRACT_ID,
-                WORKING_PLACE.WORKING_PLACE_ID)
+                WORKING_PLACE.WORKING_PLACE_ID,
+                EMPLOYEE.MANAGER_ID)
             .from(WORKING_CONTRACT)
             .leftJoin(EMPLOYEE)
             .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
