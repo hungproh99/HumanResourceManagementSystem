@@ -129,6 +129,68 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
+  public List<TimekeepingResponses> getListTimekeepingByEmployeeID(QueryParam queryParam) {
+    final List<Condition> conditions = new ArrayList<>();
+    final List<Condition> conditionsTimekeeping = new ArrayList<>();
+    final var mergeFilters =
+        queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
+
+    mergeFilters.forEach(
+        (key, values) -> {
+          Condition condition = DSL.noCondition();
+          Condition timekeepingCondition = DSL.noCondition();
+          for (QueryFilter filter : values) {
+
+            final Field<?> field = field2Map.get(filter.field);
+
+            if (Objects.isNull(field)) {
+              throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILTER_INVALID);
+            }
+            if (filter.field.equals(Constants.EMPLOYEE_ID)) {
+              condition = condition.and(queryHelper.condition(filter, field));
+            } else if (filter.field.equals(DATE)) {
+              timekeepingCondition = timekeepingCondition.and(queryHelper.condition(filter, field));
+            } else {
+              condition = condition.and(queryHelper.condition(filter, field));
+            }
+          }
+          conditions.add(condition);
+          conditionsTimekeeping.add(timekeepingCondition);
+        });
+
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
+
+    List<TimekeepingResponses> timekeepingResponses =
+        getEmployeeByManagementForTimekeeping(conditions, sortFields, queryParam.pagination)
+            .fetchInto(TimekeepingResponses.class);
+    timekeepingResponses.forEach(
+        timekeepingResponse -> {
+          timekeepingResponse.setGrade(EGradeType.getLabel(timekeepingResponse.getGrade()));
+          timekeepingResponse.setPosition(EJob.getLabel(timekeepingResponse.getPosition()));
+          List<TimekeepingResponse> timekeepingList =
+              getAllTimekeepingByEmployeeId(
+                      timekeepingResponse.getEmployee_id(), conditionsTimekeeping, sortFields)
+                  .fetchInto(TimekeepingResponse.class);
+          timekeepingList.forEach(
+              timekeeping -> {
+                List<ListTimekeepingStatusResponse> timekeepingStatusList =
+                    getAllTimekeepingStatusByTimekeepingId(
+                            timekeeping.getTimekeeping_id(), conditionsTimekeeping, sortFields)
+                        .fetchInto(ListTimekeepingStatusResponse.class);
+                timekeepingStatusList.forEach(
+                    timekeepingStatus -> {
+                      timekeepingStatus.setTimekeeping_status(
+                          ETimekeepingStatus.getLabel(timekeepingStatus.getTimekeeping_status()));
+                    });
+                timekeeping.setTimekeeping_status(timekeepingStatusList);
+              });
+          timekeepingResponse.setTimekeepingResponses(timekeepingList);
+        });
+    return timekeepingResponses;
+  }
+
+  @Override
   public List<TimekeepingResponses> getListTimekeepingToExport(
       QueryParam queryParam, List<String> list) {
     final List<Condition> conditions = new ArrayList<>();

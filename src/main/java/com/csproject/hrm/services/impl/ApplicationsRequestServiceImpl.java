@@ -932,7 +932,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   private ApplicationsRequestCreateRequest setDescription(
       ApplicationsRequestCreateRequest applicationsRequest, String[] valueArray) {
-    StringBuilder data = new StringBuilder();
     String description =
         applicationsRequestRepository.getDescriptionByRequestNameID(
             applicationsRequest.getRequestNameId());
@@ -1252,27 +1251,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         });
 
     return requestTypeDtoList;
-  }
-
-  @Override
-  public void createApproveTaxEnrollment(List<String> taxNameList, String employeeId) {
-    //    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
-    //      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeId);
-    //    }
-    //    if (taxNameList == null || taxNameList.get(0) == null) {
-    //      throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    //    }
-    //
-    //    EmployeeTaxDto employeeTaxDto;
-    //    for (String taxName : taxNameList) {
-    //      employeeTaxDto = new EmployeeTaxDto();
-    //      employeeTaxDto.setTaxTypeID(policyRepository.getTaxPolicyTypeIDByTaxName(taxName));
-    //      employeeTaxDto.setEmployeeID(employeeId);
-    //      employeeTaxDto.setTaxStatus(true);
-    //      employeeTaxDto.setTaxTypeName(taxName);
-    //      System.out.println(employeeTaxDto);
-    //      applicationsRequestRepository.createApproveTaxEnrollment(employeeTaxDto);
-    //    }
   }
 
   @Override

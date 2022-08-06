@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface TimekeepingService {
   TimekeepingResponsesList getListTimekeepingByManagement(QueryParam queryParam, String employeeId);
 
+  TimekeepingResponsesList getListTimekeepingByEmployeeID(QueryParam queryParam);
+
   void exportTimekeepingToCsv(Writer writer, QueryParam queryParam, List<String> list);
 
   void exportTimekeepingToExcel(
