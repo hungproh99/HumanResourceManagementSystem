@@ -55,7 +55,5 @@ public interface ApplicationsRequestService {
 
   List<RequestTypeDto> getAllRequestTypeByEmployeeLevel(String employeeId);
 
-  void createApproveTaxEnrollment(List<String> taxNameList, String employeeId);
-
   void updateAllApplicationRequestRemind(LocalDateTime checkDate);
 }

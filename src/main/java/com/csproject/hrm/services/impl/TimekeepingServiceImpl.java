@@ -67,6 +67,18 @@ public class TimekeepingServiceImpl implements TimekeepingService {
   }
 
   @Override
+  public TimekeepingResponsesList getListTimekeepingByEmployeeID(QueryParam queryParam) {
+    List<TimekeepingResponses> timekeepingResponsesList =
+        timekeepingRepository.getListTimekeepingByEmployeeID(queryParam);
+    int total = 1;
+
+    return TimekeepingResponsesList.builder()
+        .timekeepingResponsesList(timekeepingResponsesList)
+        .total(total)
+        .build();
+  }
+
+  @Override
   public void exportTimekeepingToCsv(Writer writer, QueryParam queryParam, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);

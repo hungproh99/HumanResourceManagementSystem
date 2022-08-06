@@ -14,6 +14,12 @@ public class WorkingInfoRequest {
   private Long office;
   private Long area;
   private Long position;
+  private Long grade;
   private Long workingTypeId;
   private LocalDate startDate;
+  private Long employeeType;
+  private String managerId;
+  private Long salaryContractId;
+  private Long workingContractId;
+  private Long workingPlaceId;
 }

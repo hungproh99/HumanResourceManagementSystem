@@ -16,6 +16,8 @@ public interface TimekeepingRepositoryCustom {
   List<TimekeepingResponses> getListTimekeepingByManagement(
       QueryParam queryParam, List<EmployeeNameAndID> employeeNameAndIDList);
 
+  List<TimekeepingResponses> getListTimekeepingByEmployeeID(QueryParam queryParam);
+
   List<TimekeepingResponses> getListTimekeepingToExport(QueryParam queryParam, List<String> list);
 
   Optional<TimekeepingDetailResponse> getTimekeepingByEmployeeIDAndDate(

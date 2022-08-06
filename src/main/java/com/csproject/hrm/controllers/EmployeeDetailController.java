@@ -222,4 +222,19 @@ public class EmployeeDetailController {
     employeeDetailService.updateEducationInfo(education);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
+
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PutMapping("update_avatar")
+  public ResponseEntity<?> updateAvatar(@Valid @RequestBody AvatarRequest avatarRequest) {
+    employeeDetailService.updateAvatar(avatarRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  }
+
+  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  //  @PutMapping("update_avatar")
+  //  public ResponseEntity<?> updateWorkingInfo(
+  //      @Valid @RequestBody WorkingInfoRequest workingInfoRequest) {
+  //    employeeDetailService.updateWorkingInfo(workingInfoRequest);
+  //    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  //  }
 }

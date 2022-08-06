@@ -15,6 +15,8 @@ public interface SalaryContractRepositoryCustom {
       LocalDate startDate,
       boolean oldStatus,
       boolean newStatus);
-
-  Optional<SalaryContractDto> getSalaryContractByEmployeeId(String employeeId);
+	
+	void updateSalaryContract(String employeeId, BigDecimal newSalary, LocalDate startDate, boolean status);
+	
+	Optional<SalaryContractDto> getSalaryContractByEmployeeId(String employeeId);
 }

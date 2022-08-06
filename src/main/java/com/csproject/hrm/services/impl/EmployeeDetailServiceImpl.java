@@ -270,4 +270,36 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     }
     return list;
   }
+
+  @Override
+  public void updateAvatar(AvatarRequest avatarRequest) {
+    String employeeID = avatarRequest.getEmployeeId();
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+    }
+    if (avatarRequest.getAvatar() == null) {
+      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
+    employeeDetailRepository.updateAvatar(avatarRequest);
+  }
+
+  //  @Override
+  //  public void updateWorkingInfo(WorkingInfoRequest workingInfoRequest) {
+  //    String employeeID = workingInfoRequest.getEmployeeId();
+  //    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
+  //      throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
+  //    }
+  //    if (workingInfoRequest.getFinalSalary() == null
+  //        || workingInfoRequest.getBaseSalary() == null
+  //        || workingInfoRequest.getOffice() == null
+  //        || workingInfoRequest.getPosition() == null
+  //        || workingInfoRequest.getWorkingTypeId() == null
+  //        || workingInfoRequest.getStartDate() == null
+  //        || workingInfoRequest.getArea() == null
+  //        || workingInfoRequest.getEmployee_type() == null
+  //        || workingInfoRequest.getManager_id() == null) {
+  //      throw new CustomParameterConstraintException(FILL_NOT_FULL);
+  //    }
+  //    employeeDetailRepository.updateWorkingInfo(workingInfoRequest);
+  //  }
 }

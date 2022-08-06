@@ -51,4 +51,6 @@ public interface EmployeeDetailRepositoryCustom {
   int countNumberDependentRelative(String employeeId);
 
   List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID);
+
+  void updateAvatar(AvatarRequest avatarRequest);
 }

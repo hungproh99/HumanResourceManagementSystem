@@ -6,6 +6,7 @@ public class Constants {
   public static final String PASSWORD_VALIDATION =
       "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+]).{8,32}$";
   public static final String ALPHANUMERIC_VALIDATION = "^[a-zA-Z]+$";
+  public static final String NUMERIC_VALIDATION = "^(?:\\d*|)$";
   public static final String FROM_EMAIL = "huynq08120@gmail.com";
   public static final String TO_EMAIL = "hihihd37@gmail.com";
   public static final String NOT_EMPTY_EMAIL = "Email can't not empty";

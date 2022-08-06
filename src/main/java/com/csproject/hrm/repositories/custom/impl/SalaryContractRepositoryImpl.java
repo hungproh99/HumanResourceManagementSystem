@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.jooq.codegen.maven.example.Tables.*;
 
@@ -65,6 +63,30 @@ public class SalaryContractRepositoryImpl implements SalaryContractRepositoryCus
                 SALARY_CONTRACT.START_DATE)
             .values(newSalary, newStatus, contractId, startDate)
             .execute();
+  }
+
+  @Override
+  public void updateSalaryContract(
+      String employeeId, BigDecimal newSalary, LocalDate startDate, boolean status) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var contractId =
+        dslContext
+            .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
+            .from(EMPLOYEE)
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .fetchOneInto(Long.class);
+
+    dslContext
+        .update(SALARY_CONTRACT)
+        .set(SALARY_CONTRACT.BASE_SALARY, newSalary)
+        .set(SALARY_CONTRACT.START_DATE, startDate)
+        .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, status)
+        .where(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(contractId))
+        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+        .execute();
   }
 
   @Override

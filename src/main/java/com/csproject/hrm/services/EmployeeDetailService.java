@@ -38,4 +38,6 @@ public interface EmployeeDetailService {
   WorkingInfoResponse findWorkingInfo(String employeeID);
 
   List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID);
+
+  void updateAvatar(AvatarRequest avatarRequest);
 }

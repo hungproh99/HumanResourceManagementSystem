@@ -62,15 +62,9 @@ public class TimekeepingController {
       @RequestParam
           Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
-    String headerAuth = request.getHeader(AUTHORIZATION);
-    String employeeId = "";
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      employeeId = jwtUtils.getIdFromJwtToken(jwt);
-    }
     QueryParam queryParam = context.queryParam(allRequestParams);
     TimekeepingResponsesList timekeeping =
-        timekeepingService.getListTimekeepingByManagement(queryParam, employeeId);
+        timekeepingService.getListTimekeepingByEmployeeID(queryParam);
     return ResponseEntity.ok(timekeeping);
   }
 
