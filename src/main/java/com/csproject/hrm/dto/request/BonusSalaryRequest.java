@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,7 +21,6 @@ public class BonusSalaryRequest {
 
   private String description;
 
-  @NotBlank(message = "date must not be blank!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate date;
 

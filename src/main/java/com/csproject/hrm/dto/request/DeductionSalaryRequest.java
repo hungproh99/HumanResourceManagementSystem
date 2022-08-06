@@ -22,7 +22,6 @@ public class DeductionSalaryRequest {
 
   private String description;
 
-  @NotBlank(message = "date must not be blank!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate date;
 

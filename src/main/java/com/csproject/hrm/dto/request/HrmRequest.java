@@ -34,7 +34,6 @@ public class HrmRequest {
   @Pattern(regexp = ALPHANUMERIC_VALIDATION, message = "gender must only alphanumeric!")
   private String gender;
 
-  @NotBlank(message = "birthDate must not be blank!")
   @Past(message = "birthDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate birthDate;
@@ -64,11 +63,9 @@ public class HrmRequest {
   @Pattern(regexp = EMAIL_VALIDATION, message = "personalEmail is not valid!")
   private String personalEmail;
 
-  @NotBlank(message = "startDate must not be blank!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate startDate;
 
-  @NotBlank(message = "endDate must not be blank!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
 }

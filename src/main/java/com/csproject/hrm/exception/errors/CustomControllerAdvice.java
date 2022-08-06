@@ -1,9 +1,13 @@
 package com.csproject.hrm.exception.errors;
 
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -71,8 +75,7 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
         ex.getBindingResult().getFieldErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.toList());
-
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.BAD_REQUEST, errors.toString()));
+    return new ResponseEntity<>(new ErrorResponse(status, errors.get(0)), status);
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
@@ -80,8 +83,8 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
       ConstraintViolationException ex, WebRequest request) {
     List<String> errors = new ArrayList<>();
     ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
-
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.BAD_REQUEST, errors.toString()));
+    return new ResponseEntity<>(
+        new ErrorResponse(HttpStatus.BAD_REQUEST, errors.get(0)), HttpStatus.BAD_REQUEST);
   }
 
   @Override
@@ -90,9 +93,8 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
       HttpHeaders headers,
       HttpStatus status,
       WebRequest request) {
-    return ResponseEntity.ok(
-        new ErrorResponse(
-            HttpStatus.BAD_REQUEST, "Missing " + ex.getParameterName() + " in request param"));
+    return new ResponseEntity<>(
+        new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getParameterName()), HttpStatus.BAD_REQUEST);
   }
 
   @Override
@@ -101,11 +103,12 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
       HttpHeaders headers,
       HttpStatus status,
       WebRequest request) {
-    return ResponseEntity.ok(
+    return new ResponseEntity<>(
         new ErrorResponse(
             HttpStatus.BAD_REQUEST,
             "Invalid format for field "
                 + StringUtils.substringsBetween(ex.getCause().getMessage(), "[", "]")[1].replaceAll(
-                    "\\\"", "")));
+                    "\\\"", "")),
+        HttpStatus.BAD_REQUEST);
   }
 }
