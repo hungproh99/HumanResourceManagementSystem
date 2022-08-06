@@ -30,7 +30,6 @@ public class EmployeeAdditionalInfoRequest {
   @Pattern(regexp = NUMERIC_VALIDATION, message = "card_id accept numeric only!")
   private String card_id;
 
-  @NotBlank(message = "provideDate must not be blank!")
   @Past(message = "provideDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate provideDate;

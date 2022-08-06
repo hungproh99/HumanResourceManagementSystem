@@ -2,8 +2,10 @@ package com.csproject.hrm.dto.request;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
 @Data
@@ -11,36 +13,38 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @SuperBuilder
 public class EmployeeDetailRequest {
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @NotBlank(message = "full_name must not be blank!")
   private String full_name;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @NotBlank(message = "employee_id must not be blank!")
   private String employee_id;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @Past(message = "startDate must less than today!")
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate start_date;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @Past(message = "endDate must less than today!")
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate end_date;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
   private Boolean working_status;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @NotBlank(message = "contract_url must not be blank!")
   private String contract_url;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @NotBlank(message = "phone_number must not be blank!")
   private String phone_number;
 
   private Long grade_id;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @Past(message = "birth_date must less than today!")
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate birth_date;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @NotBlank(message = "company_emails must not be blank!")
   private String company_email;
 
-  @NotBlank(message = "place_of_residence must not be blank!")
+  @NotBlank(message = "gender must not be blank!")
   private String gender;
 
   private String marital_status;

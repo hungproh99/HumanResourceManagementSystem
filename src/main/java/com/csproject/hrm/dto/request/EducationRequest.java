@@ -19,12 +19,10 @@ public class EducationRequest {
   @NotBlank(message = "nameSchool must not be blank!")
   private String nameSchool;
 
-  @NotBlank(message = "startDate must not be blank!")
   @Past(message = "startDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate startDate;
 
-  @NotBlank(message = "endDate must not be blank!")
   @Past(message = "endDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
