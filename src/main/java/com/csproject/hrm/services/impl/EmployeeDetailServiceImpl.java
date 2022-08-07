@@ -251,6 +251,8 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     workingInfo.setOffice(EOffice.getLabel(workingInfo.getOffice()));
     workingInfo.setPosition(EJob.getLabel(workingInfo.getPosition()));
     workingInfo.setWorking_type(EWorkingType.getLabel(workingInfo.getWorking_type()));
+    workingInfo.setGrade(EGradeType.getLabel(workingInfo.getGrade()));
+    workingInfo.setEmployee_type(EEmployeeType.getLabel(workingInfo.getEmployee_type()));
     return workingInfo;
   }
 

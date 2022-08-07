@@ -499,6 +499,8 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   public TaxAndInsuranceResponse findTaxAndInsurance(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
+    TaxAndInsuranceResponse taxAndInsuranceResponse = new TaxAndInsuranceResponse();
+
     List<EmployeeInsuranceDto> list =
         dslContext
             .select(
@@ -511,13 +513,13 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(employeeID))
             .fetchInto(EmployeeInsuranceDto.class);
 
-    TaxAndInsuranceResponse taxAndInsuranceResponse =
+    String taxCode =
         dslContext
             .select(EMPLOYEE.TAX_CODE)
             .from(EMPLOYEE)
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
-            .fetchOneInto(TaxAndInsuranceResponse.class);
-    return TaxAndInsuranceResponse.builder().insuranceDtos(list).build();
+            .fetchOneInto(String.class);
+    return TaxAndInsuranceResponse.builder().tax_code(taxCode).insuranceDtos(list).build();
   }
 
   @Override
@@ -621,7 +623,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     WorkingInfoResponse workingInfoResponse =
         Objects.requireNonNullElse(
             query.fetchOneInto(WorkingInfoResponse.class), new WorkingInfoResponse());
-    workingInfoResponse.setManager_name(getManagerByEmployeeID(employeeID));
+    workingInfoResponse.setManager_name(getManagerByEmployeeID(employeeID).split("-")[0].trim());
     return workingInfoResponse;
   }
 
