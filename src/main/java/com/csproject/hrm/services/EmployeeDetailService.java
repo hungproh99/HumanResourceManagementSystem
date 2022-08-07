@@ -40,4 +40,10 @@ public interface EmployeeDetailService {
   List<EmployeeNameAndID> getAllEmployeeByManagerID(String employeeID);
 
   void updateAvatar(AvatarRequest avatarRequest);
+
+  void updateWorkingInfo(WorkingInfoRequest workingInfoRequest);
+
+  RoleResponse getRole(String employeeID);
+
+  void updateRole(RoleRequest roleRequest);
 }

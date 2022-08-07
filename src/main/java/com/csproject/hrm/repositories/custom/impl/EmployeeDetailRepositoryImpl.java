@@ -1,7 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
-import com.csproject.hrm.dto.dto.WorkingPlaceDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.DBConnection;
@@ -13,10 +12,9 @@ import org.jooq.codegen.maven.example.Tables;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.*;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -122,61 +120,72 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
+  public boolean checkBankIsExisted(String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select(BANK.BANK_ID)
+            .from(BANK)
+            .leftJoin(EMPLOYEE)
+            .on(BANK.BANK_ID.eq(EMPLOYEE.BANK_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
+  }
+
+  @Override
   public void updateBankInfo(BankRequest bank) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    boolean existed = checkBankIsExisted(bank.getEmployeeId());
     dslContext.transaction(
         configuration -> {
-          Long bankID =
-              dslContext
-                  .insertInto(
-                      BANK,
-                      BANK.BANK_ID,
-                      BANK.NAME_BANK,
-                      BANK.ADDRESS,
-                      BANK.ACCOUNT_NUMBER,
-                      BANK.ACCOUNT_NAME)
-                  .values(
-                      bank.getId(),
-                      bank.getNameBank(),
-                      bank.getAddress(),
-                      bank.getAccountNumber(),
-                      bank.getAccountName())
-                  .onDuplicateKeyUpdate()
-                  .set(BANK.NAME_BANK, bank.getNameBank())
-                  .set(BANK.ADDRESS, bank.getAddress())
-                  .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
-                  .set(BANK.ACCOUNT_NAME, bank.getAccountName())
-                  .where(BANK.BANK_ID.eq(bank.getId()))
-                  .returningResult(BANK.BANK_ID)
-                  .fetchOne()
-                  .getValue(BANK.BANK_ID);
-          System.out.println(
-              dslContext
-                  .insertInto(
-                      BANK,
-                      BANK.BANK_ID,
-                      BANK.NAME_BANK,
-                      BANK.ADDRESS,
-                      BANK.ACCOUNT_NUMBER,
-                      BANK.ACCOUNT_NAME)
-                  .values(
-                      bank.getId(),
-                      bank.getNameBank(),
-                      bank.getAddress(),
-                      bank.getAccountNumber(),
-                      bank.getAccountName())
-                  .onDuplicateKeyUpdate()
-                  .set(BANK.NAME_BANK, bank.getNameBank())
-                  .set(BANK.ADDRESS, bank.getAddress())
-                  .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
-                  .set(BANK.ACCOUNT_NAME, bank.getAccountName())
-                  .where(BANK.BANK_ID.eq(bank.getId())));
-          System.out.println(bankID);
-          dslContext
-              .update(EMPLOYEE)
-              .set(EMPLOYEE.BANK_ID, bankID)
-              .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
-              .execute();
+          List<Long> bankID;
+          if (existed) {
+            dslContext
+                .update(BANK)
+                .set(BANK.NAME_BANK, bank.getNameBank())
+                .set(BANK.ADDRESS, bank.getAddress())
+                .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
+                .set(BANK.ACCOUNT_NAME, bank.getAccountName())
+                .where(BANK.BANK_ID.eq(bank.getId()));
+          } else {
+            bankID =
+                dslContext
+                    .insertInto(
+                        BANK,
+                        BANK.BANK_ID,
+                        BANK.NAME_BANK,
+                        BANK.ADDRESS,
+                        BANK.ACCOUNT_NUMBER,
+                        BANK.ACCOUNT_NAME)
+                    .values(
+                        bank.getId(),
+                        bank.getNameBank(),
+                        bank.getAddress(),
+                        bank.getAccountNumber(),
+                        bank.getAccountName())
+                    .returningResult(BANK.BANK_ID)
+                    .fetchInto(Long.class);
+            System.out.println(
+                dslContext
+                    .insertInto(
+                        BANK,
+                        BANK.BANK_ID,
+                        BANK.NAME_BANK,
+                        BANK.ADDRESS,
+                        BANK.ACCOUNT_NUMBER,
+                        BANK.ACCOUNT_NAME)
+                    .values(
+                        bank.getId(),
+                        bank.getNameBank(),
+                        bank.getAddress(),
+                        bank.getAccountNumber(),
+                        bank.getAccountName())
+                    .returningResult(BANK.BANK_ID));
+            dslContext
+                .update(EMPLOYEE)
+                .set(EMPLOYEE.BANK_ID, bankID.get(0))
+                .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
+                .execute();
+          }
         });
   }
 
@@ -378,7 +387,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .set(EMPLOYEE.BIRTH_DATE, employeeDetailRequest.getBirth_date())
         .set(EMPLOYEE.COMPANY_EMAIL, employeeDetailRequest.getCompany_email())
         .set(EMPLOYEE.GENDER, employeeDetailRequest.getGender())
-        .set(EMPLOYEE.AVATAR, employeeDetailRequest.getAvatar())
         .set(EMPLOYEE.MARITAL_STATUS, employeeDetailRequest.getMarital_status())
         .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeDetailRequest.getEmployee_id()));
   }
@@ -610,8 +618,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
             .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
             .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
-
-    return query.fetchOneInto(WorkingInfoResponse.class);
+    WorkingInfoResponse workingInfoResponse =
+        Objects.requireNonNullElse(
+            query.fetchOneInto(WorkingInfoResponse.class), new WorkingInfoResponse());
+    workingInfoResponse.setManager_name(getManagerByEmployeeID(employeeID));
+    return workingInfoResponse;
   }
 
   @Override
@@ -696,96 +707,158 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .execute();
   }
 
-  //  @Override
-  //  public void updateWorkingInfo(WorkingInfoRequest workingInfoRequest) {
-  //    List<Query> queries = new ArrayList<>();
-  //    //    salaryContractRepository
-  //    final DSLContext dslContext = DSL.using(connection.getConnection());
-  //    dslContext.transaction(
-  //        configuration -> {
-  //          queries.add(updateWorkingContract(configuration, workingInfoRequest));
-  //          if (checkWorkingPlaceChange(
-  //              workingInfoRequest.getWorkingContractId(),
-  //              workingInfoRequest.getOffice(),
-  //              workingInfoRequest.getArea(),
-  //              workingInfoRequest.getPosition(),
-  //              workingInfoRequest.getGrade())) {
-  //            queries.add(updateWorkingPlace(configuration, workingInfoRequest));
-  //          } else {
-  //            workingInfoRequest.setWorkingPlaceId(workingPlace.getWorking_place_id());
-  //            workingInfoRequest.setStartDate(
-  //                Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate());
-  //            queries.add(insertWorkingPlace(configuration, workingInfoRequest));
-  //          }
-  //          DSL.using(configuration).batch(queries).execute();
-  //        });
-  //  }
-  //
-  //  private boolean checkWorkingPlaceChange(
-  //      Long workingContractId, Long officeId, Long areaID, Long positionId, Long gradeId) {
-  //    WorkingPlaceDto workingPlace = getWorkingPlaceByContractID(workingContractId);
-  //    return (workingPlace.getJob_id().equals(positionId)
-  //        && workingPlace.getArea_id().equals(areaID)
-  //        && workingPlace.getOffice_id().equals(officeId)
-  //        && workingPlace.getGrade_id().equals(gradeId));
-  //  }
-  //
-  //  private boolean checkSalaryContractChange(
-  //      String employeeId, BigDecimal newSalary, LocalDate startDate) {
-  //    Optional<SalaryContractDto> salaryContractDto =
-  //        salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
-  //    return (salaryContractDto.get().getBase_salary().equals(newSalary)
-  //        && salaryContractDto.get().get.equals(areaID));
-  //  }
-  //
-  //  private Update<?> updateWorkingContract(
-  //      Configuration configuration, WorkingInfoRequest workingInfoRequest) {
-  //    return DSL.using(configuration)
-  //        .update(WORKING_CONTRACT)
-  //        .set(WORKING_CONTRACT.WORKING_CONTRACT_ID, workingInfoRequest.get())
-  //        .set(WORKING_CONTRACT.START_DATE, workingInfoRequest.getStart_date())
-  //        .set(WORKING_CONTRACT.END_DATE, workingInfoRequest.getEnd_date())
-  //        .set(WORKING_CONTRACT.CONTRACT_URL, workingInfoRequest.getContract_url())
-  //        .set(WORKING_CONTRACT.EMPLOYEE_ID, workingInfoRequest.getEmployee_id());
-  //  }
-  //
-  //  private Update<?> updateWorkingPlace(
-  //      Configuration configuration, WorkingInfoRequest workingInfoRequest) {
-  //    return DSL.using(configuration)
-  //        .update(WORKING_PLACE)
-  //        .set(WORKING_PLACE.WORKING_CONTRACT_ID, workingInfoRequest.getWorking_contract_id())
-  //        .set(WORKING_PLACE.GRADE_ID, workingInfoRequest.getGrade_id())
-  //        .set(WORKING_PLACE.AREA_ID, workingInfoRequest.getArea_id())
-  //        .set(WORKING_PLACE.JOB_ID, workingInfoRequest.getJob_id())
-  //        .set(WORKING_PLACE.OFFICE_ID, workingInfoRequest.getOffice_id())
-  //        .set(WORKING_PLACE.START_DATE, workingInfoRequest.getStart_date())
-  //        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(workingInfoRequest.getWorking_place_id()));
-  //  }
-  //
-  //  private Insert<?> insertWorkingPlace(
-  //      Configuration configuration, WorkingInfoRequest workingInfoRequest) {
-  //    DSL.using(configuration)
-  //        .update(WORKING_PLACE)
-  //        .set(WORKING_PLACE.WORKING_PLACE_STATUS, false)
-  //        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(employeeDetailRequest.getWorking_place_id()))
-  //        .execute();
-  //    return DSL.using(configuration)
-  //        .insertInto(
-  //            WORKING_PLACE,
-  //            WORKING_PLACE.WORKING_CONTRACT_ID,
-  //            WORKING_PLACE.AREA_ID,
-  //            WORKING_PLACE.JOB_ID,
-  //            WORKING_PLACE.OFFICE_ID,
-  //            WORKING_PLACE.GRADE_ID,
-  //            WORKING_PLACE.WORKING_PLACE_STATUS,
-  //            WORKING_PLACE.START_DATE)
-  //        .values(
-  //            employeeDetailRequest.getWorking_contract_id(),
-  //            employeeDetailRequest.getArea_id(),
-  //            employeeDetailRequest.getJob_id(),
-  //            employeeDetailRequest.getOffice_id(),
-  //            employeeDetailRequest.getGrade_id(),
-  //            true,
-  //            employeeDetailRequest.getStart_date());
-  //  }
+  @Override
+  public void updateWorkingInfo(WorkingInfoRequest workingInfoRequest) {
+    List<Query> queries = new ArrayList<>();
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    WorkingPlaceDto workingPlace =
+        getWorkingPlaceByContractID(workingInfoRequest.getWorkingPlaceId());
+    dslContext.transaction(
+        configuration -> {
+          queries.add(
+              DSL.using(configuration)
+                  .update(EMPLOYEE)
+                  .set(EMPLOYEE.WORKING_TYPE_ID, workingInfoRequest.getWorkingTypeId())
+                  .set(EMPLOYEE.EMPLOYEE_TYPE_ID, workingInfoRequest.getEmployeeType())
+                  .set(EMPLOYEE.MANAGER_ID, workingInfoRequest.getManagerId())
+                  .where(EMPLOYEE.EMPLOYEE_ID.eq(workingInfoRequest.getEmployeeId())));
+          boolean salaryChange =
+              checkSalaryContractChange(
+                  workingInfoRequest.getEmployeeId(),
+                  new BigDecimal(workingInfoRequest.getBaseSalary()));
+          boolean placeChange =
+              checkWorkingPlaceChange(
+                  workingPlace,
+                  workingInfoRequest.getOffice(),
+                  workingInfoRequest.getArea(),
+                  workingInfoRequest.getPosition(),
+                  workingInfoRequest.getGrade());
+          if (salaryChange) {
+            updateSalaryContract(
+                configuration,
+                workingInfoRequest.getEmployeeId(),
+                new BigDecimal(workingInfoRequest.getBaseSalary()),
+                workingInfoRequest.getStartDate(),
+                true);
+          } else {
+            salaryContractRepository.insertNewSalaryContract(
+                workingInfoRequest.getEmployeeId(),
+                new BigDecimal(workingInfoRequest.getBaseSalary()),
+                workingInfoRequest.getStartDate(),
+                false,
+                true);
+          }
+          if (placeChange) {
+            queries.add(updateWorkingPlace(configuration, workingInfoRequest));
+          } else {
+            workingInfoRequest.setWorkingPlaceId(workingPlace.getWorking_place_id());
+            workingInfoRequest.setStartDate(
+                Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate());
+            queries.add(insertWorkingPlace(configuration, workingInfoRequest));
+          }
+          DSL.using(configuration).batch(queries).execute();
+        });
+  }
+
+  private boolean checkWorkingPlaceChange(
+      WorkingPlaceDto workingPlace, Long officeId, Long areaID, Long positionId, Long gradeId) {
+    return (workingPlace.getJob_id().equals(positionId)
+        && workingPlace.getArea_id().equals(areaID)
+        && workingPlace.getOffice_id().equals(officeId)
+        && workingPlace.getGrade_id().equals(gradeId));
+  }
+
+  private boolean checkSalaryContractChange(String employeeId, BigDecimal newSalary) {
+    Optional<SalaryContractDto> salaryContractDto =
+        salaryContractRepository.getSalaryContractByEmployeeId(employeeId);
+    return (salaryContractDto.get().getBase_salary().equals(newSalary));
+  }
+
+  private Update<?> updateWorkingPlace(
+      Configuration configuration, WorkingInfoRequest workingInfoRequest) {
+    return DSL.using(configuration)
+        .update(WORKING_PLACE)
+        .set(WORKING_PLACE.WORKING_CONTRACT_ID, workingInfoRequest.getWorkingContractId())
+        .set(WORKING_PLACE.GRADE_ID, workingInfoRequest.getGrade())
+        .set(WORKING_PLACE.AREA_ID, workingInfoRequest.getArea())
+        .set(WORKING_PLACE.JOB_ID, workingInfoRequest.getPosition())
+        .set(WORKING_PLACE.OFFICE_ID, workingInfoRequest.getOffice())
+        .set(WORKING_PLACE.START_DATE, workingInfoRequest.getStartDate())
+        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(workingInfoRequest.getWorkingPlaceId()));
+  }
+
+  private Insert<?> insertWorkingPlace(
+      Configuration configuration, WorkingInfoRequest workingInfoRequest) {
+    DSL.using(configuration)
+        .update(WORKING_PLACE)
+        .set(WORKING_PLACE.WORKING_PLACE_STATUS, false)
+        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(workingInfoRequest.getWorkingPlaceId()))
+        .execute();
+    return DSL.using(configuration)
+        .insertInto(
+            WORKING_PLACE,
+            WORKING_PLACE.WORKING_CONTRACT_ID,
+            WORKING_PLACE.AREA_ID,
+            WORKING_PLACE.JOB_ID,
+            WORKING_PLACE.OFFICE_ID,
+            WORKING_PLACE.GRADE_ID,
+            WORKING_PLACE.WORKING_PLACE_STATUS,
+            WORKING_PLACE.START_DATE)
+        .values(
+            workingInfoRequest.getWorkingContractId(),
+            workingInfoRequest.getArea(),
+            workingInfoRequest.getPosition(),
+            workingInfoRequest.getOffice(),
+            workingInfoRequest.getGrade(),
+            true,
+            workingInfoRequest.getStartDate());
+  }
+
+  public void updateSalaryContract(
+      Configuration configuration,
+      String employeeId,
+      BigDecimal newSalary,
+      LocalDate startDate,
+      boolean status) {
+    final var contractId =
+        DSL.using(configuration)
+            .select(Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID)
+            .from(Tables.EMPLOYEE)
+            .leftJoin(Tables.WORKING_CONTRACT)
+            .on(Tables.WORKING_CONTRACT.EMPLOYEE_ID.eq(Tables.EMPLOYEE.EMPLOYEE_ID))
+            .where(Tables.EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(Tables.WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .fetchOneInto(Long.class);
+
+    DSL.using(configuration)
+        .update(SALARY_CONTRACT)
+        .set(SALARY_CONTRACT.BASE_SALARY, newSalary)
+        .set(SALARY_CONTRACT.START_DATE, startDate)
+        .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, status)
+        .where(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(contractId))
+        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+        .execute();
+  }
+
+  @Override
+  public RoleResponse getRole(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(ROLE_TYPE.TYPE_ID.as("roleID"), ROLE_TYPE.ROLE.as("roleName"))
+        .from(EMPLOYEE)
+        .leftJoin(ROLE_TYPE)
+        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
+        .fetchOneInto(RoleResponse.class);
+  }
+
+  @Override
+  public void updateRole(RoleRequest roleRequest) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .update(EMPLOYEE)
+        .set(EMPLOYEE.ROLE_TYPE, Long.valueOf(roleRequest.getRoleId()))
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(roleRequest.getEmployeeId()))
+        .execute();
+  }
 }

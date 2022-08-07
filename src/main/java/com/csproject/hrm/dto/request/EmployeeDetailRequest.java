@@ -4,8 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
@@ -35,6 +34,7 @@ public class EmployeeDetailRequest {
   @NotBlank(message = "phone_number must not be blank!")
   private String phone_number;
 
+  @Positive(message = "grade_id must be a positive number!")
   private Long grade_id;
 
   @Past(message = "birth_date must less than today!")
@@ -48,10 +48,19 @@ public class EmployeeDetailRequest {
   private String gender;
 
   private String marital_status;
+
+  @Positive(message = "office_id must be a positive number!")
   private Long office_id;
+
+  @Positive(message = "job_id must be a positive number!")
   private Long job_id;
+
+  @Positive(message = "area_id must be a positive number!")
   private Long area_id;
+
+  @Positive(message = "working_contract_id must be a positive number!")
   private Long working_contract_id;
+
+  @Positive(message = "working_place_id must be a positive number!")
   private Long working_place_id;
-  private String avatar;
 }

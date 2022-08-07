@@ -16,6 +16,7 @@ public class WorkingInfoResponse {
   private String start_date;
   private String employee_type;
   private String manager_id;
+  private String manager_name;
   private String salary_contract_id;
   private String working_contract_id;
   private String working_place_id;
