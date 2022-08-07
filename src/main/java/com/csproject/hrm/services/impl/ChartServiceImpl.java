@@ -259,7 +259,7 @@ public class ChartServiceImpl implements ChartService {
 
         PaidLeaveChartList paidLeaveChart = new PaidLeaveChartList();
 
-        paidLeaveChart.setReason(paidLeaveReason.getReason_name());
+        paidLeaveChart.setReason(EPaidLeaveReason.getLabel(paidLeaveReason.getReason_name()));
         int value = 0;
         if ("".equals(employeeId)) {
           if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
