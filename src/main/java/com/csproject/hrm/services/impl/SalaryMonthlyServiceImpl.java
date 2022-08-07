@@ -613,22 +613,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     }
     List<LocalDate> getListHoliday = salaryCalculator.getAllHolidayByRange(startDate, endDate);
     List<LocalDate> getListWeekend = salaryCalculator.getAllWeekendByRange(startDate, endDate);
-    int countHolidayInMonth = 0, countWeekendInMonth = 0;
-    for (LocalDate date : getListHoliday) {
-      if (date.isAfter(startDate) && date.isBefore(endDate)) {
-        countHolidayInMonth++;
-      }
-    }
-    for (LocalDate date : getListWeekend) {
-      if (date.isAfter(startDate) && date.isBefore(endDate)) {
-        countWeekendInMonth++;
-      }
-    }
     int standardDayOfWork =
-        Integer.parseInt(String.valueOf(DAYS.between(startDate, endDate)))
-            + 1
-            - countHolidayInMonth
-            - countWeekendInMonth;
+        Integer.parseInt(String.valueOf(DAYS.between(startDate, endDate.plusDays(1))))
+            - getListHoliday.size()
+            - getListWeekend.size();
 
     Double standardPoint = standardDayOfWork * maxPointPerDay;
 
@@ -650,27 +638,27 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal totalInsurance =
         getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, totalAllowance)
             .getTotal();
-    BigDecimal salaryPerDay =
+    BigDecimal salaryPerPoint =
         (salaryContractDto
                 .get()
                 .getAdditional_salary()
                 .add(salaryContractDto.get().getBase_salary()))
-            .divide(BigDecimal.valueOf(standardDayOfWork), 3, RoundingMode.HALF_UP);
-    BigDecimal finalSalary =
-        salaryContractDto
-            .get()
-            .getBase_salary()
-            .add(
-                salaryPerDay.multiply(
-                    BigDecimal.valueOf(actualWorkingPoint != null ? actualWorkingPoint : 0D)))
-            .add(
-                salaryPerDay.multiply(BigDecimal.valueOf(totalOTPoint != null ? totalOTPoint : 0D)))
-            .add(totalBonus != null ? totalBonus : BigDecimal.ZERO)
-            .subtract(totalDeduction != null ? totalDeduction : BigDecimal.ZERO)
-            .subtract(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
-            .subtract(totalTax != null ? totalTax : BigDecimal.ZERO)
-            .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO)
-            .add(totalAllowance != null ? totalAllowance : BigDecimal.ZERO);
+            .divide(BigDecimal.valueOf(standardPoint), 2, RoundingMode.HALF_UP);
+    BigDecimal finalSalary = BigDecimal.ZERO;
+    if (actualWorkingPoint != 0) {
+      finalSalary =
+          salaryPerPoint
+              .multiply(BigDecimal.valueOf(actualWorkingPoint))
+              .add(
+                  salaryPerPoint.multiply(
+                      BigDecimal.valueOf(totalOTPoint != null ? totalOTPoint : 0D)))
+              .add(totalBonus != null ? totalBonus : BigDecimal.ZERO)
+              .subtract(totalDeduction != null ? totalDeduction : BigDecimal.ZERO)
+              .subtract(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
+              .subtract(totalTax != null ? totalTax : BigDecimal.ZERO)
+              .subtract(totalInsurance != null ? totalInsurance : BigDecimal.ZERO)
+              .add(totalAllowance != null ? totalAllowance : BigDecimal.ZERO);
+    }
 
     return SalaryMonthlyDto.builder()
         .salaryMonthlyId(salaryMonthlyId)
@@ -682,6 +670,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .totalAdvance(totalAdvance != null ? totalAdvance : BigDecimal.ZERO)
         .totalTax(totalTax != null ? totalTax : BigDecimal.ZERO)
         .totalInsurance(totalInsurance != null ? totalInsurance : BigDecimal.ZERO)
+        .totalAllowance(totalAllowance)
         .finalSalary(finalSalary)
         .build();
   }
