@@ -3,7 +3,8 @@ package com.csproject.hrm.dto.request;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 @Data
@@ -31,7 +32,6 @@ public class WorkingInfoRequest {
   @Positive(message = "workingTypeId must be a positive number!")
   private Long workingTypeId;
 
-  @Past(message = "startDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate startDate;
 

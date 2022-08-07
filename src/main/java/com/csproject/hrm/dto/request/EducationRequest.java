@@ -23,7 +23,6 @@ public class EducationRequest {
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate startDate;
 
-  @Past(message = "endDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
 

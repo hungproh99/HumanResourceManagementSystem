@@ -18,11 +18,9 @@ public class EmployeeDetailRequest {
   @NotBlank(message = "employee_id must not be blank!")
   private String employee_id;
 
-  @Past(message = "startDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate start_date;
 
-  @Past(message = "endDate must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate end_date;
 

@@ -75,8 +75,7 @@ public class DataSample {
           2L,
           1L,
           1L,
-          1L,
-          "https://haycafe.vn/wp-content/uploads/2022/03/Avatar-hai-doc-600x600.jpg");
+          1L);
   public static final EmployeeAdditionalInfoRequest EMPLOYEE_ADDITIONAL_INFO_REQUEST =
       new EmployeeAdditionalInfoRequest(
           "Thạch Thất, Hà Nội",

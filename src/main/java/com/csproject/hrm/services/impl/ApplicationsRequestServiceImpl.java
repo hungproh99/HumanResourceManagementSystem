@@ -5,17 +5,9 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
-import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
-import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
-import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -31,9 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -214,7 +204,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     }
     updateApproveInformation(applicationRequestDto.get(), requestId);
-
   }
 
   @Override
@@ -1173,8 +1162,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       employeeName + " - " + employeeId,
       currentTitle,
       currentArea,
-      String.valueOf(value),
       type,
+      String.valueOf(value),
       employee
     };
 
