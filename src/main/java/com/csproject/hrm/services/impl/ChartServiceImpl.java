@@ -115,23 +115,25 @@ public class ChartServiceImpl implements ChartService {
     map.put("56-65", 0);
     map.put(">66", 0);
 
-    ageList.forEach(
-        s -> {
-          double val = (double) s / 365;
-          if (val >= 18 && val <= 24) {
-            map.put("18-24", map.get("18-24") + 1);
-          } else if (val >= 25 && val <= 35) {
-            map.put("25-35", map.get("25-35") + 1);
-          } else if (val > 36 && val <= 45) {
-            map.put("36-45", map.get("36-45") + 1);
-          } else if (val > 46 && val <= 55) {
-            map.put("46-55", map.get("46-55") + 1);
-          } else if (val > 56 && val <= 65) {
-            map.put("56-65", map.get("56-65") + 1);
-          } else {
-            map.put(">66", map.get(">66") + 1);
-          }
-        });
+    for (Integer s : ageList) {
+      if (s == null) {
+        continue;
+      }
+      double val = (double) s / 365;
+      if (val >= 18 && val <= 24) {
+        map.put("18-24", map.get("18-24") + 1);
+      } else if (val >= 25 && val <= 35) {
+        map.put("25-35", map.get("25-35") + 1);
+      } else if (val > 36 && val <= 45) {
+        map.put("36-45", map.get("36-45") + 1);
+      } else if (val > 46 && val <= 55) {
+        map.put("46-55", map.get("46-55") + 1);
+      } else if (val > 56 && val <= 65) {
+        map.put("56-65", map.get("56-65") + 1);
+      } else {
+        map.put(">66", map.get(">66") + 1);
+      }
+    }
 
     List<GeneralChart> list = new ArrayList<>();
     map.forEach(
