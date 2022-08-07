@@ -702,7 +702,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext
         .update(EMPLOYEE)
         .set(EMPLOYEE.AVATAR, avatarRequest.getAvatar())
-        .from(EMPLOYEE)
         .where(EMPLOYEE.EMPLOYEE_ID.eq(avatarRequest.getEmployeeId()))
         .execute();
   }
