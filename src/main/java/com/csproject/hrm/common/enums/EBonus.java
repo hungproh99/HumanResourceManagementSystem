@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
 import static com.csproject.hrm.common.constant.Constants.BONUS_INVALID;
 
 public enum EBonus {
-  EXCELLENT_STAFF("Excellent staff", 1);
+  PROJECT_BONUS("Project bonus", 1),
+  REWARD_BONUS("Reward bonus", 1),
+  KPI_BONUS("KPI bonus", 1),
+  OUT_SOURCE_BONUS("Out source bonus", 1);
 
   private String label;
   private long value;
