@@ -1143,6 +1143,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
     String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
     BigDecimal value = checkBigDecimalNull(applicationsRequest.getValue());
+    LocalDate startDate = checkLocalDateNull(applicationsRequest.getStartDate());
     if (applicationsRequest.getRequestNameId().intValue() == 4) {
       BigDecimal currSalary = workingContractRepository.getBaseSalaryByEmployeeID(employeeId);
       if (value.compareTo(currSalary) == -1) {
@@ -1164,6 +1165,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       currentArea,
       type,
       String.valueOf(value),
+      String.valueOf(startDate),
       employee
     };
 
