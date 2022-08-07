@@ -230,11 +230,25 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  //  @PutMapping("update_avatar")
-  //  public ResponseEntity<?> updateWorkingInfo(
-  //      @Valid @RequestBody WorkingInfoRequest workingInfoRequest) {
-  //    employeeDetailService.updateWorkingInfo(workingInfoRequest);
-  //    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
-  //  }
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PutMapping("update_working_info")
+  public ResponseEntity<?> updateWorkingInfo(
+      @Valid @RequestBody WorkingInfoRequest workingInfoRequest) {
+    employeeDetailService.updateWorkingInfo(workingInfoRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN')")
+  @GetMapping("get_role_by_employeeid")
+  public ResponseEntity<?> getRole(
+      @NotBlank(message = "employeeId must not be blank!") @RequestParam String employeeId) {
+    return ResponseEntity.ok(employeeDetailService.getRole(employeeId));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PutMapping("update_role")
+  public ResponseEntity<?> updateRole(@Valid @RequestBody RoleRequest roleRequest) {
+    employeeDetailService.updateRole(roleRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  }
 }

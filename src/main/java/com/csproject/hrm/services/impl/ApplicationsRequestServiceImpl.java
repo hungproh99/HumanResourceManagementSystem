@@ -885,22 +885,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               }
             case 4:
               {
-                if (checkLevelAndValueToApprove(applicationsRequest, "salary")) {
-
-                  applicationsRequest.setApprover(applicationsRequest.getEmployeeId());
-                }
+                checkLevelAndValueToApprove(applicationsRequest, "salary");
                 applicationsRequest =
                     createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
               }
             case 5:
               {
-                if (checkLevelAndValueToApprove(applicationsRequest, "bonus")) {
-
-                  applicationsRequest.setApprover(applicationsRequest.getEmployeeId());
-                  applicationsRequest =
-                      createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
-                }
+                checkLevelAndValueToApprove(applicationsRequest, "bonus");
                 applicationsRequest =
                     createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
@@ -950,7 +942,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
   }
 
-  private boolean checkLevelAndValueToApprove(
+  private void checkLevelAndValueToApprove(
       ApplicationsRequestCreateRequest applicationsRequest, String type) {
     String data =
         applicationsRequestRepository.getDataOfPolicy(applicationsRequest.getRequestNameId());
@@ -967,12 +959,26 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         for (RangePolicy rangePolicy : splitRange) {
           if (Integer.parseInt(rangePolicy.getMin()) <= level
               && Integer.parseInt(rangePolicy.getMax()) >= level) {
-            return Long.valueOf(value).compareTo(Long.valueOf(rangePolicy.getValue())) > 0;
+            if (Long.valueOf(value).compareTo(Long.valueOf(rangePolicy.getValue())) > 0) {
+              String msg = "";
+              if ("salary".equalsIgnoreCase(entry.getKey())) {
+                msg = "Salary Increment";
+              } else {
+                msg = "Bonus";
+              }
+              throw new CustomErrorException(
+                  HttpStatus.BAD_REQUEST,
+                  "You don't have permission to create "
+                      + msg
+                      + " "
+                      + "request have value larger than "
+                      + rangePolicy.getValue()
+                      + ".");
+            }
           }
         }
       }
     }
-    return false;
   }
 
   private ApplicationsRequestCreateRequest setDescription(
