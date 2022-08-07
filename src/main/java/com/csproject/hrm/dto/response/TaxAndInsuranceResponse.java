@@ -10,6 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class TaxAndInsuranceResponse {
-  private Long tax_code;
+  private String tax_code;
   private List<EmployeeInsuranceDto> insuranceDtos;
 }
