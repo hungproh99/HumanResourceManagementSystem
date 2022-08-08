@@ -9,11 +9,11 @@ import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.HumanManagementService;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
@@ -76,7 +76,8 @@ public class HrmController {
 
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE_BY_CSV)
   @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<?> importCsvToEmployee(@RequestParam MultipartFile multipartFile) {
+  public ResponseEntity<?> importCsvToEmployee(
+      @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
     if (multipartFile.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
@@ -95,8 +96,9 @@ public class HrmController {
 
   @PostMapping(URI_INSERT_MULTI_EMPLOYEE_BY_EXCEL)
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> importExcelToEmployee(@RequestParam MultipartFile multipartFile) {
-    if (multipartFile.isEmpty()) {
+  public ResponseEntity<?> importExcelToEmployee(
+      @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+    if (multipartFile == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
     try {
@@ -104,13 +106,13 @@ public class HrmController {
       InputStream inputStream = multipartFile.getInputStream();
       Workbook workbook = null;
       if (!extension.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-          || extension.equals("application/vnd.ms-excel")) {
+          && !extension.equals("application/vnd.ms-excel")) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, ONLY_UPLOAD_EXCEL);
       } else if (extension.equals("application/vnd.ms-excel")) {
-        workbook = new HSSFWorkbook(inputStream);
+        workbook = WorkbookFactory.create(inputStream);
       } else if (extension.equals(
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
-        workbook = new XSSFWorkbook(inputStream);
+        workbook = WorkbookFactory.create(inputStream);
       }
       humanManagementService.importExcelToEmployee(workbook);
     } catch (IOException e) {
@@ -177,37 +179,25 @@ public class HrmController {
   @PostMapping(value = URI_DOWNLOAD_CSV_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> downloadCsvEmployee(
-      HttpServletResponse servletResponse,
-      @RequestBody List<String> listId,
-      @RequestParam
-          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
-      throws IOException {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
+      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader(
         "Content-Disposition",
         "attachment; filename=\"employees_" + timestamp.getTime() + ".csv\"");
-    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), queryParam, listId);
+    humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_EMPLOYEE)
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> downloadExcelEmployee(
-      HttpServletResponse servletResponse,
-      @RequestBody List<String> listId,
-      @RequestParam
-          Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams)
-      throws IOException {
-    Context context = new Context();
-    QueryParam queryParam = context.queryParam(allRequestParams);
+      HttpServletResponse servletResponse, @RequestBody List<String> listId) throws IOException {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
         "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
-    humanManagementService.exportEmployeeToExcel(servletResponse, queryParam, listId);
+    humanManagementService.exportEmployeeToExcel(servletResponse, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 

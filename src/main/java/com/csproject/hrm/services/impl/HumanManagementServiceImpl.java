@@ -62,8 +62,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     if (!roleRepository.existsById(hrmRequest.getRole())) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
     } else if (!hrmRequest.getGender().equalsIgnoreCase("Male")
-        || !hrmRequest.getGender().equalsIgnoreCase("Female")) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be female/male");
+        && !hrmRequest.getGender().equalsIgnoreCase("Female")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be Female/Male");
     } else if (!areaRepository.existsById(hrmRequest.getArea())) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
     } else if (!officeRepository.existsById(hrmRequest.getOffice())) {
@@ -169,7 +169,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list) {
+  public void exportEmployeeToCsv(Writer writer, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
@@ -179,7 +179,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
               HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
         }
       }
-      List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
+      List<HrmResponse> hrmResponses =
+          employeeRepository.findEmployeeByListId(QueryParam.defaultParam(), list);
       try (CSVPrinter csvPrinter =
           new CSVPrinter(
               writer,
@@ -233,20 +234,47 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (CSVRecord csvRecord : csvParser) {
         try {
           String fullName = csvRecord.get("Full Name");
-          Long role = Long.parseLong(csvRecord.get("Role"));
+          Long role = ERole.getValue(csvRecord.get("Role"));
           String phone = csvRecord.get("Phone");
           String gender = csvRecord.get("Gender");
           LocalDate birthDate =
               LocalDate.parse(
                   csvRecord.get("Birth Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-          Long grade = Long.parseLong(csvRecord.get("Grade"));
-          Long position = Long.parseLong(csvRecord.get("Position"));
-          Long office = Long.parseLong(csvRecord.get("Office"));
-          Long area = Long.parseLong(csvRecord.get("Area"));
-          Long workingType = Long.parseLong(csvRecord.get("Working Type"));
+          Long grade = EGradeType.getValue(csvRecord.get("Grade"));
+          Long position = EJob.getValue(csvRecord.get("Position"));
+          Long office = EOffice.getValue(csvRecord.get("Office"));
+          Long area = EArea.getValue(csvRecord.get("Area"));
+          Long workingType = EWorkingType.getValue(csvRecord.get("Working Type"));
           String managerId = csvRecord.get("Manager Id");
-          Long employeeType = Long.parseLong(csvRecord.get("Employee Type"));
+          Long employeeType = EEmployeeType.getValue(csvRecord.get("Employee Type"));
           String personalEmail = csvRecord.get("Personal Email");
+          LocalDate startDate =
+              LocalDate.parse(
+                  csvRecord.get("Start Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+          LocalDate endDate =
+              LocalDate.parse(csvRecord.get("End Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+          if (!roleRepository.existsById(role)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
+          } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be Female/Male");
+          } else if (!areaRepository.existsById(area)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
+          } else if (!officeRepository.existsById(office)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "office not exist");
+          } else if (!gradeRepository.existsById(grade)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "grade not exist");
+          } else if (!jobRepository.existsById(position)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "position not exist");
+          } else if (!workingTypeRepository.existsById(workingType)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "workingType not exist");
+          } else if (!employeeRepository.existsById(managerId)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
+          } else if (!employeeTypeRepository.existsById(employeeType)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
+          } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "personalEmail not valid");
+          }
           hrmRequestList.add(
               HrmRequest.builder()
                   .fullName(fullName)
@@ -262,6 +290,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   .managerId(managerId)
                   .employeeType(employeeType)
                   .personalEmail(personalEmail)
+                  .startDate(startDate)
+                  .endDate(endDate)
                   .build());
         } catch (NumberFormatException e) {
           throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
@@ -291,8 +321,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   //  }
 
   @Override
-  public void exportEmployeeToExcel(
-      HttpServletResponse response, QueryParam queryParam, List<String> list) {
+  public void exportEmployeeToExcel(HttpServletResponse response, List<String> list) {
     if (list.size() == 0) {
       throw new CustomDataNotFoundException(NO_DATA);
     } else {
@@ -303,7 +332,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         }
       }
       try {
-        List<HrmResponse> hrmResponses = employeeRepository.findEmployeeByListId(queryParam, list);
+        List<HrmResponse> hrmResponses =
+            employeeRepository.findEmployeeByListId(QueryParam.defaultParam(), list);
         ExcelExportEmployee excelExportEmployee = new ExcelExportEmployee(hrmResponses);
         excelExportEmployee.export(response);
       } catch (IOException e) {
@@ -323,18 +353,20 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       }
       try {
         String fullName = row.getCell(0).toString();
-        Long role = Long.parseLong(getValue(row.getCell(1)).toString());
+        Long role = ERole.getValue(getValue(row.getCell(1)).toString());
         String phone = "0" + (int) row.getCell(2).getNumericCellValue();
         String gender = row.getCell(3).toString();
         LocalDate birthDate = row.getCell(4).getLocalDateTimeCellValue().toLocalDate();
-        Long grade = Long.parseLong(getValue(row.getCell(5)).toString());
-        Long position = Long.parseLong(getValue(row.getCell(6)).toString());
-        Long office = Long.parseLong(getValue(row.getCell(7)).toString());
-        Long area = Long.parseLong(getValue(row.getCell(8)).toString());
-        Long workingType = Long.parseLong(getValue(row.getCell(9)).toString());
+        Long grade = EGradeType.getValue(getValue(row.getCell(5)).toString());
+        Long position = EJob.getValue(getValue(row.getCell(6)).toString());
+        Long office = EOffice.getValue(getValue(row.getCell(7)).toString());
+        Long area = EArea.getValue(getValue(row.getCell(8)).toString());
+        Long workingType = EWorkingType.getValue(getValue(row.getCell(9)).toString());
         String managerId = row.getCell(10).toString();
-        Long employeeType = Long.parseLong(getValue(row.getCell(11)).toString());
+        Long employeeType = EEmployeeType.getValue(getValue(row.getCell(11)).toString());
         String personalEmail = row.getCell(12).toString();
+        LocalDate startDate = row.getCell(13).getLocalDateTimeCellValue().toLocalDate();
+        LocalDate endDate = row.getCell(14).getLocalDateTimeCellValue().toLocalDate();
         hrmRequestList.add(
             HrmRequest.builder()
                 .fullName(fullName)
@@ -350,6 +382,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 .managerId(managerId)
                 .employeeType(employeeType)
                 .personalEmail(personalEmail)
+                .startDate(startDate)
+                .endDate(endDate)
                 .build());
       } catch (NumberFormatException e) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);

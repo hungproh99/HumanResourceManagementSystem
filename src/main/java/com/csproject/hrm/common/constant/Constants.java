@@ -5,7 +5,7 @@ public class Constants {
       "^[A-Za-z][A-Za-z0-9_\\.]{3,32}@[a-z0-9]{2,}(\\.[a-z0-9]{2,4}){1,2}$";
   public static final String PASSWORD_VALIDATION =
       "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+]).{8,32}$";
-  public static final String ALPHANUMERIC_VALIDATION = "^[a-zA-Z\\s]+$";
+  public static final String ALPHANUMERIC_VALIDATION = "^[\\p{L} .'-]+$";
   public static final String NUMERIC_VALIDATION = "^(?:\\d*|)$";
   public static final String FROM_EMAIL = "huynq08120@gmail.com";
   public static final String TO_EMAIL = "hihihd37@gmail.com";
@@ -46,7 +46,7 @@ public class Constants {
   public static final String SENIORITY = "seniority";
   public static final String YEAR = " year ";
   public static final String MONTH = " month ";
-  public static final String DAY = " day ";
+  public static final String DAY = " day";
   public static final String PAGING = "paging";
   public static final String FILTER = "filter";
   public static final String ORDER_BY = "orderBy";

@@ -31,16 +31,15 @@ public interface HumanManagementService {
 
   List<GradeDto> getListGradeByPosition(Long id);
 
-  void exportEmployeeToCsv(Writer writer, QueryParam queryParam, List<String> list);
+  void exportEmployeeToCsv(Writer writer, List<String> list);
 
   void importCsvToEmployee(InputStream inputStream);
 
   //  List<String> getListManagerByName(String name);
 
-//  List<EmployeeNameAndID> getListEmployeeByManagement(String employeeId);
+  //  List<EmployeeNameAndID> getListEmployeeByManagement(String employeeId);
 
-  void exportEmployeeToExcel(
-      HttpServletResponse response, QueryParam queryParam, List<String> list);
+  void exportEmployeeToExcel(HttpServletResponse response, List<String> list);
 
   void importExcelToEmployee(Workbook workBook);
 

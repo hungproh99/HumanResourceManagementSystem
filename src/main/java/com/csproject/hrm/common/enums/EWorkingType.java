@@ -26,4 +26,13 @@ public enum EWorkingType {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, WORKING_TYPE_INVALID);
   }
+
+  public static long getValue(String workingType) {
+    for (EWorkingType eWorkingType : EWorkingType.values()) {
+      if (eWorkingType.name().equalsIgnoreCase(workingType)) {
+        return eWorkingType.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, WORKING_TYPE_INVALID);
+  }
 }
