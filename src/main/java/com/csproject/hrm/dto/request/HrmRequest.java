@@ -20,7 +20,10 @@ import static com.csproject.hrm.common.constant.Constants.*;
 @SuperBuilder
 public class HrmRequest {
   @NotBlank(message = "fullName must not be blank!")
-  @Pattern(regexp = ALPHANUMERIC_VALIDATION, message = "fullName must only alphanumeric!")
+  @Pattern(
+      regexp = ALPHANUMERIC_VALIDATION,
+      flags = Pattern.Flag.UNICODE_CASE,
+      message = "fullName must only alphanumeric!")
   private String fullName;
 
   @Positive(message = "role must be a positive number!")
@@ -31,7 +34,10 @@ public class HrmRequest {
   private String phone;
 
   @NotBlank(message = "gender must not be blank!")
-  @Pattern(regexp = ALPHANUMERIC_VALIDATION, message = "gender must only alphanumeric!")
+  @Pattern(
+      regexp = ALPHANUMERIC_VALIDATION,
+      flags = Pattern.Flag.UNICODE_CASE,
+      message = "gender must only alphanumeric!")
   private String gender;
 
   @Past(message = "birthDate must less than today!")

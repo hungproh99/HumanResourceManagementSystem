@@ -29,4 +29,13 @@ public enum EGradeType {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, GRADE_TYPE_INVALID);
   }
+
+  public static long getValue(String grade) {
+    for (EGradeType eGradeType : EGradeType.values()) {
+      if (eGradeType.name().equalsIgnoreCase(grade)) {
+        return eGradeType.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, GRADE_TYPE_INVALID);
+  }
 }

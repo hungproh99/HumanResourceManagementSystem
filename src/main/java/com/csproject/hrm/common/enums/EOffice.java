@@ -26,4 +26,13 @@ public enum EOffice {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, OFFICE_INVALID);
   }
+
+  public static long getValue(String office) {
+    for (EOffice eOffice : EOffice.values()) {
+      if (eOffice.name().equalsIgnoreCase(office)) {
+        return eOffice.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, OFFICE_INVALID);
+  }
 }

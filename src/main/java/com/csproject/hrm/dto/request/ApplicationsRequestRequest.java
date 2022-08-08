@@ -29,7 +29,10 @@ public class ApplicationsRequestRequest {
   private Long requestStatusId;
 
   @NotBlank(message = "fullName must not be blank!")
-  @Pattern(regexp = ALPHANUMERIC_VALIDATION, message = "fullName must only alphanumeric!")
+  @Pattern(
+      regexp = ALPHANUMERIC_VALIDATION,
+      flags = Pattern.Flag.UNICODE_CASE,
+      message = "fullName must only alphanumeric!")
   private String fullName;
 
   private String description;

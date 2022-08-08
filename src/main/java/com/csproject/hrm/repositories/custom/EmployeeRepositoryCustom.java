@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public interface EmployeeRepositoryCustom {
-  List<HrmResponse> findAllEmployee(QueryParam queryParam);
+  List<HrmResponse> findAllEmployee(QueryParam queryParam, String employeeId);
 
   void insertEmployee(HrmPojo hrmPojo);
 

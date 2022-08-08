@@ -25,4 +25,13 @@ public enum EJob {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, JOB_INVALID);
   }
+
+  public static long getValue(String position) {
+    for (EJob eJob : EJob.values()) {
+      if (eJob.name().equalsIgnoreCase(position)) {
+        return eJob.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, JOB_INVALID);
+  }
 }

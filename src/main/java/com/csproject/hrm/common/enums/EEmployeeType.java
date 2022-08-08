@@ -26,4 +26,13 @@ public enum EEmployeeType {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, EMPLOYEE_TYPE_INVALID);
   }
+
+  public static long getValue(String employeeType) {
+    for (EEmployeeType eEmployeeType : EEmployeeType.values()) {
+      if (eEmployeeType.name().equalsIgnoreCase(employeeType)) {
+        return eEmployeeType.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, EMPLOYEE_TYPE_INVALID);
+  }
 }

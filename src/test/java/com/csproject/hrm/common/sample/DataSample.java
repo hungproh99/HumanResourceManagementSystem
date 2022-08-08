@@ -1,13 +1,17 @@
 package com.csproject.hrm.common.sample;
 
 import com.csproject.hrm.common.utils.DateUtils;
-import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -186,4 +190,84 @@ public class DataSample {
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
           LocalDate.parse("2000-02-13"));
+
+  public static final List<WorkingTypeDto> LIST_WORKING_TYPE =
+      Arrays.asList(
+          new WorkingTypeDto(1L, "FULL_TIME", ""), new WorkingTypeDto(2L, "PART_TIME", ""));
+
+  public static final List<EmployeeTypeDto> LIST_EMPLOYEE_TYPE =
+      Arrays.asList(
+          new EmployeeTypeDto(1L, "TRAINEE", ""), new EmployeeTypeDto(2L, "OFFICIAL_EMPLOYEE", ""));
+
+  public static final List<AreaDto> LIST_AREA_DTO =
+      Arrays.asList(new AreaDto(1L, "BACK_OFFICE", ""), new AreaDto(2L, "SALES", ""));
+
+  public static final List<JobDto> LIST_JOB_DTO =
+      Arrays.asList(new JobDto(1L, "IT", ""), new JobDto(2L, "MARKETING", ""));
+
+  public static final List<GradeDto> LIST_GRADE_DTO =
+      Arrays.asList(new GradeDto(1L, "DEVELOP_1", ""), new GradeDto(2L, "DEVELOP_2", ""));
+
+  public static final List<OfficeDto> LIST_OFFICE_DTO =
+      Arrays.asList(new OfficeDto(1L, "HN_OFFICE", ""), new OfficeDto(2L, "DN_OFFICE", ""));
+
+  public static final List<RoleDto> LIST_ROLE_DTO =
+      Arrays.asList(new RoleDto(1L, "ROLE_USER"), new RoleDto(2L, "ROLE_ADMIN"));
+
+  public static final List<String> LIST_EMPLOYEE_ID = Arrays.asList("huynq100", "lienpt1");
+
+  public static final List<EmployeeNameAndID> NAME_AND_ID_LIST =
+      Arrays.asList(
+          new EmployeeNameAndID("huynq100", "Nguyen Quang Huy"),
+          new EmployeeNameAndID("lienpt1", "Pham Thi Lien"));
+
+  public static final ListTimekeepingStatusResponse LIST_TIMEKEEPING_STATUS_RESPONSE =
+      new ListTimekeepingStatusResponse(1L, "WORK_LATE");
+
+  public static final TimekeepingResponse TIMEKEEPING_RESPONSE =
+      new TimekeepingResponse(
+          1L,
+          Date.valueOf(LocalDate.now()),
+          Arrays.asList(LIST_TIMEKEEPING_STATUS_RESPONSE),
+          Time.valueOf(LocalTime.now()),
+          Time.valueOf(LocalTime.now()));
+
+  public static final TimekeepingResponsesList TIMEKEEPING_RESPONSES_LIST =
+      new TimekeepingResponsesList(
+          Arrays.asList(
+              new TimekeepingResponses(
+                  "huynq100",
+                  "Nguyen Quang Huy",
+                  "IT",
+                  "DEVELOP_1",
+                  Arrays.asList(TIMEKEEPING_RESPONSE))),
+          1);
+
+  public static final ApplicationsRequestResponse APPLICATIONS_REQUEST_RESPONSE =
+      new ApplicationsRequestResponse(
+          1L,
+          "huynq100",
+          "Nguyen Quang Huy",
+          LocalDateTime.now(),
+          "LEAVE_SOON",
+          "WORKING_TIME",
+          "Request",
+          "APPROVED",
+          LocalDateTime.now(),
+          LocalDateTime.now(),
+          "lienpt1",
+          Arrays.asList("hungnq", "lienpt2"),
+          "true",
+          "true",
+          "Request",
+          "No comment");
+
+  public static final ListApplicationsRequestResponse LIST_APPLICATIONS_REQUEST_RESPONSE =
+      new ListApplicationsRequestResponse(Arrays.asList(APPLICATIONS_REQUEST_RESPONSE), 1);
+
+  public static final UpdateApplicationRequestRequest UPDATE_APPLICATION_REQUEST_REQUEST =
+      new UpdateApplicationRequestRequest(1L, "APPROVED", "huynq100");
+
+  public static final RejectApplicationRequestRequest REJECT_APPLICATION_REQUEST_REQUEST =
+      new RejectApplicationRequestRequest(1L, "No comment");
 }

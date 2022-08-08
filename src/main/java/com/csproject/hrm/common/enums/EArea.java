@@ -28,4 +28,13 @@ public enum EArea {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, AREA_INVALID);
   }
+
+  public static long getValue(String area) {
+    for (EArea eArea : EArea.values()) {
+      if (eArea.name().equalsIgnoreCase(area)) {
+        return eArea.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, AREA_INVALID);
+  }
 }
