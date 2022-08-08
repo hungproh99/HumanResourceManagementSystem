@@ -299,12 +299,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
   private WorkingPlaceDto getWorkingPlaceByContractID(Long contractID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    System.out.println(
-        dslContext
-            .select()
-            .from(WORKING_PLACE)
-            .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(contractID))
-            .and(WORKING_PLACE.WORKING_PLACE_STATUS.eq(true)));
     return dslContext
         .select()
         .from(WORKING_PLACE)
@@ -572,7 +566,9 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
             .leftJoin(WORKING_TYPE)
             .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeID))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
 
     return query.fetchOneInto(EmployeeDetailResponse.class);
   }
@@ -620,10 +616,15 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
             .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
             .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
+
+    System.out.println(query);
+
     WorkingInfoResponse workingInfoResponse =
         Objects.requireNonNullElse(
             query.fetchOneInto(WorkingInfoResponse.class), new WorkingInfoResponse());
-    workingInfoResponse.setManager_name(getManagerByEmployeeID(employeeID).split("-")[0].trim());
+    workingInfoResponse.setManager_name(
+        Objects.requireNonNullElse(
+            getManagerByEmployeeID(employeeID).split("-")[0].trim(), "admin"));
     return workingInfoResponse;
   }
 
@@ -713,7 +714,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     List<Query> queries = new ArrayList<>();
     final DSLContext dslContext = DSL.using(connection.getConnection());
     WorkingPlaceDto workingPlace =
-        getWorkingPlaceByContractID(workingInfoRequest.getWorkingPlaceId());
+        getWorkingPlaceByContractID(workingInfoRequest.getWorkingContractId());
     dslContext.transaction(
         configuration -> {
           queries.add(

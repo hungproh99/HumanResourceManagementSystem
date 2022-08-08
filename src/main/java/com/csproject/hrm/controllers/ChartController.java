@@ -16,7 +16,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 import static com.csproject.hrm.common.constant.Constants.AUTHORIZATION;
 import static com.csproject.hrm.common.constant.Constants.BEARER;
@@ -157,19 +158,20 @@ public class ChartController {
   public ResponseEntity<?> getAllEmployeeByManagerID(HttpServletRequest request) {
     String headerAuth = request.getHeader(AUTHORIZATION);
     String employeeId = "";
-    LinkedHashMap userDetails = new LinkedHashMap<>();
+    //    LinkedHashMap userDetails = new LinkedHashMap<>();
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
       employeeId = jwtUtils.getIdFromJwtToken(jwt);
-      userDetails = jwtUtils.getClaimFromJwtToken(jwt);
+      //      userDetails = jwtUtils.getClaimFromJwtToken(jwt);
     }
-    EmployeeNameAndID employee =
-        new EmployeeNameAndID((String) userDetails.get("id"), (String) userDetails.get("fullName"));
+    //    EmployeeNameAndID employee =
+    //        new EmployeeNameAndID((String) userDetails.get("id"), (String)
+    // userDetails.get("fullName"));
 
     List<EmployeeNameAndID> employeeList =
         employeeDetailService.getAllEmployeeByManagerID(employeeId);
 
-    employeeList.add(0, employee);
+    //    employeeList.add(0, employee);
     return ResponseEntity.ok(employeeList);
   }
 
