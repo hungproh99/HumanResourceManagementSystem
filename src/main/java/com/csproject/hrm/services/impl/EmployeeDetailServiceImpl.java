@@ -3,13 +3,15 @@ package com.csproject.hrm.services.impl;
 import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.CustomDataNotFoundException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
+import com.csproject.hrm.exception.*;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
 import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,6 +155,13 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
         || employeeDetailRequest.getJob_id() == null
         || employeeDetailRequest.getGrade_id() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
+    }
+    long yearToCurrent =
+        ChronoUnit.YEARS.between(
+            LocalDate.now(ZoneId.of("UTC+07")), employeeDetailRequest.getBirth_date());
+    if (Math.abs(yearToCurrent) < 18L) {
+      throw new CustomErrorException(
+          "Birthdate must be before " + LocalDate.now(ZoneId.of("UTC+07")).minusYears(18L));
     }
     employeeDetailRepository.updateEmployeeDetail(employeeDetailRequest);
   }

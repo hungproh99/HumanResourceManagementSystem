@@ -919,9 +919,9 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequest.setApprover(applicationsRequest.getApprover().split("-")[1].trim());
 
     applicationsRequest.setRequestStatusId(1L);
-    applicationsRequest.setCreateDate(LocalDateTime.now());
-    applicationsRequest.setLatestDate(LocalDateTime.now());
-    applicationsRequest.setDuration(LocalDateTime.now().plusDays(3));
+    applicationsRequest.setCreateDate(LocalDateTime.now(ZoneId.of("UTC+07")));
+    applicationsRequest.setLatestDate(LocalDateTime.now(ZoneId.of("UTC+07")));
+    applicationsRequest.setDuration(LocalDateTime.now(ZoneId.of("UTC+07")).plusDays(3));
     applicationsRequest.setIsBookmark(false);
     applicationsRequest.setIsRemind(false);
 
