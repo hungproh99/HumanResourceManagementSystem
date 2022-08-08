@@ -30,6 +30,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +79,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
     } else if (!employeeTypeRepository.existsById(hrmRequest.getEmployeeType())) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
+    } else if (hrmRequest.getBirthDate().plus(18, ChronoUnit.YEARS).isBefore(LocalDate.now())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "birthDate must be enough 18 age");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
     String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName(), 0);

@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.util.NestedServletException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import static com.csproject.hrm.common.sample.DataSample.*;
 import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
 import static java.lang.reflect.Modifier.PROTECTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -94,6 +96,110 @@ public class LoginControllerTest {
   }
 
   @Test
+  void test_login_Wrong_Email() throws Exception {
+    LoginRequest loginRequest = LOGIN_REQUEST_WRONG_EMAIL;
+    List<GrantedAuthority> authorities =
+        new ArrayList<>(Arrays.asList(new SimpleGrantedAuthority(ROLE_MANAGER.name())));
+    UserDetailsImpl userDetails =
+        new UserDetailsImpl(
+            "huynq100", "huynq100@fpt.edu.vn", "Nguyen Quang Huy", "HUy123456789!", authorities);
+    Object credentials = PROTECTED;
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(userDetails, credentials, authorities);
+    String jwt =
+        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NTk3MTkyMjMsImV4cCI6MTY1OTgwNTYyM30.vPn7J72tTFwpJ0cKtSbLYpuwM41ZdIo5z6pjMpkktU7BN7EMHpCarEhRs-rjC4XJUzq9sRW6lTH_OxQQF5M0Vg";
+    Mockito.when(loginService.getAuthentication(loginRequest)).thenReturn(authentication);
+    Mockito.when(jwtUtils.generateJwtToken(authentication)).thenReturn(jwt);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/login")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(loginRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void test_login_Null_Email() throws Exception {
+    LoginRequest loginRequest = LOGIN_REQUEST_NULL_EMAIL;
+    List<GrantedAuthority> authorities =
+        new ArrayList<>(Arrays.asList(new SimpleGrantedAuthority(ROLE_MANAGER.name())));
+    UserDetailsImpl userDetails =
+        new UserDetailsImpl(
+            "huynq100", "huynq100@fpt.edu.vn", "Nguyen Quang Huy", "HUy123456789!", authorities);
+    Object credentials = PROTECTED;
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(userDetails, credentials, authorities);
+    String jwt =
+        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NTk3MTkyMjMsImV4cCI6MTY1OTgwNTYyM30.vPn7J72tTFwpJ0cKtSbLYpuwM41ZdIo5z6pjMpkktU7BN7EMHpCarEhRs-rjC4XJUzq9sRW6lTH_OxQQF5M0Vg";
+    Mockito.when(loginService.getAuthentication(loginRequest)).thenReturn(authentication);
+    Mockito.when(jwtUtils.generateJwtToken(authentication)).thenReturn(jwt);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/login")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(loginRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void test_login_Wrong_Password() throws Exception {
+    LoginRequest loginRequest = LOGIN_REQUEST_WRONG_PASSWORD;
+    List<GrantedAuthority> authorities =
+        new ArrayList<>(Arrays.asList(new SimpleGrantedAuthority(ROLE_MANAGER.name())));
+    UserDetailsImpl userDetails =
+        new UserDetailsImpl(
+            "huynq100", "huynq100@fpt.edu.vn", "Nguyen Quang Huy", "HUy123456789!", authorities);
+    Object credentials = PROTECTED;
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(userDetails, credentials, authorities);
+    String jwt =
+        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NTk3MTkyMjMsImV4cCI6MTY1OTgwNTYyM30.vPn7J72tTFwpJ0cKtSbLYpuwM41ZdIo5z6pjMpkktU7BN7EMHpCarEhRs-rjC4XJUzq9sRW6lTH_OxQQF5M0Vg";
+    Mockito.when(loginService.getAuthentication(loginRequest)).thenReturn(authentication);
+    Mockito.when(jwtUtils.generateJwtToken(authentication)).thenReturn(jwt);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/login")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(loginRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void test_login_Null_Password() throws Exception {
+    LoginRequest loginRequest = LOGIN_REQUEST_NULL_PASSWORD;
+    List<GrantedAuthority> authorities =
+        new ArrayList<>(Arrays.asList(new SimpleGrantedAuthority(ROLE_MANAGER.name())));
+    UserDetailsImpl userDetails =
+        new UserDetailsImpl(
+            "huynq100", "huynq100@fpt.edu.vn", "Nguyen Quang Huy", "HUy123456789!", authorities);
+    Object credentials = PROTECTED;
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(userDetails, credentials, authorities);
+    String jwt =
+        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NTk3MTkyMjMsImV4cCI6MTY1OTgwNTYyM30.vPn7J72tTFwpJ0cKtSbLYpuwM41ZdIo5z6pjMpkktU7BN7EMHpCarEhRs-rjC4XJUzq9sRW6lTH_OxQQF5M0Vg";
+    Mockito.when(loginService.getAuthentication(loginRequest)).thenReturn(authentication);
+    Mockito.when(jwtUtils.generateJwtToken(authentication)).thenReturn(jwt);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/login")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(loginRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void test_changePassword() throws Exception {
     ChangePasswordRequest changePasswordRequest = CHANGE_PASSWORD_REQUEST;
     Mockito.when(loginService.changePasswordByUsername(changePasswordRequest)).thenReturn(1);
@@ -109,6 +215,81 @@ public class LoginControllerTest {
   }
 
   @Test
+  void test_changePassword_Exception() throws Exception {
+    ChangePasswordRequest changePasswordRequest = CHANGE_PASSWORD_REQUEST;
+    Mockito.when(loginService.changePasswordByUsername(changePasswordRequest)).thenReturn(0);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put(REQUEST_MAPPING + "/change_password")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(changePasswordRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    assertThrows(NestedServletException.class, () -> mockMvc.perform(requestBuilder));
+  }
+
+  @Test
+  void test_changePassword_Wrong_Email() throws Exception {
+    ChangePasswordRequest changePasswordRequest = CHANGE_PASSWORD_REQUEST_WRONG_EMAIL;
+    Mockito.when(loginService.changePasswordByUsername(changePasswordRequest)).thenReturn(1);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put(REQUEST_MAPPING + "/change_password")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(changePasswordRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void test_changePassword_Null_Password() throws Exception {
+    ChangePasswordRequest changePasswordRequest = CHANGE_PASSWORD_REQUEST_NULL_PASSWORD;
+    Mockito.when(loginService.changePasswordByUsername(changePasswordRequest)).thenReturn(1);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put(REQUEST_MAPPING + "/change_password")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(changePasswordRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void test_changePassword_Wrong_Password() throws Exception {
+    ChangePasswordRequest changePasswordRequest = CHANGE_PASSWORD_REQUEST_WRONG_PASSWORD;
+    Mockito.when(loginService.changePasswordByUsername(changePasswordRequest)).thenReturn(1);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put(REQUEST_MAPPING + "/change_password")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(changePasswordRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void test_changePassword_Null_Email() throws Exception {
+    ChangePasswordRequest changePasswordRequest = CHANGE_PASSWORD_REQUEST_NULL_EMAIL;
+    Mockito.when(loginService.changePasswordByUsername(changePasswordRequest)).thenReturn(1);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.put(REQUEST_MAPPING + "/change_password")
+            .accept("*/*")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(changePasswordRequest))
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void test_forgotPassword() throws Exception {
     Mockito.when(loginService.forgotPasswordByUsername("huynq100@fpt.edu.vn")).thenReturn(1);
     RequestBuilder requestBuilder =
@@ -119,5 +300,44 @@ public class LoginControllerTest {
             .characterEncoding(StandardCharsets.UTF_8);
 
     mockMvc.perform(requestBuilder).andExpect(status().isOk());
+  }
+
+  @Test
+  void test_forgotPassword_Exception() throws Exception {
+    Mockito.when(loginService.forgotPasswordByUsername("huynq100@fpt.edu.vn")).thenReturn(0);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/forgot_password")
+            .accept("*/*")
+            .param("email", "huynq100@fpt.edu.vn")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    assertThrows(NestedServletException.class, () -> mockMvc.perform(requestBuilder));
+  }
+
+  @Test
+  void test_forgotPassword_Wrong_Email() throws Exception {
+    Mockito.when(loginService.forgotPasswordByUsername("huynq100")).thenReturn(1);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/forgot_password")
+            .accept("*/*")
+            .param("email", "huynq100@fpt.edu.vn")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    assertThrows(NestedServletException.class, () -> mockMvc.perform(requestBuilder));
+  }
+
+  @Test
+  void test_forgotPassword_Null_Email() throws Exception {
+    Mockito.when(loginService.forgotPasswordByUsername(null)).thenReturn(1);
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.post(REQUEST_MAPPING + "/forgot_password")
+            .accept("*/*")
+            .param("email", "huynq100@fpt.edu.vn")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    assertThrows(NestedServletException.class, () -> mockMvc.perform(requestBuilder));
   }
 }

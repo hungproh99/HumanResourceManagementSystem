@@ -5,6 +5,7 @@ import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -142,9 +143,32 @@ public class DataSample {
   public static final LoginRequest LOGIN_REQUEST =
       new LoginRequest("huynq100@fpt.edu.vn", "HUy123456789!");
 
+  public static final LoginRequest LOGIN_REQUEST_WRONG_EMAIL =
+      new LoginRequest("huynq100", "HUy123456789!");
+
+  public static final LoginRequest LOGIN_REQUEST_NULL_EMAIL =
+      new LoginRequest(null, "HUy123456789!");
+
+  public static final LoginRequest LOGIN_REQUEST_WRONG_PASSWORD =
+      new LoginRequest("huynq100@fpt.edu.vn", "HUy1234");
+
+  public static final LoginRequest LOGIN_REQUEST_NULL_PASSWORD =
+      new LoginRequest("huynq100@fpt.edu.vn", null);
+
   public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST =
       new ChangePasswordRequest(
           "huynq100@fpt.edu.vn", "HUy123456789!", "HUy123456789@", "HUy123456789@");
+
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_NULL_EMAIL =
+      new ChangePasswordRequest(null, "HUy123456789!", "HUy123456789@", "HUy123456789@");
+
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_WRONG_EMAIL =
+      new ChangePasswordRequest("null", "HUy123456789!", "HUy123456789@", "HUy123456789@");
+
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_NULL_PASSWORD =
+      new ChangePasswordRequest("huynq100@fpt.edu.vn", null, "HUy123456789@", "HUy123456789@");
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_WRONG_PASSWORD =
+      new ChangePasswordRequest("huynq100@fpt.edu.vn", "null", "HUy123456789@", "HUy123456789@");
 
   public static final JwtResponse JWT_RESPONSE =
       new JwtResponse(
@@ -270,4 +294,114 @@ public class DataSample {
 
   public static final RejectApplicationRequestRequest REJECT_APPLICATION_REQUEST_REQUEST =
       new RejectApplicationRequestRequest(1L, "No comment");
+
+  public static final SalaryMonthlyResponse SALARY_MONTHLY_RESPONSE =
+      new SalaryMonthlyResponse(
+          1L,
+          "huynq100",
+          "Nguyen Quang Huy",
+          "IT",
+          "lienpt1",
+          0D,
+          0D,
+          0D,
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          LocalDate.now(),
+          LocalDate.now(),
+          "APPROVED",
+          "No comment");
+
+  public static final SalaryMonthlyResponseList SALARY_MONTHLY_RESPONSE_LIST =
+      new SalaryMonthlyResponseList(Arrays.asList(SALARY_MONTHLY_RESPONSE), 1, "true");
+
+  public static final PointResponse POINT_RESPONSE = new PointResponse(0D, 0D, 0D, 0D);
+  public static final OTDetailResponse OT_DETAIL_RESPONSE =
+      new OTDetailResponse(1L, LocalDate.now(), LocalTime.now(), LocalTime.now(), 0D);
+  public static final OTResponse OT_RESPONSE =
+      new OTResponse("IN_WEEK", Arrays.asList(OT_DETAIL_RESPONSE), 0D);
+  public static final OTResponseList OT_RESPONSE_LIST =
+      new OTResponseList(Arrays.asList(OT_RESPONSE), 0D);
+
+  public static final BonusSalaryResponse BONUS_SALARY_RESPONSE =
+      new BonusSalaryResponse(
+          1L, BigDecimal.ZERO, "PROJECT_BONUS", Date.valueOf(LocalDate.now()), "");
+
+  public static final BonusSalaryResponseList BONUS_SALARY_RESPONSE_LIST =
+      new BonusSalaryResponseList(Arrays.asList(BONUS_SALARY_RESPONSE), BigDecimal.ZERO);
+
+  public static final DeductionSalaryResponse DEDUCTION_SALARY_RESPONSE =
+      new DeductionSalaryResponse(
+          1L, BigDecimal.ZERO, "LATE_WORK", Date.valueOf(LocalDate.now()), "");
+
+  public static final DeductionSalaryResponseList DEDUCTION_SALARY_RESPONSE_LIST =
+      new DeductionSalaryResponseList(Arrays.asList(DEDUCTION_SALARY_RESPONSE), BigDecimal.ZERO);
+  public static final AdvanceSalaryResponse ADVANCE_SALARY_RESPONSE =
+      new AdvanceSalaryResponse(1L, BigDecimal.ZERO, Date.valueOf(LocalDate.now()), "");
+
+  public static final AdvanceSalaryResponseList ADVANCE_SALARY_RESPONSE_LIST =
+      new AdvanceSalaryResponseList(Arrays.asList(ADVANCE_SALARY_RESPONSE), BigDecimal.ZERO);
+  public static final EmployeeAllowanceResponse EMPLOYEE_ALLOWANCE_RESPONSE =
+      new EmployeeAllowanceResponse(1L, BigDecimal.ZERO, "ALLOWANCE", "TRANSPORTATION_ALLOWANCE");
+
+  public static final EmployeeAllowanceResponseList EMPLOYEE_ALLOWANCE_RESPONSE_LIST =
+      new EmployeeAllowanceResponseList(
+          Arrays.asList(EMPLOYEE_ALLOWANCE_RESPONSE), BigDecimal.ZERO);
+  public static final EmployeeTaxResponse EMPLOYEE_TAX_RESPONSE =
+      new EmployeeTaxResponse(1L, BigDecimal.ZERO, "TAX", "VNP", 0D);
+
+  public static final EmployeeTaxResponseList EMPLOYEE_TAX_RESPONSE_LIST =
+      new EmployeeTaxResponseList(Arrays.asList(EMPLOYEE_TAX_RESPONSE), BigDecimal.ZERO);
+  public static final EmployeeInsuranceResponse EMPLOYEE_INSURANCE_RESPONSE =
+      new EmployeeInsuranceResponse(1L, BigDecimal.ZERO, "INSURANCE", "SI", 0D);
+
+  public static final EmployeeInsuranceResponseList EMPLOYEE_INSURANCE_RESPONSE_LIST =
+      new EmployeeInsuranceResponseList(
+          Arrays.asList(EMPLOYEE_INSURANCE_RESPONSE), BigDecimal.ZERO);
+
+  public static final SalaryMonthlyDetailResponse SALARY_MONTHLY_DETAIL_RESPONSE =
+      new SalaryMonthlyDetailResponse(
+          1L,
+          "huynq100",
+          "Nguyen Quang Huy",
+          "IT",
+          "lienpt1",
+          LocalDate.now(),
+          LocalDate.now(),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO,
+          0D,
+          "APPROVED",
+          POINT_RESPONSE,
+          OT_RESPONSE_LIST,
+          BONUS_SALARY_RESPONSE_LIST,
+          DEDUCTION_SALARY_RESPONSE_LIST,
+          ADVANCE_SALARY_RESPONSE_LIST,
+          EMPLOYEE_ALLOWANCE_RESPONSE_LIST,
+          EMPLOYEE_TAX_RESPONSE_LIST,
+          EMPLOYEE_INSURANCE_RESPONSE_LIST);
+
+  public static final DeductionSalaryRequest DEDUCTION_SALARY_REQUEST =
+      new DeductionSalaryRequest(1L, BigDecimal.ONE, "Description", LocalDate.now(), 1L);
+
+  public static final BonusSalaryRequest BONUS_SALARY_REQUEST =
+      new BonusSalaryRequest(1L, BigDecimal.ONE, "Description", LocalDate.now(), 1L);
+  public static final AdvanceSalaryRequest ADVANCE_SALARY_REQUEST =
+      new AdvanceSalaryRequest(1L, BigDecimal.ONE, "Description", LocalDate.now());
+
+  public static final RejectSalaryMonthlyRequest REJECT_SALARY_MONTHLY_REQUEST =
+      new RejectSalaryMonthlyRequest(1L, "No comment");
+  public static final UpdateSalaryMonthlyRequest UPDATE_SALARY_MONTHLY_REQUEST =
+      new UpdateSalaryMonthlyRequest(1L, "APPROVE", "huynq100");
+
+  public static final List<DeductionTypeDto> DEDUCTION_TYPE_DTO_LIST =
+      Arrays.asList(new DeductionTypeDto(1L, "WORK_LATE"));
+
+  public static final List<BonusTypeDto> BONUS_TYPE_DTO_LIST =
+      Arrays.asList(new BonusTypeDto(1L, "PROJECT_BONUS"));
 }

@@ -85,7 +85,7 @@ public class ApplicationsRequestController {
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @PostMapping(URI_UPDATE_CHECK_APPLICATION_QUEST)
+  @PutMapping(URI_UPDATE_CHECK_APPLICATION_QUEST)
   public ResponseEntity<?> updateCheckedApplicationRequest(
       HttpServletRequest request,
       @Valid @RequestBody UpdateApplicationRequestRequest updateApplicationRequestRequest) {
@@ -129,14 +129,14 @@ public class ApplicationsRequestController {
   //  }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  @PostMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
+  @PutMapping(URI_UPDATE_APPROVE_APPLICATION_REQUEST)
   public ResponseEntity<?> updateApproveApplicationRequest(@RequestParam Long requestId) {
     applicationsRequestService.updateApproveApplicationRequest(requestId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  @PostMapping(URI_UPDATE_REJECT_APPLICATION_REQUEST)
+  @PutMapping(URI_UPDATE_REJECT_APPLICATION_REQUEST)
   public ResponseEntity<?> updateRejectApplicationRequest(
       @Valid @RequestBody RejectApplicationRequestRequest rejectApplicationRequestRequest) {
     applicationsRequestService.updateRejectApplicationRequest(rejectApplicationRequestRequest);
