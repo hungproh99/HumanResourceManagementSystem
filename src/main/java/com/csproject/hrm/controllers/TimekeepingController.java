@@ -115,17 +115,17 @@ public class TimekeepingController {
     return ResponseEntity.ok(timekeeping.orElse(null));
   }
 
-  @GetMapping(URI_GET_CHECKIN_CHECKOUT)
-  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
-  public ResponseEntity<?> checkInByEmployee(HttpServletRequest request) {
-    String headerAuth = request.getHeader(AUTHORIZATION);
-    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
-      String jwt = headerAuth.substring(7);
-      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
-      LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
-      timekeepingService.insertTimekeepingCheckInCheckOut(
-          employeeId, localDateTime.toLocalDate(), localDateTime.toLocalTime());
-    }
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
-  }
+//  @GetMapping(URI_GET_CHECKIN_CHECKOUT)
+//  @PreAuthorize(value = "hasRole('MANAGER') or hasRole('USER')")
+//  public ResponseEntity<?> checkInByEmployee(HttpServletRequest request) {
+//    String headerAuth = request.getHeader(AUTHORIZATION);
+//    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
+//      String jwt = headerAuth.substring(7);
+//      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+//      LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+//      timekeepingService.insertTimekeepingCheckInCheckOut(
+//          employeeId, localDateTime.toLocalDate(), localDateTime.toLocalTime());
+//    }
+//    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+//  }
 }

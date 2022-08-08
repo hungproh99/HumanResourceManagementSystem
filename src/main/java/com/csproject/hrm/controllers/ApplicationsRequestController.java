@@ -1,12 +1,14 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.repositories.TimekeepingRepository;
 import com.csproject.hrm.services.ApplicationsRequestService;
 import com.csproject.hrm.services.ChartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,6 @@ import static com.csproject.hrm.common.uri.Uri.*;
 @Validated
 public class ApplicationsRequestController {
   @Autowired ApplicationsRequestService applicationsRequestService;
-  @Autowired TimekeepingRepository timekeepingRepository;
   @Autowired JwtUtils jwtUtils;
   @Autowired ChartService chartService;
 
@@ -94,8 +95,9 @@ public class ApplicationsRequestController {
       String employeeId = jwtUtils.getIdFromJwtToken(jwt);
       applicationsRequestService.updateCheckedApplicationRequest(
           updateApplicationRequestRequest, employeeId);
+      return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
     }
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, UNAUTHORIZED_ERROR);
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")

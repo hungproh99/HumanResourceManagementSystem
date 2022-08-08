@@ -13,7 +13,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
@@ -51,20 +50,21 @@ public class HrmController {
           Map<String, @NotBlank(message = "Value must not be blank!") String> allRequestParams) {
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams);
-    if (request.isUserInRole("MANAGER")) {
+    HrmResponseList hrmResponseList;
       String headerAuth = request.getHeader(AUTHORIZATION);
       if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
         String jwt = headerAuth.substring(7);
         String employeeId = jwtUtils.getIdFromJwtToken(jwt);
-        HrmResponseList hrmResponseList =
+      if (request.isUserInRole("MANAGER")) {
+        hrmResponseList =
             humanManagementService.getListHumanResourceOfManager(queryParam, employeeId);
         return ResponseEntity.ok(hrmResponseList);
-      } else {
-        throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+      } else if (request.isUserInRole("ADMIN")) {
+        hrmResponseList = humanManagementService.getListHumanResource(queryParam, employeeId);
+        return ResponseEntity.ok(hrmResponseList);
       }
     }
-    HrmResponseList hrmResponseList = humanManagementService.getListHumanResource(queryParam);
-    return ResponseEntity.ok(hrmResponseList);
+    throw new CustomErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized");
   }
 
   @PostMapping(URI_INSERT_EMPLOYEE)

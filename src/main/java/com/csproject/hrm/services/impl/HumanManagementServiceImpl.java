@@ -51,8 +51,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Autowired EmployeeTypeRepository employeeTypeRepository;
 
   @Override
-  public HrmResponseList getListHumanResource(QueryParam queryParam) {
-    List<HrmResponse> hrmResponses = employeeRepository.findAllEmployee(queryParam);
+  public HrmResponseList getListHumanResource(QueryParam queryParam, String employeeId) {
+    List<HrmResponse> hrmResponses = employeeRepository.findAllEmployee(queryParam, employeeId);
     int total = employeeRepository.countAllEmployeeByCondition(queryParam);
     return new HrmResponseList(hrmResponses, total);
   }

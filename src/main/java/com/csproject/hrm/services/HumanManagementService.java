@@ -13,7 +13,7 @@ import java.io.Writer;
 import java.util.List;
 
 public interface HumanManagementService {
-  HrmResponseList getListHumanResource(QueryParam queryParam);
+  HrmResponseList getListHumanResource(QueryParam queryParam, String employeeId);
 
   void insertEmployee(HrmRequest hrmRequest);
 

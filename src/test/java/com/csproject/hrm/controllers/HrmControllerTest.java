@@ -72,14 +72,23 @@ public class HrmControllerTest {
       roles = {"ADMIN"})
   void test_getAllEmployee_Admin() throws Exception {
     MultiValueMap<String, String> allRequestParams = new LinkedMultiValueMap<>();
+    String jwt =
+        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGwsImFjY291bnROb25Mb2NrZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWV9LCJpYXQiOjE2NTk3MjkwMzEsImV4cCI6MTY1OTgxNTQzMX0.7rkpFrZckf8K6pTSayMMDkNqht-9FOQRutILkVl9AkRVhHSZCTtIiDK5eWlXq2s3Jn1vYX5zihoyomC31y7nyQ";
+    String employeeId = "huynq100";
     HttpServletRequest request = mock(HttpServletRequest.class);
     Context context = new Context();
     QueryParam queryParam = context.queryParam(allRequestParams.toSingleValueMap());
-    when(humanManagementService.getListHumanResource(queryParam)).thenReturn(HRM_RESPONSE_LIST);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(jwtUtils.getIdFromJwtToken(jwt)).thenReturn(employeeId);
+    when(humanManagementService.getListHumanResource(queryParam, employeeId))
+        .thenReturn(HRM_RESPONSE_LIST);
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(REQUEST_MAPPING + "/get_all_employee")
             .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGwsImFjY291bnROb25Mb2NrZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWV9LCJpYXQiOjE2NTk3MjkwMzEsImV4cCI6MTY1OTgxNTQzMX0.7rkpFrZckf8K6pTSayMMDkNqht-9FOQRutILkVl9AkRVhHSZCTtIiDK5eWlXq2s3Jn1vYX5zihoyomC31y7nyQ")
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding(StandardCharsets.UTF_8);
 

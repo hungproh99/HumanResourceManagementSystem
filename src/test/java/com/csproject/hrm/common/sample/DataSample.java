@@ -6,7 +6,10 @@ import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -217,4 +220,54 @@ public class DataSample {
       Arrays.asList(
           new EmployeeNameAndID("huynq100", "Nguyen Quang Huy"),
           new EmployeeNameAndID("lienpt1", "Pham Thi Lien"));
+
+  public static final ListTimekeepingStatusResponse LIST_TIMEKEEPING_STATUS_RESPONSE =
+      new ListTimekeepingStatusResponse(1L, "WORK_LATE");
+
+  public static final TimekeepingResponse TIMEKEEPING_RESPONSE =
+      new TimekeepingResponse(
+          1L,
+          Date.valueOf(LocalDate.now()),
+          Arrays.asList(LIST_TIMEKEEPING_STATUS_RESPONSE),
+          Time.valueOf(LocalTime.now()),
+          Time.valueOf(LocalTime.now()));
+
+  public static final TimekeepingResponsesList TIMEKEEPING_RESPONSES_LIST =
+      new TimekeepingResponsesList(
+          Arrays.asList(
+              new TimekeepingResponses(
+                  "huynq100",
+                  "Nguyen Quang Huy",
+                  "IT",
+                  "DEVELOP_1",
+                  Arrays.asList(TIMEKEEPING_RESPONSE))),
+          1);
+
+  public static final ApplicationsRequestResponse APPLICATIONS_REQUEST_RESPONSE =
+      new ApplicationsRequestResponse(
+          1L,
+          "huynq100",
+          "Nguyen Quang Huy",
+          LocalDateTime.now(),
+          "LEAVE_SOON",
+          "WORKING_TIME",
+          "Request",
+          "APPROVED",
+          LocalDateTime.now(),
+          LocalDateTime.now(),
+          "lienpt1",
+          Arrays.asList("hungnq", "lienpt2"),
+          "true",
+          "true",
+          "Request",
+          "No comment");
+
+  public static final ListApplicationsRequestResponse LIST_APPLICATIONS_REQUEST_RESPONSE =
+      new ListApplicationsRequestResponse(Arrays.asList(APPLICATIONS_REQUEST_RESPONSE), 1);
+
+  public static final UpdateApplicationRequestRequest UPDATE_APPLICATION_REQUEST_REQUEST =
+      new UpdateApplicationRequestRequest(1L, "APPROVED", "huynq100");
+
+  public static final RejectApplicationRequestRequest REJECT_APPLICATION_REQUEST_REQUEST =
+      new RejectApplicationRequestRequest(1L, "No comment");
 }

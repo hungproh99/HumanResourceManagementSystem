@@ -19,7 +19,10 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,8 +48,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   @Autowired private final DBConnection connection;
 
   @Override
-  public List<HrmResponse> findAllEmployee(QueryParam queryParam) {
+  public List<HrmResponse> findAllEmployee(QueryParam queryParam, String employeeId) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
+    conditions.add(EMPLOYEE.EMPLOYEE_ID.ne(employeeId));
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
     List<HrmResponse> hrmResponses =
