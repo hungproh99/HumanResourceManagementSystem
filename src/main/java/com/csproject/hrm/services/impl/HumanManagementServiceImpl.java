@@ -79,7 +79,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
     } else if (!employeeTypeRepository.existsById(hrmRequest.getEmployeeType())) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
-    } else if (hrmRequest.getBirthDate().plus(18, ChronoUnit.YEARS).isBefore(LocalDate.now())) {
+    } else if (hrmRequest.getBirthDate().isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "birthDate must be enough 18 age");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
