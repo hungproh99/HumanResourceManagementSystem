@@ -344,16 +344,17 @@ public class DataSample {
           Time.valueOf(LocalTime.now()),
           Time.valueOf(LocalTime.now()));
 
+  public static final List<TimekeepingResponses> TIMEKEEPING_RESPONSES =
+      Arrays.asList(
+          new TimekeepingResponses(
+              "huynq100",
+              "Nguyen Quang Huy",
+              "IT",
+              "DEVELOP_1",
+              Arrays.asList(TIMEKEEPING_RESPONSE)));
+
   public static final TimekeepingResponsesList TIMEKEEPING_RESPONSES_LIST =
-      new TimekeepingResponsesList(
-          Arrays.asList(
-              new TimekeepingResponses(
-                  "huynq100",
-                  "Nguyen Quang Huy",
-                  "IT",
-                  "DEVELOP_1",
-                  Arrays.asList(TIMEKEEPING_RESPONSE))),
-          1);
+      new TimekeepingResponsesList(TIMEKEEPING_RESPONSES, 1);
 
   public static final ApplicationsRequestResponse APPLICATIONS_REQUEST_RESPONSE =
       new ApplicationsRequestResponse(
@@ -492,4 +493,46 @@ public class DataSample {
 
   public static final List<BonusTypeDto> BONUS_TYPE_DTO_LIST =
       Arrays.asList(new BonusTypeDto(1L, "PROJECT_BONUS"));
+
+  public static final List<EmployeeNameAndID> EMPLOYEE_NAME_AND_ID_LIST =
+      Arrays.asList(new EmployeeNameAndID("huynq100", "Nguyen Quang Huy"));
+
+  public static final RangePolicy RANGE_POLICY = new RangePolicy("1", "2", "3");
+  public static final RangePolicy RANGE_POLICY_MAX_POINT = new RangePolicy("1", "MAX", "3");
+  public static final WorkingTimeDataDto WORKING_TIME_DATA_DTO =
+      new WorkingTimeDataDto(LocalTime.now(), LocalTime.now(), Arrays.asList(RANGE_POLICY));
+
+  public static final WorkingTimeDataDto WORKING_TIME_DATA_DTO_MAX_POINT =
+      new WorkingTimeDataDto(
+          LocalTime.now(), LocalTime.now(), Arrays.asList(RANGE_POLICY_MAX_POINT));
+
+  public static final OvertimePoint OVERTIME_POINT = new OvertimePoint("IN_WEEK", 1D);
+  public static final OvertimeDataDto OVERTIME_DATA_DTO =
+      new OvertimeDataDto(1, 2, Arrays.asList(OVERTIME_POINT));
+
+  public static final SalaryContractDto SALARY_CONTRACT_DTO_FULL_TIME =
+      new SalaryContractDto(1L, BigDecimal.ONE, BigDecimal.ONE, "FULL_TIME");
+
+  public static final SalaryContractDto SALARY_CONTRACT_DTO_PART_TIME =
+      new SalaryContractDto(1L, BigDecimal.ONE, BigDecimal.ONE, "PART_TIME");
+
+  public static final OvertimeDto OVERTIME_DTO =
+      new OvertimeDto(LocalTime.now(), LocalTime.now(), "IN_WEEK");
+
+  public static final CheckInCheckOutResponse CHECK_IN_CHECK_OUT_RESPONSE =
+      new CheckInCheckOutResponse(1L, 1L, LocalTime.now(), LocalTime.now());
+
+  public static final TimekeepingDetailResponse TIMEKEEPING_DETAIL_RESPONSE =
+      new TimekeepingDetailResponse(
+          "huynq100",
+          LocalDate.now(),
+          1L,
+          Arrays.asList(LIST_TIMEKEEPING_STATUS_RESPONSE),
+          "10",
+          LocalTime.now(),
+          LocalTime.now(),
+          Arrays.asList(CHECK_IN_CHECK_OUT_RESPONSE));
+
+  public static final CheckInCheckOutDto CHECK_IN_CHECK_OUT_DTO =
+      new CheckInCheckOutDto(1L, LocalTime.now(), LocalTime.now());
 }
