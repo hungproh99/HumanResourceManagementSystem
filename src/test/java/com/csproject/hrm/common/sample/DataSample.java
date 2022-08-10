@@ -36,6 +36,28 @@ public class DataSample {
           "Full Time",
           1L,
           1L);
+  public static final EmployeeDetailResponse DETAIL_RESPONSE_SERVICE =
+      new EmployeeDetailResponse(
+          "Nguyen Quang Huy",
+          "huynq100",
+          "huynq100@fpt.edu.vn",
+          "3 year 7 month 26 day ",
+          DateUtils.convert("2019-01-02"),
+          DateUtils.convert("2025-01-01"),
+          "Active",
+          "url",
+          "0912345678",
+          "MARKETING_2",
+          DateUtils.convert("2000-12-08"),
+          "Male",
+          "Alone",
+          "HN_OFFICE",
+          "MARKETING",
+          "BACK_OFFICE",
+          "https://haycafe.vn/wp-content/uploads/2022/03/Avatar-hai-doc-600x600.jpg",
+          "FULL_TIME",
+          1L,
+          1L);
   public static final TaxAndInsuranceResponse TAX_AND_INSURANCE_RESPONSE =
       new TaxAndInsuranceResponse(
           null,

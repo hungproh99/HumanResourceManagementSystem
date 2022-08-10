@@ -1,9 +1,12 @@
 package com.csproject.hrm.common.sample;
 
+import com.csproject.hrm.common.utils.DateUtils;
 import com.csproject.hrm.dto.chart.*;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
 
 public class ChartDataSample {
   public static final GeneralDataCharts GENERAL_DATA_CHARTS =
@@ -113,4 +116,171 @@ public class ChartDataSample {
                       "Nguyen Quang Huy",
                       "https://haycafe.vn/wp-content/uploads/2022/03/Avatar-hai-doc-600x600.jpg",
                       new ArrayList<>()))));
+  public static final List<LeaveCompanyChart> LEAVE_COMPANY_CHARTS =
+      Arrays.asList(
+          new LeaveCompanyChart(
+              "Q1 2022",
+              Arrays.asList(
+                  new LeaveCompanyChartList("Sa thải", 1),
+                  new LeaveCompanyChartList("Chuyển công ty", 1),
+                  new LeaveCompanyChartList("Khác", 0))),
+          new LeaveCompanyChart(
+              "Q2 2022",
+              Arrays.asList(
+                  new LeaveCompanyChartList("Sa thải", 0),
+                  new LeaveCompanyChartList("Chuyển công ty", 0),
+                  new LeaveCompanyChartList("Khác", 0))),
+          new LeaveCompanyChart(
+              "Q3 2022",
+              Arrays.asList(
+                  new LeaveCompanyChartList("Sa thải", 0),
+                  new LeaveCompanyChartList("Chuyển công ty", 0),
+                  new LeaveCompanyChartList("Khác", 0))),
+          new LeaveCompanyChart(
+              "Q4 2022",
+              Arrays.asList(
+                  new LeaveCompanyChartList("Sa thải", 0),
+                  new LeaveCompanyChartList("Chuyển công ty", 0),
+                  new LeaveCompanyChartList("Khác", 0))));
+  public static final List<PaidLeaveChart> PAID_LEAVE_CHARTS =
+      Arrays.asList(
+          new PaidLeaveChart(
+              "Jan 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Feb 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Mar 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Apr 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "May 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Jun 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Jul 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 1))),
+          new PaidLeaveChart(
+              "Aug 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 1),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Sep 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Oct 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Nov 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))),
+          new PaidLeaveChart(
+              "Dec 2022",
+              Arrays.asList(
+                  new PaidLeaveChartList("Family Reason", 0),
+                  new PaidLeaveChartList("Unexpected Reason", 0),
+                  new PaidLeaveChartList("Health Reason", 0),
+                  new PaidLeaveChartList("Other", 0))));
+  public static final List<GeneralSalaryChart> SALARY_STRUCTURE =
+      Arrays.asList(
+          new GeneralSalaryChart("Base", BigDecimal.valueOf(5000000)),
+          new GeneralSalaryChart("Bonus", BigDecimal.valueOf(200000)),
+          new GeneralSalaryChart("Deduction", BigDecimal.valueOf(200000)),
+          new GeneralSalaryChart("Advance", BigDecimal.valueOf(160000)),
+          new GeneralSalaryChart("Tax", BigDecimal.valueOf(2250000)),
+          new GeneralSalaryChart("Insurance", BigDecimal.valueOf(1680000)));
+  public static final List<GeneralSalaryChart> SALARY_HISTORY_YEARLY =
+      Arrays.asList(
+          new GeneralSalaryChart("2021", BigDecimal.valueOf(3733383.33)),
+          new GeneralSalaryChart("2022", BigDecimal.valueOf(3771450)));
+  public static final List<GeneralSalaryChart> SALARY_HISTORY_MONTHLY =
+      Arrays.asList(
+          new GeneralSalaryChart("Jan 2021", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Feb 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Mar 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Apr 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("May 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Jun 2022", BigDecimal.valueOf(9000050)),
+          new GeneralSalaryChart("Jul 2022", BigDecimal.valueOf(8300050)),
+          new GeneralSalaryChart("Aug 2022", BigDecimal.valueOf(9100050)),
+          new GeneralSalaryChart("Sep 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Oct 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Nov 2022", BigDecimal.valueOf(0)),
+          new GeneralSalaryChart("Dec 2022", BigDecimal.valueOf(0)));
+  public static final List<EmployeeNameAndID> EMPLOYEE_NAME_AND_IDS =
+      Arrays.asList(
+          new EmployeeNameAndID("HungPV1", "Phạm Văn Hùng"),
+              new EmployeeNameAndID("LienPT2", "Phạm Thị Liên"),
+          new EmployeeNameAndID("LienPT24", "Phạm Thị Liên"),
+              new EmployeeNameAndID("HoangNK1", "Nguyễn Khắc Hoàng"),
+          new EmployeeNameAndID("HoangPQ1", "Phạm Quốc Hoàng"),
+              new EmployeeNameAndID("anv1", "nguyen van a"),
+          new EmployeeNameAndID("KhangTT1", "Truong Tuan Khang"),
+              new EmployeeNameAndID("KhangTT2", "Tran Tuan Khang"));
+  public static final List<LocalDate> DATE_LIST =
+      Arrays.asList(
+          DateUtils.convert("2022-02-01"),
+          DateUtils.convert("2022-02-02"),
+          DateUtils.convert("2022-02-03"),
+          DateUtils.convert("2022-02-04"),
+          DateUtils.convert("2022-02-05"),
+          DateUtils.convert("2022-02-06"),
+          DateUtils.convert("2022-04-09"),
+          DateUtils.convert("2022-04-10"),
+          DateUtils.convert("2022-04-11"),
+          DateUtils.convert("2022-04-30"),
+          DateUtils.convert("2022-05-01"),
+          DateUtils.convert("2022-05-02"),
+          DateUtils.convert("2022-05-03"),
+          DateUtils.convert("2022-09-01"),
+          DateUtils.convert("2022-09-02"),
+          DateUtils.convert("2022-09-03"),
+          DateUtils.convert("2022-09-04"));
 }

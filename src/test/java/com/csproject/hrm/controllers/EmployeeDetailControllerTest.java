@@ -566,7 +566,8 @@ public class EmployeeDetailControllerTest {
         .thenReturn(response);
 
     RequestBuilder requestBuilder =
-        MockMvcRequestBuilders.get(REQUEST_MAPPING + URI_GET_EDU_INFO + "?employeeID=huynq100")
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING + URI_GET_WORKING_HISTORY_INFO + "?employeeID=huynq100")
             .accept("*/*")
             .header(
                 AUTHORIZATION,
@@ -819,16 +820,16 @@ public class EmployeeDetailControllerTest {
     Mockito.doNothing().when(employeeDetailService).updateRole(request);
 
     RequestBuilder requestBuilder =
-        MockMvcRequestBuilders.put(REQUEST_MAPPING + URI_UPDATE_EDUCATION_INFO)
+        MockMvcRequestBuilders.put(REQUEST_MAPPING + "/update_role")
             .header(
                 AUTHORIZATION,
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsIlVzZXJfRGF0YSI6eyJpZCI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImVuYWJsZWQiOnRydWUsImZ1bGxOYW1lIjoiQWRtaW4iLCJhY2NvdW50Tm9uTG9ja2VkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJ1c2VybmFtZSI6bnVsbH0sImlhdCI6MTY2MDExMTU3MSwiZXhwIjoxNjYwMTk3OTcxfQ.V2pJ31EA6xAw0DfPGokOw_H-ooWodctQktQPhMzHzJqCaczrZzUpOfGaEejPE7NMRQC-nCsZbtZkNUzEQoaYig")
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsIlVzZXJfRGF0YSI6eyJpZCI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImVuYWJsZWQiOnRydWUsImZ1bGxOYW1lIjoiQWRtaW4iLCJhY2NvdW50Tm9uTG9ja2VkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJ1c2VybmFtZSI6bnVsbH0sImlhdCI6MTY2MDE1MTQyOCwiZXhwIjoxNjYwMjM3ODI4fQ.3hyPfbLrl_jveqbDBGX4v1LTglSNnqrVZEBhe71EWaCiDnu_BeRglFUeT1Banqzffg2HarQFLepROJ_uvdXDhw")
             .accept(MediaType.APPLICATION_JSON)
             .content(requestJson)
             .contentType(MediaType.APPLICATION_JSON)
             .with(csrf());
 
-    mockMvc.perform(requestBuilder).andExpect(status().isBadRequest());
+    mockMvc.perform(requestBuilder).andExpect(status().isOk());
   }
 
   @Test
@@ -842,17 +843,17 @@ public class EmployeeDetailControllerTest {
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(
-                REQUEST_MAPPING + "/get_role_by_employeeid" + "?employeeID=huynq100")
+                REQUEST_MAPPING + "/get_role_by_employeeid" + "?employeeId=huynq100")
             .accept("*/*")
             .header(
                 AUTHORIZATION,
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsIlVzZXJfRGF0YSI6eyJpZCI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImVuYWJsZWQiOnRydWUsImZ1bGxOYW1lIjoiQWRtaW4iLCJhY2NvdW50Tm9uTG9ja2VkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJ1c2VybmFtZSI6bnVsbH0sImlhdCI6MTY2MDExMTU3MSwiZXhwIjoxNjYwMTk3OTcxfQ.V2pJ31EA6xAw0DfPGokOw_H-ooWodctQktQPhMzHzJqCaczrZzUpOfGaEejPE7NMRQC-nCsZbtZkNUzEQoaYig")
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsIlVzZXJfRGF0YSI6eyJpZCI6ImFkbWluIiwiZW1haWwiOiJhZG1pbkBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImVuYWJsZWQiOnRydWUsImZ1bGxOYW1lIjoiQWRtaW4iLCJhY2NvdW50Tm9uTG9ja2VkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJ1c2VybmFtZSI6bnVsbH0sImlhdCI6MTY2MDE1MTQyOCwiZXhwIjoxNjYwMjM3ODI4fQ.3hyPfbLrl_jveqbDBGX4v1LTglSNnqrVZEBhe71EWaCiDnu_BeRglFUeT1Banqzffg2HarQFLepROJ_uvdXDhw")
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding(StandardCharsets.UTF_8);
 
     mockMvc
         .perform(requestBuilder)
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isOk())
         .andReturn()
         .getResponse()
         .getContentAsString(StandardCharsets.UTF_8);
