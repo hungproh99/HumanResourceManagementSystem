@@ -169,6 +169,12 @@ public class DataSample {
       new ChangePasswordRequest("huynq100@fpt.edu.vn", null, "HUy123456789@", "HUy123456789@");
   public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_WRONG_PASSWORD =
       new ChangePasswordRequest("huynq100@fpt.edu.vn", "null", "HUy123456789@", "HUy123456789@");
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_NEW_PASS_AND_RE_PASS_NOT_MATCH =
+      new ChangePasswordRequest(
+          "huynq100@fpt.edu.vn", "HUy123456789!", "HUy1234567@", "HUy123456789@");
+  public static final ChangePasswordRequest CHANGE_PASSWORD_REQUEST_NEW_PASS_AND_OLD_PASS_SAME =
+      new ChangePasswordRequest(
+          "huynq100@fpt.edu.vn", "HUy123456789!", "HUy123456789!", "HUy123456789!");
 
   public static final JwtResponse JWT_RESPONSE =
       new JwtResponse(
@@ -178,24 +184,23 @@ public class DataSample {
           Arrays.asList(ROLE_MANAGER.name()),
           "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwiY3JlZGVudGlhbHNOb25FeHBpcmVkIjp0cnVlLCJhY2NvdW50Tm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NTk3MTkyMjMsImV4cCI6MTY1OTgwNTYyM30.vPn7J72tTFwpJ0cKtSbLYpuwM41ZdIo5z6pjMpkktU7BN7EMHpCarEhRs-rjC4XJUzq9sRW6lTH_OxQQF5M0Vg");
 
-  public static final HrmResponseList HRM_RESPONSE_LIST =
-      new HrmResponseList(
-          Arrays.asList(
-              new HrmResponse(
-                  "HungPV1",
-                  "Phạm Văn Hùng",
-                  "HungPV1@fpt.edu.vn",
-                  "Active",
-                  "0385822476",
-                  "Female",
-                  Date.valueOf("2000-02-13"),
-                  "Develop 1",
-                  "Hồ Chí Minh Office",
-                  "Back Office",
-                  "2 year 8 month 24 day ",
-                  "IT",
-                  "Full Time")),
-          1);
+  public static final List<HrmResponse> HRM_RESPONSES =
+      Arrays.asList(
+          new HrmResponse(
+              "HungPV1",
+              "Phạm Văn Hùng",
+              "HungPV1@fpt.edu.vn",
+              "Active",
+              "0385822476",
+              "Female",
+              Date.valueOf("2000-02-13"),
+              "Develop 1",
+              "Hồ Chí Minh Office",
+              "Back Office",
+              "2 year 8 month 24 day ",
+              "IT",
+              "Full Time"));
+  public static final HrmResponseList HRM_RESPONSE_LIST = new HrmResponseList(HRM_RESPONSES, 1);
 
   public static final HrmRequest HRM_REQUEST =
       new HrmRequest(
@@ -214,6 +219,89 @@ public class DataSample {
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
           LocalDate.parse("2000-02-13"));
+
+  public static final HrmRequest HRM_REQUEST_WRONG_GENDER =
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          1L,
+          "0385822476",
+          "Abc",
+          LocalDate.parse("2000-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-02-13"),
+          LocalDate.parse("2000-02-13"));
+
+  public static final HrmRequest HRM_REQUEST_MANAGER_ROLE =
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          2L,
+          "0385822476",
+          "Male",
+          LocalDate.parse("2000-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-02-13"),
+          LocalDate.parse("2000-02-13"));
+
+  public static final HrmRequest HRM_REQUEST_USER_ROLE =
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          3L,
+          "0385822476",
+          "Male",
+          LocalDate.parse("2000-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-02-13"),
+          LocalDate.parse("2000-02-13"));
+
+  public static final HrmRequest HRM_REQUEST_NOT_ENOUGH_BIRTH_DATE =
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          1L,
+          "0385822476",
+          "Male",
+          LocalDate.parse("2020-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-02-13"),
+          LocalDate.parse("2000-02-13"));
+
+  public static final HrmPojo HRM_POJO =
+      new HrmPojo(
+          "huynq100",
+          "huynq100@fpt.edu.vn",
+          "$2a$10$759FbdwRznogY3WaPmo2w.SRiCrDYf/PQoHaI7msMqI3ZddfQm4KW",
+          true,
+          "HRM",
+          true,
+          true,
+          1);
 
   public static final List<WorkingTypeDto> LIST_WORKING_TYPE =
       Arrays.asList(

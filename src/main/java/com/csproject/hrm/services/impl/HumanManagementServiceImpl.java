@@ -11,7 +11,6 @@ import com.csproject.hrm.dto.response.HrmResponse;
 import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
 import com.csproject.hrm.exception.CustomErrorException;
-import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.HumanManagementService;
@@ -349,24 +348,23 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public void importExcelToEmployee(Workbook workBook) {
     List<HrmRequest> hrmRequestList = new ArrayList<>();
     Sheet sheet = workBook.getSheetAt(0);
-    for (int rowIndex = 0; rowIndex < getNumberOfNonEmptyCells(sheet, 0) - 1; rowIndex++) {
+    for (int rowIndex = 0; rowIndex <= getNumberOfNonEmptyCells(sheet, 0) - 1; rowIndex++) {
       Row row = sheet.getRow(rowIndex);
       if (rowIndex == 0) {
         continue;
       }
-      try {
-        String fullName = row.getCell(0).toString();
-        Long role = ERole.getValue(getValue(row.getCell(1)).toString());
+      String fullName = row.getCell(0).getStringCellValue();
+      Long role = ERole.getValue(row.getCell(1).getStringCellValue());
         String phone = "0" + (int) row.getCell(2).getNumericCellValue();
-        String gender = row.getCell(3).toString();
+      String gender = row.getCell(3).getStringCellValue();
         LocalDate birthDate = row.getCell(4).getLocalDateTimeCellValue().toLocalDate();
-        Long grade = EGradeType.getValue(getValue(row.getCell(5)).toString());
-        Long position = EJob.getValue(getValue(row.getCell(6)).toString());
-        Long office = EOffice.getValue(getValue(row.getCell(7)).toString());
-        Long area = EArea.getValue(getValue(row.getCell(8)).toString());
-        Long workingType = EWorkingType.getValue(getValue(row.getCell(9)).toString());
+      Long grade = EGradeType.getValue(row.getCell(5).getStringCellValue());
+      Long position = EJob.getValue(row.getCell(6).getStringCellValue());
+      Long office = EOffice.getValue(row.getCell(7).getStringCellValue());
+      Long area = EArea.getValue(row.getCell(8).getStringCellValue());
+      Long workingType = EWorkingType.getValue(row.getCell(9).getStringCellValue());
         String managerId = row.getCell(10).toString();
-        Long employeeType = EEmployeeType.getValue(getValue(row.getCell(11)).toString());
+      Long employeeType = EEmployeeType.getValue(row.getCell(11).getStringCellValue());
         String personalEmail = row.getCell(12).toString();
         LocalDate startDate = row.getCell(13).getLocalDateTimeCellValue().toLocalDate();
         LocalDate endDate = row.getCell(14).getLocalDateTimeCellValue().toLocalDate();
@@ -388,9 +386,6 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .build());
-      } catch (NumberFormatException e) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
-      }
     }
     insertMultiEmployee(hrmRequestList);
   }
@@ -441,9 +436,11 @@ public class HumanManagementServiceImpl implements HumanManagementService {
               || hrmRequest.getManagerId() == null
               || hrmRequest.getEmployeeType() == null
               || hrmRequest.getPersonalEmail() == null) {
-            throw new CustomParameterConstraintException(CSV_NULL_DATA);
+            throw new CustomErrorException(CSV_NULL_DATA);
           } else if (!hrmRequest.getPhone().matches(PHONE_VALIDATION)) {
-            throw new CustomParameterConstraintException(INVALID_PHONE_FORMAT);
+            throw new CustomErrorException(INVALID_PHONE_FORMAT);
+          } else if (!hrmRequest.getFullName().matches(ALPHANUMERIC_VALIDATION)) {
+            throw new CustomErrorException(INVALID_ALPHANUMERIC_VALIDATION);
           }
           HrmPojo hrmPojo = createHrmPojo(hrmRequest);
           int countList = 0;
@@ -517,26 +514,5 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       }
     }
     return numOfNonEmptyCells;
-  }
-
-  private Object getValue(Cell cell) {
-    switch (cell.getCellType()) {
-      case STRING:
-        return cell.getStringCellValue();
-      case NUMERIC:
-        return String.valueOf((int) cell.getNumericCellValue());
-      case BOOLEAN:
-        return cell.getBooleanCellValue();
-      case ERROR:
-        return cell.getErrorCellValue();
-      case FORMULA:
-        return cell.getCellFormula();
-      case BLANK:
-      case _NONE:
-        return null;
-      default:
-        break;
-    }
-    return null;
   }
 }

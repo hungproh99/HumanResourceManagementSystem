@@ -12,6 +12,7 @@ public class Constants {
   public static final String NOT_EMPTY_EMAIL = "Email can't not empty";
   public static final String INVALID_EMAIL_FORMAT = "Invalid email format";
   public static final String NOT_EMPTY_PASSWORD = "Password can't not empty";
+  public static final String INVALID_ALPHANUMERIC_VALIDATION = "Invalid alphanumeric format";
   public static final String NOT_EXIST_USER_WITH = "Don't have any user with ";
   public static final String WRONG_OLD_PASSWORD = "Old-password is wrong";
   public static final String NOT_MATCH_NEW_PASSWORD = "Re-password must match with new-password";

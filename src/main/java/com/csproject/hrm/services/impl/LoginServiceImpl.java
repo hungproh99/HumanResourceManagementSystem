@@ -60,17 +60,14 @@ public class LoginServiceImpl implements LoginService {
 
   public int forgotPasswordByUsername(String email) {
     String id = employeeRepository.findIdByCompanyEmail(email);
-    if (email == null || email.isEmpty()) {
-      throw new CustomParameterConstraintException(NOT_EMPTY_EMAIL);
-    } else if (!email.matches(EMAIL_VALIDATION)) {
-      throw new CustomParameterConstraintException(INVALID_EMAIL_FORMAT);
-    }
-    if (id == null) {
+    String fullName = employeeRepository.getEmployeeNameByEmployeeId(id);
+    if (id == null || !employeeRepository.existsById(id)) {
       throw new CustomDataNotFoundException(NOT_EXIST_USER_WITH + email);
     }
     String generatePassword = generalFunction.generateCommonLangPassword();
     String encodePassword = passwordEncoder.encode(generatePassword);
-    generalFunction.sendEmailForgotPassword(id, generatePassword, FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+    generalFunction.sendEmailForgotPassword(
+        fullName, generatePassword, FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
     return employeeRepository.updatePassword(encodePassword, id);
   }
 }

@@ -106,7 +106,7 @@ public class GeneralFunction {
   }
 
   public void sendEmailForgotPassword(
-      String id, String password, String from, String to, String subject) {
+      String fullName, String password, String from, String to, String subject) {
     MimeMessage message = emailSender.createMimeMessage();
     Resource resource = resourceLoader.getResource("classpath:email-forgot-password.vm");
     boolean multipart = true;
@@ -118,7 +118,7 @@ public class GeneralFunction {
       helper.setTo(to);
       helper.setFrom(from);
       helper.setSubject(subject);
-      message.setContent(String.format(data, id, password), "text/html; charset=utf-8");
+      message.setContent(String.format(data, fullName, password), "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);

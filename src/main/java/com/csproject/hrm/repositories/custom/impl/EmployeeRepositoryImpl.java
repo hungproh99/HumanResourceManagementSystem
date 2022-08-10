@@ -424,7 +424,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       LocalDate startDate,
       LocalDate endDate) {
 
-    final var query =
+    final var queryWorkingContract =
         DSL.using(config)
             .insertInto(
                 WORKING_CONTRACT,
@@ -436,6 +436,19 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             .values(employeeId, companyName, contractStatus, startDate, endDate)
             .returningResult(WORKING_CONTRACT.WORKING_CONTRACT_ID)
             .fetchOne();
+
+    final var querySalaryContract =
+        DSL.using(config)
+            .insertInto(
+                SALARY_CONTRACT,
+                SALARY_CONTRACT.START_DATE,
+                SALARY_CONTRACT.WORKING_CONTRACT_ID,
+                SALARY_CONTRACT.SALARY_CONTRACT_STATUS)
+            .values(
+                startDate,
+                queryWorkingContract.getValue(WORKING_CONTRACT.WORKING_CONTRACT_ID),
+                Boolean.TRUE)
+            .execute();
 
     return DSL.using(config)
         .insertInto(
@@ -452,7 +465,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             office,
             job,
             grade,
-            query.getValue(WORKING_CONTRACT.WORKING_CONTRACT_ID));
+            queryWorkingContract.getValue(WORKING_CONTRACT.WORKING_CONTRACT_ID));
   }
 
   @Override
