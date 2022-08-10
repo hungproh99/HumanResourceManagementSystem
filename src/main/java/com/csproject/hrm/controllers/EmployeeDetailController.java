@@ -185,13 +185,13 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
-  @PutMapping(URI_UPDATE_TAX_AND_INSURANCE)
-  public ResponseEntity<?> updateTaxAndInsurance(
-      @Valid @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
-    employeeDetailService.updateTaxAndInsurance(taxAndInsurance);
-    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
-  }
+  //  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  //  @PutMapping(URI_UPDATE_TAX_AND_INSURANCE)
+  //  public ResponseEntity<?> updateTaxAndInsurance(
+  //      @Valid @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
+  //    employeeDetailService.updateTaxAndInsurance(taxAndInsurance);
+  //    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  //  }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping(URI_UPDATE_BANK_INFO)
