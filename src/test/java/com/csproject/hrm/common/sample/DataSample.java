@@ -8,11 +8,8 @@ import com.csproject.hrm.dto.response.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -47,6 +44,22 @@ public class DataSample {
               new EmployeeInsuranceDto(2L, "SI", null),
               new EmployeeInsuranceDto(3L, "UI", null),
               new EmployeeInsuranceDto(4L, "PI", null)));
+  public static final WorkingInfoResponse WORKING_INFO_RESPONSE =
+      new WorkingInfoResponse(
+          "12000000.00",
+          "4000000" + ".00",
+          "Hà Nội Office",
+          "Back Office",
+          "IT",
+          "Develop 2",
+          "Full Time",
+          "2020-09-09",
+          "Trainee",
+          "huynq100",
+          "Nguyen Quang Huy",
+          "6",
+          "6",
+          "12");
   public static final EmployeeAdditionalInfo EMPLOYEE_ADDITIONAL_INFO =
       new EmployeeAdditionalInfo(
           null,
@@ -62,6 +75,63 @@ public class DataSample {
           null);
   public static final BankResponse BANK_RESPONSE =
       new BankResponse(1L, "TPBank", "Thạch Thất, Hà Nội", "2341122134", "NGUYEN THI AN");
+  public static final List<EducationResponse> EDUCATION_RESPONSES =
+      new ArrayList<>(
+          Arrays.asList(
+              new EducationResponse(
+                  1L,
+                  "FPT University",
+                  DateUtils.convert("2017-09-01"),
+                  DateUtils.convert("2020-09-01"),
+                  "",
+                  "End"),
+              new EducationResponse(
+                  2L,
+                  "FPT University 2",
+                  DateUtils.convert("2017-09-01"),
+                  DateUtils.convert("2020-09-01"),
+                  "",
+                  "End")));
+  public static final List<RelativeInformationResponse> RELATIVE_INFORMATION_RESPONSES =
+      new ArrayList<>(
+          Arrays.asList(
+              new RelativeInformationResponse(
+                  1L,
+                  "Nguyen Van Nam",
+                  DateUtils.convert("1984-09-01"),
+                  1L,
+                  "Bố",
+                  "sa",
+                  "0987654321"),
+              new RelativeInformationResponse(
+                  2L,
+                  "Nguyen Van Nam 2",
+                  DateUtils.convert("1984-09-01"),
+                  3L,
+                  "Ông hàng xóm",
+                  "sa",
+                  "0987654321")));
+  public static final RelativeInformationRequest RELATIVE_INFORMATION_REQUEST =
+      new RelativeInformationRequest(
+          1L, "Nguyen Van Nam", DateUtils.convert("1984-09-01"), 1L, "sa", "sa", "huynq100");
+  public static final List<WorkingHistoryResponse> WORKING_HISTORY_RESPONSES =
+      new ArrayList<>(
+          Arrays.asList(
+              new WorkingHistoryResponse(
+                  2L,
+                  "ABC corp 2",
+                  null,
+                  "DEV",
+                  DateUtils.convert("2000-09-01"),
+                  DateUtils.convert("2021-09-01"))));
+  public static final WorkingHistoryRequest WORKING_HISTORY_REQUEST =
+      new WorkingHistoryRequest(
+          2L,
+          "huynq100",
+          "ABC corp 2",
+          "DEV",
+          DateUtils.convert("2000-09-01"),
+          DateUtils.convert("2021-09-01"));
   public static final EmployeeDetailRequest EMPLOYEE_DETAIL_REQUEST =
       new EmployeeDetailRequest(
           "Nguyen Quang Huy",
@@ -90,11 +160,11 @@ public class DataSample {
           "03251837462",
           DateUtils.convert("2021-09-01"),
           "Thạch Thất, Hà Nội",
-          null,
+          "huyquanhoa@gmail.com",
           "0912345678",
           null,
           null,
-          null);
+          "huynq100");
   public static final BankRequest BANK_REQUEST =
       new BankRequest(
           1L, "TPBank", "Thạch Thất, Hà Nội", "2341122134", "NGUYEN THI AN", "huynq100");
@@ -104,9 +174,24 @@ public class DataSample {
           "FPT University",
           DateUtils.convert("2017-09-01"),
           DateUtils.convert("2020-09-01"),
-          "",
+          "s",
           "End",
           "huynq100");
+  public static final WorkingInfoRequest WORKING_INFO_REQUEST =
+      new WorkingInfoRequest(
+          "huynq100",
+          "5000000",
+          1L,
+          1L,
+          2L,
+          4L,
+          1L,
+          DateUtils.convert("2019-01-02"),
+          1L,
+          "admin",
+          1L,
+          1L,
+          1L);
   public static final ApplicationsRequestCreateRequest APPLICATIONS_REQUEST_TIMEKEEPING =
       new ApplicationsRequestCreateRequest(
           null,
