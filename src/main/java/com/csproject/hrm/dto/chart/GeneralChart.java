@@ -2,8 +2,7 @@ package com.csproject.hrm.dto.chart;
 
 import lombok.*;
 
-@Setter
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
