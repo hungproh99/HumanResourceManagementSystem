@@ -8,8 +8,12 @@ import com.csproject.hrm.dto.response.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -620,4 +624,17 @@ public class DataSample {
 
   public static final CheckInCheckOutDto CHECK_IN_CHECK_OUT_DTO =
       new CheckInCheckOutDto(1L, LocalTime.now(), LocalTime.now());
+  public static final ApplicationsRequestRequest APPLICATIONS_REQUEST_REQUEST =
+      new ApplicationsRequestRequest(
+          1L, "huynq100", 1L, 1L, "Nguyen Quang Huy", "Abc", "lienpt1", true);
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "LEAVE_SOON",
+          "WORKING_TIME",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-02][End_Date|2022-08-02][Start_Time|18:00][End_time|20:00]");
 }

@@ -5,9 +5,17 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -23,14 +31,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public class ApplicationsRequestServiceImpl implements ApplicationsRequestService {
@@ -524,16 +534,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             employeeId,
             requestId);
         break;
-      case "SALARY_INCREMENT":
-        updateSalaryIncrement(startDate, value, employeeId, requestId);
-        break;
+//      case "SALARY_INCREMENT":
+//        updateSalaryIncrement(startDate, value, employeeId, requestId);
+//        break;
       case "BONUS":
         updateBonusSalary(date, description, value, employeeId, bonusType, requestId);
         break;
-      case "CONFLICT_CUSTOMER":
-      case "LEAK_INFORMATION":
-        updateConflictAndLeakInfo(date, description, value, employeeId, deductionType, requestId);
-        break;
+//      case "CONFLICT_CUSTOMER":
+//      case "LEAK_INFORMATION":
+//        updateConflictAndLeakInfo(date, description, value, employeeId, deductionType, requestId);
+//        break;
       case "ADVANCE":
         updateAdvanceRequest(date, description, value, employeeId, requestId);
         break;
@@ -704,16 +714,16 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
-  private void updateSalaryIncrement(
-      LocalDate startDate, BigDecimal value, String employeeId, Long requestId) {
-    if (startDate == null || value == null || requestId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
-    }
-    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
-
-    applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
+  //  private void updateSalaryIncrement(
+  //      LocalDate startDate, BigDecimal value, String employeeId, Long requestId) {
+  //    if (startDate == null || value == null || requestId == null) {
+  //      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+  //    }
+  //    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+  //
+  //    applicationsRequestRepository.updateStatusApplication(
+  //        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
+  //  }
 
   private void updateBonusSalary(
       LocalDate date,
@@ -745,37 +755,37 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
-  private void updateConflictAndLeakInfo(
-      LocalDate date,
-      String description,
-      BigDecimal value,
-      String employeeId,
-      Long deductionType,
-      Long requestId) {
-    if (date == null
-        || description == null
-        || deductionType == null
-        || value == null
-        || requestId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
-    }
-    LocalDate startDate = date.with(firstDayOfMonth());
-    LocalDate lastDate = date.with(lastDayOfMonth());
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
-            startDate, lastDate, employeeId);
-    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
-    Long salaryId =
-        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
-    deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
-        salaryId, date, description, deductionType, value);
-    if (deductionType.equals(EDeduction.getValue("FIRE")))
-      employeeRepository.updateStatusEmployee(employeeId, false);
-
-    applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
+//  private void updateConflictAndLeakInfo(
+//      LocalDate date,
+//      String description,
+//      BigDecimal value,
+//      String employeeId,
+//      Long deductionType,
+//      Long requestId) {
+//    if (date == null
+//        || description == null
+//        || deductionType == null
+//        || value == null
+//        || requestId == null) {
+//      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+//    }
+//    LocalDate startDate = date.with(firstDayOfMonth());
+//    LocalDate lastDate = date.with(lastDayOfMonth());
+//    Double actualWorkingPoint =
+//        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+//            startDate, lastDate, employeeId);
+//    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
+//    Long salaryId =
+//        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+//            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
+//    deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
+//        salaryId, date, description, deductionType, value);
+//    if (deductionType.equals(EDeduction.getValue("FIRE")))
+//      employeeRepository.updateStatusEmployee(employeeId, false);
+//
+//    applicationsRequestRepository.updateStatusApplication(
+//        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
+//  }
 
   private void updateAdvanceRequest(
       LocalDate date, String description, BigDecimal value, String employeeId, Long requestId) {
@@ -795,10 +805,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     applicationsRequestRepository.updateStatusApplication(
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
-
-  private boolean isInvalidSplit(String[] split) {
-    return split.length != TWO_NUMBER || isBlank(split[ZERO_NUMBER]) || isBlank(split[ONE_NUMBER]);
   }
 
   @Override
