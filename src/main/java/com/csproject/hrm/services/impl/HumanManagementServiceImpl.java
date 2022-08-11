@@ -60,26 +60,30 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Override
   public void insertEmployee(HrmRequest hrmRequest) {
     if (!roleRepository.existsById(hrmRequest.getRole())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
     } else if (!hrmRequest.getGender().equalsIgnoreCase("Male")
         && !hrmRequest.getGender().equalsIgnoreCase("Female")) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be Female/Male");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
     } else if (!areaRepository.existsById(hrmRequest.getArea())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
     } else if (!officeRepository.existsById(hrmRequest.getOffice())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "office not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
     } else if (!gradeRepository.existsById(hrmRequest.getGrade())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "grade not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
     } else if (!jobRepository.existsById(hrmRequest.getPosition())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "position not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
     } else if (!workingTypeRepository.existsById(hrmRequest.getWorkingType())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "workingType not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
     } else if (!employeeRepository.existsById(hrmRequest.getManagerId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
     } else if (!employeeTypeRepository.existsById(hrmRequest.getEmployeeType())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
     } else if (hrmRequest.getBirthDate().isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "birthDate must be enough 18 age");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Birth Date must be enough 18 age");
+    } else if (hrmRequest.getStartDate().isAfter(hrmRequest.getEndDate())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
+    } else if (hrmRequest.getEndDate().isBefore(LocalDate.now())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not before Current Date");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
     String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName(), 0);
@@ -88,7 +92,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     hrmPojo.setCompanyEmail(companyEmail);
 
     generalFunction.sendEmailForNewEmployee(
-        List.of(hrmPojo), FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+        hrmPojo, FROM_EMAIL, hrmPojo.getPersonalEmail(), SEND_PASSWORD_SUBJECT);
     hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
     employeeRepository.insertEmployee(hrmPojo);
   }
@@ -114,8 +118,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<RoleDto> getListRoleType(boolean isAdmin) {
-    List<RoleDto> roleDto = employeeRepository.getListRoleType(isAdmin);
+  public List<RoleDto> getListRoleType() {
+    List<RoleDto> roleDto = employeeRepository.getListRoleType();
     roleDto.forEach(
         role -> {
           role.setRole(ERole.getLabel(role.getRole()));
@@ -178,7 +182,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
         }
       }
       List<HrmResponse> hrmResponses =
@@ -255,27 +259,42 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   csvRecord.get("Start Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
           LocalDate endDate =
               LocalDate.parse(csvRecord.get("End Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-          if (!roleRepository.existsById(role)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
+          if (csvRecord.get("Full Name") == null
+              || csvRecord.get("Role") == null
+              || csvRecord.get("Phone") == null
+              || csvRecord.get("Gender") == null
+              || csvRecord.get("Birth Date") == null
+              || csvRecord.get("Grade") == null
+              || csvRecord.get("Position") == null
+              || csvRecord.get("Office") == null
+              || csvRecord.get("Area") == null
+              || csvRecord.get("Working Type") == null
+              || csvRecord.get("Manager Id") == null
+              || csvRecord.get("Employee Type") == null
+              || csvRecord.get("Personal Email") == null
+              || csvRecord.get("Start Date") == null
+              || csvRecord.get("End Date") == null) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in csv");
+          } else if (!roleRepository.existsById(role)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
           } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be Female/Male");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
           } else if (!areaRepository.existsById(area)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
           } else if (!officeRepository.existsById(office)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "office not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
           } else if (!gradeRepository.existsById(grade)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "grade not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
           } else if (!jobRepository.existsById(position)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "position not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
           } else if (!workingTypeRepository.existsById(workingType)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "workingType not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
           } else if (!employeeRepository.existsById(managerId)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
           } else if (!employeeTypeRepository.existsById(employeeType)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
           } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "personalEmail not valid");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Personal Email not valid");
           }
           hrmRequestList.add(
               HrmRequest.builder()
@@ -330,7 +349,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
         }
       }
       try {
@@ -368,6 +387,24 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         String personalEmail = row.getCell(12).toString();
         LocalDate startDate = row.getCell(13).getLocalDateTimeCellValue().toLocalDate();
         LocalDate endDate = row.getCell(14).getLocalDateTimeCellValue().toLocalDate();
+
+      if (row.getCell(0) == null
+          || row.getCell(1) == null
+          || row.getCell(2) == null
+          || row.getCell(3) == null
+          || row.getCell(4) == null
+          || row.getCell(5) == null
+          || row.getCell(6) == null
+          || row.getCell(7) == null
+          || row.getCell(8) == null
+          || row.getCell(9) == null
+          || row.getCell(10) == null
+          || row.getCell(11) == null
+          || row.getCell(12) == null
+          || row.getCell(13) == null
+          || row.getCell(14) == null) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in excel");
+      }
         hrmRequestList.add(
             HrmRequest.builder()
                 .fullName(fullName)
@@ -394,7 +431,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     return employeeRepository.findAllEmployeeOfManager(queryParam, employeeId);
   }
@@ -403,7 +440,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     int level = employeeRepository.getLevelOfEmployee(employeeId);
     return employeeRepository.getListManagerHigherOfArea(employeeId, level);
@@ -413,7 +450,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     int level = employeeRepository.getLevelOfEmployee(employeeId);
     return employeeRepository.getListManagerLowerOfArea(employeeId, level);
@@ -455,9 +492,9 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           hrmPojo.setEmployeeId(employeeId);
           hrmPojo.setCompanyEmail(companyEmail);
           hrmPojos.add(hrmPojo);
+          generalFunction.sendEmailForNewEmployee(
+              hrmPojo, FROM_EMAIL, hrmPojo.getPersonalEmail(), SEND_PASSWORD_SUBJECT);
         });
-    //    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL,
-    // SEND_PASSWORD_SUBJECT);
     for (HrmPojo hrmPojo : hrmPojos) {
       hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
     }
@@ -469,7 +506,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     String companyName = "HRM";
     int level = 0;
     if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_MANAGER.name()))) {
-      level = employeeRepository.getLevelOfEmployee(hrmRequest.getManagerId()) - 1;
+      level = employeeRepository.getLevelOfEmployee(hrmRequest.getManagerId()) + 1;
     } else if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_USER.name()))) {
       level = -1;
     }

@@ -40,7 +40,7 @@ public interface SalaryMonthlyRepositoryCustom {
   void updateStatusSalaryMonthlyBySalaryMonthlyId(Long salaryMonthlyId, String statusSalary);
 
   void updateCheckedSalaryMonthly(
-      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, boolean isRemind, String employeeId);
+      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId);
 
   void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest);
 
@@ -48,7 +48,7 @@ public interface SalaryMonthlyRepositoryCustom {
 
   List<SalaryMonthlyRemindResponse> getAllSalaryMonthlyToRemind(LocalDate checkDate);
 
-  void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind);
+  //  void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind);
 
   boolean checkAlreadyApproveOrReject(Long salaryMonthlyId);
 }

@@ -13,12 +13,12 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @Builder
 public class UpdateSalaryMonthlyRequest {
-  @Positive(message = "salaryMonthlyId must be a positive number!")
+  @Positive(message = "Salary Monthly Id must be a positive number!")
   private Long salaryMonthlyId;
 
-  @NotBlank(message = "salaryStatus must not be blank!")
+  @NotBlank(message = "Salary Status must not be blank!")
   private String salaryStatus;
 
-  @NotBlank(message = "approverId must not be blank!")
+  @NotBlank(message = "Approver Id must not be blank!")
   private String approverId;
 }

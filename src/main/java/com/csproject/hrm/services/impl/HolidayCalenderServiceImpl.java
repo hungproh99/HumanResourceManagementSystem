@@ -1,6 +1,7 @@
 package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.dto.dto.HolidayCalenderDto;
+import com.csproject.hrm.dto.request.HolidayCalendarRequest;
 import com.csproject.hrm.repositories.HolidayCalenderRepository;
 import com.csproject.hrm.services.HolidayCalenderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,10 @@ public class HolidayCalenderServiceImpl implements HolidayCalenderService {
           }
         });
     return localDateList;
+  }
+
+  @Override
+  public void insertHolidayCalendar(HolidayCalendarRequest holidayCalendarRequest) {
+    holidayCalenderRepository.insertHoliday(holidayCalendarRequest);
   }
 }

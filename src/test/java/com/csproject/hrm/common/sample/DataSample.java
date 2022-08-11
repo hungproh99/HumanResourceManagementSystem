@@ -329,7 +329,7 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2022-08-15"));
 
   public static final HrmRequest HRM_REQUEST_WRONG_GENDER =
       new HrmRequest(
@@ -365,7 +365,7 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2022-08-15"));
 
   public static final HrmRequest HRM_REQUEST_USER_ROLE =
       new HrmRequest(
@@ -383,7 +383,25 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2022-08-15"));
+
+  public static final HrmRequest HRM_REQUEST_START_AFTER_END =
+          new HrmRequest(
+                  "Nguyen Quang Huy",
+                  3L,
+                  "0385822476",
+                  "Male",
+                  LocalDate.parse("2000-02-13"),
+                  1L,
+                  1L,
+                  1L,
+                  1L,
+                  1L,
+                  "huynq100",
+                  1L,
+                  "huynq100@fpt.edu.vn",
+                  LocalDate.parse("2000-09-13"),
+                  LocalDate.parse("2000-08-15"));
 
   public static final HrmRequest HRM_REQUEST_NOT_ENOUGH_BIRTH_DATE =
       new HrmRequest(
@@ -649,7 +667,7 @@ public class DataSample {
   public static final ApplicationsRequestRequest APPLICATIONS_REQUEST_REQUEST =
       new ApplicationsRequestRequest(
           1L, "huynq100", 1L, 1L, "Nguyen Quang Huy", "Abc", "lienpt1", true);
-  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO =
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_WORKING_TIME =
       new ApplicationRequestDto(
           1L,
           "huynq100",
@@ -658,5 +676,86 @@ public class DataSample {
           "No comment",
           LocalDateTime.now(),
           "lienpt1",
-          "[Start_Date|2022-08-02][End_Date|2022-08-02][Start_Time|18:00][End_time|20:00]");
+          "[Date|2022-09-12]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_OVER_TIME =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "OT",
+          "WORKING_TIME",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-02][End_Date|2022-08-02][Start_Time|18:00][End_Time|20:00]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_PAID_LEAVE =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "PAID_LEAVE",
+          "PAID_LEAVE",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-03][End_Date|2022-08-03][Reason|1]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_BONUS =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "BONUS",
+          "NOMINATION",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Employee_Name|Nguyen Quang Huy - huynq100][Current_Position|DEV 1][Current_Area|IT][Value|500000][Bonus_Type|Yearly Bonus][Description|Abc]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_SALARY_INCREMENT =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "SALARY_INCREMENT",
+          "NOMINATION",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-03][Value|500000]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_ADVANCE =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "ADVANCES",
+          "ADVANCE",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Date|2022-08-03][Value|500000][Description|Abc]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_EMPLOYEE_ID_NULL =
+      new ApplicationRequestDto(
+          1L,
+          null,
+          "ADVANCES",
+          "ADVANCE",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Date|2022-08-03][Value|500000][Description|Abc]");
+
+  public static final TimekeepingIdOvertimeTypeDto TIMEKEEPING_ID_OVERTIME_TYPE_DTO =
+      new TimekeepingIdOvertimeTypeDto(2L, LocalDate.parse("2022-08-02"), 2L);
+
+  public static final ApplicationRequestRemindResponse APPLICATION_REQUEST_REMIND_RESPONSE =
+      new ApplicationRequestRemindResponse(
+          1L,
+          "WORKING_TIME",
+          "LEAVE_SOON",
+          LocalDateTime.now(),
+          "Nguyen Quang Huy",
+          "huynq100",
+          "lienpt1",
+          Arrays.asList("hungnq", "lienpt2"),
+          LocalDateTime.now());
 }

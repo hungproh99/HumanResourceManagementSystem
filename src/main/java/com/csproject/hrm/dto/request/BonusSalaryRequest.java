@@ -13,10 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BonusSalaryRequest {
-  @Positive(message = "bonusSalaryId must be a positive number!")
+  @Positive(message = "Bonus Salary Id must be a positive number!")
   private Long bonusSalaryId;
 
-  @Positive(message = "value must be a positive number!")
+  @Positive(message = "Value must be a positive number!")
   private BigDecimal value;
 
   private String description;
@@ -24,6 +24,6 @@ public class BonusSalaryRequest {
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate date;
 
-  @Positive(message = "bonusTypeId must be a positive number!")
+  @Positive(message = "Bonus Type Id must be a positive number!")
   private Long bonusTypeId;
 }

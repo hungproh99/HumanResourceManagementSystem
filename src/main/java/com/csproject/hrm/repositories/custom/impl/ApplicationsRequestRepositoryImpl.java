@@ -896,16 +896,16 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     return applicationRequestRemindResponses;
   }
 
-  @Override
-  public void updateAllApplicationRequestRemind(Long requestId, boolean isRemind) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
-        dslContext
-            .update(APPLICATIONS_REQUEST)
-            .set(APPLICATIONS_REQUEST.IS_REMIND, isRemind)
-            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
-            .execute();
-  }
+  //  @Override
+  //  public void updateAllApplicationRequestRemind(Long requestId, boolean isRemind) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    final var query =
+  //        dslContext
+  //            .update(APPLICATIONS_REQUEST)
+  //            .set(APPLICATIONS_REQUEST.IS_REMIND, isRemind)
+  //            .where(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID.eq(requestId))
+  //            .execute();
+  //  }
 
   private Select<?> getListRequestRemind(LocalDateTime checkDate) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
@@ -917,7 +917,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             APPLICATIONS_REQUEST.CREATE_DATE,
             EMPLOYEE.FULL_NAME,
             EMPLOYEE.EMPLOYEE_ID,
-            APPLICATIONS_REQUEST.APPROVER)
+            APPLICATIONS_REQUEST.APPROVER,
+            APPLICATIONS_REQUEST.DURATION.as("duration"))
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -928,7 +929,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .leftJoin(REQUEST_TYPE)
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
         .where(APPLICATIONS_REQUEST.DURATION.le(checkDate))
-        .and(APPLICATIONS_REQUEST.IS_REMIND.isFalse());
+        .and(
+            APPLICATIONS_REQUEST.REQUEST_STATUS.eq(
+                ERequestStatus.getValue(ERequestStatus.PENDING.name())));
   }
 
   @Override

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ExcelExportApplicationRequest {
@@ -60,6 +61,8 @@ public class ExcelExportApplicationRequest {
     } else if (value instanceof Date) {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
       cell.setCellValue(simpleDateFormat.format(value));
+    } else if (value instanceof LocalDateTime) {
+      cell.setCellValue((LocalDateTime) value);
     } else {
       cell.setCellValue((String) value);
     }

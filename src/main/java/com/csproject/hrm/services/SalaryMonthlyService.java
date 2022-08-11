@@ -1,6 +1,7 @@
 package com.csproject.hrm.services;
 
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.BonusTypeDto;
+import com.csproject.hrm.dto.dto.DeductionTypeDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.SalaryMonthlyDetailResponse;
 import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
@@ -53,7 +54,7 @@ public interface SalaryMonthlyService {
 
   void deleteAdvanceSalary(Long advanceSalaryId);
 
-  void updateAllSalaryRemind(LocalDate checkDate);
+  void updateAllSalaryRemind(LocalDate checkDate, LocalDate currDate);
 
   List<DeductionTypeDto> getListDeductionTypeDto();
 

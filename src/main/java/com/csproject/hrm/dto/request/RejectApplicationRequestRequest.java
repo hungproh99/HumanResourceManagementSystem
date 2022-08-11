@@ -12,7 +12,7 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @Builder
 public class RejectApplicationRequestRequest {
-  @Positive(message = "requestId must be a positive number!")
+  @Positive(message = "Request Id must be a positive number!")
   private Long requestId;
 
   private String comment;

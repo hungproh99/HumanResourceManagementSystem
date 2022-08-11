@@ -250,6 +250,22 @@ public class HumanManagementServiceTest {
   }
 
   @Test
+  void test_insertEmployee_StartDateAfterEndDate() {
+    HrmRequest hrmRequest = HRM_REQUEST_START_AFTER_END;
+    when(roleRepository.existsById(hrmRequest.getRole())).thenReturn(true);
+    when(areaRepository.existsById(hrmRequest.getArea())).thenReturn(true);
+    when(officeRepository.existsById(hrmRequest.getOffice())).thenReturn(true);
+    when(gradeRepository.existsById(hrmRequest.getGrade())).thenReturn(true);
+    when(jobRepository.existsById(hrmRequest.getPosition())).thenReturn(true);
+    when(workingTypeRepository.existsById(hrmRequest.getWorkingType())).thenReturn(true);
+    when(employeeRepository.existsById(hrmRequest.getManagerId())).thenReturn(true);
+    when(employeeTypeRepository.existsById(hrmRequest.getEmployeeType())).thenReturn(true);
+
+    assertThrows(
+        CustomErrorException.class, () -> humanManagementService.insertEmployee(hrmRequest));
+  }
+
+  @Test
   void test_getListWorkingType() {
     when(employeeRepository.getListWorkingType()).thenReturn(LIST_WORKING_TYPE);
     humanManagementService.getListWorkingType();
@@ -263,9 +279,8 @@ public class HumanManagementServiceTest {
 
   @Test
   void test_getListRoleType_IsAdmin() {
-    boolean isAdmin = true;
-    when(employeeRepository.getListRoleType(isAdmin)).thenReturn(LIST_ROLE_DTO);
-    humanManagementService.getListRoleType(isAdmin);
+    when(employeeRepository.getListRoleType()).thenReturn(LIST_ROLE_DTO);
+    humanManagementService.getListRoleType();
   }
 
   @Test

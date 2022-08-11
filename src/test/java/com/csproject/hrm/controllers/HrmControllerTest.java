@@ -414,7 +414,7 @@ public class HrmControllerTest {
             .accept("*/*")
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding(StandardCharsets.UTF_8);
-    when(humanManagementService.getListRoleType(true)).thenReturn(LIST_ROLE_DTO);
+    when(humanManagementService.getListRoleType()).thenReturn(LIST_ROLE_DTO);
     String actual =
         mockMvc
             .perform(requestBuilder)

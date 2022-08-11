@@ -53,7 +53,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       QueryParam queryParam, String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     List<EmployeeNameAndID> employeeNameAndIDList = getAllEmployeeByManagerID(employeeId);
     if (employeeNameAndIDList.isEmpty()) {
@@ -94,7 +94,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
         }
       }
       List<TimekeepingResponses> timekeepingResponses =
@@ -140,7 +140,7 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
         }
       }
       try {

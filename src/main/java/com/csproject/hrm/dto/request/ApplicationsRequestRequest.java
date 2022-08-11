@@ -16,28 +16,28 @@ import static com.csproject.hrm.common.constant.Constants.ALPHANUMERIC_VALIDATIO
 @NoArgsConstructor
 @Builder
 public class ApplicationsRequestRequest {
-  @Positive(message = "applicationRequestId must be a positive number!")
+  @Positive(message = "Application Request Id must be a positive number!")
   private Long applicationRequestId;
 
-  @NotBlank(message = "employeeId must not be blank!")
+  @NotBlank(message = "Employee Id must not be blank!")
   private String employeeId;
 
-  @Positive(message = "requestNameId must be a positive number!")
+  @Positive(message = "Request Name Id must be a positive number!")
   private Long requestNameId;
 
-  @Positive(message = "requestStatusId must be a positive number!")
+  @Positive(message = "Request Status Id must be a positive number!")
   private Long requestStatusId;
 
-  @NotBlank(message = "fullName must not be blank!")
+  @NotBlank(message = "Full Name must not be blank!")
   @Pattern(
       regexp = ALPHANUMERIC_VALIDATION,
       flags = Pattern.Flag.UNICODE_CASE,
-      message = "fullName must only alphanumeric!")
+      message = "Full Name must only alphanumeric!")
   private String fullName;
 
   private String description;
 
-  @NotBlank(message = "approver must not be blank!")
+  @NotBlank(message = "Approver must not be blank!")
   private String approver;
 
   private Boolean isBookmark;

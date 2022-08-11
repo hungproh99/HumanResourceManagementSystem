@@ -125,31 +125,23 @@ public class GeneralFunction {
     }
   }
 
-  public void sendEmailForNewEmployee(
-      List<HrmPojo> hrmPojos, String from, String to, String subject) {
-    int size = hrmPojos.size();
-    MimeMessage[] messages = new MimeMessage[size];
+  public void sendEmailForNewEmployee(HrmPojo hrmPojo, String from, String to, String subject) {
+    MimeMessage message = emailSender.createMimeMessage();
     Resource resource = resourceLoader.getResource("classpath:email-add-employee.vm");
     boolean multipart = true;
     try {
       InputStream inputStream = resource.getInputStream();
       byte[] bdata = FileCopyUtils.copyToByteArray(inputStream);
       String data = new String(bdata, StandardCharsets.UTF_8);
-      for (int i = 0; i < size; i++) {
-        messages[i] = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(messages[i], multipart, "utf-8");
+      MimeMessageHelper helper = new MimeMessageHelper(message, multipart, "utf-8");
         helper.setTo(to);
         helper.setFrom(from);
         helper.setSubject(subject);
-        messages[i].setContent(
-            String.format(
-                data,
-                hrmPojos.get(i).getFullName(),
-                hrmPojos.get(i).getCompanyName(),
-                hrmPojos.get(i).getPassword()),
-            "text/html; charset=utf-8");
-      }
-      emailSender.send(messages);
+      message.setContent(
+          String.format(
+              data, hrmPojo.getFullName(), hrmPojo.getCompanyName(), hrmPojo.getPassword()),
+          "text/html; charset=utf-8");
+      emailSender.send(message);
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
     }
@@ -181,6 +173,8 @@ public class GeneralFunction {
       String createDate,
       List<String> checkBy,
       String requestId,
+      String duration,
+      String remainDay,
       String from,
       String to,
       String subject) {
@@ -208,7 +202,8 @@ public class GeneralFunction {
       helper.setFrom(from);
       helper.setSubject(subject);
       message.setContent(
-          String.format(data, approveName, createName, createDate, paragraph, requestId),
+          String.format(
+              data, approveName, createName, createDate, duration, remainDay, paragraph, requestId),
           "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
@@ -265,6 +260,8 @@ public class GeneralFunction {
       String createDate,
       List<String> checkBy,
       String requestId,
+      String duration,
+      String remainDay,
       String from,
       String to,
       String subject) {
@@ -292,7 +289,8 @@ public class GeneralFunction {
       helper.setFrom(from);
       helper.setSubject(subject);
       message.setContent(
-          String.format(data, approveName, createName, createDate, paragraph, requestId),
+          String.format(
+              data, approveName, createName, createDate, duration, remainDay, paragraph, requestId),
           "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {
@@ -372,10 +370,10 @@ public class GeneralFunction {
     BigDecimal familyAllowancesDependent = BigDecimal.ZERO;
     for (Map.Entry<String, String> i : hashMap) {
       if (i.getKey().equalsIgnoreCase("Family_Allowances_Personal")) {
-        familyAllowancesPersonal = BigDecimal.valueOf(Long.parseLong(i.getValue()));
+        familyAllowancesPersonal = BigDecimal.valueOf(Double.parseDouble(i.getValue()));
       } else if (i.getKey().equalsIgnoreCase("Family_Allowances_Dependent")) {
         familyAllowancesDependent =
-            BigDecimal.valueOf(Long.parseLong(i.getValue()))
+            BigDecimal.valueOf(Double.parseDouble(i.getValue()))
                 .multiply(BigDecimal.valueOf(countNumberDependent));
       }
     }
@@ -396,19 +394,22 @@ public class GeneralFunction {
             if (rangePolicy.getMax().equalsIgnoreCase("MAX")) {
               maxValue = BigDecimal.valueOf(Long.MAX_VALUE);
             } else {
-              maxValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMax()));
+              maxValue = BigDecimal.valueOf(Double.parseDouble(rangePolicy.getMax()));
             }
-            minValue = BigDecimal.valueOf(Long.parseLong(rangePolicy.getMin()));
+            minValue = BigDecimal.valueOf(Double.parseDouble(rangePolicy.getMin()));
             if (maxValue.compareTo(salaryForTax) >= 0 && minValue.compareTo(salaryForTax) < 0) {
+              String[] splitStrike = rangePolicy.getValue().split("\\-", 2);
               BigDecimal value =
-                  monthlySalary.multiply(
-                      BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue()))
-                          .divide(BigDecimal.TEN)
-                          .divide(BigDecimal.TEN));
+                  monthlySalary
+                      .multiply(
+                          BigDecimal.valueOf(Double.parseDouble(splitStrike[ZERO_NUMBER]))
+                              .divide(BigDecimal.TEN)
+                              .divide(BigDecimal.TEN))
+                      .subtract(BigDecimal.valueOf(Double.parseDouble(splitStrike[ONE_NUMBER])));
               employeeTaxResponse.setTax_name(
                   EPolicyName.getLabel(employeeTaxResponse.getTax_name()));
               employeeTaxResponse.setTax_value(
-                  BigDecimal.valueOf(Long.parseLong(rangePolicy.getValue())).doubleValue());
+                  BigDecimal.valueOf(Double.parseDouble(rangePolicy.getValue())).doubleValue());
               employeeTaxResponse.setValue(value);
               break;
             }
@@ -420,7 +421,7 @@ public class GeneralFunction {
   }
 
   public List<EmployeeInsuranceResponse> readInsuranceDataByEmployeeId(
-      String employeeId, BigDecimal salaryForInsurance) {
+      String employeeId, BigDecimal baseSalary) {
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
         employeeInsuranceRepository.getListInsuranceByEmployeeId(employeeId);
     if (employeeInsuranceResponses.isEmpty()) {
@@ -436,14 +437,20 @@ public class GeneralFunction {
     for (Map.Entry<String, String> i : hashMap) {
       for (EmployeeInsuranceResponse employeeInsuranceResponse : employeeInsuranceResponses) {
         if (i.getKey().equalsIgnoreCase(employeeInsuranceResponse.getInsurance_name())) {
+          String[] splitStrike = i.getValue().split("\\-", 2);
+          BigDecimal value =
+              baseSalary
+                  .multiply(BigDecimal.valueOf(Double.parseDouble(splitStrike[ZERO_NUMBER])))
+                  .divide(BigDecimal.TEN)
+                  .divide(BigDecimal.TEN);
+          if (value.compareTo(BigDecimal.valueOf(Double.parseDouble(splitStrike[ONE_NUMBER])))
+              >= 0) {
+            value = BigDecimal.valueOf(Double.parseDouble(splitStrike[ONE_NUMBER]));
+          }
           employeeInsuranceResponse.setInsurance_name(
               EPolicyName.getLabel(employeeInsuranceResponse.getInsurance_name()));
           employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
-          employeeInsuranceResponse.setValue(
-              salaryForInsurance
-                  .multiply(BigDecimal.valueOf(Double.parseDouble(i.getValue())))
-                  .divide(BigDecimal.TEN)
-                  .divide(BigDecimal.TEN));
+          employeeInsuranceResponse.setValue(value);
           break;
         }
       }
@@ -548,6 +555,17 @@ public class GeneralFunction {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
     }
     return rangePolicyList;
+  }
+
+  public HashMap<String, String> splitStrikeData(String data) {
+    HashMap<String, String> hashMap = new HashMap<>();
+    if (!isBlank(data)) {
+      String[] splitStrike = data.split("\\-", 2);
+      hashMap.put(splitStrike[ZERO_NUMBER], splitStrike[ONE_NUMBER]);
+    } else {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA);
+    }
+    return hashMap;
   }
 
   private boolean isInvalidSplit(String[] split) {

@@ -86,7 +86,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getWorkingType(),
                   hrmPojo.getManagerId(),
                   hrmPojo.getEmployeeType(),
-                  hrmPojo.getPersonalEmail())
+                  hrmPojo.getPersonalEmail(),
+                  hrmPojo.getLevel())
               .execute();
           queries.add(
               insertWorkingContractAndWorkingPlaceRecord(
@@ -127,7 +128,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getWorkingType(),
                         hrmPojo.getManagerId(),
                         hrmPojo.getEmployeeType(),
-                        hrmPojo.getPersonalEmail())
+                        hrmPojo.getPersonalEmail(),
+                        hrmPojo.getLevel())
                     .execute();
                 queries.add(
                     insertWorkingContractAndWorkingPlaceRecord(
@@ -189,16 +191,14 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   }
 
   @Override
-  public List<RoleDto> getListRoleType(boolean isAdmin) {
+  public List<RoleDto> getListRoleType() {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     List<Condition> conditions = new ArrayList<>();
-    if (!isAdmin) {
-      conditions.add(ROLE_TYPE.ROLE.notLike(ERole.ROLE_ADMIN.name()));
-    }
     return dslContext
         .select(ROLE_TYPE.TYPE_ID, ROLE_TYPE.ROLE)
         .from(ROLE_TYPE)
         .where(conditions)
+        .and(ROLE_TYPE.ROLE.notEqual(ERole.ROLE_ADMIN.name()))
         .orderBy(ROLE_TYPE.TYPE_ID.asc())
         .fetchInto(RoleDto.class);
   }
@@ -378,7 +378,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       Long workingType,
       String managerId,
       Long employeeType,
-      String personalEmail) {
+      String personalEmail,
+      int level) {
     return DSL.using(config)
         .insertInto(
             EMPLOYEE,
@@ -394,7 +395,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             EMPLOYEE.WORKING_TYPE_ID,
             EMPLOYEE.MANAGER_ID,
             EMPLOYEE.EMPLOYEE_TYPE_ID,
-            EMPLOYEE.PERSONAL_EMAIL)
+            EMPLOYEE.PERSONAL_EMAIL,
+            EMPLOYEE.LEVEL)
         .values(
             employeeId,
             companyEmail,
@@ -408,7 +410,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             workingType,
             managerId,
             employeeType,
-            personalEmail);
+            personalEmail,
+            level);
   }
 
   private Insert<?> insertWorkingContractAndWorkingPlaceRecord(
