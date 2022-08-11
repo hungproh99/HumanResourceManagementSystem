@@ -4,29 +4,36 @@ import com.csproject.hrm.common.sample.DataSample;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.repositories.EmployeeDetailRepository;
+import com.csproject.hrm.services.impl.EmployeeDetailServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.NO_EMPLOYEE_WITH_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {EmployeeDetailService.class})
+@ExtendWith(MockitoExtension.class)
 public class EmployeeDetailServiceTest {
-  @Qualifier("employeeDetailServiceImpl")
-  @Autowired
-  EmployeeDetailService employeeDetailService;
+  @Autowired @Mock EmployeeDetailRepository employeeDetailRepository;
+  @InjectMocks EmployeeDetailServiceImpl employeeDetailService;
 
   @DisplayName("Test findMainDetail Normal")
   @Test
   void testFindMainDetail_Normal() {
-    EmployeeDetailResponse expected = DataSample.DETAIL_RESPONSE;
-    EmployeeDetailResponse actual = employeeDetailService.findMainDetail("huynq100");
+    EmployeeDetailResponse expected = DataSample.DETAIL_RESPONSE_SERVICE;
+    String employeeId = "huynq100";
+    when(employeeDetailRepository.checkEmployeeIDIsExists(employeeId)).thenReturn(true);
+    when(employeeDetailRepository.findMainDetail(employeeId)).thenReturn(expected);
+    EmployeeDetailResponse actual = employeeDetailService.findMainDetail(employeeId);
     assertEquals(expected, actual);
   }
 
@@ -51,7 +58,10 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindTaxAndInsurance_Normal() {
     TaxAndInsuranceResponse expected = DataSample.TAX_AND_INSURANCE_RESPONSE;
-    TaxAndInsuranceResponse actual = employeeDetailService.findTaxAndInsurance("huynq100");
+    String employeeId = "huynq100";
+    when(employeeDetailRepository.checkEmployeeIDIsExists(employeeId)).thenReturn(true);
+    when(employeeDetailRepository.findTaxAndInsurance(employeeId)).thenReturn(expected);
+    TaxAndInsuranceResponse actual = employeeDetailService.findTaxAndInsurance(employeeId);
     assertEquals(expected, actual);
   }
 
@@ -76,7 +86,10 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindAdditionalInfo_Normal() {
     EmployeeAdditionalInfo expected = DataSample.EMPLOYEE_ADDITIONAL_INFO;
-    EmployeeAdditionalInfo actual = employeeDetailService.findAdditionalInfo("huynq100");
+    String employeeId = "huynq100";
+    when(employeeDetailRepository.checkEmployeeIDIsExists(employeeId)).thenReturn(true);
+    when(employeeDetailRepository.findAdditionalInfo(employeeId)).thenReturn(expected);
+    EmployeeAdditionalInfo actual = employeeDetailService.findAdditionalInfo(employeeId);
     assertEquals(expected, actual);
   }
 
@@ -102,7 +115,10 @@ public class EmployeeDetailServiceTest {
   @Test
   void testFindBankInfo_Normal() {
     BankResponse expected = DataSample.BANK_RESPONSE;
-    BankResponse actual = employeeDetailService.findBankByEmployeeID("huynq100");
+    String employeeId = "huynq100";
+    when(employeeDetailRepository.checkEmployeeIDIsExists(employeeId)).thenReturn(true);
+    when(employeeDetailRepository.findBankByEmployeeID(employeeId)).thenReturn(expected);
+    BankResponse actual = employeeDetailService.findBankByEmployeeID(employeeId);
     assertEquals(expected, actual);
   }
 
@@ -128,8 +144,12 @@ public class EmployeeDetailServiceTest {
   @DisplayName("Test findEducationByEmployeeID Normal")
   @Test
   void testFindEducation_Normal() {
-    List<EducationResponse> actual = employeeDetailService.findEducationByEmployeeID("huynq100");
-    assertEquals(2, actual.size());
+    List<EducationResponse> expected = DataSample.EDUCATION_RESPONSES;
+    String employeeId = "huynq100";
+    when(employeeDetailRepository.checkEmployeeIDIsExists(employeeId)).thenReturn(true);
+    when(employeeDetailRepository.findEducationByEmployeeID(employeeId)).thenReturn(expected);
+    List<EducationResponse> actual = employeeDetailService.findEducationByEmployeeID(employeeId);
+    assertEquals(expected, actual);
   }
 
   @DisplayName("Test findEducationByEmployeeID EmployeeID Is null")
@@ -155,9 +175,13 @@ public class EmployeeDetailServiceTest {
   @DisplayName("Test findWorkingHistoryByEmployeeID Normal")
   @Test
   void testFindWorkingHistory_Normal() {
+    List<WorkingHistoryResponse> expected = DataSample.WORKING_HISTORY_RESPONSES;
+    String employeeId = "huynq100";
+    when(employeeDetailRepository.checkEmployeeIDIsExists(employeeId)).thenReturn(true);
+    when(employeeDetailRepository.findWorkingHistoryByEmployeeID(employeeId)).thenReturn(expected);
     List<WorkingHistoryResponse> actual =
         employeeDetailService.findWorkingHistoryByEmployeeID("huynq100");
-    assertEquals(2, actual.size());
+    assertEquals(expected, actual);
   }
 
   @DisplayName("Test findWorkingHistoryByEmployeeID EmployeeID Is null")
@@ -179,13 +203,6 @@ public class EmployeeDetailServiceTest {
             () -> employeeDetailService.findWorkingHistoryByEmployeeID(""));
     assertEquals(NO_EMPLOYEE_WITH_ID, exception.getMessage());
   }
-
-  //  @DisplayName("Test updateEmployeeDetail Normal")
-  //  @Test
-  //  void testUpdateEmployeeDetail_Normal() {
-  //    EmployeeDetailRequest record = DataSample.EMPLOYEE_DETAIL_REQUEST;
-  //    verify(employeeDetailService, atLeastOnce()).updateEmployeeDetail(record);
-  //  }
 
   @DisplayName("Test updateEmployeeDetail EmployeeID Is not exist in db")
   @Test

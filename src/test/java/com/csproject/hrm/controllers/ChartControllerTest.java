@@ -1,9 +1,10 @@
 package com.csproject.hrm.controllers;
 
 import com.csproject.hrm.common.sample.ChartDataSample;
+import com.csproject.hrm.common.utils.DateUtils;
 import com.csproject.hrm.config.TestSecurityConfig;
-import com.csproject.hrm.dto.chart.GeneralDataCharts;
-import com.csproject.hrm.dto.chart.OrganizationalChart;
+import com.csproject.hrm.dto.chart.*;
+import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.jwt.JwtUtils;
 import com.csproject.hrm.services.impl.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.List;
 
 import static com.csproject.hrm.common.constant.Constants.AUTHORIZATION;
 import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
@@ -72,7 +75,7 @@ public class ChartControllerTest {
             .accept("*/*")
             .header(
                 AUTHORIZATION,
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGwsImFjY291bnROb25Mb2NrZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWV9LCJpYXQiOjE2NTk3MjkwMzEsImV4cCI6MTY1OTgxNTQzMX0.7rkpFrZckf8K6pTSayMMDkNqht-9FOQRutILkVl9AkRVhHSZCTtIiDK5eWlXq2s3Jn1vYX5zihoyomC31y7nyQ")
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding(StandardCharsets.UTF_8);
 
@@ -101,7 +104,288 @@ public class ChartControllerTest {
             .accept("*/*")
             .header(
                 AUTHORIZATION,
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiZW5hYmxlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGwsImFjY291bnROb25Mb2NrZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWV9LCJpYXQiOjE2NTk3MjkwMzEsImV4cCI6MTY1OTgxNTQzMX0.7rkpFrZckf8K6pTSayMMDkNqht-9FOQRutILkVl9AkRVhHSZCTtIiDK5eWlXq2s3Jn1vYX5zihoyomC31y7nyQ")
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetLeaveCompanyReason_Admin_Normal() throws Exception {
+    String employeeId = "huynq100";
+    String areaName = chartService.getAreaNameByEmployeeID(employeeId);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<LeaveCompanyChart> response = ChartDataSample.LEAVE_COMPANY_CHARTS;
+
+    when(chartService.getLeaveCompanyReasonByYearAndAreaName(2022, areaName)).thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(REQUEST_MAPPING + "/get_leave_company_reason_chart?year=2022")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetPaidLeaveReason_Admin_Normal() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<PaidLeaveChart> response = ChartDataSample.PAID_LEAVE_CHARTS;
+
+    when(chartService.getPaidLeaveReasonByYearAndManagerID(
+            request.getHeader(AUTHORIZATION), 2022, "huynq100"))
+        .thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING + "/get_paid_leave_reason_chart?year=2022&employeeId=huynq100")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetSalaryStructure_Admin_Normal() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<GeneralSalaryChart> response = ChartDataSample.SALARY_STRUCTURE;
+
+    when(chartService.getSalaryStructureByDateAndEmployeeID(
+            DateUtils.convert("2022-08-01"), "huynq100"))
+        .thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING + "/get_salary_structure_chart?date=2022-08-01&employeeId=huynq100")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetSalaryStructure_Admin_EmployeeIDIsEmpty() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<GeneralSalaryChart> response = ChartDataSample.SALARY_STRUCTURE;
+
+    when(chartService.getSalaryStructureByDateAndEmployeeID(DateUtils.convert("2022-08-01"), ""))
+        .thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING + "/get_salary_structure_chart?date=2022-08-01&employeeId=huynq100")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetSalaryHistory_Yearly_Admin_Normal() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<GeneralSalaryChart> response = ChartDataSample.SALARY_HISTORY_YEARLY;
+
+    when(chartService.getSalaryHistoryByDateAndEmployeeIDAndType(
+            chartService.getStartDateOfContract("huynq100"), "huynq100", "yearly"))
+        .thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING + "/get_salary_history_chart?type=yearly&employeeId=huynq100")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetSalaryHistory_Yearly_Admin_EmployeeIDIsEmpty() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<GeneralSalaryChart> response = ChartDataSample.SALARY_HISTORY_YEARLY;
+
+    when(chartService.getSalaryHistoryByDateAndEmployeeIDAndType(
+            chartService.getStartDateOfContract("huynq100"), "", "yearly"))
+        .thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING + "/get_salary_history_chart?type=yearly&employeeId=huynq100")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetSalaryHistory_Monthly_Admin_Normal() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<GeneralSalaryChart> response = ChartDataSample.SALARY_HISTORY_MONTHLY;
+
+    when(chartService.getSalaryHistoryByDateAndEmployeeIDAndType(
+            DateUtils.convert("2022-10-01"), "huynq100", "monthly"))
+        .thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(
+                REQUEST_MAPPING
+                    + "/get_salary_history_chart?type=monthly&date=2022-10-01&employeeId=huynq100")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetAllEmployeeByManagerID_Admin_Normal() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<EmployeeNameAndID> response = ChartDataSample.EMPLOYEE_NAME_AND_IDS;
+
+    when(employeeDetailService.getAllEmployeeByManagerID("huynq100")).thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(REQUEST_MAPPING + "/get_employee_by_manager")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
+            .contentType(MediaType.APPLICATION_JSON)
+            .characterEncoding(StandardCharsets.UTF_8);
+
+    mockMvc
+        .perform(requestBuilder)
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString(StandardCharsets.UTF_8);
+  }
+
+  @Test
+  @WithMockUser(
+      value = "admin",
+      roles = {"ADMIN"})
+  void testGetAllHoliday_Admin_Normal() throws Exception {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.isUserInRole("ADMIN")).thenReturn(true);
+
+    List<LocalDate> response = ChartDataSample.DATE_LIST;
+
+    when(holidayCalenderService.getAllHolidayByYear(LocalDate.of(2022, 1, 1))).thenReturn(response);
+
+    RequestBuilder requestBuilder =
+        MockMvcRequestBuilders.get(REQUEST_MAPPING + "/get_all_holiday?year=2022")
+            .accept("*/*")
+            .header(
+                AUTHORIZATION,
+                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJodXlucTEwMCIsIlVzZXJfRGF0YSI6eyJpZCI6Imh1eW5xMTAwIiwiZW1haWwiOiJodXlucTEwMEBmcHQuZWR1LnZuIiwiYXV0aG9yaXRpZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfTUFOQUdFUiJ9XSwiZW5hYmxlZCI6dHJ1ZSwiZnVsbE5hbWUiOiJOZ3V5ZW4gUXVhbmcgSHV5IiwiYWNjb3VudE5vbkxvY2tlZCI6dHJ1ZSwiYWNjb3VudE5vbkV4cGlyZWQiOnRydWUsImNyZWRlbnRpYWxzTm9uRXhwaXJlZCI6dHJ1ZSwidXNlcm5hbWUiOm51bGx9LCJpYXQiOjE2NjAxNTQxNDMsImV4cCI6MTY2MDI0MDU0M30.imi_WcXHDUxND1T4feWl7_YX3jXNJbkIC-zgA2lZNk2g_bowc9P2z-nMeRbGvTXWS1Wv3VGHOWmMRTHEGl2D6A")
             .contentType(MediaType.APPLICATION_JSON)
             .characterEncoding(StandardCharsets.UTF_8);
 
