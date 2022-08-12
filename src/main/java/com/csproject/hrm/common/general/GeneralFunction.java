@@ -380,7 +380,7 @@ public class GeneralFunction {
     BigDecimal totalDeductionTax =
         familyAllowancesPersonal.add(familyAllowancesDependent).add(totalInsurance);
 
-    BigDecimal salaryForTax = monthlySalary.subtract(totalInsurance);
+    BigDecimal salaryForTax = monthlySalary.subtract(totalDeductionTax);
     if (salaryForTax.compareTo(totalDeductionTax) <= 0) {
       return new ArrayList<>();
     }
@@ -400,7 +400,7 @@ public class GeneralFunction {
             if (maxValue.compareTo(salaryForTax) >= 0 && minValue.compareTo(salaryForTax) < 0) {
               String[] splitStrike = rangePolicy.getValue().split("\\-", 2);
               BigDecimal value =
-                  monthlySalary
+                  salaryForTax
                       .multiply(
                           BigDecimal.valueOf(Double.parseDouble(splitStrike[ZERO_NUMBER]))
                               .divide(BigDecimal.TEN)
@@ -409,7 +409,7 @@ public class GeneralFunction {
               employeeTaxResponse.setTax_name(
                   EPolicyName.getLabel(employeeTaxResponse.getTax_name()));
               employeeTaxResponse.setTax_value(
-                  BigDecimal.valueOf(Double.parseDouble(rangePolicy.getValue())).doubleValue());
+                  BigDecimal.valueOf(Double.parseDouble(splitStrike[ZERO_NUMBER])).doubleValue());
               employeeTaxResponse.setValue(value);
               break;
             }
@@ -449,7 +449,8 @@ public class GeneralFunction {
           }
           employeeInsuranceResponse.setInsurance_name(
               EPolicyName.getLabel(employeeInsuranceResponse.getInsurance_name()));
-          employeeInsuranceResponse.setInsurance_value(Double.parseDouble(i.getValue()));
+          employeeInsuranceResponse.setInsurance_value(
+              Double.parseDouble(splitStrike[ZERO_NUMBER]));
           employeeInsuranceResponse.setValue(value);
           break;
         }

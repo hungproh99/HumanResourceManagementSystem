@@ -456,6 +456,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     return DSL.using(config)
         .insertInto(
             WORKING_PLACE,
+            WORKING_PLACE.START_DATE,
             WORKING_PLACE.WORKING_PLACE_STATUS,
             WORKING_PLACE.AREA_ID,
             WORKING_PLACE.OFFICE_ID,
@@ -463,6 +464,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             WORKING_PLACE.GRADE_ID,
             WORKING_PLACE.WORKING_CONTRACT_ID)
         .values(
+            startDate,
             placeStatus,
             area,
             office,

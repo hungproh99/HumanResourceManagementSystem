@@ -686,7 +686,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(RELATIVE_INFORMATION)
             .leftJoin(EMPLOYEE)
             .on(EMPLOYEE.EMPLOYEE_ID.eq(RELATIVE_INFORMATION.EMPLOYEE_ID))
-            .where(RELATIVE_INFORMATION.IS_DEPENDENT.isTrue()));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
   }
 
   @Override

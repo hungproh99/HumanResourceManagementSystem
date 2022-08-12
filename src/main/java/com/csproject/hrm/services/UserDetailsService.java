@@ -20,7 +20,6 @@ public class UserDetailsService
   @Override
   @Transactional
   public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-    System.out.println("hello" + employeeRepository.findIdByCompanyEmail(id));
     Optional<Employee> employee = employeeRepository.findById(id);
     if (employee.isEmpty()) {
       throw new UsernameNotFoundException("User not found with id: " + id);

@@ -32,6 +32,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -239,6 +241,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
       for (CSVRecord csvRecord : csvParser) {
         try {
+          checkValidFormatCsv(csvParser);
           String fullName = csvRecord.get("Full Name");
           Long role = ERole.getValue(csvRecord.get("Role"));
           String phone = csvRecord.get("Phone");
@@ -259,23 +262,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   csvRecord.get("Start Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
           LocalDate endDate =
               LocalDate.parse(csvRecord.get("End Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-          if (csvRecord.get("Full Name") == null
-              || csvRecord.get("Role") == null
-              || csvRecord.get("Phone") == null
-              || csvRecord.get("Gender") == null
-              || csvRecord.get("Birth Date") == null
-              || csvRecord.get("Grade") == null
-              || csvRecord.get("Position") == null
-              || csvRecord.get("Office") == null
-              || csvRecord.get("Area") == null
-              || csvRecord.get("Working Type") == null
-              || csvRecord.get("Manager Id") == null
-              || csvRecord.get("Employee Type") == null
-              || csvRecord.get("Personal Email") == null
-              || csvRecord.get("Start Date") == null
-              || csvRecord.get("End Date") == null) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in csv");
-          } else if (!roleRepository.existsById(role)) {
+          if (!roleRepository.existsById(role)) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
           } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
@@ -317,6 +304,9 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         } catch (NumberFormatException e) {
           throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
         }
+      }
+      if (hrmRequestList.isEmpty()) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Nothing to insert");
       }
       insertMultiEmployee(hrmRequestList);
     } catch (IOException e) {
@@ -367,9 +357,13 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public void importExcelToEmployee(Workbook workBook) {
     List<HrmRequest> hrmRequestList = new ArrayList<>();
     Sheet sheet = workBook.getSheetAt(0);
+    if (getNumberOfNonEmptyCells(sheet, 0) <= 1) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format excel for import");
+    }
     for (int rowIndex = 0; rowIndex <= getNumberOfNonEmptyCells(sheet, 0) - 1; rowIndex++) {
       Row row = sheet.getRow(rowIndex);
       if (rowIndex == 0) {
+        checkValidFormatExcel(row);
         continue;
       }
       String fullName = row.getCell(0).getStringCellValue();
@@ -423,6 +417,9 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .build());
+    }
+    if (hrmRequestList.isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Nothing to insert");
     }
     insertMultiEmployee(hrmRequestList);
   }
@@ -551,5 +548,78 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       }
     }
     return numOfNonEmptyCells;
+  }
+
+  private void checkValidFormatCsv(CSVParser csvParser) {
+    Set<Map.Entry<String, Integer>> map = csvParser.getHeaderMap().entrySet();
+    for (Map.Entry<String, Integer> i : map) {
+      if (i.getKey().equals("Full Name")) {
+        continue;
+      } else if (i.getKey().equals("Role")) {
+        continue;
+      } else if (i.getKey().equals("Phone")) {
+        continue;
+      } else if (i.getKey().equals("Gender")) {
+        continue;
+      } else if (i.getKey().equals("Grade")) {
+        continue;
+      } else if (i.getKey().equals("Position")) {
+        continue;
+      } else if (i.getKey().equals("Office")) {
+        continue;
+      } else if (i.getKey().equals("Area")) {
+        continue;
+      } else if (i.getKey().equals("Working Type")) {
+        continue;
+      } else if (i.getKey().equals("Manager Id")) {
+        continue;
+      } else if (i.getKey().equals("Employee Type")) {
+        continue;
+      } else if (i.getKey().equals("Personal Email")) {
+        continue;
+      } else if (i.getKey().equals("Start Date")) {
+        continue;
+      } else if (i.getKey().equals("End Date")) {
+        continue;
+      } else if (i.getKey().equals("Birth Date")) {
+        continue;
+      } else {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+      }
+    }
+  }
+
+  private void checkValidFormatExcel(Row row) {
+    if (!row.getCell(0).getStringCellValue().equals("Full Name")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(1).getStringCellValue().equals("Role")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(2).getStringCellValue().equals("Phone")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(3).getStringCellValue().equals("Gender")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(4).getStringCellValue().equals("Birth Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(5).getStringCellValue().equals("Grade")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(6).getStringCellValue().equals("Position")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(7).getStringCellValue().equals("Office")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(8).getStringCellValue().equals("Area")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(9).getStringCellValue().equals("Working Type")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(10).getStringCellValue().equals("Manager Id")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(11).getStringCellValue().equals("Employee Type")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(12).getStringCellValue().equals("Personal Email")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(13).getStringCellValue().equals("Start Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(14).getStringCellValue().equals("End Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    }
   }
 }

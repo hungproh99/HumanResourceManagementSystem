@@ -415,8 +415,8 @@ public class HumanManagementServiceTest {
     when(sheet.getLastRowNum()).thenReturn(11);
     for (int i = 0; i <= 1; i++) {
       when(sheet.getRow(i)).thenReturn(row);
-      when(row.getCell(0)).thenReturn(cell);
     }
+    Row row0 = mock(Row.class);
     Row row1 = mock(Row.class);
     Cell cell0 = mock(Cell.class);
     Cell cell1 = mock(Cell.class);
@@ -433,43 +433,91 @@ public class HumanManagementServiceTest {
     Cell cell12 = mock(Cell.class);
     Cell cell13 = mock(Cell.class);
     Cell cell14 = mock(Cell.class);
-    for (int i = 0; i < 1; i++) {
-      when(sheet.getRow(1)).thenReturn(row1);
-      when(row1.getCell(0)).thenReturn(cell0);
-      when(row1.getCell(1)).thenReturn(cell1);
-      when(row1.getCell(2)).thenReturn(cell2);
-      when(row1.getCell(3)).thenReturn(cell3);
-      when(row1.getCell(4)).thenReturn(cell4);
-      when(row1.getCell(5)).thenReturn(cell5);
-      when(row1.getCell(6)).thenReturn(cell6);
-      when(row1.getCell(7)).thenReturn(cell7);
-      when(row1.getCell(8)).thenReturn(cell8);
-      when(row1.getCell(9)).thenReturn(cell9);
-      when(row1.getCell(10)).thenReturn(cell10);
-      when(row1.getCell(11)).thenReturn(cell11);
-      when(row1.getCell(12)).thenReturn(cell12);
-      when(row1.getCell(13)).thenReturn(cell13);
-      when(row1.getCell(14)).thenReturn(cell14);
+    Cell cell15 = mock(Cell.class);
+    Cell cell16 = mock(Cell.class);
+    Cell cell17 = mock(Cell.class);
+    Cell cell18 = mock(Cell.class);
+    Cell cell19 = mock(Cell.class);
+    Cell cell20 = mock(Cell.class);
+    Cell cell21 = mock(Cell.class);
+    Cell cell22 = mock(Cell.class);
+    Cell cell23 = mock(Cell.class);
+    Cell cell24 = mock(Cell.class);
+    Cell cell25 = mock(Cell.class);
+    Cell cell26 = mock(Cell.class);
+    Cell cell27 = mock(Cell.class);
+    Cell cell28 = mock(Cell.class);
+    Cell cell29 = mock(Cell.class);
 
-      when(row1.getCell(0).getStringCellValue()).thenReturn("Nguyen Quang Huy");
-      when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
-      when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
-      when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
-      when(row1.getCell(4).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
-      when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
-      when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
-      when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
-      when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
-      when(row1.getCell(10).toString()).thenReturn("huynq100");
-      when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
-      when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
-      when(row1.getCell(13).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(14).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-    }
+    when(sheet.getRow(0)).thenReturn(row0);
+    when(row0.getCell(0)).thenReturn(cell0);
+    when(row0.getCell(1)).thenReturn(cell1);
+    when(row0.getCell(2)).thenReturn(cell2);
+    when(row0.getCell(3)).thenReturn(cell3);
+    when(row0.getCell(4)).thenReturn(cell4);
+    when(row0.getCell(5)).thenReturn(cell5);
+    when(row0.getCell(6)).thenReturn(cell6);
+    when(row0.getCell(7)).thenReturn(cell7);
+    when(row0.getCell(8)).thenReturn(cell8);
+    when(row0.getCell(9)).thenReturn(cell9);
+    when(row0.getCell(10)).thenReturn(cell10);
+    when(row0.getCell(11)).thenReturn(cell11);
+    when(row0.getCell(12)).thenReturn(cell12);
+    when(row0.getCell(13)).thenReturn(cell13);
+    when(row0.getCell(14)).thenReturn(cell14);
+
+    when(row0.getCell(0).getStringCellValue()).thenReturn("Full Name");
+    when(row0.getCell(1).getStringCellValue()).thenReturn("Role");
+    when(row0.getCell(2).getStringCellValue()).thenReturn("Phone");
+    when(row0.getCell(3).getStringCellValue()).thenReturn("Gender");
+    when(row0.getCell(4).getStringCellValue()).thenReturn("Birth Date");
+    when(row0.getCell(5).getStringCellValue()).thenReturn("Grade");
+    when(row0.getCell(6).getStringCellValue()).thenReturn("Position");
+    when(row0.getCell(7).getStringCellValue()).thenReturn("Office");
+    when(row0.getCell(8).getStringCellValue()).thenReturn("Area");
+    when(row0.getCell(9).getStringCellValue()).thenReturn("Working Type");
+    when(row0.getCell(10).getStringCellValue()).thenReturn("Manager Id");
+    when(row0.getCell(11).getStringCellValue()).thenReturn("Employee Type");
+    when(row0.getCell(12).getStringCellValue()).thenReturn("Personal Email");
+    when(row0.getCell(13).getStringCellValue()).thenReturn("Start Date");
+    when(row0.getCell(14).getStringCellValue()).thenReturn("End Date");
+
+    when(sheet.getRow(1)).thenReturn(row1);
+    when(row1.getCell(0)).thenReturn(cell15);
+    when(row1.getCell(1)).thenReturn(cell16);
+    when(row1.getCell(2)).thenReturn(cell17);
+    when(row1.getCell(3)).thenReturn(cell18);
+    when(row1.getCell(4)).thenReturn(cell19);
+    when(row1.getCell(5)).thenReturn(cell20);
+    when(row1.getCell(6)).thenReturn(cell21);
+    when(row1.getCell(7)).thenReturn(cell22);
+    when(row1.getCell(8)).thenReturn(cell23);
+    when(row1.getCell(9)).thenReturn(cell24);
+    when(row1.getCell(10)).thenReturn(cell25);
+    when(row1.getCell(11)).thenReturn(cell26);
+    when(row1.getCell(12)).thenReturn(cell27);
+    when(row1.getCell(13)).thenReturn(cell28);
+    when(row1.getCell(14)).thenReturn(cell29);
+
+    when(row1.getCell(0).getStringCellValue()).thenReturn("Nguyen Quang Huy");
+    when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
+    when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
+    when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
+    when(row1.getCell(4).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
+    when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
+    when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
+    when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
+    when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
+    when(row1.getCell(10).toString()).thenReturn("huynq100");
+    when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
+    when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
+    when(row1.getCell(13).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(14).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+
     humanManagementService.importExcelToEmployee(workbook);
   }
 
@@ -479,8 +527,8 @@ public class HumanManagementServiceTest {
     when(sheet.getLastRowNum()).thenReturn(11);
     for (int i = 0; i <= 1; i++) {
       when(sheet.getRow(i)).thenReturn(row);
-      when(row.getCell(0)).thenReturn(cell);
     }
+    Row row0 = mock(Row.class);
     Row row1 = mock(Row.class);
     Cell cell0 = mock(Cell.class);
     Cell cell1 = mock(Cell.class);
@@ -497,43 +545,91 @@ public class HumanManagementServiceTest {
     Cell cell12 = mock(Cell.class);
     Cell cell13 = mock(Cell.class);
     Cell cell14 = mock(Cell.class);
-    for (int i = 0; i < 1; i++) {
-      when(sheet.getRow(1)).thenReturn(row1);
-      when(row1.getCell(0)).thenReturn(cell0);
-      when(row1.getCell(1)).thenReturn(cell1);
-      when(row1.getCell(2)).thenReturn(cell2);
-      when(row1.getCell(3)).thenReturn(cell3);
-      when(row1.getCell(4)).thenReturn(cell4);
-      when(row1.getCell(5)).thenReturn(cell5);
-      when(row1.getCell(6)).thenReturn(cell6);
-      when(row1.getCell(7)).thenReturn(cell7);
-      when(row1.getCell(8)).thenReturn(cell8);
-      when(row1.getCell(9)).thenReturn(cell9);
-      when(row1.getCell(10)).thenReturn(cell10);
-      when(row1.getCell(11)).thenReturn(cell11);
-      when(row1.getCell(12)).thenReturn(cell12);
-      when(row1.getCell(13)).thenReturn(cell13);
-      when(row1.getCell(14)).thenReturn(cell14);
+    Cell cell15 = mock(Cell.class);
+    Cell cell16 = mock(Cell.class);
+    Cell cell17 = mock(Cell.class);
+    Cell cell18 = mock(Cell.class);
+    Cell cell19 = mock(Cell.class);
+    Cell cell20 = mock(Cell.class);
+    Cell cell21 = mock(Cell.class);
+    Cell cell22 = mock(Cell.class);
+    Cell cell23 = mock(Cell.class);
+    Cell cell24 = mock(Cell.class);
+    Cell cell25 = mock(Cell.class);
+    Cell cell26 = mock(Cell.class);
+    Cell cell27 = mock(Cell.class);
+    Cell cell28 = mock(Cell.class);
+    Cell cell29 = mock(Cell.class);
 
-      when(row1.getCell(0).getStringCellValue()).thenReturn(null);
-      when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
-      when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
-      when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
-      when(row1.getCell(4).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
-      when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
-      when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
-      when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
-      when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
-      when(row1.getCell(10).toString()).thenReturn("huynq100");
-      when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
-      when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
-      when(row1.getCell(13).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(14).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-    }
+    when(sheet.getRow(0)).thenReturn(row0);
+    when(row0.getCell(0)).thenReturn(cell0);
+    when(row0.getCell(1)).thenReturn(cell1);
+    when(row0.getCell(2)).thenReturn(cell2);
+    when(row0.getCell(3)).thenReturn(cell3);
+    when(row0.getCell(4)).thenReturn(cell4);
+    when(row0.getCell(5)).thenReturn(cell5);
+    when(row0.getCell(6)).thenReturn(cell6);
+    when(row0.getCell(7)).thenReturn(cell7);
+    when(row0.getCell(8)).thenReturn(cell8);
+    when(row0.getCell(9)).thenReturn(cell9);
+    when(row0.getCell(10)).thenReturn(cell10);
+    when(row0.getCell(11)).thenReturn(cell11);
+    when(row0.getCell(12)).thenReturn(cell12);
+    when(row0.getCell(13)).thenReturn(cell13);
+    when(row0.getCell(14)).thenReturn(cell14);
+
+    when(row0.getCell(0).getStringCellValue()).thenReturn("Full Name");
+    when(row0.getCell(1).getStringCellValue()).thenReturn("Role");
+    when(row0.getCell(2).getStringCellValue()).thenReturn("Phone");
+    when(row0.getCell(3).getStringCellValue()).thenReturn("Gender");
+    when(row0.getCell(4).getStringCellValue()).thenReturn("Birth Date");
+    when(row0.getCell(5).getStringCellValue()).thenReturn("Grade");
+    when(row0.getCell(6).getStringCellValue()).thenReturn("Position");
+    when(row0.getCell(7).getStringCellValue()).thenReturn("Office");
+    when(row0.getCell(8).getStringCellValue()).thenReturn("Area");
+    when(row0.getCell(9).getStringCellValue()).thenReturn("Working Type");
+    when(row0.getCell(10).getStringCellValue()).thenReturn("Manager Id");
+    when(row0.getCell(11).getStringCellValue()).thenReturn("Employee Type");
+    when(row0.getCell(12).getStringCellValue()).thenReturn("Personal Email");
+    when(row0.getCell(13).getStringCellValue()).thenReturn("Start Date");
+    when(row0.getCell(14).getStringCellValue()).thenReturn("End Date");
+
+    when(sheet.getRow(1)).thenReturn(row1);
+    when(row1.getCell(0)).thenReturn(cell15);
+    when(row1.getCell(1)).thenReturn(cell16);
+    when(row1.getCell(2)).thenReturn(cell17);
+    when(row1.getCell(3)).thenReturn(cell18);
+    when(row1.getCell(4)).thenReturn(cell19);
+    when(row1.getCell(5)).thenReturn(cell20);
+    when(row1.getCell(6)).thenReturn(cell21);
+    when(row1.getCell(7)).thenReturn(cell22);
+    when(row1.getCell(8)).thenReturn(cell23);
+    when(row1.getCell(9)).thenReturn(cell24);
+    when(row1.getCell(10)).thenReturn(cell25);
+    when(row1.getCell(11)).thenReturn(cell26);
+    when(row1.getCell(12)).thenReturn(cell27);
+    when(row1.getCell(13)).thenReturn(cell28);
+    when(row1.getCell(14)).thenReturn(cell29);
+
+    when(row1.getCell(0).getStringCellValue()).thenReturn(null);
+    when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
+    when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
+    when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
+    when(row1.getCell(4).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
+    when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
+    when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
+    when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
+    when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
+    when(row1.getCell(10).toString()).thenReturn("huynq100");
+    when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
+    when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
+    when(row1.getCell(13).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(14).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+
     assertThrows(
         CustomErrorException.class, () -> humanManagementService.importExcelToEmployee(workbook));
   }
@@ -544,8 +640,8 @@ public class HumanManagementServiceTest {
     when(sheet.getLastRowNum()).thenReturn(11);
     for (int i = 0; i <= 1; i++) {
       when(sheet.getRow(i)).thenReturn(row);
-      when(row.getCell(0)).thenReturn(cell);
     }
+    Row row0 = mock(Row.class);
     Row row1 = mock(Row.class);
     Cell cell0 = mock(Cell.class);
     Cell cell1 = mock(Cell.class);
@@ -562,43 +658,91 @@ public class HumanManagementServiceTest {
     Cell cell12 = mock(Cell.class);
     Cell cell13 = mock(Cell.class);
     Cell cell14 = mock(Cell.class);
-    for (int i = 0; i < 1; i++) {
-      when(sheet.getRow(1)).thenReturn(row1);
-      when(row1.getCell(0)).thenReturn(cell0);
-      when(row1.getCell(1)).thenReturn(cell1);
-      when(row1.getCell(2)).thenReturn(cell2);
-      when(row1.getCell(3)).thenReturn(cell3);
-      when(row1.getCell(4)).thenReturn(cell4);
-      when(row1.getCell(5)).thenReturn(cell5);
-      when(row1.getCell(6)).thenReturn(cell6);
-      when(row1.getCell(7)).thenReturn(cell7);
-      when(row1.getCell(8)).thenReturn(cell8);
-      when(row1.getCell(9)).thenReturn(cell9);
-      when(row1.getCell(10)).thenReturn(cell10);
-      when(row1.getCell(11)).thenReturn(cell11);
-      when(row1.getCell(12)).thenReturn(cell12);
-      when(row1.getCell(13)).thenReturn(cell13);
-      when(row1.getCell(14)).thenReturn(cell14);
+    Cell cell15 = mock(Cell.class);
+    Cell cell16 = mock(Cell.class);
+    Cell cell17 = mock(Cell.class);
+    Cell cell18 = mock(Cell.class);
+    Cell cell19 = mock(Cell.class);
+    Cell cell20 = mock(Cell.class);
+    Cell cell21 = mock(Cell.class);
+    Cell cell22 = mock(Cell.class);
+    Cell cell23 = mock(Cell.class);
+    Cell cell24 = mock(Cell.class);
+    Cell cell25 = mock(Cell.class);
+    Cell cell26 = mock(Cell.class);
+    Cell cell27 = mock(Cell.class);
+    Cell cell28 = mock(Cell.class);
+    Cell cell29 = mock(Cell.class);
 
-      when(row1.getCell(0).getStringCellValue()).thenReturn("Nguyen Quang Huy");
-      when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
-      when(row1.getCell(2).getNumericCellValue()).thenReturn(1234D);
-      when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
-      when(row1.getCell(4).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
-      when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
-      when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
-      when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
-      when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
-      when(row1.getCell(10).toString()).thenReturn("huynq100");
-      when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
-      when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
-      when(row1.getCell(13).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(14).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-    }
+    when(sheet.getRow(0)).thenReturn(row0);
+    when(row0.getCell(0)).thenReturn(cell0);
+    when(row0.getCell(1)).thenReturn(cell1);
+    when(row0.getCell(2)).thenReturn(cell2);
+    when(row0.getCell(3)).thenReturn(cell3);
+    when(row0.getCell(4)).thenReturn(cell4);
+    when(row0.getCell(5)).thenReturn(cell5);
+    when(row0.getCell(6)).thenReturn(cell6);
+    when(row0.getCell(7)).thenReturn(cell7);
+    when(row0.getCell(8)).thenReturn(cell8);
+    when(row0.getCell(9)).thenReturn(cell9);
+    when(row0.getCell(10)).thenReturn(cell10);
+    when(row0.getCell(11)).thenReturn(cell11);
+    when(row0.getCell(12)).thenReturn(cell12);
+    when(row0.getCell(13)).thenReturn(cell13);
+    when(row0.getCell(14)).thenReturn(cell14);
+
+    when(row0.getCell(0).getStringCellValue()).thenReturn("Full Name");
+    when(row0.getCell(1).getStringCellValue()).thenReturn("Role");
+    when(row0.getCell(2).getStringCellValue()).thenReturn("Phone");
+    when(row0.getCell(3).getStringCellValue()).thenReturn("Gender");
+    when(row0.getCell(4).getStringCellValue()).thenReturn("Birth Date");
+    when(row0.getCell(5).getStringCellValue()).thenReturn("Grade");
+    when(row0.getCell(6).getStringCellValue()).thenReturn("Position");
+    when(row0.getCell(7).getStringCellValue()).thenReturn("Office");
+    when(row0.getCell(8).getStringCellValue()).thenReturn("Area");
+    when(row0.getCell(9).getStringCellValue()).thenReturn("Working Type");
+    when(row0.getCell(10).getStringCellValue()).thenReturn("Manager Id");
+    when(row0.getCell(11).getStringCellValue()).thenReturn("Employee Type");
+    when(row0.getCell(12).getStringCellValue()).thenReturn("Personal Email");
+    when(row0.getCell(13).getStringCellValue()).thenReturn("Start Date");
+    when(row0.getCell(14).getStringCellValue()).thenReturn("End Date");
+
+    when(sheet.getRow(1)).thenReturn(row1);
+    when(row1.getCell(0)).thenReturn(cell15);
+    when(row1.getCell(1)).thenReturn(cell16);
+    when(row1.getCell(2)).thenReturn(cell17);
+    when(row1.getCell(3)).thenReturn(cell18);
+    when(row1.getCell(4)).thenReturn(cell19);
+    when(row1.getCell(5)).thenReturn(cell20);
+    when(row1.getCell(6)).thenReturn(cell21);
+    when(row1.getCell(7)).thenReturn(cell22);
+    when(row1.getCell(8)).thenReturn(cell23);
+    when(row1.getCell(9)).thenReturn(cell24);
+    when(row1.getCell(10)).thenReturn(cell25);
+    when(row1.getCell(11)).thenReturn(cell26);
+    when(row1.getCell(12)).thenReturn(cell27);
+    when(row1.getCell(13)).thenReturn(cell28);
+    when(row1.getCell(14)).thenReturn(cell29);
+
+    when(row1.getCell(0).getStringCellValue()).thenReturn("Nguyen Quang Huy");
+    when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
+    when(row1.getCell(2).getNumericCellValue()).thenReturn(1317D);
+    when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
+    when(row1.getCell(4).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
+    when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
+    when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
+    when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
+    when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
+    when(row1.getCell(10).toString()).thenReturn("huynq100");
+    when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
+    when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
+    when(row1.getCell(13).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(14).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+
     assertThrows(
         CustomErrorException.class, () -> humanManagementService.importExcelToEmployee(workbook));
   }
@@ -609,8 +753,8 @@ public class HumanManagementServiceTest {
     when(sheet.getLastRowNum()).thenReturn(11);
     for (int i = 0; i <= 1; i++) {
       when(sheet.getRow(i)).thenReturn(row);
-      when(row.getCell(0)).thenReturn(cell);
     }
+    Row row0 = mock(Row.class);
     Row row1 = mock(Row.class);
     Cell cell0 = mock(Cell.class);
     Cell cell1 = mock(Cell.class);
@@ -627,43 +771,90 @@ public class HumanManagementServiceTest {
     Cell cell12 = mock(Cell.class);
     Cell cell13 = mock(Cell.class);
     Cell cell14 = mock(Cell.class);
-    for (int i = 0; i < 1; i++) {
-      when(sheet.getRow(1)).thenReturn(row1);
-      when(row1.getCell(0)).thenReturn(cell0);
-      when(row1.getCell(1)).thenReturn(cell1);
-      when(row1.getCell(2)).thenReturn(cell2);
-      when(row1.getCell(3)).thenReturn(cell3);
-      when(row1.getCell(4)).thenReturn(cell4);
-      when(row1.getCell(5)).thenReturn(cell5);
-      when(row1.getCell(6)).thenReturn(cell6);
-      when(row1.getCell(7)).thenReturn(cell7);
-      when(row1.getCell(8)).thenReturn(cell8);
-      when(row1.getCell(9)).thenReturn(cell9);
-      when(row1.getCell(10)).thenReturn(cell10);
-      when(row1.getCell(11)).thenReturn(cell11);
-      when(row1.getCell(12)).thenReturn(cell12);
-      when(row1.getCell(13)).thenReturn(cell13);
-      when(row1.getCell(14)).thenReturn(cell14);
+    Cell cell15 = mock(Cell.class);
+    Cell cell16 = mock(Cell.class);
+    Cell cell17 = mock(Cell.class);
+    Cell cell18 = mock(Cell.class);
+    Cell cell19 = mock(Cell.class);
+    Cell cell20 = mock(Cell.class);
+    Cell cell21 = mock(Cell.class);
+    Cell cell22 = mock(Cell.class);
+    Cell cell23 = mock(Cell.class);
+    Cell cell24 = mock(Cell.class);
+    Cell cell25 = mock(Cell.class);
+    Cell cell26 = mock(Cell.class);
+    Cell cell27 = mock(Cell.class);
+    Cell cell28 = mock(Cell.class);
+    Cell cell29 = mock(Cell.class);
 
-      when(row1.getCell(0).getStringCellValue()).thenReturn("23");
-      when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
-      when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
-      when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
-      when(row1.getCell(4).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
-      when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
-      when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
-      when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
-      when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
-      when(row1.getCell(10).toString()).thenReturn("huynq100");
-      when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
-      when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
-      when(row1.getCell(13).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(14).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-    }
+    when(sheet.getRow(0)).thenReturn(row0);
+    when(row0.getCell(0)).thenReturn(cell0);
+    when(row0.getCell(1)).thenReturn(cell1);
+    when(row0.getCell(2)).thenReturn(cell2);
+    when(row0.getCell(3)).thenReturn(cell3);
+    when(row0.getCell(4)).thenReturn(cell4);
+    when(row0.getCell(5)).thenReturn(cell5);
+    when(row0.getCell(6)).thenReturn(cell6);
+    when(row0.getCell(7)).thenReturn(cell7);
+    when(row0.getCell(8)).thenReturn(cell8);
+    when(row0.getCell(9)).thenReturn(cell9);
+    when(row0.getCell(10)).thenReturn(cell10);
+    when(row0.getCell(11)).thenReturn(cell11);
+    when(row0.getCell(12)).thenReturn(cell12);
+    when(row0.getCell(13)).thenReturn(cell13);
+    when(row0.getCell(14)).thenReturn(cell14);
+
+    when(row0.getCell(0).getStringCellValue()).thenReturn("Full Name");
+    when(row0.getCell(1).getStringCellValue()).thenReturn("Role");
+    when(row0.getCell(2).getStringCellValue()).thenReturn("Phone");
+    when(row0.getCell(3).getStringCellValue()).thenReturn("Gender");
+    when(row0.getCell(4).getStringCellValue()).thenReturn("Birth Date");
+    when(row0.getCell(5).getStringCellValue()).thenReturn("Grade");
+    when(row0.getCell(6).getStringCellValue()).thenReturn("Position");
+    when(row0.getCell(7).getStringCellValue()).thenReturn("Office");
+    when(row0.getCell(8).getStringCellValue()).thenReturn("Area");
+    when(row0.getCell(9).getStringCellValue()).thenReturn("Working Type");
+    when(row0.getCell(10).getStringCellValue()).thenReturn("Manager Id");
+    when(row0.getCell(11).getStringCellValue()).thenReturn("Employee Type");
+    when(row0.getCell(12).getStringCellValue()).thenReturn("Personal Email");
+    when(row0.getCell(13).getStringCellValue()).thenReturn("Start Date");
+    when(row0.getCell(14).getStringCellValue()).thenReturn("End Date");
+
+    when(sheet.getRow(1)).thenReturn(row1);
+    when(row1.getCell(0)).thenReturn(cell15);
+    when(row1.getCell(1)).thenReturn(cell16);
+    when(row1.getCell(2)).thenReturn(cell17);
+    when(row1.getCell(3)).thenReturn(cell18);
+    when(row1.getCell(4)).thenReturn(cell19);
+    when(row1.getCell(5)).thenReturn(cell20);
+    when(row1.getCell(6)).thenReturn(cell21);
+    when(row1.getCell(7)).thenReturn(cell22);
+    when(row1.getCell(8)).thenReturn(cell23);
+    when(row1.getCell(9)).thenReturn(cell24);
+    when(row1.getCell(10)).thenReturn(cell25);
+    when(row1.getCell(11)).thenReturn(cell26);
+    when(row1.getCell(12)).thenReturn(cell27);
+    when(row1.getCell(13)).thenReturn(cell28);
+    when(row1.getCell(14)).thenReturn(cell29);
+
+    when(row1.getCell(0).getStringCellValue()).thenReturn("23");
+    when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
+    when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
+    when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
+    when(row1.getCell(4).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
+    when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
+    when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
+    when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
+    when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
+    when(row1.getCell(10).toString()).thenReturn("huynq100");
+    when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
+    when(row1.getCell(12).toString()).thenReturn("huynq100@fpt.edu.vn");
+    when(row1.getCell(13).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(14).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
     assertThrows(
         CustomErrorException.class, () -> humanManagementService.importExcelToEmployee(workbook));
   }
@@ -674,8 +865,8 @@ public class HumanManagementServiceTest {
     when(sheet.getLastRowNum()).thenReturn(11);
     for (int i = 0; i <= 1; i++) {
       when(sheet.getRow(i)).thenReturn(row);
-      when(row.getCell(0)).thenReturn(cell);
     }
+    Row row0 = mock(Row.class);
     Row row1 = mock(Row.class);
     Cell cell0 = mock(Cell.class);
     Cell cell1 = mock(Cell.class);
@@ -692,43 +883,90 @@ public class HumanManagementServiceTest {
     Cell cell12 = mock(Cell.class);
     Cell cell13 = mock(Cell.class);
     Cell cell14 = mock(Cell.class);
-    for (int i = 0; i < 1; i++) {
-      when(sheet.getRow(1)).thenReturn(row1);
-      when(row1.getCell(0)).thenReturn(cell0);
-      when(row1.getCell(1)).thenReturn(cell1);
-      when(row1.getCell(2)).thenReturn(cell2);
-      when(row1.getCell(3)).thenReturn(cell3);
-      when(row1.getCell(4)).thenReturn(cell4);
-      when(row1.getCell(5)).thenReturn(cell5);
-      when(row1.getCell(6)).thenReturn(cell6);
-      when(row1.getCell(7)).thenReturn(cell7);
-      when(row1.getCell(8)).thenReturn(cell8);
-      when(row1.getCell(9)).thenReturn(cell9);
-      when(row1.getCell(10)).thenReturn(cell10);
-      when(row1.getCell(11)).thenReturn(cell11);
-      when(row1.getCell(12)).thenReturn(cell12);
-      when(row1.getCell(13)).thenReturn(cell13);
-      when(row1.getCell(14)).thenReturn(cell14);
+    Cell cell15 = mock(Cell.class);
+    Cell cell16 = mock(Cell.class);
+    Cell cell17 = mock(Cell.class);
+    Cell cell18 = mock(Cell.class);
+    Cell cell19 = mock(Cell.class);
+    Cell cell20 = mock(Cell.class);
+    Cell cell21 = mock(Cell.class);
+    Cell cell22 = mock(Cell.class);
+    Cell cell23 = mock(Cell.class);
+    Cell cell24 = mock(Cell.class);
+    Cell cell25 = mock(Cell.class);
+    Cell cell26 = mock(Cell.class);
+    Cell cell27 = mock(Cell.class);
+    Cell cell28 = mock(Cell.class);
+    Cell cell29 = mock(Cell.class);
 
-      when(row1.getCell(0).getStringCellValue()).thenReturn("Nguyen Nguyen");
-      when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
-      when(row1.getCell(2).getNumericCellValue()).thenReturn(1231324324D);
-      when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
-      when(row1.getCell(4).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
-      when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
-      when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
-      when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
-      when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
-      when(row1.getCell(10).toString()).thenReturn("huynq100");
-      when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
-      when(row1.getCell(12).toString()).thenReturn(null);
-      when(row1.getCell(13).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-      when(row1.getCell(14).getLocalDateTimeCellValue())
-          .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
-    }
+    when(sheet.getRow(0)).thenReturn(row0);
+    when(row0.getCell(0)).thenReturn(cell0);
+    when(row0.getCell(1)).thenReturn(cell1);
+    when(row0.getCell(2)).thenReturn(cell2);
+    when(row0.getCell(3)).thenReturn(cell3);
+    when(row0.getCell(4)).thenReturn(cell4);
+    when(row0.getCell(5)).thenReturn(cell5);
+    when(row0.getCell(6)).thenReturn(cell6);
+    when(row0.getCell(7)).thenReturn(cell7);
+    when(row0.getCell(8)).thenReturn(cell8);
+    when(row0.getCell(9)).thenReturn(cell9);
+    when(row0.getCell(10)).thenReturn(cell10);
+    when(row0.getCell(11)).thenReturn(cell11);
+    when(row0.getCell(12)).thenReturn(cell12);
+    when(row0.getCell(13)).thenReturn(cell13);
+    when(row0.getCell(14)).thenReturn(cell14);
+
+    when(row0.getCell(0).getStringCellValue()).thenReturn("Full Name");
+    when(row0.getCell(1).getStringCellValue()).thenReturn("Role");
+    when(row0.getCell(2).getStringCellValue()).thenReturn("Phone");
+    when(row0.getCell(3).getStringCellValue()).thenReturn("Gender");
+    when(row0.getCell(4).getStringCellValue()).thenReturn("Birth Date");
+    when(row0.getCell(5).getStringCellValue()).thenReturn("Grade");
+    when(row0.getCell(6).getStringCellValue()).thenReturn("Position");
+    when(row0.getCell(7).getStringCellValue()).thenReturn("Office");
+    when(row0.getCell(8).getStringCellValue()).thenReturn("Area");
+    when(row0.getCell(9).getStringCellValue()).thenReturn("Working Type");
+    when(row0.getCell(10).getStringCellValue()).thenReturn("Manager Id");
+    when(row0.getCell(11).getStringCellValue()).thenReturn("Employee Type");
+    when(row0.getCell(12).getStringCellValue()).thenReturn("Personal Email");
+    when(row0.getCell(13).getStringCellValue()).thenReturn("Start Date");
+    when(row0.getCell(14).getStringCellValue()).thenReturn("End Date");
+
+    when(sheet.getRow(1)).thenReturn(row1);
+    when(row1.getCell(0)).thenReturn(cell15);
+    when(row1.getCell(1)).thenReturn(cell16);
+    when(row1.getCell(2)).thenReturn(cell17);
+    when(row1.getCell(3)).thenReturn(cell18);
+    when(row1.getCell(4)).thenReturn(cell19);
+    when(row1.getCell(5)).thenReturn(cell20);
+    when(row1.getCell(6)).thenReturn(cell21);
+    when(row1.getCell(7)).thenReturn(cell22);
+    when(row1.getCell(8)).thenReturn(cell23);
+    when(row1.getCell(9)).thenReturn(cell24);
+    when(row1.getCell(10)).thenReturn(cell25);
+    when(row1.getCell(11)).thenReturn(cell26);
+    when(row1.getCell(12)).thenReturn(cell27);
+    when(row1.getCell(13)).thenReturn(cell28);
+    when(row1.getCell(14)).thenReturn(cell29);
+
+    when(row1.getCell(0).getStringCellValue()).thenReturn("Nguyen Quang Huy");
+    when(row1.getCell(1).getStringCellValue()).thenReturn("ROLE_ADMIN");
+    when(row1.getCell(2).getNumericCellValue()).thenReturn(132487617D);
+    when(row1.getCell(3).getStringCellValue()).thenReturn("Male");
+    when(row1.getCell(4).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(5).getStringCellValue()).thenReturn("DEVELOP_1");
+    when(row1.getCell(6).getStringCellValue()).thenReturn("IT");
+    when(row1.getCell(7).getStringCellValue()).thenReturn("HN_OFFICE");
+    when(row1.getCell(8).getStringCellValue()).thenReturn("BACK_OFFICE");
+    when(row1.getCell(9).getStringCellValue()).thenReturn("FULL_TIME");
+    when(row1.getCell(10).toString()).thenReturn("huynq100");
+    when(row1.getCell(11).getStringCellValue()).thenReturn("TRAINEE");
+    when(row1.getCell(12).toString()).thenReturn(null);
+    when(row1.getCell(13).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
+    when(row1.getCell(14).getLocalDateTimeCellValue())
+        .thenReturn(LocalDateTime.now(ZoneId.systemDefault()));
     assertThrows(
         CustomErrorException.class, () -> humanManagementService.importExcelToEmployee(workbook));
   }
