@@ -329,7 +329,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2022-08-15"));
+          LocalDate.parse("2022-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_WRONG_GENDER =
       new HrmRequest(
@@ -347,7 +349,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2000-02-13"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_MANAGER_ROLE =
       new HrmRequest(
@@ -365,7 +369,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2022-08-15"));
+          LocalDate.parse("2022-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_USER_ROLE =
       new HrmRequest(
@@ -383,25 +389,29 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2022-08-15"));
+          LocalDate.parse("2022-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_START_AFTER_END =
-          new HrmRequest(
-                  "Nguyen Quang Huy",
-                  3L,
-                  "0385822476",
-                  "Male",
-                  LocalDate.parse("2000-02-13"),
-                  1L,
-                  1L,
-                  1L,
-                  1L,
-                  1L,
-                  "huynq100",
-                  1L,
-                  "huynq100@fpt.edu.vn",
-                  LocalDate.parse("2000-09-13"),
-                  LocalDate.parse("2000-08-15"));
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          3L,
+          "0385822476",
+          "Male",
+          LocalDate.parse("2000-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-09-13"),
+          LocalDate.parse("2000-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_NOT_ENOUGH_BIRTH_DATE =
       new HrmRequest(
@@ -419,7 +429,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2000-02-13"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmPojo HRM_POJO =
       new HrmPojo(

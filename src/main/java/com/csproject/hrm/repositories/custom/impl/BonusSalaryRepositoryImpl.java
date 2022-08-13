@@ -1,9 +1,9 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.enums.EBonus;
-import com.csproject.hrm.dto.request.BonusSalaryRequest;
 import com.csproject.hrm.dto.dto.BonusTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
+import com.csproject.hrm.dto.request.BonusSalaryRequest;
 import com.csproject.hrm.dto.response.BonusSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -42,18 +42,17 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
 
   @Override
   public void insertBonusSalaryByEmployeeId(
-      Long salaryId, LocalDate date, String description, Long bonusType, BigDecimal bonus) {
+      Long salaryId, LocalDate date, Long bonusType, BigDecimal bonus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .insertInto(
                 BONUS_SALARY,
                 BONUS_SALARY.DATE,
-                BONUS_SALARY.DESCRIPTION,
                 BONUS_SALARY.VALUE,
                 BONUS_SALARY.SALARY_ID,
                 BONUS_SALARY.BONUS_TYPE_ID)
-            .values(date, description, bonus, salaryId, bonusType)
+            .values(date, bonus, salaryId, bonusType)
             .execute();
   }
 

@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -74,4 +75,10 @@ public class HrmRequest {
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
+
+  @Positive(message = "Base Salary must be a positive number!")
+  private BigDecimal baseSalary;
+
+  @Positive(message = "Salary must be a positive number!")
+  private BigDecimal salary;
 }

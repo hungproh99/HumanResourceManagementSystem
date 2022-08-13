@@ -1,7 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.request.AdvanceSalaryRequest;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
+import com.csproject.hrm.dto.request.AdvanceSalaryRequest;
 import com.csproject.hrm.dto.response.AdvanceSalaryResponse;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
@@ -38,18 +38,16 @@ public class AdvanceSalaryRepositoryImpl implements AdvanceSalaryRepositoryCusto
   @Autowired private final DBConnection connection;
 
   @Override
-  public void insertAdvanceSalaryByEmployeeId(
-      Long salaryId, LocalDate date, String description, BigDecimal bonus) {
+  public void insertAdvanceSalaryByEmployeeId(Long salaryId, LocalDate date, BigDecimal bonus) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext
             .insertInto(
                 ADVANCES_SALARY,
                 ADVANCES_SALARY.DATE,
-                ADVANCES_SALARY.DESCRIPTION,
                 ADVANCES_SALARY.VALUE,
                 ADVANCES_SALARY.SALARY_ID)
-            .values(date, description, bonus, salaryId)
+            .values(date, bonus, salaryId)
             .execute();
   }
 

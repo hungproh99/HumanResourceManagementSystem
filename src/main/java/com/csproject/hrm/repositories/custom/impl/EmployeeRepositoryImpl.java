@@ -18,11 +18,9 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,7 +99,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getOffice(),
                   hrmPojo.getGrade(),
                   hrmPojo.getStartDate(),
-                  hrmPojo.getEndDate()));
+                  hrmPojo.getEndDate(),
+                  hrmPojo.getBaseSalary(),
+                  hrmPojo.getSalary().subtract(hrmPojo.getBaseSalary())));
           DSL.using(configuration).batch(queries).execute();
         });
   }
@@ -143,7 +143,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getOffice(),
                         hrmPojo.getGrade(),
                         hrmPojo.getStartDate(),
-                        hrmPojo.getEndDate()));
+                        hrmPojo.getEndDate(),
+                        hrmPojo.getBaseSalary(),
+                        hrmPojo.getSalary().subtract(hrmPojo.getBaseSalary())));
               });
 
           DSL.using(configuration).batch(queries).execute();
@@ -336,9 +338,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             year(currentDate())
                 .minus(year(WORKING_CONTRACT.START_DATE))
                 .concat(YEAR)
-                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
                 .concat(MONTH)
-                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
                 .concat(DAY)
                 .as(SENIORITY),
             JOB.POSITION.as(POSITION_NAME),
@@ -425,7 +427,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       Long office,
       Long grade,
       LocalDate startDate,
-      LocalDate endDate) {
+      LocalDate endDate,
+      BigDecimal baseSalary,
+      BigDecimal additionalSalary) {
 
     final var queryWorkingContract =
         DSL.using(config)
@@ -444,10 +448,14 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         DSL.using(config)
             .insertInto(
                 SALARY_CONTRACT,
+                SALARY_CONTRACT.BASE_SALARY,
+                SALARY_CONTRACT.ADDITIONAL_SALARY,
                 SALARY_CONTRACT.START_DATE,
                 SALARY_CONTRACT.WORKING_CONTRACT_ID,
                 SALARY_CONTRACT.SALARY_CONTRACT_STATUS)
             .values(
+                baseSalary,
+                additionalSalary,
                 startDate,
                 queryWorkingContract.getValue(WORKING_CONTRACT.WORKING_CONTRACT_ID),
                 Boolean.TRUE)
@@ -477,20 +485,27 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String employeeId) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
     conditions.add(EMPLOYEE.WORKING_STATUS.isTrue());
+    conditions.add(EMPLOYEE.EMPLOYEE_ID.ne(employeeId));
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    final var query = findAllEmployeeOfManager(conditions, sortFields, employeeId);
     List<HrmResponse> hrmResponses =
-        findAllEmployeeOfManager(conditions, sortFields, queryParam.pagination, employeeId)
-            .fetchInto(HrmResponse.class);
+        findAllEmployeeOfManager(conditions, sortFields, employeeId).fetchInto(HrmResponse.class);
 
-    List<HrmResponse> hrmResponseList =
-        getListHrmResponse(hrmResponses, conditions, sortFields, queryParam.pagination);
+    List<HrmResponse> hrmResponseList = getListHrmResponse(hrmResponses, conditions, sortFields);
 
-    List<HrmResponse> hrmResponsesCount =
-        countAllEmployeeOfManager(conditions, employeeId).fetchInto(HrmResponse.class);
-
-    List<HrmResponse> hrmResponsesCountList =
-        getCountListHrmResponse(hrmResponsesCount, conditions);
+    int limit = queryParam.pagination.getLimit();
+    int offset = queryParam.pagination.getOffset();
+    int size = limit + offset;
+    List<HrmResponse> hrmResponseListReturn = new ArrayList<>();
+    if (offset < hrmResponseList.size()) {
+      if (size > hrmResponseList.size()) {
+        size = hrmResponseList.size();
+      }
+      for (int i = offset; i < size; i++) {
+        hrmResponseListReturn.add(hrmResponseList.get(i));
+      }
+    }
 
     hrmResponses.forEach(
         hrmResponse -> {
@@ -502,8 +517,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         });
 
     return HrmResponseList.builder()
-        .hrmResponse(hrmResponseList)
-        .total(hrmResponsesCountList.size())
+        .hrmResponse(hrmResponseListReturn)
+        .total(hrmResponseListReturn.size())
         .build();
   }
 
@@ -517,33 +532,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
   }
 
-  public Select<?> countAllEmployeeOfManager(List<Condition> conditions, String employeeId) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    return dslContext
-        .select(EMPLOYEE.EMPLOYEE_ID)
-        .from(EMPLOYEE)
-        .leftJoin(WORKING_CONTRACT)
-        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-        .leftJoin(WORKING_PLACE)
-        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-        .leftJoin(AREA)
-        .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-        .leftJoin(OFFICE)
-        .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
-        .leftJoin(JOB)
-        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-        .leftJoin(GRADE_TYPE)
-        .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
-        .leftJoin(WORKING_TYPE)
-        .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-        .where(conditions)
-        .and(EMPLOYEE.MANAGER_ID.eq(employeeId));
-  }
-
   public Select<?> findAllEmployeeOfManager(
       List<Condition> conditions,
       List<OrderField<?>> sortFields,
-      Pagination pagination,
       String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
@@ -563,9 +554,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             year(currentDate())
                 .minus(year(WORKING_CONTRACT.START_DATE))
                 .concat(YEAR)
-                .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
                 .concat(MONTH)
-                .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
                 .concat(DAY)
                 .as(SENIORITY),
             JOB.POSITION.as(POSITION_NAME),
@@ -587,29 +578,23 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
         .and(EMPLOYEE.MANAGER_ID.eq(employeeId))
-        .orderBy(sortFields)
-        .limit(pagination.limit)
-        .offset(pagination.offset);
+        .orderBy(sortFields);
   }
 
   private List<HrmResponse> getListHrmResponse(
-      List<HrmResponse> list,
-      List<Condition> conditions,
-      List<OrderField<?>> sortFields,
-      Pagination pagination) {
+      List<HrmResponse> list, List<Condition> conditions, List<OrderField<?>> sortFields) {
     outer:
-    while (true) {
+    while (list.size() > 0) {
       for (int i = 0; i < list.size(); i++) {
         List<HrmResponse> hrmResponsesSub =
-            findAllEmployeeOfManager(
-                    conditions, sortFields, pagination, list.get(i).getEmployee_id())
+            findAllEmployeeOfManager(conditions, sortFields, list.get(i).getEmployee_id())
                 .fetchInto(HrmResponse.class);
         if (hrmResponsesSub.isEmpty() && i == list.size() - 1) {
           break outer;
         } else if (hrmResponsesSub.isEmpty()) {
           continue;
         } else {
-          hrmResponsesSub = getListHrmResponse(hrmResponsesSub, conditions, sortFields, pagination);
+          hrmResponsesSub = getListHrmResponse(hrmResponsesSub, conditions, sortFields);
           list =
               Stream.of(list, hrmResponsesSub)
                   .flatMap(x -> x.stream())
@@ -617,31 +602,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         }
       }
     }
-    return list;
-  }
-
-  private List<HrmResponse> getCountListHrmResponse(
-      List<HrmResponse> list, List<Condition> conditions) {
-    outer:
-    while (true) {
-      for (int i = 0; i < list.size(); i++) {
-        List<HrmResponse> hrmResponsesSub =
-            countAllEmployeeOfManager(conditions, list.get(i).getEmployee_id())
-                .fetchInto(HrmResponse.class);
-        if (hrmResponsesSub.isEmpty() && i == list.size() - 1) {
-          break outer;
-        } else if (hrmResponsesSub.isEmpty()) {
-          continue;
-        } else {
-          hrmResponsesSub = getCountListHrmResponse(hrmResponsesSub, conditions);
-          list =
-              Stream.of(list, hrmResponsesSub)
-                  .flatMap(x -> x.stream())
-                  .collect(Collectors.toList());
-        }
-      }
-    }
-    return list;
+    return new ArrayList(new HashSet(list));
   }
 
   @Override

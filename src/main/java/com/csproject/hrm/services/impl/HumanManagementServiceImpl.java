@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -262,6 +263,9 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   csvRecord.get("Start Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
           LocalDate endDate =
               LocalDate.parse(csvRecord.get("End Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+          BigDecimal baseSalary =
+              BigDecimal.valueOf(Double.parseDouble(csvRecord.get("Base Salary")));
+          BigDecimal salary = BigDecimal.valueOf(Double.parseDouble(csvRecord.get("Salary")));
           if (!roleRepository.existsById(role)) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
           } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
@@ -300,6 +304,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   .personalEmail(personalEmail)
                   .startDate(startDate)
                   .endDate(endDate)
+                  .salary(salary)
+                  .baseSalary(baseSalary)
                   .build());
         } catch (NumberFormatException e) {
           throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
@@ -381,6 +387,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         String personalEmail = row.getCell(12).toString();
         LocalDate startDate = row.getCell(13).getLocalDateTimeCellValue().toLocalDate();
         LocalDate endDate = row.getCell(14).getLocalDateTimeCellValue().toLocalDate();
+      BigDecimal baseSalary = BigDecimal.valueOf(row.getCell(15).getNumericCellValue());
+      BigDecimal salary = BigDecimal.valueOf(row.getCell(16).getNumericCellValue());
 
       if (row.getCell(0) == null
           || row.getCell(1) == null
@@ -396,27 +404,31 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           || row.getCell(11) == null
           || row.getCell(12) == null
           || row.getCell(13) == null
-          || row.getCell(14) == null) {
+          || row.getCell(14) == null
+          || row.getCell(15) == null
+          || row.getCell(16) == null) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in excel");
       }
-        hrmRequestList.add(
-            HrmRequest.builder()
-                .fullName(fullName)
-                .role(role)
-                .phone(phone)
-                .gender(gender)
-                .birthDate(birthDate)
-                .grade(grade)
-                .position(position)
-                .office(office)
-                .area(area)
-                .workingType(workingType)
-                .managerId(managerId)
-                .employeeType(employeeType)
-                .personalEmail(personalEmail)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build());
+      hrmRequestList.add(
+          HrmRequest.builder()
+              .fullName(fullName)
+              .role(role)
+              .phone(phone)
+              .gender(gender)
+              .birthDate(birthDate)
+              .grade(grade)
+              .position(position)
+              .office(office)
+              .area(area)
+              .workingType(workingType)
+              .managerId(managerId)
+              .employeeType(employeeType)
+              .personalEmail(personalEmail)
+              .startDate(startDate)
+              .endDate(endDate)
+              .salary(salary)
+              .baseSalary(baseSalary)
+              .build());
     }
     if (hrmRequestList.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Nothing to insert");
@@ -583,6 +595,10 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         continue;
       } else if (i.getKey().equals("Birth Date")) {
         continue;
+      } else if (i.getKey().equals("Base Salary")) {
+        continue;
+      } else if (i.getKey().equals("Salary")) {
+        continue;
       } else {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
       }
@@ -619,6 +635,10 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     } else if (!row.getCell(13).getStringCellValue().equals("Start Date")) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
     } else if (!row.getCell(14).getStringCellValue().equals("End Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(15).getStringCellValue().equals("Base Salary")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(16).getStringCellValue().equals("Salary")) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
     }
   }

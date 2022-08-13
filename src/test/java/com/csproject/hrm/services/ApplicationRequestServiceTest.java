@@ -344,7 +344,6 @@ public class ApplicationRequestServiceTest {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put("Bonus_Type", "1");
     hashMap.put("Value", "500000");
-    hashMap.put("Description", "abc");
     hashMap.put("Date", "2022-08-02");
     when(applicationsRequestRepository.checkExistRequestId(2L)).thenReturn(true);
     when(applicationsRequestRepository.checkAlreadyApproveOrReject(2L)).thenReturn(false);
@@ -377,7 +376,6 @@ public class ApplicationRequestServiceTest {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put("Date", "2022-08-02");
     hashMap.put("Value", "500000");
-    hashMap.put("Description", "abc");
     when(applicationsRequestRepository.checkExistRequestId(2L)).thenReturn(true);
     when(applicationsRequestRepository.checkAlreadyApproveOrReject(2L)).thenReturn(false);
     when(applicationsRequestRepository.getApplicationRequestDtoByRequestId(2L))
