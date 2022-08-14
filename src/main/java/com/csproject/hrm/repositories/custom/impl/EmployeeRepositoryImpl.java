@@ -315,7 +315,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .on(GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
-        .where(conditions);
+        .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
   }
 
   public Select<?> findAllEmployee(
@@ -361,6 +363,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
@@ -577,6 +581,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .leftJoin(WORKING_TYPE)
         .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
         .where(conditions)
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(EMPLOYEE.MANAGER_ID.eq(employeeId))
         .orderBy(sortFields);
   }
@@ -659,6 +665,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             .leftJoin(AREA)
             .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
             .fetchOneInto(String.class);
 
     return dslContext
@@ -679,6 +687,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(AREA.NAME.eq(area))
         .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .fetchInto(EmployeeNameAndID.class);
   }
 
@@ -696,6 +706,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             .leftJoin(AREA)
             .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
             .fetchOneInto(String.class);
 
     return dslContext
@@ -715,6 +727,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(AREA.NAME.eq(area))
         .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .fetchInto(EmployeeNameAndID.class);
   }
 

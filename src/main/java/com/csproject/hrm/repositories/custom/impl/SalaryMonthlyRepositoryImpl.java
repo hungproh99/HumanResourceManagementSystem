@@ -194,6 +194,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .leftJoin(EMPLOYEE)
             .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
             .fetchOneInto(String.class);
     LocalDate duration = endDate.plusDays(3);
     if (managerId == null) {
@@ -556,7 +558,10 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
             .leftJoin(SALARY_STATUS)
             .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
-            .where(conditions));
+            .where(conditions)
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue()));
   }
 
   private int countAllManagementReviewSalaryMonthly(List<Condition> conditions, String employeeId) {
