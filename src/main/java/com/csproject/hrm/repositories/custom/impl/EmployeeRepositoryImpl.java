@@ -518,7 +518,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 
     return HrmResponseList.builder()
         .hrmResponse(hrmResponseListReturn)
-        .total(hrmResponseListReturn.size())
+        .total(hrmResponseList.size())
         .build();
   }
 
