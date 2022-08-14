@@ -487,9 +487,21 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
   private List<OrderField<?>> getOrderFieldApplicationRequest(QueryParam queryParam) {
     final List<OrderField<?>> orderByList = new ArrayList<>();
 
-    if (null == queryParam || isEmpty(queryParam.orderByList)) {
-      orderByList.add(APPLICATIONS_REQUEST.LATEST_DATE.desc());
-    }
+    orderByList.add(
+        when(
+                APPLICATIONS_REQUEST.REQUEST_STATUS.eq(
+                    ERequestStatus.getValue(ERequestStatus.PENDING.name())),
+                1)
+            .when(
+                APPLICATIONS_REQUEST.REQUEST_STATUS.eq(
+                    ERequestStatus.getValue(ERequestStatus.APPROVED.name())),
+                2)
+            .when(
+                APPLICATIONS_REQUEST.REQUEST_STATUS.eq(
+                    ERequestStatus.getValue(ERequestStatus.REJECTED.name())),
+                3)
+            .asc());
+    orderByList.add(APPLICATIONS_REQUEST.LATEST_DATE.desc());
 
     for (OrderByClause clause : queryParam.orderByList) {
 
