@@ -487,31 +487,29 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 
   @Override
   public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    conditions.add(EMPLOYEE.WORKING_STATUS.isTrue());
-    conditions.add(EMPLOYEE.EMPLOYEE_ID.ne(employeeId));
     List<OrderField<?>> sortFields =
         queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
-    final var query = findAllEmployeeOfManager(conditions, sortFields, employeeId);
     List<HrmResponse> hrmResponses =
-        findAllEmployeeOfManager(conditions, sortFields, employeeId).fetchInto(HrmResponse.class);
+        findAllEmployeeOfManager(new ArrayList<>(), sortFields, employeeId)
+            .fetchInto(HrmResponse.class);
 
-    List<HrmResponse> hrmResponseList = getListHrmResponse(hrmResponses, conditions, sortFields);
+    List<HrmResponse> hrmResponseList =
+        getListHrmResponse(hrmResponses, new ArrayList<>(), sortFields);
 
-    int limit = queryParam.pagination.getLimit();
-    int offset = queryParam.pagination.getOffset();
-    int size = limit + offset;
-    List<HrmResponse> hrmResponseListReturn = new ArrayList<>();
-    if (offset < hrmResponseList.size()) {
-      if (size > hrmResponseList.size()) {
-        size = hrmResponseList.size();
-      }
-      for (int i = offset; i < size; i++) {
-        hrmResponseListReturn.add(hrmResponseList.get(i));
-      }
+    Condition condition = DSL.noCondition();
+    for (HrmResponse hrmResponse : hrmResponseList) {
+      condition = condition.or(EMPLOYEE.EMPLOYEE_ID.eq(hrmResponse.getEmployee_id()));
     }
+    conditions.add(condition);
 
-    hrmResponses.forEach(
+    List<HrmResponse> hrmResponseListReturn =
+        findAllEmployee(conditions, sortFields, queryParam.pagination).fetchInto(HrmResponse.class);
+
+    int count = dslContext.fetchCount(countAllEmployee(conditions));
+
+    hrmResponseListReturn.forEach(
         hrmResponse -> {
           hrmResponse.setArea_name(EArea.getLabel(hrmResponse.getArea_name()));
           hrmResponse.setGrade(EGradeType.getLabel(hrmResponse.getGrade()));
@@ -520,10 +518,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
           hrmResponse.setWorking_name(EWorkingType.getLabel(hrmResponse.getWorking_name()));
         });
 
-    return HrmResponseList.builder()
-        .hrmResponse(hrmResponseListReturn)
-        .total(hrmResponseList.size())
-        .build();
+    return HrmResponseList.builder().hrmResponse(hrmResponseListReturn).total(count).build();
   }
 
   @Override
@@ -584,6 +579,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(EMPLOYEE.MANAGER_ID.eq(employeeId))
+        .and(EMPLOYEE.WORKING_STATUS.isTrue())
+        .and(EMPLOYEE.EMPLOYEE_ID.ne(employeeId))
         .orderBy(sortFields);
   }
 

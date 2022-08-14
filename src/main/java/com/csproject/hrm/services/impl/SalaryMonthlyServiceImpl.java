@@ -559,7 +559,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
           String approveEmail =
               employeeRepository.getEmployeeEmailByEmployeeId(
                   salaryMonthlyRemindResponse.getApprover());
-          if (salaryMonthlyRemindResponse.getDuration().isEqual(currDate)) {
+          if (salaryMonthlyRemindResponse.getDuration().isEqual(currDate)
+              || salaryMonthlyRemindResponse.getDuration().isBefore(currDate)) {
             salaryMonthlyRepository.updateRejectSalaryMonthly(
                 new RejectSalaryMonthlyRequest(
                     salaryMonthlyRemindResponse.getSalaryMonthlyId(), "Out of Duration"));

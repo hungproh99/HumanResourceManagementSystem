@@ -82,7 +82,7 @@ public class TimekeepingController {
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader(
         "Content-Disposition",
-        "attachment; filename=\"timekeeping_" + timestamp.getTime() + ".csv\"");
+        "attachment; filename=\"working_data_" + timestamp.getTime() + ".csv\"");
     timekeepingService.exportTimekeepingToCsv(servletResponse.getWriter(), queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -100,7 +100,7 @@ public class TimekeepingController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=timekeeping_" + timestamp.getTime() + ".xlsx");
+        "Content-Disposition", "attachment; filename=working_data_" + timestamp.getTime() + ".xlsx");
     timekeepingService.exportTimekeepingToExcel(servletResponse, queryParam, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }

@@ -159,7 +159,7 @@ public class ApplicationsRequestController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_REQUEST_RECEIVE)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadCsvRequestReceive(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -185,7 +185,7 @@ public class ApplicationsRequestController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_REQUEST_RECEIVE)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadExcelRequestReceive(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -210,7 +210,7 @@ public class ApplicationsRequestController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_CSV_REQUEST_SEND)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadCsvRequestSend(
       HttpServletRequest request,
       HttpServletResponse servletResponse,
@@ -236,7 +236,7 @@ public class ApplicationsRequestController {
   }
 
   @PostMapping(value = URI_DOWNLOAD_EXCEL_REQUEST_SEND)
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   public ResponseEntity<?> downloadExcelRequestSend(
       HttpServletRequest request,
       HttpServletResponse servletResponse,

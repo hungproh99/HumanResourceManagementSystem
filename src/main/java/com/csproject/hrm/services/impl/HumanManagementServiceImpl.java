@@ -543,6 +543,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
             .personalEmail(hrmRequest.getPersonalEmail())
             .startDate(hrmRequest.getStartDate())
             .endDate(hrmRequest.getEndDate())
+            .salary(hrmRequest.getSalary())
+            .baseSalary(hrmRequest.getBaseSalary())
             .build();
 
     return hrmPojo;

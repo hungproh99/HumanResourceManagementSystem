@@ -35,6 +35,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1344,9 +1345,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                   applicationRequestRemindResponse.getApprover());
 
           if (applicationRequestRemindResponse
-              .getDuration()
-              .toLocalDate()
-              .isEqual(currDate.toLocalDate())) {
+                  .getDuration()
+                  .toLocalDate()
+                  .isEqual(currDate.toLocalDate())
+              || applicationRequestRemindResponse
+                  .getDuration()
+                  .toLocalDate()
+                  .isBefore(currDate.toLocalDate())) {
             applicationsRequestRepository.updateRejectApplicationRequest(
                 new RejectApplicationRequestRequest(
                     applicationRequestRemindResponse.getApplication_request_id(),
@@ -1356,10 +1361,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             generalFunction.sendEmailRemindRequest(
                 approveName,
                 createName,
-                applicationRequestRemindResponse.getCreate_date().toString(),
+                applicationRequestRemindResponse
+                    .getCreate_date()
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 applicationRequestRemindResponse.getChecked_by(),
                 applicationRequestRemindResponse.getApplication_request_id().toString(),
-                applicationRequestRemindResponse.getDuration().toString(),
+                applicationRequestRemindResponse
+                    .getDuration()
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 applicationRequestRemindResponse.getDuration().compareTo(currDate) + "",
                 FROM_EMAIL,
                 TO_EMAIL,

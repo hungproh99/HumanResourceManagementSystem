@@ -207,6 +207,7 @@ public class DataSample {
       new WorkingInfoRequest(
           "huynq100",
           "5000000",
+          "10000000",
           1L,
           1L,
           2L,
@@ -330,8 +331,8 @@ public class DataSample {
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
           LocalDate.parse("2022-08-15"),
-          BigDecimal.ZERO,
-          BigDecimal.ZERO);
+          BigDecimal.ONE,
+          BigDecimal.ONE);
 
   public static final HrmRequest HRM_REQUEST_WRONG_GENDER =
       new HrmRequest(
