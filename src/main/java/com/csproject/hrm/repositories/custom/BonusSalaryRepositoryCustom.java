@@ -29,4 +29,6 @@ public interface BonusSalaryRepositoryCustom {
   Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByBonusSalary(Long bonusSalaryId);
 
   boolean checkExistBonusSalary(Long bonusSalaryId);
+	
+	BonusTypeDto getBonusTypeDtoByID(Long bonusTypeID);
 }

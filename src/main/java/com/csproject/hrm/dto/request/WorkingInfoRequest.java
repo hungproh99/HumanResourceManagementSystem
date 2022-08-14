@@ -17,6 +17,9 @@ public class WorkingInfoRequest {
   @NotBlank(message = "baseSalary must not be blank!")
   private String baseSalary;
 
+  @NotBlank(message = "finalSalary must not be blank!")
+  private String finalSalary;
+
   @Positive(message = "office must be a positive number!")
   private Long office;
 

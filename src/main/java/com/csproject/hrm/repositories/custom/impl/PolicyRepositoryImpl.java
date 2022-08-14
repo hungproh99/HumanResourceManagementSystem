@@ -3,20 +3,14 @@ package com.csproject.hrm.repositories.custom.impl;
 import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.dto.response.PolicyCategoryResponse;
 import com.csproject.hrm.dto.response.PolicyResponse;
-import com.csproject.hrm.jooq.DBConnection;
-import com.csproject.hrm.jooq.JooqHelper;
-import com.csproject.hrm.jooq.Pagination;
-import com.csproject.hrm.jooq.QueryParam;
+import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.PolicyRepositoryCustom;
 import lombok.AllArgsConstructor;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.jooq.codegen.maven.example.Tables.*;
 import static org.jooq.impl.DSL.when;
@@ -55,7 +49,7 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
             POLICY.CREATED_DATE,
             POLICY.EFFECTIVE_DATE,
             POLICY_TYPE.POLICY_TYPE_,
-            //            POLICY_TYPE.POLICY_NAME,
+            POLICY_NAME.POLICY_NAME_,
             POLICY.DESCRIPTION,
             POLICY_CATEGORY.POLICY_CATEGORY_,
             (when(POLICY.POLICY_STATUS.isTrue(), "true")
@@ -63,6 +57,8 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
                 .as(POLICY.POLICY_STATUS))
         .from(POLICY)
         .leftJoin(POLICY_TYPE)
+        .on(POLICY.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
+        .leftJoin(POLICY_NAME)
         .on(POLICY.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
         .leftJoin(POLICY_CATEGORY)
         .on(POLICY_CATEGORY.POLICY_CATEGORY_ID.eq(POLICY_TYPE.POLICY_CATEGORY_ID))

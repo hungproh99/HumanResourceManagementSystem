@@ -300,6 +300,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
     if (workingInfoRequest.getBaseSalary() == null
+        || workingInfoRequest.getFinalSalary() == null
         || workingInfoRequest.getOffice() == null
         || workingInfoRequest.getPosition() == null
         || workingInfoRequest.getWorkingTypeId() == null

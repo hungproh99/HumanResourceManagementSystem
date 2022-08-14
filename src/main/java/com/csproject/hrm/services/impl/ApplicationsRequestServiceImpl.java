@@ -1058,7 +1058,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     List<PaidLeaveReasonDto> list = chartRepository.getAllPaidLeaveReason();
     for (PaidLeaveReasonDto reasonDto : list) {
       if (reasonDto.getReason_id().equals(reasonID)) {
-        reasonName = reasonDto.getReason_name();
+        reasonName = EPaidLeaveReason.getLabel(reasonDto.getReason_name());
       }
     }
     String employee =
@@ -1083,12 +1083,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       ApplicationsRequestCreateRequest applicationsRequest) {
     String approver = applicationsRequest.getApprover();
     String value = checkStringNull(applicationsRequest.getValue());
+    LocalDate date = checkLocalDateNull(applicationsRequest.getDate());
     String employee =
         checkStringNull(
             employeeDetailRepository.getEmployeeInfoByEmployeeID(
                 applicationsRequest.getCreateEmployeeId()));
 
-    String[] valueArray = {approver, value, employee};
+    String[] valueArray = {approver, value, String.valueOf(date), employee};
 
     return setDescription(setData(applicationsRequest, valueArray), valueArray);
   }
@@ -1152,10 +1153,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String currentTitle = checkStringNull(applicationsRequest.getCurrentTitle());
     String currentArea = checkStringNull(applicationsRequest.getCurrentArea());
     BigDecimal value = checkBigDecimalNull(applicationsRequest.getValue());
-    LocalDate startDate = checkLocalDateNull(applicationsRequest.getStartDate());
+    LocalDate startDate = checkLocalDateNull(applicationsRequest.getDate());
     if (applicationsRequest.getRequestNameId().intValue() == 4) {
       BigDecimal currSalary = workingContractRepository.getBaseSalaryByEmployeeID(employeeId);
-      if (value.compareTo(currSalary) == -1) {
+      if (value.compareTo(currSalary) < 0) {
         throw new CustomErrorException("Increase salary must larger current salary!");
       }
     }
@@ -1166,6 +1167,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                 applicationsRequest.getCreateEmployeeId()));
 
     String type = checkStringNull(applicationsRequest.getType());
+    String typeName = applicationsRequest.getType();
+    if (applicationsRequest.getRequestNameId().intValue() == 3) {
+      BonusTypeDto bonusTypeDto =
+          bonusSalaryRepository.getBonusTypeDtoByID(Long.valueOf(applicationsRequest.getType()));
+      typeName = EBonus.getLabel(bonusTypeDto.getBonus_type_name());
+    }
 
     String[] valueArray = {
       approver,
@@ -1177,8 +1184,20 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       String.valueOf(startDate),
       employee
     };
-
-    return setDescription(setData(applicationsRequest, valueArray), valueArray);
+    return setDescription(
+        setData(
+            applicationsRequest,
+            new String[] {
+              approver,
+              employeeName + " - " + employeeId,
+              currentTitle,
+              currentArea,
+              typeName,
+              String.valueOf(value),
+              String.valueOf(startDate),
+              employee
+            }),
+        valueArray);
   }
 
   private ApplicationsRequestCreateRequest createRequestForPenalise(

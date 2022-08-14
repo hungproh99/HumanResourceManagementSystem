@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.jooq.codegen.maven.example.tables.BonusSalary.BONUS_SALARY;
 import static org.jooq.codegen.maven.example.tables.BonusType.BONUS_TYPE;
@@ -155,5 +152,15 @@ public class BonusSalaryRepositoryImpl implements BonusSalaryRepositoryCustom {
           bonusTypeDto.setBonus_type_name(EBonus.getLabel(bonusTypeDto.getBonus_type_name()));
         });
     return bonusTypeDtos;
+  }
+
+  @Override
+  public BonusTypeDto getBonusTypeDtoByID(Long bonusTypeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(BONUS_TYPE.BONUS_TYPE_ID, BONUS_TYPE.BONUS_TYPE_.as("bonus_type_name"))
+        .from(BONUS_TYPE)
+        .where(BONUS_TYPE.BONUS_TYPE_ID.eq(bonusTypeID))
+        .fetchOneInto(BonusTypeDto.class);
   }
 }
