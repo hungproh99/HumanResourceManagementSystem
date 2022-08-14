@@ -95,7 +95,15 @@ public class ExcelExportTimekeeping {
         createCell(row, columnCount++, timekeepingResponses.getPosition(), style);
         createCell(row, columnCount++, timekeepingResponses.getGrade(), style);
         createCell(row, columnCount++, timekeepingResponse.getCurrent_date(), style);
-        createCell(row, columnCount++, timekeepingResponse.getTimekeeping_status(), style);
+        String timekeepingStatus = null;
+        for (int i = 0; i < timekeepingResponse.getTimekeeping_status().size(); i++) {
+          if (i == timekeepingResponse.getTimekeeping_status().size() - 1) {
+            timekeepingStatus += timekeepingResponse.getTimekeeping_status().get(i);
+          } else {
+            timekeepingStatus += timekeepingResponse.getTimekeeping_status().get(i) + ", ";
+          }
+        }
+        createCell(row, columnCount++, timekeepingStatus, style);
         createCell(row, columnCount++, timekeepingResponse.getFirst_check_in().toString(), style);
         createCell(row, columnCount++, timekeepingResponse.getLast_check_out().toString(), style);
       }

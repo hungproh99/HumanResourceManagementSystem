@@ -12,7 +12,7 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @Builder
 public class RejectSalaryMonthlyRequest {
-  @Positive(message = "salaryMonthlyId must be a positive number!")
+  @Positive(message = "Salary Monthly Id must be a positive number!")
   private Long salaryMonthlyId;
 
   private String comment;

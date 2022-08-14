@@ -21,7 +21,7 @@ public interface HumanManagementService {
 
   List<EmployeeTypeDto> getListEmployeeType();
 
-  List<RoleDto> getListRoleType(boolean isAdmin);
+  List<RoleDto> getListRoleType();
 
   List<OfficeDto> getListOffice();
 

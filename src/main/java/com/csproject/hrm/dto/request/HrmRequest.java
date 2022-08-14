@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.csproject.hrm.common.constant.Constants.*;
@@ -19,54 +20,54 @@ import static com.csproject.hrm.common.constant.Constants.*;
 @NoArgsConstructor
 @SuperBuilder
 public class HrmRequest {
-  @NotBlank(message = "fullName must not be blank!")
+  @NotBlank(message = "Full Name must not be blank!")
   @Pattern(
       regexp = ALPHANUMERIC_VALIDATION,
       flags = Pattern.Flag.UNICODE_CASE,
-      message = "fullName must only alphanumeric!")
+      message = "Full Name must only alphanumeric!")
   private String fullName;
 
-  @Positive(message = "role must be a positive number!")
+  @Positive(message = "Role must be a positive number!")
   private Long role;
 
-  @NotBlank(message = "phone must not be blank!")
-  @Pattern(regexp = PHONE_VALIDATION, message = "phone is not valid!")
+  @NotBlank(message = "Phone must not be blank!")
+  @Pattern(regexp = PHONE_VALIDATION, message = "Phone is not valid!")
   private String phone;
 
-  @NotBlank(message = "gender must not be blank!")
+  @NotBlank(message = "Gender must not be blank!")
   @Pattern(
       regexp = ALPHANUMERIC_VALIDATION,
       flags = Pattern.Flag.UNICODE_CASE,
-      message = "gender must only alphanumeric!")
+      message = "Gender must only alphanumeric!")
   private String gender;
 
-  @Past(message = "birthDate must less than today!")
+  @Past(message = "Birth Date must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate birthDate;
 
-  @Positive(message = "grade must be a positive number!")
+  @Positive(message = "Grade must be a positive number!")
   private Long grade;
 
-  @Positive(message = "position must be a positive number!")
+  @Positive(message = "Position must be a positive number!")
   private Long position;
 
-  @Positive(message = "office must be a positive number!")
+  @Positive(message = "Office must be a positive number!")
   private Long office;
 
-  @Positive(message = "area must be a positive number!")
+  @Positive(message = "Area must be a positive number!")
   private Long area;
 
-  @Positive(message = "workingType must be a positive number!")
+  @Positive(message = "Working Type must be a positive number!")
   private Long workingType;
 
-  @NotBlank(message = "managerId must not be blank!")
+  @NotBlank(message = "Manager Id must not be blank!")
   private String managerId;
 
-  @Positive(message = "employeeType must be a positive number!")
+  @Positive(message = "Employee Type must be a positive number!")
   private Long employeeType;
 
-  @NotBlank(message = "personalEmail must not be blank!")
-  @Pattern(regexp = EMAIL_VALIDATION, message = "personalEmail is not valid!")
+  @NotBlank(message = "Personal Email must not be blank!")
+  @Pattern(regexp = EMAIL_VALIDATION, message = "Personal Email is not valid!")
   private String personalEmail;
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -74,4 +75,10 @@ public class HrmRequest {
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
+
+  @Positive(message = "Base Salary must be a positive number!")
+  private BigDecimal baseSalary;
+
+  @Positive(message = "Salary must be a positive number!")
+  private BigDecimal salary;
 }

@@ -1,6 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.dto.dto.HolidayCalenderDto;
+import com.csproject.hrm.dto.request.HolidayCalendarRequest;
 import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.repositories.custom.HolidayCalenderRepositoryCustom;
@@ -37,5 +38,21 @@ public class HolidayCalenderRepositoryImpl implements HolidayCalenderRepositoryC
         .where(HOLIDAY_CALENDER.START_DATE.ge(firstDate))
         .and(HOLIDAY_CALENDER.END_DATE.le(lastDate))
         .fetchInto(HolidayCalenderDto.class);
+  }
+
+  @Override
+  public void insertHoliday(HolidayCalendarRequest holidayCalendarRequest) {
+    DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .insertInto(
+            HOLIDAY_CALENDER,
+            HOLIDAY_CALENDER.HOLIDAY_NAME,
+            HOLIDAY_CALENDER.START_DATE,
+            HOLIDAY_CALENDER.END_DATE)
+        .values(
+            holidayCalendarRequest.getHoliday_name(),
+            holidayCalendarRequest.getStart_date(),
+            holidayCalendarRequest.getEnd_date())
+        .execute();
   }
 }

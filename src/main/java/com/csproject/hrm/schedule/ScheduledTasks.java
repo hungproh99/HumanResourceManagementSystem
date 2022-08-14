@@ -24,9 +24,10 @@ public class ScheduledTasks {
 
   @Scheduled(cron = "0 59 23 ? * * ")
   public void scheduleTaskSendMailRemind() {
-    LocalDateTime checkDate = LocalDateTime.now().plus(3, ChronoUnit.DAYS);
-    applicationsRequestService.updateAllApplicationRequestRemind(checkDate);
-    salaryMonthlyService.updateAllSalaryRemind(checkDate.toLocalDate());
+    LocalDateTime currDate = LocalDateTime.now();
+    LocalDateTime checkDate = currDate.plus(3, ChronoUnit.DAYS);
+    applicationsRequestService.updateAllApplicationRequestRemind(checkDate, currDate);
+    salaryMonthlyService.updateAllSalaryRemind(checkDate.toLocalDate(), currDate.toLocalDate());
   }
 
   @Scheduled(cron = "0 50 23 ? * * ")

@@ -13,12 +13,12 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 @Builder
 public class UpdateApplicationRequestRequest {
-  @Positive(message = "applicationRequestId must be a positive number!")
+  @Positive(message = "Application Request Id must be a positive number!")
   private Long applicationRequestId;
 
-  @NotBlank(message = "requestStatus must not be blank!")
+  @NotBlank(message = "Request Status must not be blank!")
   private String requestStatus;
 
-  @NotBlank(message = "approverId must not be blank!")
+  @NotBlank(message = "Approver Id must not be blank!")
   private String approverId;
 }

@@ -28,7 +28,7 @@ public interface EmployeeRepositoryCustom {
 
   List<EmployeeTypeDto> getListEmployeeType();
 
-  List<RoleDto> getListRoleType(boolean isAdmin);
+  List<RoleDto> getListRoleType();
 
   List<HrmResponse> findEmployeeByListId(QueryParam queryParam, List<String> list);
 

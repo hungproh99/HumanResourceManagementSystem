@@ -138,10 +138,10 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
 
     EmployeeTaxResponseList employeeTaxResponseList =
-        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary, allowance);
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary);
 
     EmployeeInsuranceResponseList employeeInsuranceResponseList =
-        getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, allowance);
+        getEmployeeInsuranceResponseList(employeeId, baseSalary);
 
     return SalaryMonthlyDetailResponse.builder()
         .salary_monthly_id(salaryMonthlyId)
@@ -414,8 +414,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
           HttpStatus.BAD_REQUEST,
           "salaryStatus \"" + updateSalaryMonthlyRequest.getSalaryStatus() + "\" not exist!");
     }
-    salaryMonthlyRepository.updateCheckedSalaryMonthly(
-        updateSalaryMonthlyRequest, Boolean.FALSE, employeeId);
+    salaryMonthlyRepository.updateCheckedSalaryMonthly(updateSalaryMonthlyRequest, employeeId);
   }
 
   @Override
@@ -542,7 +541,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   @Override
-  public void updateAllSalaryRemind(LocalDate checkDate) {
+  public void updateAllSalaryRemind(LocalDate checkDate, LocalDate currDate) {
     List<SalaryMonthlyRemindResponse> salaryMonthlyRemindResponseList =
         salaryMonthlyRepository.getAllSalaryMonthlyToRemind(checkDate);
 
@@ -560,21 +559,25 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
           String approveEmail =
               employeeRepository.getEmployeeEmailByEmployeeId(
                   salaryMonthlyRemindResponse.getApprover());
-
-          generalFunction.sendEmailRemindSalary(
-              approveName,
-              createName,
-              salaryMonthlyRemindResponse.getStartDate().getMonth()
-                  + "-"
-                  + salaryMonthlyRemindResponse.getStartDate().getYear(),
-              salaryMonthlyRemindResponse.getCheckedBy(),
-              salaryMonthlyRemindResponse.getSalaryMonthlyId().toString(),
-              FROM_EMAIL,
-              TO_EMAIL,
-              "Remind Request");
-
-          salaryMonthlyRepository.updateAllSalaryMonthlyRemind(
-              salaryMonthlyRemindResponse.getSalaryMonthlyId(), Boolean.TRUE);
+          if (salaryMonthlyRemindResponse.getDuration().isEqual(currDate)) {
+            salaryMonthlyRepository.updateRejectSalaryMonthly(
+                new RejectSalaryMonthlyRequest(
+                    salaryMonthlyRemindResponse.getSalaryMonthlyId(), "Out of Duration"));
+          } else {
+            generalFunction.sendEmailRemindSalary(
+                approveName,
+                createName,
+                salaryMonthlyRemindResponse.getStartDate().getMonth()
+                    + "-"
+                    + salaryMonthlyRemindResponse.getStartDate().getYear(),
+                salaryMonthlyRemindResponse.getCheckedBy(),
+                salaryMonthlyRemindResponse.getSalaryMonthlyId().toString(),
+                salaryMonthlyRemindResponse.getDuration().toString(),
+                salaryMonthlyRemindResponse.getDuration().compareTo(currDate) + "",
+                FROM_EMAIL,
+                TO_EMAIL,
+                "Remind Request");
+          }
         });
   }
 
@@ -633,11 +636,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
     BigDecimal totalAllowance = getEmployeeAllowanceResponseList(employeeId).getTotal();
     BigDecimal totalTax =
-        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary, totalAllowance)
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary)
             .getTotal();
-    BigDecimal totalInsurance =
-        getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, totalAllowance)
-            .getTotal();
+    BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     BigDecimal salaryPerPoint =
         (salaryContractDto
                 .get()
@@ -739,11 +740,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private EmployeeTaxResponseList getEmployeeTaxResponseList(
-      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary, BigDecimal allowance) {
+      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary) {
     BigDecimal monthlySalary = baseSalary.add(additionalSalary);
-    BigDecimal totalInsurance =
-        getEmployeeInsuranceResponseList(employeeId, baseSalary, additionalSalary, allowance)
-            .getTotal();
+    BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     List<EmployeeTaxResponse> employeeTaxResponses =
         generalFunction.readTaxDataByEmployeeId(employeeId, monthlySalary, totalInsurance);
     BigDecimal totalTax = BigDecimal.ZERO;
@@ -757,10 +756,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   }
 
   private EmployeeInsuranceResponseList getEmployeeInsuranceResponseList(
-      String employeeId, BigDecimal baseSalary, BigDecimal additionalSalary, BigDecimal allowance) {
-    BigDecimal salaryForInsurance = baseSalary.add(additionalSalary).add(allowance);
+      String employeeId, BigDecimal baseSalary) {
     List<EmployeeInsuranceResponse> employeeInsuranceResponses =
-        generalFunction.readInsuranceDataByEmployeeId(employeeId, salaryForInsurance);
+        generalFunction.readInsuranceDataByEmployeeId(employeeId, baseSalary);
     BigDecimal totalInsurance = BigDecimal.ZERO;
     if (employeeInsuranceResponses.isEmpty()) {
       return new EmployeeInsuranceResponseList(employeeInsuranceResponses, totalInsurance);

@@ -1,10 +1,15 @@
 package com.csproject.hrm.controllers;
 
+import com.csproject.hrm.dto.request.HolidayCalendarRequest;
 import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.services.*;
+import com.csproject.hrm.services.ChartService;
+import com.csproject.hrm.services.EmployeeDetailService;
+import com.csproject.hrm.services.HolidayCalenderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
@@ -12,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
@@ -19,8 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
-import static com.csproject.hrm.common.constant.Constants.AUTHORIZATION;
-import static com.csproject.hrm.common.constant.Constants.BEARER;
+import static com.csproject.hrm.common.constant.Constants.*;
 import static com.csproject.hrm.common.uri.Uri.REQUEST_MAPPING;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -181,5 +186,13 @@ public class ChartController {
       @Positive(message = "Year must be a positive number!") @RequestParam Integer year) {
     LocalDate date = LocalDate.of(year, 1, 1);
     return ResponseEntity.ok(holidayCalenderService.getAllHolidayByYear(date));
+  }
+
+  @PreAuthorize(value = "hasRole('ADMIN')")
+  @PostMapping(value = "insert_holiday")
+  public ResponseEntity<?> insertHolidayByYear(
+      @Valid @RequestBody HolidayCalendarRequest holidayCalendarRequest) {
+    holidayCalenderService.insertHolidayCalendar(holidayCalendarRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }

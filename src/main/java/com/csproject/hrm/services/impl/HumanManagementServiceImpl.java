@@ -26,12 +26,15 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 
@@ -60,26 +63,30 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   @Override
   public void insertEmployee(HrmRequest hrmRequest) {
     if (!roleRepository.existsById(hrmRequest.getRole())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
     } else if (!hrmRequest.getGender().equalsIgnoreCase("Male")
         && !hrmRequest.getGender().equalsIgnoreCase("Female")) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be Female/Male");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
     } else if (!areaRepository.existsById(hrmRequest.getArea())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
     } else if (!officeRepository.existsById(hrmRequest.getOffice())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "office not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
     } else if (!gradeRepository.existsById(hrmRequest.getGrade())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "grade not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
     } else if (!jobRepository.existsById(hrmRequest.getPosition())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "position not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
     } else if (!workingTypeRepository.existsById(hrmRequest.getWorkingType())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "workingType not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
     } else if (!employeeRepository.existsById(hrmRequest.getManagerId())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
     } else if (!employeeTypeRepository.existsById(hrmRequest.getEmployeeType())) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
     } else if (hrmRequest.getBirthDate().isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "birthDate must be enough 18 age");
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Birth Date must be enough 18 age");
+    } else if (hrmRequest.getStartDate().isAfter(hrmRequest.getEndDate())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
+    } else if (hrmRequest.getEndDate().isBefore(LocalDate.now())) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not before Current Date");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
     String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName(), 0);
@@ -88,7 +95,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     hrmPojo.setCompanyEmail(companyEmail);
 
     generalFunction.sendEmailForNewEmployee(
-        List.of(hrmPojo), FROM_EMAIL, TO_EMAIL, SEND_PASSWORD_SUBJECT);
+        hrmPojo, FROM_EMAIL, hrmPojo.getPersonalEmail(), SEND_PASSWORD_SUBJECT);
     hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
     employeeRepository.insertEmployee(hrmPojo);
   }
@@ -114,8 +121,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   }
 
   @Override
-  public List<RoleDto> getListRoleType(boolean isAdmin) {
-    List<RoleDto> roleDto = employeeRepository.getListRoleType(isAdmin);
+  public List<RoleDto> getListRoleType() {
+    List<RoleDto> roleDto = employeeRepository.getListRoleType();
     roleDto.forEach(
         role -> {
           role.setRole(ERole.getLabel(role.getRole()));
@@ -178,7 +185,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
         }
       }
       List<HrmResponse> hrmResponses =
@@ -235,6 +242,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                 CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
       for (CSVRecord csvRecord : csvParser) {
         try {
+          checkValidFormatCsv(csvParser);
           String fullName = csvRecord.get("Full Name");
           Long role = ERole.getValue(csvRecord.get("Role"));
           String phone = csvRecord.get("Phone");
@@ -255,27 +263,29 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   csvRecord.get("Start Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
           LocalDate endDate =
               LocalDate.parse(csvRecord.get("End Date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+          BigDecimal baseSalary =
+              BigDecimal.valueOf(Double.parseDouble(csvRecord.get("Base Salary")));
+          BigDecimal salary = BigDecimal.valueOf(Double.parseDouble(csvRecord.get("Salary")));
           if (!roleRepository.existsById(role)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "role not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
           } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "gender must be Female/Male");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
           } else if (!areaRepository.existsById(area)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "area not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
           } else if (!officeRepository.existsById(office)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "office not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
           } else if (!gradeRepository.existsById(grade)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "grade not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
           } else if (!jobRepository.existsById(position)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "position not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
           } else if (!workingTypeRepository.existsById(workingType)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "workingType not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
           } else if (!employeeRepository.existsById(managerId)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "managerId not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
           } else if (!employeeTypeRepository.existsById(employeeType)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "employeeType not exist");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
           } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
-            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "personalEmail not valid");
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Personal Email not valid");
           }
           hrmRequestList.add(
               HrmRequest.builder()
@@ -294,10 +304,15 @@ public class HumanManagementServiceImpl implements HumanManagementService {
                   .personalEmail(personalEmail)
                   .startDate(startDate)
                   .endDate(endDate)
+                  .salary(salary)
+                  .baseSalary(baseSalary)
                   .build());
         } catch (NumberFormatException e) {
           throw new CustomErrorException(HttpStatus.BAD_REQUEST, WRONG_NUMBER_FORMAT);
         }
+      }
+      if (hrmRequestList.isEmpty()) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Nothing to insert");
       }
       insertMultiEmployee(hrmRequestList);
     } catch (IOException e) {
@@ -330,7 +345,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       for (String employeeId : list) {
         if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
         }
       }
       try {
@@ -348,9 +363,13 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public void importExcelToEmployee(Workbook workBook) {
     List<HrmRequest> hrmRequestList = new ArrayList<>();
     Sheet sheet = workBook.getSheetAt(0);
+    if (getNumberOfNonEmptyCells(sheet, 0) <= 1) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format excel for import");
+    }
     for (int rowIndex = 0; rowIndex <= getNumberOfNonEmptyCells(sheet, 0) - 1; rowIndex++) {
       Row row = sheet.getRow(rowIndex);
       if (rowIndex == 0) {
+        checkValidFormatExcel(row);
         continue;
       }
       String fullName = row.getCell(0).getStringCellValue();
@@ -368,24 +387,51 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         String personalEmail = row.getCell(12).toString();
         LocalDate startDate = row.getCell(13).getLocalDateTimeCellValue().toLocalDate();
         LocalDate endDate = row.getCell(14).getLocalDateTimeCellValue().toLocalDate();
-        hrmRequestList.add(
-            HrmRequest.builder()
-                .fullName(fullName)
-                .role(role)
-                .phone(phone)
-                .gender(gender)
-                .birthDate(birthDate)
-                .grade(grade)
-                .position(position)
-                .office(office)
-                .area(area)
-                .workingType(workingType)
-                .managerId(managerId)
-                .employeeType(employeeType)
-                .personalEmail(personalEmail)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build());
+      BigDecimal baseSalary = BigDecimal.valueOf(row.getCell(15).getNumericCellValue());
+      BigDecimal salary = BigDecimal.valueOf(row.getCell(16).getNumericCellValue());
+
+      if (row.getCell(0) == null
+          || row.getCell(1) == null
+          || row.getCell(2) == null
+          || row.getCell(3) == null
+          || row.getCell(4) == null
+          || row.getCell(5) == null
+          || row.getCell(6) == null
+          || row.getCell(7) == null
+          || row.getCell(8) == null
+          || row.getCell(9) == null
+          || row.getCell(10) == null
+          || row.getCell(11) == null
+          || row.getCell(12) == null
+          || row.getCell(13) == null
+          || row.getCell(14) == null
+          || row.getCell(15) == null
+          || row.getCell(16) == null) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in excel");
+      }
+      hrmRequestList.add(
+          HrmRequest.builder()
+              .fullName(fullName)
+              .role(role)
+              .phone(phone)
+              .gender(gender)
+              .birthDate(birthDate)
+              .grade(grade)
+              .position(position)
+              .office(office)
+              .area(area)
+              .workingType(workingType)
+              .managerId(managerId)
+              .employeeType(employeeType)
+              .personalEmail(personalEmail)
+              .startDate(startDate)
+              .endDate(endDate)
+              .salary(salary)
+              .baseSalary(baseSalary)
+              .build());
+    }
+    if (hrmRequestList.isEmpty()) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Nothing to insert");
     }
     insertMultiEmployee(hrmRequestList);
   }
@@ -394,7 +440,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public HrmResponseList getListHumanResourceOfManager(QueryParam queryParam, String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     return employeeRepository.findAllEmployeeOfManager(queryParam, employeeId);
   }
@@ -403,7 +449,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     int level = employeeRepository.getLevelOfEmployee(employeeId);
     return employeeRepository.getListManagerHigherOfArea(employeeId, level);
@@ -413,7 +459,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
   public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId) {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     int level = employeeRepository.getLevelOfEmployee(employeeId);
     return employeeRepository.getListManagerLowerOfArea(employeeId, level);
@@ -455,9 +501,9 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           hrmPojo.setEmployeeId(employeeId);
           hrmPojo.setCompanyEmail(companyEmail);
           hrmPojos.add(hrmPojo);
+          generalFunction.sendEmailForNewEmployee(
+              hrmPojo, FROM_EMAIL, hrmPojo.getPersonalEmail(), SEND_PASSWORD_SUBJECT);
         });
-    //    generalFunction.sendEmailForNewEmployee(hrmPojos, FROM_EMAIL, TO_EMAIL,
-    // SEND_PASSWORD_SUBJECT);
     for (HrmPojo hrmPojo : hrmPojos) {
       hrmPojo.setPassword(passwordEncoder.encode(hrmPojo.getPassword()));
     }
@@ -469,7 +515,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     String companyName = "HRM";
     int level = 0;
     if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_MANAGER.name()))) {
-      level = employeeRepository.getLevelOfEmployee(hrmRequest.getManagerId()) - 1;
+      level = employeeRepository.getLevelOfEmployee(hrmRequest.getManagerId()) + 1;
     } else if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_USER.name()))) {
       level = -1;
     }
@@ -514,5 +560,86 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       }
     }
     return numOfNonEmptyCells;
+  }
+
+  private void checkValidFormatCsv(CSVParser csvParser) {
+    Set<Map.Entry<String, Integer>> map = csvParser.getHeaderMap().entrySet();
+    for (Map.Entry<String, Integer> i : map) {
+      if (i.getKey().equals("Full Name")) {
+        continue;
+      } else if (i.getKey().equals("Role")) {
+        continue;
+      } else if (i.getKey().equals("Phone")) {
+        continue;
+      } else if (i.getKey().equals("Gender")) {
+        continue;
+      } else if (i.getKey().equals("Grade")) {
+        continue;
+      } else if (i.getKey().equals("Position")) {
+        continue;
+      } else if (i.getKey().equals("Office")) {
+        continue;
+      } else if (i.getKey().equals("Area")) {
+        continue;
+      } else if (i.getKey().equals("Working Type")) {
+        continue;
+      } else if (i.getKey().equals("Manager Id")) {
+        continue;
+      } else if (i.getKey().equals("Employee Type")) {
+        continue;
+      } else if (i.getKey().equals("Personal Email")) {
+        continue;
+      } else if (i.getKey().equals("Start Date")) {
+        continue;
+      } else if (i.getKey().equals("End Date")) {
+        continue;
+      } else if (i.getKey().equals("Birth Date")) {
+        continue;
+      } else if (i.getKey().equals("Base Salary")) {
+        continue;
+      } else if (i.getKey().equals("Salary")) {
+        continue;
+      } else {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+      }
+    }
+  }
+
+  private void checkValidFormatExcel(Row row) {
+    if (!row.getCell(0).getStringCellValue().equals("Full Name")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(1).getStringCellValue().equals("Role")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(2).getStringCellValue().equals("Phone")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(3).getStringCellValue().equals("Gender")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(4).getStringCellValue().equals("Birth Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(5).getStringCellValue().equals("Grade")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(6).getStringCellValue().equals("Position")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(7).getStringCellValue().equals("Office")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(8).getStringCellValue().equals("Area")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(9).getStringCellValue().equals("Working Type")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(10).getStringCellValue().equals("Manager Id")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(11).getStringCellValue().equals("Employee Type")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(12).getStringCellValue().equals("Personal Email")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(13).getStringCellValue().equals("Start Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(14).getStringCellValue().equals("End Date")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(15).getStringCellValue().equals("Base Salary")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    } else if (!row.getCell(16).getStringCellValue().equals("Salary")) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Wrong format csv for import");
+    }
   }
 }

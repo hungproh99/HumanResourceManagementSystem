@@ -21,4 +21,5 @@ public class ApplicationRequestRemindResponse {
   private String employee_id;
   private String approver;
   private List<String> checked_by;
+  private LocalDateTime duration;
 }

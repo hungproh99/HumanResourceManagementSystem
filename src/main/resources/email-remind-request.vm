@@ -2,6 +2,8 @@
 
 <div>You you missed the request of <strong>%s</strong> created at <strong>%s</strong>.</div>
 
+<div>Duration for this request is <strong>%s</strong> You have <strong style="color:red;">%s</strong> days remain to do.</div>
+
 %s
 
 <div>Click this <a href="http://localhost:3000/forgot/%s">Request</a> to check.</div>

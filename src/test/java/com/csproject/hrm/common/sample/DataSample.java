@@ -8,8 +8,12 @@ import com.csproject.hrm.dto.response.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -325,7 +329,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2022-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_WRONG_GENDER =
       new HrmRequest(
@@ -343,7 +349,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2000-02-13"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_MANAGER_ROLE =
       new HrmRequest(
@@ -361,7 +369,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2022-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_USER_ROLE =
       new HrmRequest(
@@ -379,7 +389,29 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2022-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
+
+  public static final HrmRequest HRM_REQUEST_START_AFTER_END =
+      new HrmRequest(
+          "Nguyen Quang Huy",
+          3L,
+          "0385822476",
+          "Male",
+          LocalDate.parse("2000-02-13"),
+          1L,
+          1L,
+          1L,
+          1L,
+          1L,
+          "huynq100",
+          1L,
+          "huynq100@fpt.edu.vn",
+          LocalDate.parse("2000-09-13"),
+          LocalDate.parse("2000-08-15"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_NOT_ENOUGH_BIRTH_DATE =
       new HrmRequest(
@@ -397,7 +429,9 @@ public class DataSample {
           1L,
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
-          LocalDate.parse("2000-02-13"));
+          LocalDate.parse("2000-02-13"),
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmPojo HRM_POJO =
       new HrmPojo(
@@ -451,16 +485,17 @@ public class DataSample {
           Time.valueOf(LocalTime.now()),
           Time.valueOf(LocalTime.now()));
 
+  public static final List<TimekeepingResponses> TIMEKEEPING_RESPONSES =
+      Arrays.asList(
+          new TimekeepingResponses(
+              "huynq100",
+              "Nguyen Quang Huy",
+              "IT",
+              "DEVELOP_1",
+              Arrays.asList(TIMEKEEPING_RESPONSE)));
+
   public static final TimekeepingResponsesList TIMEKEEPING_RESPONSES_LIST =
-      new TimekeepingResponsesList(
-          Arrays.asList(
-              new TimekeepingResponses(
-                  "huynq100",
-                  "Nguyen Quang Huy",
-                  "IT",
-                  "DEVELOP_1",
-                  Arrays.asList(TIMEKEEPING_RESPONSE))),
-          1);
+      new TimekeepingResponsesList(TIMEKEEPING_RESPONSES, 1);
 
   public static final ApplicationsRequestResponse APPLICATIONS_REQUEST_RESPONSE =
       new ApplicationsRequestResponse(
@@ -599,4 +634,140 @@ public class DataSample {
 
   public static final List<BonusTypeDto> BONUS_TYPE_DTO_LIST =
       Arrays.asList(new BonusTypeDto(1L, "PROJECT_BONUS"));
+
+  public static final List<EmployeeNameAndID> EMPLOYEE_NAME_AND_ID_LIST =
+      Arrays.asList(new EmployeeNameAndID("huynq100", "Nguyen Quang Huy"));
+
+  public static final RangePolicy RANGE_POLICY = new RangePolicy("1", "2", "3");
+  public static final RangePolicy RANGE_POLICY_MAX_POINT = new RangePolicy("1", "MAX", "3");
+  public static final WorkingTimeDataDto WORKING_TIME_DATA_DTO =
+      new WorkingTimeDataDto(LocalTime.now(), LocalTime.now(), Arrays.asList(RANGE_POLICY));
+
+  public static final WorkingTimeDataDto WORKING_TIME_DATA_DTO_MAX_POINT =
+      new WorkingTimeDataDto(
+          LocalTime.now(), LocalTime.now(), Arrays.asList(RANGE_POLICY_MAX_POINT));
+
+  public static final OvertimePoint OVERTIME_POINT = new OvertimePoint("IN_WEEK", 1D);
+  public static final OvertimeDataDto OVERTIME_DATA_DTO =
+      new OvertimeDataDto(1, 2, Arrays.asList(OVERTIME_POINT));
+
+  public static final SalaryContractDto SALARY_CONTRACT_DTO_FULL_TIME =
+      new SalaryContractDto(1L, BigDecimal.ONE, BigDecimal.ONE, "FULL_TIME");
+
+  public static final SalaryContractDto SALARY_CONTRACT_DTO_PART_TIME =
+      new SalaryContractDto(1L, BigDecimal.ONE, BigDecimal.ONE, "PART_TIME");
+
+  public static final OvertimeDto OVERTIME_DTO =
+      new OvertimeDto(LocalTime.now(), LocalTime.now(), "IN_WEEK");
+
+  public static final CheckInCheckOutResponse CHECK_IN_CHECK_OUT_RESPONSE =
+      new CheckInCheckOutResponse(1L, 1L, LocalTime.now(), LocalTime.now());
+
+  public static final TimekeepingDetailResponse TIMEKEEPING_DETAIL_RESPONSE =
+      new TimekeepingDetailResponse(
+          "huynq100",
+          LocalDate.now(),
+          1L,
+          Arrays.asList(LIST_TIMEKEEPING_STATUS_RESPONSE),
+          "10",
+          LocalTime.now(),
+          LocalTime.now(),
+          Arrays.asList(CHECK_IN_CHECK_OUT_RESPONSE));
+
+  public static final CheckInCheckOutDto CHECK_IN_CHECK_OUT_DTO =
+      new CheckInCheckOutDto(1L, LocalTime.now(), LocalTime.now());
+  public static final ApplicationsRequestRequest APPLICATIONS_REQUEST_REQUEST =
+      new ApplicationsRequestRequest(
+          1L, "huynq100", 1L, 1L, "Nguyen Quang Huy", "Abc", "lienpt1", true);
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_WORKING_TIME =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "LEAVE_SOON",
+          "WORKING_TIME",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Date|2022-09-12]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_OVER_TIME =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "OT",
+          "WORKING_TIME",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-02][End_Date|2022-08-02][Start_Time|18:00][End_Time|20:00]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_PAID_LEAVE =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "PAID_LEAVE",
+          "PAID_LEAVE",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-03][End_Date|2022-08-03][Reason|1]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_BONUS =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "BONUS",
+          "NOMINATION",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Employee_Name|Nguyen Quang Huy - huynq100][Current_Position|DEV 1][Current_Area|IT][Value|500000][Bonus_Type|Yearly Bonus][Description|Abc]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_SALARY_INCREMENT =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "SALARY_INCREMENT",
+          "NOMINATION",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Start_Date|2022-08-03][Value|500000]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_ADVANCE =
+      new ApplicationRequestDto(
+          1L,
+          "huynq100",
+          "ADVANCES",
+          "ADVANCE",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Date|2022-08-03][Value|500000][Description|Abc]");
+
+  public static final ApplicationRequestDto APPLICATION_REQUEST_DTO_EMPLOYEE_ID_NULL =
+      new ApplicationRequestDto(
+          1L,
+          null,
+          "ADVANCES",
+          "ADVANCE",
+          "No comment",
+          LocalDateTime.now(),
+          "lienpt1",
+          "[Date|2022-08-03][Value|500000][Description|Abc]");
+
+  public static final TimekeepingIdOvertimeTypeDto TIMEKEEPING_ID_OVERTIME_TYPE_DTO =
+      new TimekeepingIdOvertimeTypeDto(2L, LocalDate.parse("2022-08-02"), 2L);
+
+  public static final ApplicationRequestRemindResponse APPLICATION_REQUEST_REMIND_RESPONSE =
+      new ApplicationRequestRemindResponse(
+          1L,
+          "WORKING_TIME",
+          "LEAVE_SOON",
+          LocalDateTime.now(),
+          "Nguyen Quang Huy",
+          "huynq100",
+          "lienpt1",
+          Arrays.asList("hungnq", "lienpt2"),
+          LocalDateTime.now());
 }

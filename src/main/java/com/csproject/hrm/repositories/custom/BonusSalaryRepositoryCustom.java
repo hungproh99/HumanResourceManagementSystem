@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface BonusSalaryRepositoryCustom {
   void insertBonusSalaryByEmployeeId(
-      Long salaryId, LocalDate date, String description, Long bonusType, BigDecimal bonus);
+      Long salaryId, LocalDate date, Long bonusType, BigDecimal bonus);
 
   List<BonusSalaryResponse> getListBonusMonthlyBySalaryMonthlyId(Long salaryId);
 

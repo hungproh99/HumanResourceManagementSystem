@@ -5,9 +5,17 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -23,14 +31,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 public class ApplicationsRequestServiceImpl implements ApplicationsRequestService {
@@ -57,7 +67,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       QueryParam queryParam, String employeeId) {
     if (employeeRepository.findById(employeeId).isEmpty()) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         applicationsRequestRepository.getListApplicationRequestReceive(queryParam, employeeId);
@@ -74,7 +84,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       QueryParam queryParam, String employeeId) {
     if (employeeRepository.findById(employeeId).isEmpty()) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employeeId \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee Id \"" + employeeId + "\" not exist");
     }
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
         applicationsRequestRepository.getListApplicationRequestSend(queryParam, employeeId);
@@ -91,19 +101,19 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (employeeRepository.findById(applicationsRequest.getEmployeeId()).isEmpty()) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "employeeId \"" + applicationsRequest.getEmployeeId() + "\" not exist");
+          "Employee Id \"" + applicationsRequest.getEmployeeId() + "\" not exist");
     } else if (employeeRepository.findById(applicationsRequest.getApprover()).isEmpty()) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "approver \"" + applicationsRequest.getApprover() + "\" not exist");
+          "Approver \"" + applicationsRequest.getApprover() + "\" not exist");
     } else if (!requestStatusRepository.existsById(applicationsRequest.getRequestStatusId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "requestStatus \"" + applicationsRequest.getRequestStatusId() + "\" not exist");
+          "Request Status \"" + applicationsRequest.getRequestStatusId() + "\" not exist");
     } else if (!requestNameRepository.existsById(applicationsRequest.getRequestNameId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "requestName \"" + applicationsRequest.getRequestNameId() + "\" not exist");
+          "Request Name \"" + applicationsRequest.getRequestNameId() + "\" not exist");
     }
     LocalDateTime createdDate = LocalDateTime.now();
     LocalDateTime latestDate = LocalDateTime.now();
@@ -119,19 +129,19 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         updateApplicationRequestRequest.getApplicationRequestId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "requestId \""
+          "Request Id \""
               + updateApplicationRequestRequest.getApplicationRequestId()
               + "\" not exist!");
     } else if (!employeeDetailRepository.checkEmployeeIDIsExists(
         updateApplicationRequestRequest.getApproverId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "approverId \"" + updateApplicationRequestRequest.getApproverId() + "\" not exist!");
+          "Approver Id \"" + updateApplicationRequestRequest.getApproverId() + "\" not exist!");
     } else if (!requestStatusRepository.existsById(
         ERequestStatus.getValue(updateApplicationRequestRequest.getRequestStatus()))) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "requestStatus \""
+          "Request Status \""
               + updateApplicationRequestRequest.getRequestStatus()
               + "\" not exist!");
     }
@@ -193,10 +203,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, NO_DATA + "with " + requestId);
     } else if (!applicationsRequestRepository.checkExistRequestId(requestId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\"  not exist");
+          HttpStatus.BAD_REQUEST, "Request Id \"" + requestId + "\"  not exist");
     } else if (applicationsRequestRepository.checkAlreadyApproveOrReject(requestId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\"  already approve or reject");
+          HttpStatus.BAD_REQUEST, "Request Id \"" + requestId + "\"  already approve or reject");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(requestId);
@@ -213,18 +223,23 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         rejectApplicationRequestRequest.getRequestId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "requestId \"" + rejectApplicationRequestRequest.getRequestId() + "\" not exist");
+          "Request Id \"" + rejectApplicationRequestRequest.getRequestId() + "\" not exist");
     } else if (applicationsRequestRepository.checkAlreadyApproveOrReject(
         rejectApplicationRequestRequest.getRequestId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "requestId \""
+          "Request Id \""
               + rejectApplicationRequestRequest.getRequestId()
               + "\"  already approve or reject");
     }
     Optional<ApplicationRequestDto> applicationRequestDto =
         applicationsRequestRepository.getApplicationRequestDtoByRequestId(
             rejectApplicationRequestRequest.getRequestId());
+    if (applicationRequestDto.isEmpty()) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST,
+          NO_DATA + "with " + rejectApplicationRequestRequest.getRequestId());
+    }
     String employeeId = applicationRequestDto.get().getEmployeeId();
     String employeeName = employeeRepository.getEmployeeNameByEmployeeId(employeeId);
     String approveId = applicationRequestDto.get().getApproveId();
@@ -256,13 +271,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee \"" + employeeId + "\" not exist");
     } else {
       try {
         for (Long requestId : list) {
           if (!applicationsRequestRepository.existsById(requestId)) {
             throw new CustomErrorException(
-                HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+                HttpStatus.BAD_REQUEST, "Request Id \"" + requestId + "\" not exist");
           }
         }
         List<ApplicationsRequestResponse> applicationsRequestResponseList =
@@ -284,13 +299,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee \"" + employeeId + "\" not exist");
     } else {
       try {
         for (Long requestId : list) {
           if (!applicationsRequestRepository.existsById(requestId)) {
             throw new CustomErrorException(
-                HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+                HttpStatus.BAD_REQUEST, "Request Id \"" + requestId + "\" not exist");
           }
         }
         List<ApplicationsRequestResponse> applicationsRequestResponseList =
@@ -312,12 +327,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee \"" + employeeId + "\" not exist");
     } else {
       for (Long requestId : list) {
         if (!applicationsRequestRepository.existsById(requestId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "RequestId \"" + requestId + "\" not exist");
         }
       }
       List<ApplicationsRequestResponse> applicationsRequestResponseList =
@@ -375,12 +390,12 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       throw new CustomDataNotFoundException(NO_DATA);
     } else if (!employeeRepository.existsById(employeeId)) {
       throw new CustomErrorException(
-          HttpStatus.BAD_REQUEST, "employee \"" + employeeId + "\" not exist");
+          HttpStatus.BAD_REQUEST, "Employee \"" + employeeId + "\" not exist");
     } else {
       for (Long requestId : list) {
         if (!applicationsRequestRepository.existsById(requestId)) {
           throw new CustomErrorException(
-              HttpStatus.BAD_REQUEST, "requestId \"" + requestId + "\" not exist");
+              HttpStatus.BAD_REQUEST, "RequestId \"" + requestId + "\" not exist");
         }
       }
       List<ApplicationsRequestResponse> applicationsRequestResponseList =
@@ -473,27 +488,27 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         case "Date":
           date = LocalDate.parse(i.getValue());
           break;
-        case "Desired_Position":
-          desiredPosition = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Area":
-          desiredArea = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Office":
-          desiredOffice = Long.parseLong(i.getValue());
-          break;
-        case "Desired_Grade":
-          desiredGrade = Long.parseLong(i.getValue());
-          break;
+          //        case "Desired_Position":
+          //          desiredPosition = Long.parseLong(i.getValue());
+          //          break;
+          //        case "Desired_Area":
+          //          desiredArea = Long.parseLong(i.getValue());
+          //          break;
+          //        case "Desired_Office":
+          //          desiredOffice = Long.parseLong(i.getValue());
+          //          break;
+          //        case "Desired_Grade":
+          //          desiredGrade = Long.parseLong(i.getValue());
+          //          break;
         case "Value":
           value = BigDecimal.valueOf(Long.parseLong(i.getValue()));
           break;
         case "Bonus_Type":
           bonusType = Long.parseLong(i.getValue());
           break;
-        case "Deduction_Type":
-          deductionType = Long.parseLong(i.getValue());
-          break;
+          //        case "Deduction_Type":
+          //          deductionType = Long.parseLong(i.getValue());
+          //          break;
         case "Description":
           description = i.getValue();
           break;
@@ -508,34 +523,35 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         updateWorkingTime(date, employeeId, requestName, requestId);
         break;
       case "OT":
-        updateOvertime(startDate, endDate, startTime, endTime, currentDate, employeeId, requestId);
+        updateOvertime(startDate, endDate, startTime, endTime, employeeId, requestId);
         break;
       case "PAID_LEAVE":
         updatePaidLeave(startDate, endDate, employeeId, requestName, requestId, reason);
         break;
-      case "PROMOTION":
-        updatePromotion(
-            desiredArea,
-            desiredOffice,
-            desiredPosition,
-            desiredGrade,
-            startDate,
-            value,
-            employeeId,
-            requestId);
-        break;
+        //      case "PROMOTION":
+        //        updatePromotion(
+        //            desiredArea,
+        //            desiredOffice,
+        //            desiredPosition,
+        //            desiredGrade,
+        //            startDate,
+        //            value,
+        //            employeeId,
+        //            requestId);
+        //        break;
       case "SALARY_INCREMENT":
         updateSalaryIncrement(startDate, value, employeeId, requestId);
         break;
       case "BONUS":
-        updateBonusSalary(date, description, value, employeeId, bonusType, requestId);
+        updateBonusSalary(date, value, employeeId, bonusType, requestId);
         break;
-      case "CONFLICT_CUSTOMER":
-      case "LEAK_INFORMATION":
-        updateConflictAndLeakInfo(date, description, value, employeeId, deductionType, requestId);
-        break;
-      case "ADVANCE":
-        updateAdvanceRequest(date, description, value, employeeId, requestId);
+        //      case "CONFLICT_CUSTOMER":
+        //      case "LEAK_INFORMATION":
+        //        updateConflictAndLeakInfo(date, description, value, employeeId, deductionType,
+        // requestId);
+        //        break;
+      case "ADVANCES":
+        updateAdvanceRequest(date, value, employeeId, requestId);
         break;
     }
     generalFunction.sendEmailUpdateRequest(
@@ -568,7 +584,6 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       LocalDate endDate,
       LocalTime startTime,
       LocalTime endTime,
-      LocalDate currentDate,
       String employeeId,
       Long requestId) {
     if (startDate == null
@@ -588,13 +603,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           boolean isHoliday = false;
           boolean isWeekend = false;
           for (LocalDate date : holidayList) {
-            if (currentDate.equals(date)) {
+            if (timekeepingIdOvertimeTypeDto.getCurrDate().equals(date)) {
               isHoliday = true;
               break;
             }
           }
           for (LocalDate date : weekendList) {
-            if (currentDate.equals(date)) {
+            if (timekeepingIdOvertimeTypeDto.getCurrDate().equals(date)) {
               isWeekend = true;
               break;
             }
@@ -651,6 +666,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       localDateList.add(startDate);
     } else {
       List<LocalDate> rangeDates = startDate.datesUntil(endDate).collect(Collectors.toList());
+      rangeDates.add(endDate);
       for (LocalDate date : rangeDates) {
         if (!timekeepingRepository.checkExistDateInTimekeeping(date, employeeId)) {
           localDateList.add(date);
@@ -671,38 +687,38 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
-  private void updatePromotion(
-      Long desiredArea,
-      Long desiredOffice,
-      Long desiredPosition,
-      Long desiredGrade,
-      LocalDate startDate,
-      BigDecimal value,
-      String employeeId,
-      Long requestId) {
-    if (desiredArea == null
-        || desiredOffice == null
-        || desiredPosition == null
-        || desiredGrade == null
-        || startDate == null
-        || value == null
-        || requestId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
-    }
-    workingPlaceRepository.insertNewWorkingPlace(
-        employeeId,
-        desiredArea,
-        desiredOffice,
-        desiredGrade,
-        desiredPosition,
-        startDate,
-        false,
-        true);
-    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
-
-    applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
+  //  private void updatePromotion(
+  //      Long desiredArea,
+  //      Long desiredOffice,
+  //      Long desiredPosition,
+  //      Long desiredGrade,
+  //      LocalDate startDate,
+  //      BigDecimal value,
+  //      String employeeId,
+  //      Long requestId) {
+  //    if (desiredArea == null
+  //        || desiredOffice == null
+  //        || desiredPosition == null
+  //        || desiredGrade == null
+  //        || startDate == null
+  //        || value == null
+  //        || requestId == null) {
+  //      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+  //    }
+  //    workingPlaceRepository.insertNewWorkingPlace(
+  //        employeeId,
+  //        desiredArea,
+  //        desiredOffice,
+  //        desiredGrade,
+  //        desiredPosition,
+  //        startDate,
+  //        false,
+  //        true);
+  //    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+  //
+  //    applicationsRequestRepository.updateStatusApplication(
+  //        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
+  //  }
 
   private void updateSalaryIncrement(
       LocalDate startDate, BigDecimal value, String employeeId, Long requestId) {
@@ -717,13 +733,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
   private void updateBonusSalary(
       LocalDate date,
-      String description,
       BigDecimal value,
       String employeeId,
       Long bonusType,
       Long requestId) {
     if (date == null
-        || description == null
         || bonusType == null
         || value == null
         || requestId == null) {
@@ -738,48 +752,47 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
-    bonusSalaryRepository.insertBonusSalaryByEmployeeId(
-        salaryId, date, description, bonusType, value);
+    bonusSalaryRepository.insertBonusSalaryByEmployeeId(salaryId, date, bonusType, value);
 
     applicationsRequestRepository.updateStatusApplication(
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
   }
 
-  private void updateConflictAndLeakInfo(
-      LocalDate date,
-      String description,
-      BigDecimal value,
-      String employeeId,
-      Long deductionType,
-      Long requestId) {
-    if (date == null
-        || description == null
-        || deductionType == null
-        || value == null
-        || requestId == null) {
-      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
-    }
-    LocalDate startDate = date.with(firstDayOfMonth());
-    LocalDate lastDate = date.with(lastDayOfMonth());
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
-            startDate, lastDate, employeeId);
-    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
-    Long salaryId =
-        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
-    deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
-        salaryId, date, description, deductionType, value);
-    if (deductionType.equals(EDeduction.getValue("FIRE")))
-      employeeRepository.updateStatusEmployee(employeeId, false);
-
-    applicationsRequestRepository.updateStatusApplication(
-        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
+  //  private void updateConflictAndLeakInfo(
+  //      LocalDate date,
+  //      String description,
+  //      BigDecimal value,
+  //      String employeeId,
+  //      Long deductionType,
+  //      Long requestId) {
+  //    if (date == null
+  //        || description == null
+  //        || deductionType == null
+  //        || value == null
+  //        || requestId == null) {
+  //      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
+  //    }
+  //    LocalDate startDate = date.with(firstDayOfMonth());
+  //    LocalDate lastDate = date.with(lastDayOfMonth());
+  //    Double actualWorkingPoint =
+  //        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(
+  //            startDate, lastDate, employeeId);
+  //    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
+  //    Long salaryId =
+  //        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+  //            employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
+  //    deductionSalaryRepository.insertDeductionSalaryByEmployeeId(
+  //        salaryId, date, description, deductionType, value);
+  //    if (deductionType.equals(EDeduction.getValue("FIRE")))
+  //      employeeRepository.updateStatusEmployee(employeeId, false);
+  //
+  //    applicationsRequestRepository.updateStatusApplication(
+  //        requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
+  //  }
 
   private void updateAdvanceRequest(
-      LocalDate date, String description, BigDecimal value, String employeeId, Long requestId) {
-    if (date == null || description == null || value == null || requestId == null) {
+      LocalDate date, BigDecimal value, String employeeId, Long requestId) {
+    if (date == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
     LocalDate startDate = date.with(firstDayOfMonth());
@@ -791,14 +804,10 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     Long salaryId =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
             employeeId, startDate, lastDate, actualWorkingPoint, ESalaryMonthly.PENDING.name());
-    advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, description, value);
+    advanceSalaryRepository.insertAdvanceSalaryByEmployeeId(salaryId, date, value);
 
     applicationsRequestRepository.updateStatusApplication(
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());
-  }
-
-  private boolean isInvalidSplit(String[] split) {
-    return split.length != TWO_NUMBER || isBlank(split[ZERO_NUMBER]) || isBlank(split[ONE_NUMBER]);
   }
 
   @Override
@@ -1315,7 +1324,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
   }
 
   @Override
-  public void updateAllApplicationRequestRemind(LocalDateTime checkDate) {
+  public void updateAllApplicationRequestRemind(LocalDateTime checkDate, LocalDateTime currDate) {
     List<ApplicationRequestRemindResponse> applicationRequestRemindResponses =
         applicationsRequestRepository.getAllApplicationRequestToRemind(checkDate);
 
@@ -1334,18 +1343,28 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               employeeRepository.getEmployeeEmailByEmployeeId(
                   applicationRequestRemindResponse.getApprover());
 
-          generalFunction.sendEmailRemindRequest(
-              approveName,
-              createName,
-              applicationRequestRemindResponse.getCreate_date().toString(),
-              applicationRequestRemindResponse.getChecked_by(),
-              applicationRequestRemindResponse.getApplication_request_id().toString(),
-              FROM_EMAIL,
-              TO_EMAIL,
-              "Remind Request");
-
-          applicationsRequestRepository.updateAllApplicationRequestRemind(
-              applicationRequestRemindResponse.getApplication_request_id(), Boolean.TRUE);
+          if (applicationRequestRemindResponse
+              .getDuration()
+              .toLocalDate()
+              .isEqual(currDate.toLocalDate())) {
+            applicationsRequestRepository.updateRejectApplicationRequest(
+                new RejectApplicationRequestRequest(
+                    applicationRequestRemindResponse.getApplication_request_id(),
+                    "Out of duration"),
+                LocalDateTime.now());
+          } else {
+            generalFunction.sendEmailRemindRequest(
+                approveName,
+                createName,
+                applicationRequestRemindResponse.getCreate_date().toString(),
+                applicationRequestRemindResponse.getChecked_by(),
+                applicationRequestRemindResponse.getApplication_request_id().toString(),
+                applicationRequestRemindResponse.getDuration().toString(),
+                applicationRequestRemindResponse.getDuration().compareTo(currDate) + "",
+                FROM_EMAIL,
+                TO_EMAIL,
+                "Remind Request");
+          }
         });
   }
 }

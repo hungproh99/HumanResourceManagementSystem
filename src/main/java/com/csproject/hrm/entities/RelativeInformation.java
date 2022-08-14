@@ -37,10 +37,6 @@ public class RelativeInformation {
   @Column(name = "contact")
   private String contact;
 
-  @Column(name = "is_dependent")
-  @Type(type = "boolean")
-  private Boolean isDependentABoolean;
-
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")
   private Employee employee;

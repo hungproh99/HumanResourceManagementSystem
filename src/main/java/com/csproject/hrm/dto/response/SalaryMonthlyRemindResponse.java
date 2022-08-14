@@ -21,4 +21,5 @@ public class SalaryMonthlyRemindResponse {
   private String position;
   private String approver;
   private List<String> checkedBy;
+  private LocalDate duration;
 }

@@ -1,7 +1,0 @@
-<div>Dear <strong>%s</strong>,</div>
-
-<div>Your request about <strong>%s</strong> just <strong>%s</strong> at <strong>%s</strong> by <strong>%s</strong>.</div>
-%s
-<div>Click this <a href="http://localhost:3000/forgot/%s">Request</a> to check.</div>
-
-<div>Request processing system.</div>

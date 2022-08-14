@@ -537,11 +537,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 OFFICE.NAME.as(OFFICE_NAME),
                 AREA.NAME.as(AREA_NAME),
                 year(currentDate())
-                    .minus(year(WORKING_CONTRACT.START_DATE))
+                    .minus(year(Tables.WORKING_CONTRACT.START_DATE))
                     .concat(YEAR)
-                    .concat(month(currentDate().minus(month(WORKING_CONTRACT.START_DATE))))
+                    .concat(month(currentDate()).minus(month(Tables.WORKING_CONTRACT.START_DATE)))
                     .concat(MONTH)
-                    .concat(day(currentDate().minus(day(WORKING_CONTRACT.START_DATE))))
+                    .concat(day(currentDate()).minus(day(Tables.WORKING_CONTRACT.START_DATE)))
                     .concat(DAY)
                     .as(SENIORITY),
                 JOB.POSITION.as(POSITION_NAME),
@@ -686,7 +686,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .from(RELATIVE_INFORMATION)
             .leftJoin(EMPLOYEE)
             .on(EMPLOYEE.EMPLOYEE_ID.eq(RELATIVE_INFORMATION.EMPLOYEE_ID))
-            .where(RELATIVE_INFORMATION.IS_DEPENDENT.isTrue()));
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
   }
 
   @Override

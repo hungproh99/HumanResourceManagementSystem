@@ -7,7 +7,6 @@ import com.csproject.hrm.jooq.QueryParam;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Writer;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +25,6 @@ public interface TimekeepingService {
 
   void upsertPointPerDay(LocalDate currentDate);
 
-  void insertTimekeepingCheckInCheckOut(
-      String employeeId, LocalDate localDate, LocalTime localTime);
+  //  void insertTimekeepingCheckInCheckOut(
+  //      String employeeId, LocalDate localDate, LocalTime localTime);
 }

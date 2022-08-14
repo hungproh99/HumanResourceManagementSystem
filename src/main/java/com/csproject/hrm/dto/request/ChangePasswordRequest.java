@@ -16,19 +16,19 @@ import static com.csproject.hrm.common.constant.Constants.PASSWORD_VALIDATION;
 @NoArgsConstructor
 @Builder
 public class ChangePasswordRequest {
-  @NotBlank(message = "email must not be blank!")
-  @Pattern(regexp = EMAIL_VALIDATION, message = "email is not valid!")
+  @NotBlank(message = "Email must not be blank!")
+  @Pattern(regexp = EMAIL_VALIDATION, message = "Email is not valid!")
   private String email;
 
-  @NotBlank(message = "old_password must not be blank!")
-  @Pattern(regexp = PASSWORD_VALIDATION, message = "old_password is not valid!")
+  @NotBlank(message = "Old Password must not be blank!")
+  @Pattern(regexp = PASSWORD_VALIDATION, message = "Old Password is not valid!")
   private String old_password;
 
-  @NotBlank(message = "new_password must not be blank!")
-  @Pattern(regexp = PASSWORD_VALIDATION, message = "new_password is not valid!")
+  @NotBlank(message = "New Password must not be blank!")
+  @Pattern(regexp = PASSWORD_VALIDATION, message = "New Password is not valid!")
   private String new_password;
 
-  @NotBlank(message = "re_password must not be blank!")
-  @Pattern(regexp = PASSWORD_VALIDATION, message = "re_password is not valid!")
+  @NotBlank(message = "Re Password must not be blank!")
+  @Pattern(regexp = PASSWORD_VALIDATION, message = "Re Password is not valid!")
   private String re_password;
 }

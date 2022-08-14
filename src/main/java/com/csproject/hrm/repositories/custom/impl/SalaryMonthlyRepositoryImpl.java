@@ -194,6 +194,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .leftJoin(EMPLOYEE)
             .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
             .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
             .fetchOneInto(String.class);
     LocalDate duration = endDate.plusDays(3);
     if (managerId == null) {
@@ -243,7 +245,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
 
   @Override
   public void updateCheckedSalaryMonthly(
-      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, boolean isRemind, String employeeId) {
+      UpdateSalaryMonthlyRequest updateSalaryMonthlyRequest, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     dslContext.transaction(
         configuration -> {
@@ -253,7 +255,6 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
                   SALARY_MONTHLY.SALARY_STATUS_ID,
                   ESalaryMonthly.getValue(updateSalaryMonthlyRequest.getSalaryStatus()))
               .set(SALARY_MONTHLY.APPROVER, updateSalaryMonthlyRequest.getApproverId())
-              .set(SALARY_MONTHLY.IS_REMIND, isRemind)
               .where(SALARY_MONTHLY.SALARY_ID.eq(updateSalaryMonthlyRequest.getSalaryMonthlyId()))
               .execute();
           final var insertForwarder =
@@ -267,18 +268,6 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   @Override
   public void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var managerId =
-        dslContext
-            .select(EMPLOYEE.MANAGER_ID)
-            .from(SALARY_MONTHLY)
-            .leftJoin(SALARY_CONTRACT)
-            .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(EMPLOYEE)
-            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
-            .where(SALARY_MONTHLY.SALARY_ID.eq(rejectSalaryMonthlyRequest.getSalaryMonthlyId()))
-            .fetchOneInto(String.class);
     final var query =
         dslContext
             .update(SALARY_MONTHLY)
@@ -286,7 +275,6 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
                 SALARY_MONTHLY.SALARY_STATUS_ID,
                 ESalaryMonthly.getValue(ESalaryMonthly.REJECTED.name()))
             .set(SALARY_MONTHLY.COMMENT, rejectSalaryMonthlyRequest.getComment())
-            .set(SALARY_MONTHLY.APPROVER, managerId)
             .where(SALARY_MONTHLY.SALARY_ID.eq(rejectSalaryMonthlyRequest.getSalaryMonthlyId()))
             .execute();
   }
@@ -395,16 +383,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     return salaryMonthlyRemindResponseList;
   }
 
-  @Override
-  public void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
-        dslContext
-            .update(SALARY_MONTHLY)
-            .set(SALARY_MONTHLY.IS_REMIND, isRemind)
-            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyId))
-            .execute();
-  }
+//  @Override
+//  public void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind) {
+//    final DSLContext dslContext = DSL.using(connection.getConnection());
+//    final var query =
+//        dslContext
+//            .update(SALARY_MONTHLY)
+//            .set(SALARY_MONTHLY.IS_REMIND, isRemind)
+//            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyId))
+//            .execute();
+//  }
 
   @Override
   public boolean checkAlreadyApproveOrReject(Long salaryMonthlyId) {
@@ -433,7 +421,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.START_DATE.as("endDate"),
             SALARY_MONTHLY.APPROVER.as("approver"),
-            JOB.POSITION.as("position"))
+            JOB.POSITION.as("position"),
+            SALARY_MONTHLY.DURATION.as("duration"))
         .from(SALARY_MONTHLY)
         .leftJoin(SALARY_CONTRACT)
         .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
@@ -446,7 +435,9 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .leftJoin(JOB)
         .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
         .where(SALARY_MONTHLY.DURATION.le(checkDate))
-        .and(SALARY_MONTHLY.IS_REMIND.isFalse())
+        .and(
+            SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                ESalaryMonthly.getValue(ESalaryMonthly.PENDING.name())))
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
@@ -567,7 +558,10 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
             .leftJoin(SALARY_STATUS)
             .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
-            .where(conditions));
+            .where(conditions)
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue()));
   }
 
   private int countAllManagementReviewSalaryMonthly(List<Condition> conditions, String employeeId) {
