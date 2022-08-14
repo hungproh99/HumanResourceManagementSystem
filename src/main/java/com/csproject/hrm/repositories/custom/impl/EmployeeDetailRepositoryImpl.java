@@ -740,6 +740,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 configuration,
                 workingInfoRequest.getEmployeeId(),
                 new BigDecimal(workingInfoRequest.getBaseSalary()),
+                new BigDecimal(workingInfoRequest.getFinalSalary()),
                 workingInfoRequest.getStartDate(),
                 true);
           } else {
@@ -820,6 +821,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
       Configuration configuration,
       String employeeId,
       BigDecimal newSalary,
+      BigDecimal finalSalary,
       LocalDate startDate,
       boolean status) {
     final var contractId =
@@ -835,6 +837,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     DSL.using(configuration)
         .update(SALARY_CONTRACT)
         .set(SALARY_CONTRACT.BASE_SALARY, newSalary)
+        .set(SALARY_CONTRACT.ADDITIONAL_SALARY, finalSalary.subtract(newSalary))
         .set(SALARY_CONTRACT.START_DATE, startDate)
         .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, status)
         .where(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(contractId))

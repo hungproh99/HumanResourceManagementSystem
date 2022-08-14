@@ -1,7 +1,6 @@
 package com.csproject.hrm.services.impl;
 
-import com.csproject.hrm.common.enums.EPolicyCategory;
-import com.csproject.hrm.common.enums.EPolicyType;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.PolicyRepository;
@@ -24,6 +23,7 @@ public class PolicyServiceImpl implements PolicyService {
           policyResponse.setPolicy_type(EPolicyType.getLabel(policyResponse.getPolicy_type()));
           policyResponse.setPolicy_category(
               EPolicyCategory.getLabel(policyResponse.getPolicy_category()));
+          policyResponse.setPolicy_name(EPolicyName.getLabel(policyResponse.getPolicy_name()));
         });
     int total = policyRepository.getTotalPolicyByCategoryID(queryParam);
     return ListPolicyResponse.builder().policyResponseList(policyResponses).total(total).build();

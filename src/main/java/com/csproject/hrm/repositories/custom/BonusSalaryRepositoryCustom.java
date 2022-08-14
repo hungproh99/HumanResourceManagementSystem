@@ -1,8 +1,8 @@
 package com.csproject.hrm.repositories.custom;
 
-import com.csproject.hrm.dto.request.BonusSalaryRequest;
 import com.csproject.hrm.dto.dto.BonusTypeDto;
 import com.csproject.hrm.dto.dto.SalaryMonthlyInfoDto;
+import com.csproject.hrm.dto.request.BonusSalaryRequest;
 import com.csproject.hrm.dto.response.BonusSalaryResponse;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +29,6 @@ public interface BonusSalaryRepositoryCustom {
   Optional<SalaryMonthlyInfoDto> getSalaryMonthlyInfoByBonusSalary(Long bonusSalaryId);
 
   boolean checkExistBonusSalary(Long bonusSalaryId);
+	
+	BonusTypeDto getBonusTypeDtoByID(Long bonusTypeID);
 }
