@@ -12,23 +12,23 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @SuperBuilder
 public class WorkingHistoryRequest {
-  @Positive(message = "Working History \"id\" must be a positive number!")
+  @Positive(message = "Working History \"ID\" must be a positive number!")
   private Long id;
 
-  @NotBlank(message = "employeeId must not be blank!")
+  @NotBlank(message = "Employee ID must not be blank!")
   private String employeeId;
 
-  @NotBlank(message = "companyName must not be blank!")
+  @NotBlank(message = "Company Name must not be blank!")
   private String companyName;
 
-  @NotBlank(message = "position must not be blank!")
+  @NotBlank(message = "Position must not be blank!")
   private String position;
 
-  @Past(message = "startDate must less than today!")
+  @Past(message = "Start Date must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate startDate;
 
-  @Past(message = "endDate must less than today!")
+  @Past(message = "End Date must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
 }

@@ -135,18 +135,19 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   public void updateBankInfo(BankRequest bank) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     boolean existed = checkBankIsExisted(bank.getEmployeeId());
-    dslContext.transaction(
-        configuration -> {
-          List<Long> bankID;
-          if (existed) {
-            dslContext
-                .update(BANK)
-                .set(BANK.NAME_BANK, bank.getNameBank())
-                .set(BANK.ADDRESS, bank.getAddress())
-                .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
-                .set(BANK.ACCOUNT_NAME, bank.getAccountName())
-                .where(BANK.BANK_ID.eq(bank.getId()));
-          } else {
+    if (existed) {
+      dslContext
+          .update(BANK)
+          .set(BANK.NAME_BANK, bank.getNameBank())
+          .set(BANK.ADDRESS, bank.getAddress())
+          .set(BANK.ACCOUNT_NUMBER, bank.getAccountNumber())
+          .set(BANK.ACCOUNT_NAME, bank.getAccountName())
+          .where(BANK.BANK_ID.eq(bank.getId()))
+          .execute();
+    } else {
+      dslContext.transaction(
+          configuration -> {
+            List<Long> bankID;
             bankID =
                 dslContext
                     .insertInto(
@@ -164,60 +165,35 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                         bank.getAccountName())
                     .returningResult(BANK.BANK_ID)
                     .fetchInto(Long.class);
-            System.out.println(
-                dslContext
-                    .insertInto(
-                        BANK,
-                        BANK.BANK_ID,
-                        BANK.NAME_BANK,
-                        BANK.ADDRESS,
-                        BANK.ACCOUNT_NUMBER,
-                        BANK.ACCOUNT_NAME)
-                    .values(
-                        bank.getId(),
-                        bank.getNameBank(),
-                        bank.getAddress(),
-                        bank.getAccountNumber(),
-                        bank.getAccountName())
-                    .returningResult(BANK.BANK_ID));
             dslContext
                 .update(EMPLOYEE)
                 .set(EMPLOYEE.BANK_ID, bankID.get(0))
                 .where(EMPLOYEE.EMPLOYEE_ID.eq(bank.getEmployeeId()))
                 .execute();
-          }
-        });
+          });
+    }
   }
 
   @Override
-  public void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance) {
-    //    final DSLContext dslContext = DSL.using(connection.getConnection());
-    //    dslContext
-    //        .update(EMPLOYEE)
-    //        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
-    //        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
-    //        .execute();
+  public void updateInsurance(TaxAndInsuranceRequest taxAndInsurance) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .update(EMPLOYEE_INSURANCE)
+        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
+        .set(EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID, taxAndInsurance.getInsuranceId())
+        .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
+        .and(EMPLOYEE_INSURANCE.POLICY_NAME_ID.eq(Long.valueOf(taxAndInsurance.getPolicyNameId())))
+        .execute();
+  }
 
-    //    dslContext
-    //        .insertInto(
-    //            EMPLOYEE_INSURANCE,
-    //            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
-    //            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
-    //            EMPLOYEE_INSURANCE.ADDRESS,
-    //            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
-    //            EMPLOYEE_INSURANCE.POLICY_TYPE_ID)
-    //        .values(
-    //            taxAndInsurance.getInsuranceId(),
-    //            taxAndInsurance.getEmployeeId(),
-    //            taxAndInsurance.getInsuranceAddress(),
-    //            taxAndInsurance.getInsuranceStatus(),
-    //            taxAndInsurance.getPolicyTypeId())
-    //        .onDuplicateKeyUpdate()
-    //        .set(EMPLOYEE_INSURANCE.EMPLOYEE_ID, taxAndInsurance.getEmployeeId())
-    //        .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-    //        .set(EMPLOYEE_INSURANCE.INSURANCE_STATUS, taxAndInsurance.getInsuranceStatus())
-    //        .set(EMPLOYEE_INSURANCE.POLICY_TYPE_ID, taxAndInsurance.getPolicyTypeId())
-    //        .execute();
+  @Override
+  public void updateTax(TaxAndInsuranceRequest taxAndInsurance) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    dslContext
+        .update(EMPLOYEE)
+        .set(EMPLOYEE.TAX_CODE, taxAndInsurance.getTaxCode())
+        .where(EMPLOYEE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
+        .execute();
   }
 
   @Override
@@ -245,11 +221,9 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             IDENTITY_CARD.PROVIDE_PLACE)
         .values(
             employeeAdditionalInfo.getPlace_of_residence(),
-            employeeAdditionalInfo.getPlace_of_origin(),
-            employeeAdditionalInfo.getNationality(),
-            employeeAdditionalInfo.getCard_id(),
-            employeeAdditionalInfo.getProvideDate(),
-            employeeAdditionalInfo.getProvidePlace())
+                employeeAdditionalInfo.getPlace_of_origin(),
+            employeeAdditionalInfo.getNationality(), employeeAdditionalInfo.getCard_id(),
+            employeeAdditionalInfo.getProvideDate(), employeeAdditionalInfo.getProvidePlace())
         .onDuplicateKeyUpdate()
         .set(IDENTITY_CARD.PLACE_OF_RESIDENCE, employeeAdditionalInfo.getPlace_of_residence())
         .set(IDENTITY_CARD.PLACE_OF_ORIGIN, employeeAdditionalInfo.getPlace_of_origin())
@@ -419,12 +393,9 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     final var query =
         dslContext
             .select(
-                WORKING_HISTORY.WORKING_HISTORY_ID,
-                WORKING_HISTORY.COMPANY_NAME,
-                WORKING_HISTORY.TYPE_ID,
-                WORKING_HISTORY.POSITION,
-                WORKING_HISTORY.START_DATE,
-                WORKING_HISTORY.END_DATE)
+                WORKING_HISTORY.WORKING_HISTORY_ID, WORKING_HISTORY.COMPANY_NAME,
+                WORKING_HISTORY.TYPE_ID, WORKING_HISTORY.POSITION,
+                WORKING_HISTORY.START_DATE, WORKING_HISTORY.END_DATE)
             .from(WORKING_HISTORY)
             .rightJoin(EMPLOYEE)
             .on(WORKING_HISTORY.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))

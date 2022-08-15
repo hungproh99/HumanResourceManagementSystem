@@ -20,7 +20,9 @@ public interface EmployeeDetailRepositoryCustom {
 
   void updateBankInfo(BankRequest bank);
 
-  void updateTaxAndInsurance(TaxAndInsuranceRequest taxAndInsurance);
+  void updateInsurance(TaxAndInsuranceRequest taxAndInsurance);
+
+  void updateTax(TaxAndInsuranceRequest taxAndInsurance);
 
   void updateAdditionalInfo(EmployeeAdditionalInfoRequest employeeAdditionalInfo);
 

@@ -104,7 +104,18 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
-    employeeDetailRepository.updateTaxAndInsurance(taxAndInsurance);
+    TaxAndInsuranceResponse response = employeeDetailRepository.findTaxAndInsurance(employeeID);
+    if (taxAndInsurance.getTaxCode() == null || "".equals(taxAndInsurance.getTaxCode())) {
+      if (taxAndInsurance.getInsuranceId() == null
+          || taxAndInsurance.getInsuranceAddress() == null
+          || taxAndInsurance.getPolicyNameId() == null) {
+        throw new CustomParameterConstraintException(FILL_NOT_FULL);
+      } else {
+        employeeDetailRepository.updateInsurance(taxAndInsurance);
+      }
+    } else {
+      employeeDetailRepository.updateTax(taxAndInsurance);
+    }
   }
 
   @Override

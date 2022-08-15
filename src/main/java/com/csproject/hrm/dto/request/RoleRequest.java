@@ -13,10 +13,10 @@ import static com.csproject.hrm.common.constant.Constants.NUMERIC_VALIDATION;
 @NoArgsConstructor
 @SuperBuilder
 public class RoleRequest {
-  @NotBlank(message = "roleID must not be blank!")
-  @Pattern(regexp = NUMERIC_VALIDATION, message = "roleID accept numeric only!")
-  private String roleId;
-
-  @NotBlank(message = "employeeID must not be blank!")
-  private String employeeId;
+	@NotBlank(message = "Role ID must not be blank!")
+	@Pattern(regexp = NUMERIC_VALIDATION, message = "Role ID accept numeric only!")
+	private String roleId;
+	
+	@NotBlank(message = "Employee ID must not be blank!")
+	private String employeeId;
 }

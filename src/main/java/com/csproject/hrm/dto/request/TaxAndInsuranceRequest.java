@@ -9,7 +9,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class TaxAndInsuranceRequest {
   private String taxCode;
-  private Long insuranceId;
+  private String insuranceId;
   private String employeeId;
   private String insuranceAddress;
+  private String policyNameId;
 }

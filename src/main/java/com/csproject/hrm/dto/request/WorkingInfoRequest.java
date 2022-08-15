@@ -3,53 +3,57 @@ package com.csproject.hrm.dto.request;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
+
+import static com.csproject.hrm.common.constant.Constants.NUMERIC_VALIDATION;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkingInfoRequest {
-  @NotBlank(message = "employeeId must not be blank!")
+  @NotBlank(message = "Employee ID must not be blank!")
   private String employeeId;
 
-  @NotBlank(message = "baseSalary must not be blank!")
+  @NotBlank(message = "Base Salary must not be blank!")
+  @Pattern(regexp = NUMERIC_VALIDATION, message = "Base Salary accept numeric only!")
   private String baseSalary;
 
-  @NotBlank(message = "finalSalary must not be blank!")
+  @NotBlank(message = "Final Salary must not be blank!")
+  @Pattern(regexp = NUMERIC_VALIDATION, message = "Final Salary accept numeric only!")
   private String finalSalary;
 
-  @Positive(message = "office must be a positive number!")
+  @Positive(message = "Office must be a positive number!")
   private Long office;
 
-  @Positive(message = "area must be a positive number!")
+  @Positive(message = "Area must be a positive number!")
   private Long area;
 
-  @Positive(message = "position must be a positive number!")
+  @Positive(message = "Position must be a positive number!")
   private Long position;
 
-  @Positive(message = "grade must be a positive number!")
+  @Positive(message = "Grade must be a positive number!")
   private Long grade;
 
-  @Positive(message = "workingTypeId must be a positive number!")
+  @Positive(message = "Working Type ID must be a positive number!")
   private Long workingTypeId;
 
+  //  @Past(message = "Start Date must less than today!")
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate startDate;
 
-  @Positive(message = "employeeType must be a positive number!")
+  @Positive(message = "Employee Type must be a positive number!")
   private Long employeeType;
 
-  @NotBlank(message = "managerId must not be blank!")
+  @NotBlank(message = "Manager ID must not be blank!")
   private String managerId;
 
-  @Positive(message = "salaryContractId must be a positive number!")
+  @Positive(message = "Salary Contract ID must be a positive number!")
   private Long salaryContractId;
 
-  @Positive(message = "workingContractId must be a positive number!")
+  @Positive(message = "Working Contract ID must be a positive number!")
   private Long workingContractId;
 
-  @Positive(message = "workingPlaceId must be a positive number!")
+  @Positive(message = "Working Place ID must be a positive number!")
   private Long workingPlaceId;
 }

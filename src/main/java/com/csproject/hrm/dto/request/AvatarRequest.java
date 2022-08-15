@@ -10,9 +10,9 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @SuperBuilder
 public class AvatarRequest {
-  @NotBlank(message = "nameBank must not be blank!")
-  private String avatar;
-
-  @NotBlank(message = "employeeId must not be blank!")
-  private String employeeId;
+	@NotBlank(message = "Avatar must not be blank!")
+	private String avatar;
+	
+	@NotBlank(message = "Employee ID must not be blank!")
+	private String employeeId;
 }
