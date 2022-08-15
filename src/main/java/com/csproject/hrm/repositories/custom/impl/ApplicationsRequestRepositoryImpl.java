@@ -25,10 +25,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
-import static org.aspectj.util.LangUtil.isEmpty;
 import static org.jooq.codegen.maven.example.Tables.POLICY_TYPE;
 import static org.jooq.codegen.maven.example.Tables.REVIEW_REQUEST;
 import static org.jooq.codegen.maven.example.tables.ApplicationsRequest.APPLICATIONS_REQUEST;
@@ -65,19 +63,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
 
     final List<OrderField<?>> orderByList = getOrderFieldApplicationRequest(queryParam);
 
-    List<ApplicationsRequestResponse> applicationsRequestResponseForwardList =
-        getListApplicationRequestReceiveForward(
-                conditions, orderByList, queryParam.pagination, employeeId)
-            .fetchInto(ApplicationsRequestResponse.class);
-
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
-        Stream.of(
-                applicationsRequestResponseForwardList,
-                getListApplicationRequestReceive(
-                        conditions, orderByList, queryParam.pagination, employeeId)
-                    .fetchInto(ApplicationsRequestResponse.class))
-            .flatMap(x -> x.stream())
-            .collect(Collectors.toList());
+        getListApplicationRequestReceive(conditions, orderByList, queryParam.pagination, employeeId)
+            .fetchInto(ApplicationsRequestResponse.class);
 
     applicationsRequestResponseList.forEach(
         applicationsRequestResponse -> {
@@ -133,46 +121,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
       Pagination pagination,
       String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-
-    return dslContext
-        .select(
-            APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
-            EMPLOYEE.EMPLOYEE_ID,
-            EMPLOYEE.FULL_NAME,
-            APPLICATIONS_REQUEST.CREATE_DATE,
-            REQUEST_NAME.NAME.as("request_name"),
-            REQUEST_TYPE.NAME.as("request_type"),
-            APPLICATIONS_REQUEST.DESCRIPTION,
-            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
-            APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
-            APPLICATIONS_REQUEST.DURATION,
-            APPLICATIONS_REQUEST.APPROVER,
-            (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
-                    .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
-                .as(IS_BOOKMARK),
-            APPLICATIONS_REQUEST.COMMENT)
-        .from(EMPLOYEE)
-        .leftJoin(APPLICATIONS_REQUEST)
-        .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-        .leftJoin(REQUEST_STATUS)
-        .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
-        .leftJoin(REQUEST_NAME)
-        .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
-        .leftJoin(REQUEST_TYPE)
-        .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-        .where(conditions)
-        .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
-        .orderBy(sortFields)
-        .limit(pagination.limit)
-        .offset(pagination.offset);
-  }
-
-  private Select<?> getListApplicationRequestReceiveForward(
-      List<Condition> conditions,
-      List<OrderField<?>> sortFields,
-      Pagination pagination,
-      String employeeId) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
     TableLike<?> selectReview =
         dslContext
             .select(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID, REVIEW_REQUEST.EMPLOYEE_ID)
@@ -204,14 +152,44 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
         .leftJoin(REQUEST_TYPE)
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
-        .leftJoin(selectReview)
-        .on(
-            selectReview
-                .field(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
-                .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
         .where(conditions)
-        .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId))
+        .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
         .orderBy(sortFields)
+        .unionAll(
+            dslContext
+                .select(
+                    APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
+                    EMPLOYEE.EMPLOYEE_ID,
+                    EMPLOYEE.FULL_NAME,
+                    APPLICATIONS_REQUEST.CREATE_DATE,
+                    REQUEST_NAME.NAME.as("request_name"),
+                    REQUEST_TYPE.NAME.as("request_type"),
+                    APPLICATIONS_REQUEST.DESCRIPTION,
+                    REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                    APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                    APPLICATIONS_REQUEST.DURATION,
+                    APPLICATIONS_REQUEST.APPROVER,
+                    (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                            .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                        .as(IS_BOOKMARK),
+                    APPLICATIONS_REQUEST.COMMENT)
+                .from(EMPLOYEE)
+                .leftJoin(APPLICATIONS_REQUEST)
+                .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+                .leftJoin(REQUEST_STATUS)
+                .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+                .leftJoin(REQUEST_NAME)
+                .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
+                .leftJoin(REQUEST_TYPE)
+                .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+                .leftJoin(selectReview)
+                .on(
+                    selectReview
+                        .field(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
+                        .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
+                .where(conditions)
+                .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId))
+                .orderBy(sortFields))
         .limit(pagination.limit)
         .offset(pagination.offset);
   }
@@ -648,19 +626,9 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     }
     conditions.add(condition);
 
-    List<ApplicationsRequestResponse> applicationsRequestResponseForwardList =
-        getListApplicationRequestReceiveForward(
-                conditions, orderByList, queryParam.pagination, employeeId)
-            .fetchInto(ApplicationsRequestResponse.class);
-
     List<ApplicationsRequestResponse> applicationsRequestResponseList =
-        Stream.of(
-                applicationsRequestResponseForwardList,
-                getListApplicationRequestReceive(
-                        conditions, orderByList, queryParam.pagination, employeeId)
-                    .fetchInto(ApplicationsRequestResponse.class))
-            .flatMap(x -> x.stream())
-            .collect(Collectors.toList());
+        getListApplicationRequestReceive(conditions, orderByList, queryParam.pagination, employeeId)
+            .fetchInto(ApplicationsRequestResponse.class);
 
     applicationsRequestResponseList.forEach(
         applicationsRequestResponse -> {

@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.Writer;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface HumanManagementService {
@@ -48,4 +49,6 @@ public interface HumanManagementService {
   List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId);
 
   List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId);
+
+  void updateWorkingStatusForListEmployee(LocalDate dateCheck);
 }

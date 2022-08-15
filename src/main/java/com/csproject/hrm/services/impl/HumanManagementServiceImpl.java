@@ -87,6 +87,14 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
     } else if (hrmRequest.getEndDate().isBefore(LocalDate.now())) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+    } else if (hrmRequest
+            .getBaseSalary()
+            .compareTo(BigDecimal.valueOf(Double.parseDouble("5000000")))
+        < 0) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
+    } else if (hrmRequest.getBaseSalary().compareTo(hrmRequest.getSalary()) > 0) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must less than Salary");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
     String employeeId = generalFunction.generateIdEmployee(hrmRequest.getFullName(), 0);
@@ -465,6 +473,12 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     return employeeRepository.getListManagerLowerOfArea(employeeId, level);
   }
 
+  @Override
+  public void updateWorkingStatusForListEmployee(LocalDate dateCheck) {
+    List<String> employeeIdList = employeeRepository.findAllNewEmployeeDeactive(dateCheck);
+    employeeRepository.updateWorkingStatusForListEmployee(Boolean.TRUE, employeeIdList);
+  }
+
   private void insertMultiEmployee(List<HrmRequest> hrmRequestList) {
     List<HrmPojo> hrmPojos = new ArrayList<>();
     hrmRequestList.forEach(
@@ -523,7 +537,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     HrmPojo hrmPojo =
         HrmPojo.builder()
             .password(password)
-            .workStatus(true)
+            .workStatus(false)
             .contractStatus(true)
             .placeStatus(true)
             .level(level)

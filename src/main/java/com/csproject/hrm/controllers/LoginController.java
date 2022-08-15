@@ -62,8 +62,8 @@ public class LoginController {
 
   @PostMapping(URI_FORGOT_PASSWORD)
   public ResponseEntity<?> forgotPassword(
-      @NotBlank(message = "email must not be blank!")
-          @Pattern(regexp = EMAIL_VALIDATION)
+      @NotBlank(message = "Email must not be blank!")
+          @Pattern(regexp = EMAIL_VALIDATION, message = "Email invalid format!")
           @RequestParam
           String email) {
     int updatePassword = loginService.forgotPasswordByUsername(email);
