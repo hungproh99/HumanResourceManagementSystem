@@ -12,26 +12,26 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @SuperBuilder
 public class EducationRequest {
-
-  @Positive(message = "Education \"id\" must be a positive number!")
-  private Long id;
-
-  @NotBlank(message = "nameSchool must not be blank!")
-  private String nameSchool;
-
-  @Past(message = "startDate must less than today!")
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate startDate;
-
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate endDate;
-
-  @NotBlank(message = "certificate must not be blank!")
-  private String certificate;
-
-  @NotBlank(message = "status must not be blank!")
-  private String status;
-
-  @NotBlank(message = "employeeId must not be blank!")
-  private String employeeId;
+	
+	@Positive(message = "Education \"ID\" must be a positive number!")
+	private Long id;
+	
+	@NotBlank(message = "School Name must not be blank!")
+	private String nameSchool;
+	
+	@Past(message = "Start Date must less than today!")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate startDate;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate endDate;
+	
+	@NotBlank(message = "Certificate must not be blank!")
+	private String certificate;
+	
+	@NotBlank(message = "Status must not be blank!")
+	private String status;
+	
+	@NotBlank(message = "Employee ID must not be blank!")
+	private String employeeId;
 }

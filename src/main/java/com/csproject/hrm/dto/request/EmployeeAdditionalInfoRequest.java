@@ -14,40 +14,40 @@ import static com.csproject.hrm.common.constant.Constants.NUMERIC_VALIDATION;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeAdditionalInfoRequest {
-  @NotBlank(message = "address must not be blank!")
-  private String address;
-
-  @NotBlank(message = "place_of_residence must not be blank!")
-  private String place_of_residence;
-
-  @NotBlank(message = "place_of_origin must not be blank!")
-  private String place_of_origin;
-
-  @NotBlank(message = "nationality must not be blank!")
-  private String nationality;
-
-  @NotBlank(message = "card_id must not be blank!")
-  @Pattern(regexp = NUMERIC_VALIDATION, message = "card_id accept numeric only!")
-  private String card_id;
-
-  @Past(message = "provideDate must less than today!")
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate provideDate;
-
-  @NotBlank(message = "providePlace must not be blank!")
-  private String providePlace;
-
-  @Pattern(regexp = EMAIL_VALIDATION, message = "personal_email is not valid!!")
-  private String personal_email;
-
-  @NotBlank(message = "phone_number must not be blank!")
-  @Pattern(regexp = NUMERIC_VALIDATION, message = "card_id accept numeric only!")
-  private String phone_number;
-
-  private String nick_name;
-
-  private String facebook;
-
-  @NotBlank(message = "employee_id must not be blank!")
-  private String employee_id;
+	@NotBlank(message = "Address must not be blank!")
+	private String address;
+	
+	@NotBlank(message = "Place Of Residence must not be blank!")
+	private String place_of_residence;
+	
+	@NotBlank(message = "Place Of Origin must not be blank!")
+	private String place_of_origin;
+	
+	@NotBlank(message = "Nationality must not be blank!")
+	private String nationality;
+	
+	@NotBlank(message = "Card ID must not be blank!")
+	@Pattern(regexp = NUMERIC_VALIDATION, message = "card_id accept numeric only!")
+	private String card_id;
+	
+	@Past(message = "Provide Date must less than today!")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate provideDate;
+	
+	@NotBlank(message = "Provide Place must not be blank!")
+	private String providePlace;
+	
+	@Pattern(regexp = EMAIL_VALIDATION, message = "Personal Email is not valid!!")
+	private String personal_email;
+	
+	@NotBlank(message = "Phone Number must not be blank!")
+	@Pattern(regexp = NUMERIC_VALIDATION, message = "Phone Number accept numeric only!")
+	private String phone_number;
+	
+	private String nick_name;
+	
+	private String facebook;
+	
+	@NotBlank(message = "Employee ID must not be blank!")
+	private String employee_id;
 }

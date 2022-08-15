@@ -6,7 +6,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeInsuranceDto {
-  private Long insuranceID;
-  private String insuranceName;
-  private String address;
+	private Long insuranceID;
+	private String insuranceName;
+	private String address;
+	private String policyNameID;
 }

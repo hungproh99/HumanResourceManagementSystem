@@ -1,9 +1,6 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
-import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
-import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
-import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -108,10 +105,9 @@ public class ApplicationsRequestController {
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @GetMapping("get_all_request_type")
-  public ResponseEntity<?> getAllRequestType(
-      @NotBlank(message = "EmployeeID must not be blank!") @RequestParam String employeeId) {
+  public ResponseEntity<?> getAllRequestType() {
     return ResponseEntity.ok(
-        applicationsRequestService.getAllRequestTypeByEmployeeLevel(employeeId));
+        applicationsRequestService.getAllRequestType());
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")

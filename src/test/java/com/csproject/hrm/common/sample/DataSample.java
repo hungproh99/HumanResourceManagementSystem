@@ -8,12 +8,8 @@ import com.csproject.hrm.dto.response.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -63,13 +59,7 @@ public class DataSample {
           1L,
           1L);
   public static final TaxAndInsuranceResponse TAX_AND_INSURANCE_RESPONSE =
-      new TaxAndInsuranceResponse(
-          null,
-          Arrays.asList(
-              new EmployeeInsuranceDto(1L, "HI", null),
-              new EmployeeInsuranceDto(2L, "SI", null),
-              new EmployeeInsuranceDto(3L, "UI", null),
-              new EmployeeInsuranceDto(4L, "PI", null)));
+      new TaxAndInsuranceResponse(null, Arrays.asList());
   public static final WorkingInfoResponse WORKING_INFO_RESPONSE =
       new WorkingInfoResponse(
           "12000000.00",
@@ -206,8 +196,8 @@ public class DataSample {
   public static final WorkingInfoRequest WORKING_INFO_REQUEST =
       new WorkingInfoRequest(
           "huynq100",
-          "5000000",
           "10000000",
+          "5000000",
           1L,
           1L,
           2L,
@@ -331,8 +321,8 @@ public class DataSample {
           "huynq100@fpt.edu.vn",
           LocalDate.parse("2000-02-13"),
           LocalDate.parse("2022-08-15"),
-          BigDecimal.ONE,
-          BigDecimal.ONE);
+          BigDecimal.ZERO,
+          BigDecimal.ZERO);
 
   public static final HrmRequest HRM_REQUEST_WRONG_GENDER =
       new HrmRequest(

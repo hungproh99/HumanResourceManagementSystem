@@ -1,6 +1,7 @@
 package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.*;
@@ -104,7 +105,18 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
-    employeeDetailRepository.updateTaxAndInsurance(taxAndInsurance);
+    TaxAndInsuranceResponse response = employeeDetailRepository.findTaxAndInsurance(employeeID);
+    if (taxAndInsurance.getTaxCode() == null || "".equals(taxAndInsurance.getTaxCode())) {
+      if (taxAndInsurance.getInsuranceId() == null
+          || taxAndInsurance.getInsuranceAddress() == null
+          || taxAndInsurance.getPolicyNameId() == null) {
+        throw new CustomParameterConstraintException(FILL_NOT_FULL);
+      } else {
+        employeeDetailRepository.updateInsurance(taxAndInsurance);
+      }
+    } else {
+      employeeDetailRepository.updateTax(taxAndInsurance);
+    }
   }
 
   @Override
@@ -219,11 +231,16 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
-    if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
-      return employeeDetailRepository.findTaxAndInsurance(employeeID);
-    } else {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
+    TaxAndInsuranceResponse response = employeeDetailRepository.findTaxAndInsurance(employeeID);
+    List<EmployeeInsuranceDto> list = response.getInsuranceDtos();
+    for (EmployeeInsuranceDto dto : list) {
+      dto.setInsuranceName(EInsurance.getLabel(dto.getInsuranceName()));
+    }
+    response.setInsuranceDtos(list);
+    return response;
   }
 
   @Override
@@ -310,6 +327,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
         || workingInfoRequest.getManagerId() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
+
     employeeDetailRepository.updateWorkingInfo(workingInfoRequest);
   }
 
