@@ -378,7 +378,8 @@ public class ChartControllerTest {
 
     List<LocalDate> response = ChartDataSample.DATE_LIST;
 
-    when(holidayCalenderService.getAllHolidayByYear(LocalDate.of(2022, 1, 1))).thenReturn(response);
+    when(holidayCalenderService.getAllHolidayByYear(LocalDate.of(2022, 1, 1)).isEmpty())
+        .thenReturn(false);
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(REQUEST_MAPPING + "/get_all_holiday?year=2022")
