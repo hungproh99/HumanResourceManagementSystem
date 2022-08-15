@@ -327,6 +327,7 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
         || workingInfoRequest.getManagerId() == null) {
       throw new CustomParameterConstraintException(FILL_NOT_FULL);
     }
+
     employeeDetailRepository.updateWorkingInfo(workingInfoRequest);
   }
 
