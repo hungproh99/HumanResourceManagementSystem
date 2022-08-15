@@ -1,6 +1,7 @@
 package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.*;
+import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.*;
@@ -230,11 +231,16 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (employeeID == null) {
       throw new NullPointerException("Param employeeID is null!");
     }
-    if (employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
-      return employeeDetailRepository.findTaxAndInsurance(employeeID);
-    } else {
+    if (!employeeDetailRepository.checkEmployeeIDIsExists(employeeID)) {
       throw new CustomDataNotFoundException(NO_EMPLOYEE_WITH_ID + employeeID);
     }
+    TaxAndInsuranceResponse response = employeeDetailRepository.findTaxAndInsurance(employeeID);
+    List<EmployeeInsuranceDto> list = response.getInsuranceDtos();
+    for (EmployeeInsuranceDto dto : list) {
+      dto.setInsuranceName(EInsurance.getLabel(dto.getInsuranceName()));
+    }
+    response.setInsuranceDtos(list);
+    return response;
   }
 
   @Override
