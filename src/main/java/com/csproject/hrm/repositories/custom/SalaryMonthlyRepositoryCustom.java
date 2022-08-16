@@ -3,9 +3,7 @@ package com.csproject.hrm.repositories.custom;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
-import com.csproject.hrm.dto.response.SalaryMonthlyRemindResponse;
-import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
-import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -28,7 +26,9 @@ public interface SalaryMonthlyRepositoryCustom {
       LocalDate endDate,
       Double actualWorkingPoint,
       String salaryStatus);
-
+  
+  Long getSalaryMonthlyIdByEmployeeIdAndDate(String employeeId, LocalDate startDate, LocalDate endDate);
+  
   void updateSalaryMonthlyByListEmployee(List<SalaryMonthlyDto> salaryMonthlyDtoList);
 
   List<SalaryMonthlyResponse> getListPersonalSalaryMonthlyToExport(

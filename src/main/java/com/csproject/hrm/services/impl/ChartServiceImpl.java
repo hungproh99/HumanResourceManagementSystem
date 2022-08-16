@@ -31,6 +31,7 @@ public class ChartServiceImpl implements ChartService {
   @Autowired ChartRepository chartRepository;
   @Autowired WorkingPlaceRepository contractRepository;
   @Autowired SalaryMonthlyRepository salaryMonthlyRepository;
+  @Autowired SalaryContractRepository salaryContractRepository;
   @Autowired SalaryMonthlyService salaryMonthlyService;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
   @Autowired TimekeepingRepository timekeepingRepository;
@@ -308,15 +309,28 @@ public class ChartServiceImpl implements ChartService {
 
     LocalDate startDate = date.withDayOfMonth(1);
     LocalDate endDate = date.withDayOfMonth(date.getMonth().length(date.isLeapYear()));
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeID);
-    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryID =
-        salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeID, startDate, endDate, actualWorkingPoint, ESalaryMonthly.APPROVED.name());
-
-    SalaryMonthlyDetailResponse salaryMonthly =
-        salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);
+        Objects.requireNonNullElse(
+            salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
+                employeeID, startDate, endDate),
+            0L);
+    SalaryMonthlyDetailResponse salaryMonthly;
+    if (salaryID == 0L) {
+      Optional<SalaryContractDto> salaryContract =
+          salaryContractRepository.getSalaryContractByEmployeeId(employeeID);
+      salaryMonthly = new SalaryMonthlyDetailResponse();
+      salaryMonthly.setBase_salary(salaryContract.orElse(new SalaryContractDto()).getBase_salary());
+      salaryMonthly.setBonusSalaryResponseList(new BonusSalaryResponseList(null, BigDecimal.ZERO));
+      salaryMonthly.setDeductionSalaryResponseList(
+          new DeductionSalaryResponseList(null, BigDecimal.ZERO));
+      salaryMonthly.setAdvanceSalaryResponseList(
+          new AdvanceSalaryResponseList(null, BigDecimal.ZERO));
+      salaryMonthly.setEmployeeTaxResponseList(new EmployeeTaxResponseList(null, BigDecimal.ZERO));
+      salaryMonthly.setEmployeeInsuranceResponseList(
+          new EmployeeInsuranceResponseList(null, BigDecimal.ZERO));
+    } else {
+      salaryMonthly = salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);
+    }
 
     map.put("Base", Objects.requireNonNullElse(salaryMonthly.getBase_salary(), BigDecimal.ZERO));
     map.put(
