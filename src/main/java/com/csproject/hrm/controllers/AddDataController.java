@@ -5,7 +5,6 @@ import com.csproject.hrm.services.HumanManagementService;
 import com.csproject.hrm.services.TimekeepingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +29,7 @@ public class AddDataController {
   @Autowired TimekeepingService timekeepingService;
   @Autowired SalaryCalculator salaryCalculator;
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
-  @GetMapping("add/data_timekeeping")
+  @GetMapping("/add_data_timekeeping")
   public ResponseEntity<?> getListApplicationsRequestReceive() {
 
     LocalDate startDate = LocalDate.parse("2019-01-01");
@@ -54,18 +52,12 @@ public class AddDataController {
       }
       if (!check) {
         timekeepingService.insertTimekeepingCheckInCheckOut("HuyNQ1", date, LocalTime.of(8, 0, 0));
-        timekeepingService.insertTimekeepingCheckInCheckOut(
-            "HuyNQ1", date, LocalTime.of(10, 30, 0));
-        timekeepingService.insertTimekeepingCheckInCheckOut(
-            "HuyNQ1", date, LocalTime.of(10, 40, 0));
         timekeepingService.insertTimekeepingCheckInCheckOut("HuyNQ1", date, LocalTime.of(12, 0, 0));
         timekeepingService.insertTimekeepingCheckInCheckOut("HuyNQ1", date, LocalTime.of(13, 0, 0));
-        timekeepingService.insertTimekeepingCheckInCheckOut("HuyNQ1", date, LocalTime.of(15, 0, 0));
-        timekeepingService.insertTimekeepingCheckInCheckOut(
-            "HuyNQ1", date, LocalTime.of(15, 10, 0));
         timekeepingService.insertTimekeepingCheckInCheckOut(
             "HuyNQ1", date, LocalTime.of(17, 30, 0));
       }
+      check = false;
     }
 
     return ResponseEntity.ok("Ok");
