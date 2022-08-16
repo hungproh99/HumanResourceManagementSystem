@@ -491,7 +491,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           //          desiredGrade = Long.parseLong(i.getValue());
           //          break;
         case "Value":
-          value = BigDecimal.valueOf(Long.parseLong(i.getValue()));
+          value = BigDecimal.valueOf(Double.parseDouble(i.getValue()));
           break;
         case "Bonus_Type":
           bonusType = Long.parseLong(i.getValue());
@@ -715,7 +715,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (startDate == null || value == null || requestId == null) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Not enough data to update");
     }
-    salaryContractRepository.insertNewSalaryContract(employeeId, value, startDate, false, true);
+    salaryContractRepository.insertNewSalaryContractByIncreaseSalary(
+        employeeId, value, startDate, false);
 
     applicationsRequestRepository.updateStatusApplication(
         requestId, ERequestStatus.APPROVED.name(), LocalDateTime.now());

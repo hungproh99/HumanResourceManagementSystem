@@ -1,8 +1,6 @@
 package com.csproject.hrm.schedule;
 
-import com.csproject.hrm.services.ApplicationsRequestService;
-import com.csproject.hrm.services.SalaryMonthlyService;
-import com.csproject.hrm.services.TimekeepingService;
+import com.csproject.hrm.services.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +19,8 @@ public class ScheduledTasks {
   @Autowired ApplicationsRequestService applicationsRequestService;
   @Autowired TimekeepingService timekeepingService;
   @Autowired SalaryMonthlyService salaryMonthlyService;
+  @Autowired HumanManagementService humanManagementService;
+  @Autowired SalaryContractService salaryContractService;
 
   @Scheduled(cron = "0 59 23 ? * * ")
   public void scheduleTaskSendMailRemind() {
@@ -28,6 +28,7 @@ public class ScheduledTasks {
     LocalDateTime checkDate = currDate.plus(2, ChronoUnit.DAYS);
     applicationsRequestService.updateAllApplicationRequestRemind(checkDate, currDate);
     salaryMonthlyService.updateAllSalaryRemind(checkDate.toLocalDate(), currDate.toLocalDate());
+    humanManagementService.updateWorkingStatusForListEmployee(currDate.toLocalDate());
   }
 
   @Scheduled(cron = "0 50 23 ? * * ")
@@ -41,6 +42,12 @@ public class ScheduledTasks {
     LocalDate endDate = LocalDate.now();
     LocalDate startDate = endDate.with(firstDayOfMonth());
     salaryMonthlyService.upsertSalaryMonthlyByEmployeeIdList(startDate, endDate);
+  }
+
+  @Scheduled(cron = "0 0 1 1  * ?")
+  public void updateSalaryContractPerMonth() {
+    LocalDate currentDate = LocalDate.now();
+    salaryContractService.updateStatusSalaryContract(true, currentDate);
   }
 
   @Scheduled(cron = "0 00 07 ? * * ")

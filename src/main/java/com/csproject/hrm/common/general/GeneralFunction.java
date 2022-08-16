@@ -139,7 +139,11 @@ public class GeneralFunction {
         helper.setSubject(subject);
       message.setContent(
           String.format(
-              data, hrmPojo.getFullName(), hrmPojo.getCompanyName(), hrmPojo.getPassword()),
+              data,
+              hrmPojo.getFullName(),
+              hrmPojo.getCompanyEmail(),
+              hrmPojo.getPassword(),
+              hrmPojo.getStartDate()),
           "text/html; charset=utf-8");
       emailSender.send(message);
     } catch (MessagingException | IOException e) {

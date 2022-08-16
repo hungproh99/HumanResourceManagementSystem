@@ -49,8 +49,10 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   public List<HrmResponse> findAllEmployee(QueryParam queryParam, String employeeId) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
     conditions.add(EMPLOYEE.EMPLOYEE_ID.ne(employeeId));
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(WORKING_CONTRACT.START_DATE.desc());
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
+
     List<HrmResponse> hrmResponses =
         findAllEmployee(conditions, sortFields, queryParam.pagination).fetchInto(HrmResponse.class);
     hrmResponses.forEach(
@@ -337,12 +339,16 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             GRADE_TYPE.NAME.as(GRADE),
             OFFICE.NAME.as(OFFICE_NAME),
             AREA.NAME.as(AREA_NAME),
-            year(currentDate())
-                .minus(year(WORKING_CONTRACT.START_DATE))
+            when(year(currentDate()).minus(year(WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                .otherwise(year(currentDate()).minus(year(WORKING_CONTRACT.START_DATE)))
                 .concat(YEAR)
-                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+                .concat(
+                    when(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                        .otherwise(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE))))
                 .concat(MONTH)
-                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+                .concat(
+                    when(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                        .otherwise(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE))))
                 .concat(DAY)
                 .as(SENIORITY),
             JOB.POSITION.as(POSITION_NAME),
@@ -489,8 +495,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   public HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(WORKING_CONTRACT.START_DATE.desc());
+    sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
     List<HrmResponse> hrmResponses =
         findAllEmployeeOfManager(new ArrayList<>(), sortFields, employeeId)
             .fetchInto(HrmResponse.class);
@@ -521,20 +528,18 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     return HrmResponseList.builder().hrmResponse(hrmResponseListReturn).total(count).build();
   }
 
-  @Override
-  public void updateStatusEmployee(String employeeId, boolean status) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var query =
-        dslContext
-            .update(EMPLOYEE)
-            .set(EMPLOYEE.WORKING_STATUS, status)
-            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
-  }
+  //  @Override
+  //  public void updateStatusEmployee(String employeeId, boolean status) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    final var query =
+  //        dslContext
+  //            .update(EMPLOYEE)
+  //            .set(EMPLOYEE.WORKING_STATUS, status)
+  //            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+  //  }
 
   public Select<?> findAllEmployeeOfManager(
-      List<Condition> conditions,
-      List<OrderField<?>> sortFields,
-      String employeeId) {
+      List<Condition> conditions, List<OrderField<?>> sortFields, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(
@@ -550,12 +555,16 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             GRADE_TYPE.NAME.as(GRADE),
             OFFICE.NAME.as(OFFICE_NAME),
             AREA.NAME.as(AREA_NAME),
-            year(currentDate())
-                .minus(year(WORKING_CONTRACT.START_DATE))
+            when(year(currentDate()).minus(year(WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                .otherwise(year(currentDate()).minus(year(WORKING_CONTRACT.START_DATE)))
                 .concat(YEAR)
-                .concat(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)))
+                .concat(
+                    when(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                        .otherwise(month(currentDate()).minus(month(WORKING_CONTRACT.START_DATE))))
                 .concat(MONTH)
-                .concat(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)))
+                .concat(
+                    when(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                        .otherwise(day(currentDate()).minus(day(WORKING_CONTRACT.START_DATE))))
                 .concat(DAY)
                 .as(SENIORITY),
             JOB.POSITION.as(POSITION_NAME),
@@ -737,5 +746,38 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .from(EMPLOYEE)
         .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
         .fetchOneInto(Integer.class);
+  }
+
+  @Override
+  public List<String> findAllNewEmployeeDeactive(LocalDate checkDate) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(EMPLOYEE.EMPLOYEE_ID)
+        .from(EMPLOYEE)
+        .leftJoin(WORKING_CONTRACT)
+        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+        .where(EMPLOYEE.WORKING_STATUS.isFalse())
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+        .and(WORKING_CONTRACT.START_DATE.eq(checkDate))
+        .fetchInto(String.class);
+  }
+
+  @Override
+  public void updateWorkingStatusForListEmployee(
+      Boolean workingStatus, List<String> employeeIdList) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    List<Query> queries = new ArrayList<>();
+    dslContext.transaction(
+        configuration -> {
+          employeeIdList.forEach(
+              employeeId -> {
+                queries.add(
+                    dslContext
+                        .update(EMPLOYEE)
+                        .set(EMPLOYEE.WORKING_STATUS, workingStatus)
+                        .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
+              });
+        });
+    dslContext.batch(queries).execute();
   }
 }

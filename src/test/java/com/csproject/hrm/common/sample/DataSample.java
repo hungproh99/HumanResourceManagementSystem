@@ -8,8 +8,12 @@ import com.csproject.hrm.dto.response.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -536,7 +540,8 @@ public class DataSample {
           LocalDate.now(),
           LocalDate.now(),
           "APPROVED",
-          "No comment");
+          "No comment",
+          new ArrayList<>());
 
   public static final SalaryMonthlyResponseList SALARY_MONTHLY_RESPONSE_LIST =
       new SalaryMonthlyResponseList(Arrays.asList(SALARY_MONTHLY_RESPONSE), 1, "true");
@@ -592,6 +597,7 @@ public class DataSample {
           "Nguyen Quang Huy",
           "IT",
           "lienpt1",
+          new ArrayList<>(),
           LocalDate.now(),
           LocalDate.now(),
           BigDecimal.ZERO,

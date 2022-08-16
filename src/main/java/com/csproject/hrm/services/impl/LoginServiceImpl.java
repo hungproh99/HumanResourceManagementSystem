@@ -48,12 +48,12 @@ public class LoginServiceImpl implements LoginService {
     String encode_new_password = passwordEncoder.encode(new_password);
     if (username == null) {
       throw new CustomDataNotFoundException(NOT_EXIST_USER_WITH + email);
-    } else if (!passwordEncoder.matches(old_password, password)) {
-      throw new CustomParameterConstraintException(WRONG_OLD_PASSWORD);
     } else if (!new_password.equals(re_password)) {
       throw new CustomParameterConstraintException(NOT_MATCH_NEW_PASSWORD);
     } else if (new_password.equals(old_password)) {
       throw new CustomParameterConstraintException(NOT_SAME_OLD_PASSWORD);
+    } else if (!passwordEncoder.matches(old_password, password)) {
+      throw new CustomParameterConstraintException(WRONG_OLD_PASSWORD);
     }
     return employeeRepository.updatePassword(encode_new_password, username);
   }

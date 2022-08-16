@@ -282,40 +282,40 @@ public class TimekeepingServiceImpl implements TimekeepingService {
     timekeepingRepository.updatePointPerDay(timekeepingDtoList);
   }
 
-  //  @Override
-  //  public void insertTimekeepingCheckInCheckOut(
-  //      String employeeId, LocalDate localDate, LocalTime localTime) {
-  //    if (localTime.isBefore(LocalTime.of(7, 0))) {
-  //      throw new CustomErrorException(
-  //          HttpStatus.BAD_REQUEST, "Timekeeping will start after 7:00 am");
-  //    }
-  //    Optional<TimekeepingDetailResponse> timekeepingDetailResponse =
-  //        timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeId, localDate);
-  //    Long timekeepingId;
-  //    if (timekeepingDetailResponse.isEmpty()) {
-  //      TimekeepingDto timekeepingDto = new TimekeepingDto(0D, 0D, localDate, employeeId);
-  //      timekeepingId = timekeepingRepository.insertTimekeeping(timekeepingDto);
-  //    } else {
-  //      timekeepingId = timekeepingDetailResponse.get().getTimekeeping_id();
-  //    }
-  //    WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
-  //    Optional<CheckInCheckOutDto> checkInCheckOutDto =
-  //        checkInCheckOutRepository.getLastCheckInCheckOutByTimekeeping(timekeepingId);
-  //    if (checkInCheckOutDto.isEmpty()) {
-  //      checkInCheckOutRepository.insertCheckInByTimekeepingId(timekeepingId, localTime);
-  //    } else if (checkInCheckOutDto.get().getCheckin() != null
-  //        && checkInCheckOutDto.get().getCheckout() != null) {
-  //      checkInCheckOutRepository.insertCheckInByTimekeepingId(timekeepingId, localTime);
-  //    } else if (checkInCheckOutDto.get().getCheckin() != null
-  //        && checkInCheckOutDto.get().getCheckout() == null) {
-  //      checkInCheckOutRepository.updateCheckOutByTimekeepingId(
-  //          checkInCheckOutDto.get().getCheckin_checkout_id(), localTime);
-  //    }
-  //    if (localTime.isAfter(workingTimeDataDto.getStartTime())) {
-  //      listTimekeepingStatusRepository.insertListTimekeepingStatus(
-  //          timekeepingId, ETimekeepingStatus.WORK_LATE.name());
-  //    }
-  //  }
+  @Override
+  public void insertTimekeepingCheckInCheckOut(
+      String employeeId, LocalDate localDate, LocalTime localTime) {
+    if (localTime.isBefore(LocalTime.of(7, 0))) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Timekeeping will start after 7:00 am");
+    }
+    Optional<TimekeepingDetailResponse> timekeepingDetailResponse =
+        timekeepingRepository.getTimekeepingByEmployeeIDAndDate(employeeId, localDate);
+    Long timekeepingId;
+    if (timekeepingDetailResponse.isEmpty()) {
+      TimekeepingDto timekeepingDto = new TimekeepingDto(0D, 0D, localDate, employeeId);
+      timekeepingId = timekeepingRepository.insertTimekeeping(timekeepingDto);
+    } else {
+      timekeepingId = timekeepingDetailResponse.get().getTimekeeping_id();
+    }
+    WorkingTimeDataDto workingTimeDataDto = generalFunction.readWorkingTimeData();
+    Optional<CheckInCheckOutDto> checkInCheckOutDto =
+        checkInCheckOutRepository.getLastCheckInCheckOutByTimekeeping(timekeepingId);
+    if (checkInCheckOutDto.isEmpty()) {
+      checkInCheckOutRepository.insertCheckInByTimekeepingId(timekeepingId, localTime);
+    } else if (checkInCheckOutDto.get().getCheckin() != null
+        && checkInCheckOutDto.get().getCheckout() != null) {
+      checkInCheckOutRepository.insertCheckInByTimekeepingId(timekeepingId, localTime);
+    } else if (checkInCheckOutDto.get().getCheckin() != null
+        && checkInCheckOutDto.get().getCheckout() == null) {
+      checkInCheckOutRepository.updateCheckOutByTimekeepingId(
+          checkInCheckOutDto.get().getCheckin_checkout_id(), localTime);
+    }
+    if (localTime.isAfter(workingTimeDataDto.getStartTime())) {
+      listTimekeepingStatusRepository.insertListTimekeepingStatus(
+          timekeepingId, ETimekeepingStatus.WORK_LATE.name());
+    }
+  }
 
   private void insertTimekeepingDayOff(List<String> employeeIdList, LocalDate currentDate) {
     List<LocalDate> holidayList =

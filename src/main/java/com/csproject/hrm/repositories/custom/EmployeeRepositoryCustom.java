@@ -10,6 +10,7 @@ import com.csproject.hrm.dto.response.HrmResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -38,7 +39,7 @@ public interface EmployeeRepositoryCustom {
 
   HrmResponseList findAllEmployeeOfManager(QueryParam queryParam, String employeeId);
 
-  void updateStatusEmployee(String employeeId, boolean status);
+//  void updateStatusEmployee(String employeeId, boolean status);
 
   String getEmployeeNameByEmployeeId(String employeeId);
 
@@ -53,4 +54,8 @@ public interface EmployeeRepositoryCustom {
   List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId, Integer level);
 
   int getLevelOfEmployee(String employeeId);
+
+  List<String> findAllNewEmployeeDeactive(LocalDate checkDate);
+
+  void updateWorkingStatusForListEmployee(Boolean workingStatus, List<String> employeeIdList);
 }

@@ -2,12 +2,14 @@
 
 <div> Welcome to HRM </div>
 
-<div> Please login in this link to join with us <a href="http://localhost:3000/forgot">Change Password</a> </div>
-
 <div> This is your email in company <strong>%s</strong></div>
 
 <div> And your password is <strong>%s</strong></div>
 
-<div> You can change password in this link <a href="http://localhost:3000/forgot">Change Password</a> </div>
+<div> This account will be active at <strong>%s</strong> </div>
+
+<div> After that you can login in this link to join with us <a href="https://swq490-g5-hrmonline.tk/login">Sign In</a> </div>
+
+<div> You can change password in this link <a href="https://swq490-g5-hrmonline.tk/forgot/change-password">Change Password</a> </div>
 
 <div> Regards.</div>

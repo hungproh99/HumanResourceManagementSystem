@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,10 +17,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +77,7 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
       WebRequest request) {
     List<String> errors =
         ex.getBindingResult().getFieldErrors().stream()
+            .sorted(Comparator.comparing(FieldError::getField))
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.toList());
     return new ResponseEntity<>(new ErrorResponse(status, errors.get(0)), status);
@@ -82,7 +87,10 @@ public class CustomControllerAdvice extends ResponseEntityExceptionHandler {
   public ResponseEntity<?> constraintViolationException(
       ConstraintViolationException ex, WebRequest request) {
     List<String> errors = new ArrayList<>();
-    ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
+    ex.getConstraintViolations().stream()
+        .sorted(Comparator.comparing(ConstraintViolation::getMessage))
+        .collect(Collectors.toCollection(LinkedHashSet::new))
+        .forEach(cv -> errors.add(cv.getMessage()));
     return new ResponseEntity<>(
         new ErrorResponse(HttpStatus.BAD_REQUEST, errors.get(0)), HttpStatus.BAD_REQUEST);
   }

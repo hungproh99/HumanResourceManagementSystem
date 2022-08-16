@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -30,4 +31,5 @@ public class SalaryMonthlyResponse {
   private LocalDate endDate;
   private String salaryStatus;
   private String comment;
+  private List<String> checked_by;
 }

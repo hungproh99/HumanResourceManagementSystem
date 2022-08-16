@@ -1,6 +1,8 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.*;
+import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
+import com.csproject.hrm.dto.dto.SalaryContractDto;
+import com.csproject.hrm.dto.dto.WorkingPlaceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.DBConnection;
@@ -13,8 +15,13 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -507,12 +514,27 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 GRADE_TYPE.NAME.as(GRADE),
                 OFFICE.NAME.as(OFFICE_NAME),
                 AREA.NAME.as(AREA_NAME),
-                year(currentDate())
-                    .minus(year(Tables.WORKING_CONTRACT.START_DATE))
+                when(year(currentDate()).minus(year(Tables.WORKING_CONTRACT.START_DATE)).lt(0), 0)
+                    .otherwise(year(currentDate()).minus(year(Tables.WORKING_CONTRACT.START_DATE)))
                     .concat(YEAR)
-                    .concat(month(currentDate()).minus(month(Tables.WORKING_CONTRACT.START_DATE)))
+                    .concat(
+                        when(
+                                month(currentDate())
+                                    .minus(month(Tables.WORKING_CONTRACT.START_DATE))
+                                    .lt(0),
+                                0)
+                            .otherwise(
+                                month(currentDate())
+                                    .minus(month(Tables.WORKING_CONTRACT.START_DATE))))
                     .concat(MONTH)
-                    .concat(day(currentDate()).minus(day(Tables.WORKING_CONTRACT.START_DATE)))
+                    .concat(
+                        when(
+                                day(currentDate())
+                                    .minus(day(Tables.WORKING_CONTRACT.START_DATE))
+                                    .lt(0),
+                                0)
+                            .otherwise(
+                                day(currentDate()).minus(day(Tables.WORKING_CONTRACT.START_DATE))))
                     .concat(DAY)
                     .as(SENIORITY),
                 JOB.POSITION.as(POSITION_NAME),
@@ -715,12 +737,12 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 workingInfoRequest.getStartDate(),
                 true);
           } else {
-            salaryContractRepository.insertNewSalaryContract(
-                workingInfoRequest.getEmployeeId(),
-                new BigDecimal(workingInfoRequest.getBaseSalary()),
-                workingInfoRequest.getStartDate(),
-                false,
-                true);
+            //            salaryContractRepository.insertNewSalaryContract(
+            //                workingInfoRequest.getEmployeeId(),
+            //                new BigDecimal(workingInfoRequest.getBaseSalary()),
+            //                workingInfoRequest.getStartDate(),
+            //                false,
+            //                true);
           }
           if (placeChange) {
             queries.add(updateWorkingPlace(configuration, workingInfoRequest));
