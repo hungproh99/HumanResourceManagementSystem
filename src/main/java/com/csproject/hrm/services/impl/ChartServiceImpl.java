@@ -314,12 +314,12 @@ public class ChartServiceImpl implements ChartService {
             salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
                 employeeID, startDate, endDate),
             0L);
-    SalaryMonthlyDetailResponse salaryMonthly = null;
+    SalaryMonthlyDetailResponse salaryMonthly;
     if (salaryID == 0L) {
       Optional<SalaryContractDto> salaryContract =
           salaryContractRepository.getSalaryContractByEmployeeId(employeeID);
       salaryMonthly = new SalaryMonthlyDetailResponse();
-      salaryMonthly.setBase_salary(salaryContract.get().getBase_salary());
+      salaryMonthly.setBase_salary(salaryContract.orElse(new SalaryContractDto()).getBase_salary());
       salaryMonthly.setBonusSalaryResponseList(new BonusSalaryResponseList(null, BigDecimal.ZERO));
       salaryMonthly.setDeductionSalaryResponseList(
           new DeductionSalaryResponseList(null, BigDecimal.ZERO));
