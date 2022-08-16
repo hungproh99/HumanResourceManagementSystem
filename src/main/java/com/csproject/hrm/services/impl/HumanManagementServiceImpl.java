@@ -93,7 +93,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         < 0) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
-    } else if (hrmRequest.getBaseSalary().compareTo(hrmRequest.getSalary()) > 0) {
+    } else if (hrmRequest.getBaseSalary().compareTo(hrmRequest.getSalary()) >= 0) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must less than Salary");
     }
     HrmPojo hrmPojo = createHrmPojo(hrmRequest);
@@ -294,6 +294,20 @@ public class HumanManagementServiceImpl implements HumanManagementService {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
           } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
             throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Personal Email not valid");
+          } else if (birthDate.isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "Birth Date must be enough 18 age");
+          } else if (startDate.isAfter(endDate)) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
+          } else if (endDate.isBefore(LocalDate.now())) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+          } else if (baseSalary.compareTo(BigDecimal.valueOf(Double.parseDouble("5000000"))) < 0) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
+          } else if (baseSalary.compareTo(salary) >= 0) {
+            throw new CustomErrorException(
+                HttpStatus.BAD_REQUEST, "Base Salary must less than Salary");
           }
           hrmRequestList.add(
               HrmRequest.builder()
@@ -416,6 +430,37 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           || row.getCell(15) == null
           || row.getCell(16) == null) {
         throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in excel");
+      } else if (!roleRepository.existsById(role)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
+      } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
+      } else if (!areaRepository.existsById(area)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
+      } else if (!officeRepository.existsById(office)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
+      } else if (!gradeRepository.existsById(grade)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
+      } else if (!jobRepository.existsById(position)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
+      } else if (!workingTypeRepository.existsById(workingType)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
+      } else if (!employeeRepository.existsById(managerId)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
+      } else if (!employeeTypeRepository.existsById(employeeType)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
+      } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Personal Email not valid");
+      } else if (birthDate.isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Birth Date must be enough 18 age");
+      } else if (startDate.isAfter(endDate)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
+      } else if (endDate.isBefore(LocalDate.now())) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+      } else if (baseSalary.compareTo(BigDecimal.valueOf(Double.parseDouble("5000000"))) < 0) {
+        throw new CustomErrorException(
+            HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
+      } else if (baseSalary.compareTo(salary) >= 0) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must less than Salary");
       }
       hrmRequestList.add(
           HrmRequest.builder()
@@ -533,11 +578,15 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     } else if (hrmRequest.getRole().equals(ERole.getValue(ERole.ROLE_USER.name()))) {
       level = -1;
     }
+    boolean workStatus = false;
+    if (hrmRequest.getStartDate().isBefore(LocalDate.now())) {
+      workStatus = true;
+    }
 
     HrmPojo hrmPojo =
         HrmPojo.builder()
             .password(password)
-            .workStatus(false)
+            .workStatus(workStatus)
             .contractStatus(true)
             .placeStatus(true)
             .level(level)

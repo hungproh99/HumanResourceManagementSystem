@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.AREA;
@@ -30,7 +29,8 @@ import static org.jooq.codegen.maven.example.tables.Employee.EMPLOYEE;
 import static org.jooq.codegen.maven.example.tables.SalaryContract.SALARY_CONTRACT;
 import static org.jooq.codegen.maven.example.tables.SalaryMonthly.SALARY_MONTHLY;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.when;
 
 @AllArgsConstructor
 public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCustom {
@@ -73,8 +73,23 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     List<Condition> conditions = new ArrayList<>();
     final var mergeFilters =
         queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(
+        when(
+                SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                    ESalaryMonthly.getValue(ESalaryMonthly.PENDING.name())),
+                1)
+            .when(
+                SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                    ESalaryMonthly.getValue(ESalaryMonthly.APPROVED.name())),
+                2)
+            .when(
+                SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                    ESalaryMonthly.getValue(ESalaryMonthly.REJECTED.name())),
+                3)
+            .asc());
+    sortFields.add(SALARY_MONTHLY.START_DATE.desc());
+
     LocalDate currDate = LocalDate.now();
     mergeFilters.forEach(
         (key, values) -> {
@@ -100,18 +115,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
           conditions.add(condition);
         });
     List<SalaryMonthlyResponse> salaryMonthlyResponses =
-        Stream.of(
-                getAllManagementSalaryMonthly(
-                        conditions, sortFields, queryParam.pagination, employeeId)
-                    .fetchInto(SalaryMonthlyResponse.class),
-                getAllManagementReviewSalaryMonthly(
-                        conditions, sortFields, queryParam.pagination, employeeId)
-                    .fetchInto(SalaryMonthlyResponse.class))
-            .flatMap(x -> x.stream())
-            .collect(Collectors.toList());
-    int total =
-        countAllManagementReviewSalaryMonthly(conditions, employeeId)
-            + countAllManagementSalaryMonthly(conditions, employeeId);
+        getAllManagementSalaryMonthly(conditions, sortFields, queryParam.pagination, employeeId)
+            .fetchInto(SalaryMonthlyResponse.class);
+    salaryMonthlyResponses.forEach(
+        salaryMonthlyResponse -> {
+          salaryMonthlyResponse.setChecked_by(
+              getListForwarderBySalaryId(salaryMonthlyResponse.getSalaryMonthlyId())
+                  .fetchInto(String.class));
+        });
+
+    int total = countAllManagementSalaryMonthly(conditions, employeeId);
 
     return new SalaryMonthlyResponseList(salaryMonthlyResponses, total, isEnoughLevel);
   }
@@ -138,7 +151,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),
-            SALARY_STATUS.NAME.as("salaryStatus"))
+            SALARY_STATUS.NAME.as("salaryStatus"),
+            SALARY_MONTHLY.COMMENT)
         .from(SALARY_MONTHLY)
         .leftJoin(SALARY_CONTRACT)
         .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
@@ -336,15 +350,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     }
     conditions.add(condition);
     List<SalaryMonthlyResponse> salaryMonthlyResponses =
-        Stream.of(
-                getAllManagementSalaryMonthly(
-                        conditions, sortFields, queryParam.pagination, employeeId)
-                    .fetchInto(SalaryMonthlyResponse.class),
-                getAllManagementReviewSalaryMonthly(
-                        conditions, sortFields, queryParam.pagination, employeeId)
-                    .fetchInto(SalaryMonthlyResponse.class))
-            .flatMap(x -> x.stream())
-            .collect(Collectors.toList());
+        getAllManagementSalaryMonthly(conditions, sortFields, queryParam.pagination, employeeId)
+            .fetchInto(SalaryMonthlyResponse.class);
     return salaryMonthlyResponses;
   }
 
@@ -564,37 +571,10 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue()));
   }
 
-  private int countAllManagementReviewSalaryMonthly(List<Condition> conditions, String employeeId) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    TableLike<?> selectReview =
-        dslContext.select(REVIEW_SALARY.SALARY_ID, REVIEW_SALARY.EMPLOYEE_ID).from(REVIEW_SALARY);
-    return dslContext.fetchCount(
-        dslContext
-            .select()
-            .from(SALARY_MONTHLY)
-            .leftJoin(SALARY_CONTRACT)
-            .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(EMPLOYEE)
-            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
-            .leftJoin(WORKING_PLACE)
-            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(JOB)
-            .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-            .leftJoin(SALARY_STATUS)
-            .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
-            .leftJoin(selectReview)
-            .on(selectReview.field(REVIEW_SALARY.SALARY_ID).eq(SALARY_MONTHLY.SALARY_ID))
-            .where(conditions)
-            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
-            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
-            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-            .and(selectReview.field(REVIEW_SALARY.EMPLOYEE_ID).eq(employeeId)));
-  }
-
   private int countAllManagementSalaryMonthly(List<Condition> conditions, String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    TableLike<?> selectReview =
+        dslContext.select(REVIEW_SALARY.SALARY_ID, REVIEW_SALARY.EMPLOYEE_ID).from(REVIEW_SALARY);
     return dslContext.fetchCount(
         dslContext
             .select()
@@ -615,75 +595,34 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
             .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
             .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-            .and(SALARY_MONTHLY.APPROVER.eq(employeeId)));
-  }
-
-  private Select<?> getAllManagementReviewSalaryMonthly(
-      List<Condition> conditions,
-      List<OrderField<?>> sortFields,
-      Pagination pagination,
-      String employeeId) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    TableLike<?> selectReview =
-        dslContext.select(REVIEW_SALARY.SALARY_ID, REVIEW_SALARY.EMPLOYEE_ID).from(REVIEW_SALARY);
-    final var salaryStatusTable =
-        dslContext
-            .select(
-                asterisk(),
-                when(SALARY_STATUS.NAME.eq(ESalaryMonthly.PENDING.name()), 1)
-                    .when(SALARY_STATUS.NAME.eq(ESalaryMonthly.REJECTED.name()), 2)
-                    .when(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()), 3)
-                    .as("Order"))
-            .from(SALARY_STATUS)
-            .asTable();
-    sortFields.add(salaryStatusTable.field("Order").asc());
-
-    return dslContext
-        .select(
-            SALARY_MONTHLY.SALARY_ID.as("salaryMonthlyId"),
-            EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
-            EMPLOYEE.FULL_NAME.as("fullName"),
-            JOB.POSITION.as("position"),
-            SALARY_MONTHLY.APPROVER.as("approverId"),
-            SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
-            SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
-            SALARY_MONTHLY.OT_POINT.as("otPoint"),
-            SALARY_MONTHLY.TOTAL_DEDUCTION.as("totalDeduction"),
-            SALARY_MONTHLY.TOTAL_BONUS.as("totalBonus"),
-            SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
-            SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
-            SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
-            SALARY_MONTHLY.TOTAL_ALLOWANCE.as("totalAllowance"),
-            SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
-            SALARY_MONTHLY.START_DATE.as("startDate"),
-            SALARY_MONTHLY.END_DATE.as("endDate"),
-            salaryStatusTable.field(SALARY_STATUS.NAME).as("salaryStatus"),
-            SALARY_MONTHLY.COMMENT)
-        .from(SALARY_MONTHLY)
-        .leftJoin(SALARY_CONTRACT)
-        .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
-        .leftJoin(WORKING_CONTRACT)
-        .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
-        .leftJoin(EMPLOYEE)
-        .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
-        .leftJoin(WORKING_PLACE)
-        .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID))
-        .leftJoin(JOB)
-        .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-        .leftJoin(salaryStatusTable)
-        .on(salaryStatusTable.field(SALARY_STATUS.STATUS_ID).eq(SALARY_MONTHLY.SALARY_STATUS_ID))
-        .leftJoin(SALARY_STATUS)
-        .on(SALARY_STATUS.STATUS_ID.eq(salaryStatusTable.field(SALARY_STATUS.STATUS_ID)))
-        .leftJoin(selectReview)
-        .on(selectReview.field(REVIEW_SALARY.SALARY_ID).eq(SALARY_MONTHLY.SALARY_ID))
-        .where(conditions)
-        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
-        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
-        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-        .and(selectReview.field(REVIEW_SALARY.EMPLOYEE_ID).eq(employeeId))
-        .orderBy(sortFields)
-        .limit(pagination.limit)
-        .offset(pagination.offset);
+            .and(SALARY_MONTHLY.APPROVER.eq(employeeId))
+            .unionAll(
+                dslContext
+                    .select()
+                    .from(SALARY_MONTHLY)
+                    .leftJoin(SALARY_CONTRACT)
+                    .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
+                    .leftJoin(WORKING_CONTRACT)
+                    .on(
+                        WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(
+                            SALARY_CONTRACT.WORKING_CONTRACT_ID))
+                    .leftJoin(EMPLOYEE)
+                    .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+                    .leftJoin(WORKING_PLACE)
+                    .on(
+                        WORKING_PLACE.WORKING_CONTRACT_ID.eq(
+                            Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID))
+                    .leftJoin(JOB)
+                    .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+                    .leftJoin(SALARY_STATUS)
+                    .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
+                    .leftJoin(selectReview)
+                    .on(selectReview.field(REVIEW_SALARY.SALARY_ID).eq(SALARY_MONTHLY.SALARY_ID))
+                    .where(conditions)
+                    .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+                    .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+                    .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+                    .and(selectReview.field(REVIEW_SALARY.EMPLOYEE_ID).eq(employeeId))));
   }
 
   private Select<?> getAllManagementSalaryMonthly(
@@ -692,17 +631,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
       Pagination pagination,
       String employeeId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var salaryStatusTable =
-        dslContext
-            .select(
-                asterisk(),
-                when(SALARY_STATUS.NAME.eq(ESalaryMonthly.PENDING.name()), 1)
-                    .when(SALARY_STATUS.NAME.eq(ESalaryMonthly.REJECTED.name()), 2)
-                    .when(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()), 3)
-                    .as("Order"))
-            .from(SALARY_STATUS)
-            .asTable();
-    sortFields.add(salaryStatusTable.field("Order").asc());
+    TableLike<?> selectReview =
+        dslContext.select(REVIEW_SALARY.SALARY_ID, REVIEW_SALARY.EMPLOYEE_ID).from(REVIEW_SALARY);
 
     return dslContext
         .select(
@@ -723,7 +653,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),
-            salaryStatusTable.field(SALARY_STATUS.NAME).as("salaryStatus"),
+            SALARY_STATUS.NAME.as("salaryStatus"),
             SALARY_MONTHLY.COMMENT)
         .from(SALARY_MONTHLY)
         .leftJoin(SALARY_CONTRACT)
@@ -736,15 +666,57 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID))
         .leftJoin(JOB)
         .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
-        .leftJoin(salaryStatusTable)
-        .on(salaryStatusTable.field(SALARY_STATUS.STATUS_ID).eq(SALARY_MONTHLY.SALARY_STATUS_ID))
         .leftJoin(SALARY_STATUS)
-        .on(SALARY_STATUS.STATUS_ID.eq(salaryStatusTable.field(SALARY_STATUS.STATUS_ID)))
+        .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
         .where(conditions)
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .and(SALARY_MONTHLY.APPROVER.eq(employeeId))
+        .unionAll(
+            dslContext
+                .select(
+                    SALARY_MONTHLY.SALARY_ID.as("salaryMonthlyId"),
+                    EMPLOYEE.EMPLOYEE_ID.as("employeeId"),
+                    EMPLOYEE.FULL_NAME.as("fullName"),
+                    JOB.POSITION.as("position"),
+                    SALARY_MONTHLY.APPROVER.as("approverId"),
+                    SALARY_MONTHLY.STANDARD_POINT.as("standardPoint"),
+                    SALARY_MONTHLY.ACTUAL_POINT.as("actualPoint"),
+                    SALARY_MONTHLY.OT_POINT.as("otPoint"),
+                    SALARY_MONTHLY.TOTAL_DEDUCTION.as("totalDeduction"),
+                    SALARY_MONTHLY.TOTAL_BONUS.as("totalBonus"),
+                    SALARY_MONTHLY.TOTAL_INSURANCE_PAYMENT.as("totalInsurance"),
+                    SALARY_MONTHLY.TOTAL_TAX_PAYMENT.as("totalTax"),
+                    SALARY_MONTHLY.TOTAL_ADVANCE.as("totalAdvance"),
+                    SALARY_MONTHLY.TOTAL_ALLOWANCE.as("totalAllowance"),
+                    SALARY_MONTHLY.FINAL_SALARY.as("finalSalary"),
+                    SALARY_MONTHLY.START_DATE.as("startDate"),
+                    SALARY_MONTHLY.END_DATE.as("endDate"),
+                    SALARY_STATUS.NAME.as("salaryStatus"),
+                    SALARY_MONTHLY.COMMENT)
+                .from(SALARY_MONTHLY)
+                .leftJoin(SALARY_CONTRACT)
+                .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
+                .leftJoin(WORKING_CONTRACT)
+                .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
+                .leftJoin(EMPLOYEE)
+                .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+                .leftJoin(WORKING_PLACE)
+                .on(
+                    WORKING_PLACE.WORKING_CONTRACT_ID.eq(
+                        Tables.WORKING_CONTRACT.WORKING_CONTRACT_ID))
+                .leftJoin(JOB)
+                .on(JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+                .leftJoin(SALARY_STATUS)
+                .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
+                .leftJoin(selectReview)
+                .on(selectReview.field(REVIEW_SALARY.SALARY_ID).eq(SALARY_MONTHLY.SALARY_ID))
+                .where(conditions)
+                .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+                .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+                .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+                .and(selectReview.field(REVIEW_SALARY.EMPLOYEE_ID).eq(employeeId)))
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
@@ -794,5 +766,13 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
+  }
+
+  private Select<?> getListForwarderBySalaryId(Long salaryId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(REVIEW_SALARY.EMPLOYEE_ID)
+        .from(REVIEW_SALARY)
+        .where(REVIEW_SALARY.SALARY_ID.eq(salaryId));
   }
 }
