@@ -308,12 +308,9 @@ public class ChartServiceImpl implements ChartService {
 
     LocalDate startDate = date.withDayOfMonth(1);
     LocalDate endDate = date.withDayOfMonth(date.getMonth().length(date.isLeapYear()));
-    Double actualWorkingPoint =
-        timekeepingRepository.countPointDayWorkPerMonthByEmployeeId(startDate, endDate, employeeID);
-    actualWorkingPoint = actualWorkingPoint != null ? actualWorkingPoint : 0D;
     Long salaryID =
         salaryMonthlyRepository.getSalaryMonthlyIdByEmployeeIdAndDate(
-            employeeID, startDate, endDate, actualWorkingPoint, ESalaryMonthly.APPROVED.name());
+            employeeID, startDate, endDate);
 
     SalaryMonthlyDetailResponse salaryMonthly =
         salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);

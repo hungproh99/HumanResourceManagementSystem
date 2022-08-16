@@ -4,9 +4,7 @@ import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
-import com.csproject.hrm.dto.response.SalaryMonthlyRemindResponse;
-import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
-import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
+import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.SalaryMonthlyRepositoryCustom;
@@ -234,6 +232,29 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   }
 
   @Override
+  public Long getSalaryMonthlyIdByEmployeeIdAndDate(
+      String employeeId, LocalDate startDate, LocalDate endDate) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    Long salaryContractId =
+        dslContext
+            .select(SALARY_CONTRACT.SALARY_CONTRACT_ID)
+            .from(SALARY_CONTRACT)
+            .leftJoin(WORKING_CONTRACT)
+            .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .where(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId))
+            .fetchOneInto(Long.class);
+    return dslContext
+        .select(SALARY_MONTHLY.SALARY_ID)
+        .from(SALARY_MONTHLY)
+        .where(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(salaryContractId))
+        .and(SALARY_MONTHLY.START_DATE.le(startDate))
+        .and(SALARY_MONTHLY.END_DATE.ge(endDate))
+        .fetchOneInto(Long.class);
+  }
+
+  @Override
   public void updateSalaryMonthlyByListEmployee(List<SalaryMonthlyDto> salaryMonthlyDtoList) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var queries =
@@ -383,16 +404,16 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     return salaryMonthlyRemindResponseList;
   }
 
-//  @Override
-//  public void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind) {
-//    final DSLContext dslContext = DSL.using(connection.getConnection());
-//    final var query =
-//        dslContext
-//            .update(SALARY_MONTHLY)
-//            .set(SALARY_MONTHLY.IS_REMIND, isRemind)
-//            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyId))
-//            .execute();
-//  }
+  //  @Override
+  //  public void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    final var query =
+  //        dslContext
+  //            .update(SALARY_MONTHLY)
+  //            .set(SALARY_MONTHLY.IS_REMIND, isRemind)
+  //            .where(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthlyId))
+  //            .execute();
+  //  }
 
   @Override
   public boolean checkAlreadyApproveOrReject(Long salaryMonthlyId) {
