@@ -597,6 +597,7 @@ public class DataSample {
           "Nguyen Quang Huy",
           "IT",
           "lienpt1",
+          new ArrayList<>(),
           LocalDate.now(),
           LocalDate.now(),
           BigDecimal.ZERO,
