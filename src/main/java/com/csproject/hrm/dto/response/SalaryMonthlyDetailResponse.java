@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class SalaryMonthlyDetailResponse {
   private String full_name;
   private String position;
   private String approverId;
+  private List<String> checked_by;
   private LocalDate start_date;
   private LocalDate end_date;
   private BigDecimal base_salary;
