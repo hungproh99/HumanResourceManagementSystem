@@ -1,9 +1,6 @@
 package com.csproject.hrm.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -19,6 +16,9 @@ public class EmployeeTax {
   @Column(name = "employee_tax_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  
+  @Column(name = "tax_code")
+  private String taxCode;
 
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")

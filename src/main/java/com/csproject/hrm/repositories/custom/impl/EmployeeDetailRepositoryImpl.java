@@ -1,8 +1,6 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
-import com.csproject.hrm.dto.dto.SalaryContractDto;
-import com.csproject.hrm.dto.dto.WorkingPlaceDto;
+import com.csproject.hrm.dto.dto.*;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.jooq.DBConnection;
@@ -15,13 +13,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static org.jooq.codegen.maven.example.Tables.*;
@@ -187,9 +180,12 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext
         .update(EMPLOYEE_INSURANCE)
         .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-        .set(EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID, taxAndInsurance.getInsuranceId())
+        .set(EMPLOYEE_INSURANCE.INSURANCE_CODE, taxAndInsurance.getInsuranceCode())
         .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
         .and(EMPLOYEE_INSURANCE.POLICY_NAME_ID.eq(Long.valueOf(taxAndInsurance.getPolicyNameId())))
+        .and(
+            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID.eq(
+                Long.valueOf(taxAndInsurance.getInsuranceId())))
         .execute();
   }
 
@@ -471,12 +467,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   public TaxAndInsuranceResponse findTaxAndInsurance(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
 
-    TaxAndInsuranceResponse taxAndInsuranceResponse = new TaxAndInsuranceResponse();
-
     List<EmployeeInsuranceDto> list =
         dslContext
             .select(
                 EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID.as("insuranceID"),
+                EMPLOYEE_INSURANCE.INSURANCE_CODE.as("insuranceCode"),
                 EMPLOYEE_INSURANCE.ADDRESS.as("address"),
                 POLICY_NAME.POLICY_NAME_.as("insuranceName"))
             .from(EMPLOYEE_INSURANCE)

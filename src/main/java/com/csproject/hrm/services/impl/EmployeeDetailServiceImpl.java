@@ -8,6 +8,7 @@ import com.csproject.hrm.exception.*;
 import com.csproject.hrm.repositories.EmployeeDetailRepository;
 import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -110,8 +111,11 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
       if (taxAndInsurance.getInsuranceId() == null
           || taxAndInsurance.getInsuranceAddress() == null
           || taxAndInsurance.getPolicyNameId() == null) {
-        throw new CustomParameterConstraintException(FILL_NOT_FULL);
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, FILL_NOT_FULL);
       } else {
+        if (response.getInsuranceDtos().contains(taxAndInsurance.getInsuranceCode())) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Insurance code is existed!");
+        }
         employeeDetailRepository.updateInsurance(taxAndInsurance);
       }
     } else {

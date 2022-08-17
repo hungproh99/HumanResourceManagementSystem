@@ -15,19 +15,22 @@ public class EmployeeInsurance {
   @Id
   @Column(name = "employee_insurance_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private String id;
-  
+  private Long id;
+
+  @Column(name = "insurance_code")
+  private String insuranceCode;
+
   @Column(name = "address")
   private String address;
-  
+
   @ManyToOne(cascade = CascadeType.ALL, targetEntity = Employee.class)
   @JoinColumn(name = "employee_id")
   private Employee employee;
-  
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "policy_name_id")
   private PolicyName policyName;
-  
+
   @Column(name = "insurance_status")
   @Type(type = "boolean")
   private Boolean insurance_status;
