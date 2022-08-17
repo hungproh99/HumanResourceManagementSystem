@@ -104,6 +104,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getEndDate(),
                   hrmPojo.getBaseSalary(),
                   hrmPojo.getSalary().subtract(hrmPojo.getBaseSalary())));
+          queries.add(insertInsurance(configuration, hrmPojo.getEmployeeId()));
+          queries.add(insertAllowance(configuration, hrmPojo.getEmployeeId()));
+          queries.add(insertTax(configuration, hrmPojo.getEmployeeId()));
           DSL.using(configuration).batch(queries).execute();
         });
   }
@@ -148,6 +151,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getEndDate(),
                         hrmPojo.getBaseSalary(),
                         hrmPojo.getSalary().subtract(hrmPojo.getBaseSalary())));
+                queries.add(insertInsurance(configuration, hrmPojo.getEmployeeId()));
+                queries.add(insertAllowance(configuration, hrmPojo.getEmployeeId()));
+                queries.add(insertTax(configuration, hrmPojo.getEmployeeId()));
               });
 
           DSL.using(configuration).batch(queries).execute();
@@ -779,5 +785,42 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
               });
         });
     dslContext.batch(queries).execute();
+  }
+
+  private Insert<?> insertInsurance(Configuration config, String employeeId) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE_INSURANCE,
+            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
+            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
+            EMPLOYEE_INSURANCE.POLICY_NAME_ID)
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.HI.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.SI.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.UI.name()));
+  }
+
+  private Insert<?> insertTax(Configuration config, String employeeId) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE_TAX,
+            EMPLOYEE_TAX.TAX_STATUS,
+            EMPLOYEE_TAX.EMPLOYEE_ID,
+            EMPLOYEE_TAX.POLICY_NAME_ID)
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.VNP.name()));
+  }
+
+  private Insert<?> insertAllowance(Configuration config, String employeeId) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE_ALLOWANCE,
+            EMPLOYEE_ALLOWANCE.ALLOWANCE_STATUS,
+            EMPLOYEE_ALLOWANCE.EMPLOYEE_ID,
+            EMPLOYEE_ALLOWANCE.POLICY_NAME_ID)
+        .values(
+            Boolean.TRUE,
+            employeeId,
+            EPolicyName.getValue(EPolicyName.TRANSPORTATION_ALLOWANCE.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.PHONE_ALLOWANCE.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.MEAL_ALLOWANCE.name()));
   }
 }

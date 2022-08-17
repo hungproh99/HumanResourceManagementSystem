@@ -15,7 +15,7 @@ public class EmployeeInsurance {
   @Id
   @Column(name = "employee_insurance_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private String id;
+  private Long id;
   
   @Column(name = "address")
   private String address;

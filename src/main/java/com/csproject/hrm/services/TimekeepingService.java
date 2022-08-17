@@ -27,5 +27,5 @@ public interface TimekeepingService {
   void upsertPointPerDay(LocalDate currentDate);
 
   void insertTimekeepingCheckInCheckOut(
-      String employeeId, LocalDate localDate, LocalTime localTime);
+      String employeeId, LocalDate localDate, Double point, LocalTime localTime);
 }

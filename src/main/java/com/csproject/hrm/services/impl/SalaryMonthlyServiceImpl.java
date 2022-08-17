@@ -170,10 +170,12 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   public void upsertSalaryMonthlyByEmployeeIdList(LocalDate startDate, LocalDate endDate) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
     List<String> employeeIdList = employeeRepository.getAllEmployeeIdActive();
-    employeeIdList.forEach(
-        employeeId -> {
-          salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
-        });
+    for (String employeeId : employeeIdList) {
+      if (employeeId.equalsIgnoreCase("admin")) {
+        continue;
+      }
+      salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
+    }
     salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);
   }
 

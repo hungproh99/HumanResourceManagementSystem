@@ -187,7 +187,9 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     dslContext
         .update(EMPLOYEE_INSURANCE)
         .set(EMPLOYEE_INSURANCE.ADDRESS, taxAndInsurance.getInsuranceAddress())
-        .set(EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID, taxAndInsurance.getInsuranceId())
+        .set(
+            EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID,
+            Long.valueOf(taxAndInsurance.getInsuranceId()))
         .where(EMPLOYEE_INSURANCE.EMPLOYEE_ID.eq(taxAndInsurance.getEmployeeId()))
         .and(EMPLOYEE_INSURANCE.POLICY_NAME_ID.eq(Long.valueOf(taxAndInsurance.getPolicyNameId())))
         .execute();
