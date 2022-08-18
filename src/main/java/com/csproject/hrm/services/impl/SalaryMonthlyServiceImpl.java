@@ -163,6 +163,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .employeeAllowanceResponseList(employeeAllowanceResponseList)
         .employeeInsuranceResponseList(employeeInsuranceResponseList)
         .employeeTaxResponseList(employeeTaxResponseList)
+        .comment(salaryMonthlyResponse.get().getComment())
+        .checked_by(salaryMonthlyResponse.get().getChecked_by())
         .build();
   }
 

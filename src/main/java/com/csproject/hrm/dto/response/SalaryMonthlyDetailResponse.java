@@ -20,6 +20,7 @@ public class SalaryMonthlyDetailResponse {
   private String position;
   private String approverId;
   private List<String> checked_by;
+  private String comment;
   private LocalDate start_date;
   private LocalDate end_date;
   private BigDecimal base_salary;
