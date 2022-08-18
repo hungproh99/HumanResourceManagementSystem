@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PolicyServiceImpl implements PolicyService {
@@ -23,7 +24,9 @@ public class PolicyServiceImpl implements PolicyService {
           policyResponse.setPolicy_type(EPolicyType.getLabel(policyResponse.getPolicy_type()));
           policyResponse.setPolicy_category(
               EPolicyCategory.getLabel(policyResponse.getPolicy_category()));
-          policyResponse.setPolicy_name(EPolicyName.getLabel(policyResponse.getPolicy_name()));
+          policyResponse.setPolicy_name(
+              EPolicyName.getLabel(
+                  Objects.requireNonNullElse(policyResponse.getPolicy_name(), "NULL")));
         });
     int total = policyRepository.getTotalPolicyByCategoryID(queryParam);
     return ListPolicyResponse.builder().policyResponseList(policyResponses).total(total).build();

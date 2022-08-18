@@ -34,6 +34,7 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
 
     final List<OrderField<?>> orderByList =
         queryHelper.queryOrderBy(queryParam, field2Map, POLICY.POLICY_ID);
+    System.out.println(getListPolicyByCategoryID(conditions, orderByList, queryParam.pagination));
     return getListPolicyByCategoryID(conditions, orderByList, queryParam.pagination)
         .fetchInto(PolicyResponse.class);
   }
@@ -59,7 +60,7 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
         .leftJoin(POLICY_TYPE)
         .on(POLICY.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
         .leftJoin(POLICY_NAME)
-        .on(POLICY.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
+        .on(POLICY_NAME.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
         .leftJoin(POLICY_CATEGORY)
         .on(POLICY_CATEGORY.POLICY_CATEGORY_ID.eq(POLICY_TYPE.POLICY_CATEGORY_ID))
         .where(conditions)
@@ -79,6 +80,8 @@ public class PolicyRepositoryImpl implements PolicyRepositoryCustom {
             .from(POLICY)
             .leftJoin(POLICY_TYPE)
             .on(POLICY.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
+            .leftJoin(POLICY_NAME)
+            .on(POLICY_NAME.POLICY_TYPE_ID.eq(POLICY_TYPE.POLICY_TYPE_ID))
             .leftJoin(POLICY_CATEGORY)
             .on(POLICY_CATEGORY.POLICY_CATEGORY_ID.eq(POLICY_TYPE.POLICY_CATEGORY_ID))
             .where(conditions);
