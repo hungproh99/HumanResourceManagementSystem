@@ -473,7 +473,8 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 EMPLOYEE_INSURANCE.EMPLOYEE_INSURANCE_ID.as("insuranceID"),
                 EMPLOYEE_INSURANCE.INSURANCE_CODE.as("insuranceCode"),
                 EMPLOYEE_INSURANCE.ADDRESS.as("address"),
-                POLICY_NAME.POLICY_NAME_.as("insuranceName"))
+                POLICY_NAME.POLICY_NAME_.as("insuranceName"),
+                POLICY_NAME.POLICY_NAME_ID.as("policyNameID"))
             .from(EMPLOYEE_INSURANCE)
             .leftJoin(POLICY_NAME)
             .on(EMPLOYEE_INSURANCE.POLICY_NAME_ID.eq(POLICY_NAME.POLICY_NAME_ID))

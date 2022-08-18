@@ -14,7 +14,8 @@ public enum EPolicyName {
   VNP("Viet Nam Progressive", 6),
   TRANSPORTATION_ALLOWANCE("Transportation Allowance", 7),
   PHONE_ALLOWANCE("Phone Allowance", 8),
-  MEAL_ALLOWANCE("Meal Allowance", 9);
+  MEAL_ALLOWANCE("Meal Allowance", 9),
+  NULL("", 10);
 
   private final String label;
   private final long value;
