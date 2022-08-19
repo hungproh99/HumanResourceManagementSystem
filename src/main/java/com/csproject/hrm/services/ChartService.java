@@ -9,7 +9,7 @@ import java.util.List;
 public interface ChartService {
   String getAreaNameByEmployeeID(String employeeID);
 
-  GeneralDataCharts getGeneralEmployeeDataForChartByAreaName(String areaName);
+  GeneralDataCharts getGeneralEmployeeDataForChartByAreaName(String employeeId, String areaName);
 
   OrganizationalChart getOrganizational();
 

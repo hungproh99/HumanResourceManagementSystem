@@ -814,7 +814,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String approver =
         Objects.requireNonNullElse(
             employeeDetailRepository.getManagerByEmployeeID(createEmployeeId),
-            "Nguyen Quang Huy - huynq100");
+            "Nguyen Quang Huy - huynq1");
 
     applicationsRequest.setApprover(approver);
 
@@ -859,7 +859,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
           switch (requestNameId.intValue()) {
             case 3:
               {
-                applicationsRequest = createRequestForNominationAndPromotion(applicationsRequest);
+                //                applicationsRequest =
+                // createRequestForNominationAndPromotion(applicationsRequest);
                 break;
               }
             case 4:
@@ -883,7 +884,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       case 5:
       case 6:
         {
-          applicationsRequest = createRequestForPenalise(applicationsRequest);
+          //          applicationsRequest = createRequestForPenalise(applicationsRequest);
           break;
         }
       case 7:
@@ -896,13 +897,13 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       case 8:
         {
           if (requestNameId.intValue() == 13) {
-            applicationsRequest = createRequestForTaxEnrollment(applicationsRequest);
+            //            applicationsRequest = createRequestForTaxEnrollment(applicationsRequest);
           }
           break;
         }
       default:
         {
-          throw new CustomErrorException("err");
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Request Type ID is not existed!");
         }
     }
 
@@ -918,7 +919,11 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     applicationsRequestRepository.createApplicationsRequest(applicationsRequest);
 
     generalFunction.sendEmailCreateRequest(
-        createEmployeeId, approver, FROM_EMAIL, "hihihd37@gmail.com", "New request");
+        createEmployeeId,
+        approver,
+        FROM_EMAIL,
+        applicationsRequest.getApprover() + "@thegorf.tk",
+        "New request");
   }
 
   private void checkLevelAndValueToApprove(
@@ -1149,7 +1154,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
 
     String type = checkStringNull(applicationsRequest.getType());
     String typeName = applicationsRequest.getType();
-    if (applicationsRequest.getRequestNameId().intValue() == 3) {
+    if (applicationsRequest.getRequestNameId().intValue() == 5) {
       BonusTypeDto bonusTypeDto =
           bonusSalaryRepository.getBonusTypeDtoByID(Long.valueOf(applicationsRequest.getType()));
       typeName = EBonus.getLabel(bonusTypeDto.getBonus_type_name());

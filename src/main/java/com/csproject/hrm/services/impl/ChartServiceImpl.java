@@ -35,6 +35,7 @@ public class ChartServiceImpl implements ChartService {
   @Autowired SalaryMonthlyService salaryMonthlyService;
   @Autowired EmployeeDetailRepository employeeDetailRepository;
   @Autowired TimekeepingRepository timekeepingRepository;
+  @Autowired WorkingPlaceRepository workingPlaceRepository;
   @Autowired JwtUtils jwtUtils;
 
   @Override
@@ -46,29 +47,50 @@ public class ChartServiceImpl implements ChartService {
   }
 
   @Override
-  public GeneralDataCharts getGeneralEmployeeDataForChartByAreaName(String areaName) {
+  public GeneralDataCharts getGeneralEmployeeDataForChartByAreaName(
+      String employeeId, String areaName) {
     GeneralDataCharts dataCharts = new GeneralDataCharts();
+    List<AreaDto> areaList;
+    if ("huynq1".equalsIgnoreCase(employeeId)) {
+      areaList = getListAreaEnum();
+    } else {
+      AreaDto dto = new AreaDto();
+      dto.setName(areaName);
+      areaList = new ArrayList<>();
+      areaList.add(dto);
+    }
+    int totalEmployee = 0;
+    int totalMale = 0;
+    int totalFemale = 0;
 
-    dataCharts.setTotalEmployee(chartRepository.countTotalEmployeeByAreaName(areaName));
+    for (AreaDto area : areaList) {
+      totalEmployee += chartRepository.countTotalEmployeeByAreaName(area.getName());
+      totalMale += chartRepository.countTotalEmployeeByGenderAndAreaName(area.getName(), "Male");
+      totalFemale +=
+          chartRepository.countTotalEmployeeByGenderAndAreaName(area.getName(), "Female");
+    }
 
-    dataCharts.setTotalMaleEmployee(
-        chartRepository.countTotalEmployeeByGenderAndAreaName(areaName, "Male"));
+    dataCharts.setTotalEmployee(totalEmployee);
 
-    dataCharts.setTotalFemaleEmployee(
-        chartRepository.countTotalEmployeeByGenderAndAreaName(areaName, "Female"));
+    dataCharts.setTotalMaleEmployee(totalMale);
 
-    dataCharts.setSeniorityList(getSeniority(areaName));
+    dataCharts.setTotalFemaleEmployee(totalFemale);
 
-    dataCharts.setAgeList(getAge(areaName));
+    dataCharts.setSeniorityList(getSeniority(areaList));
 
-    dataCharts.setWorkingTypeList(getWorkingType(areaName));
+    dataCharts.setAgeList(getAge(areaList));
+
+    dataCharts.setWorkingTypeList(getWorkingType(areaList));
 
     return dataCharts;
   }
 
-  private List<GeneralChart> getSeniority(String areaName) {
-    List<Integer> seniorityList =
-        chartRepository.getAllEmployeeSeniorityForChartByAreaName(areaName);
+  private List<AreaDto> getListAreaEnum() {
+    List<AreaDto> areaDto = workingPlaceRepository.getListArea();
+    return areaDto;
+  }
+
+  private List<GeneralChart> getSeniority(List<AreaDto> areaList) {
     Map<String, Integer> map = new LinkedHashMap<>();
     map.put("<1", 0);
     map.put("1-2", 0);
@@ -76,24 +98,27 @@ public class ChartServiceImpl implements ChartService {
     map.put("3-4", 0);
     map.put("4-5", 0);
     map.put(">5", 0);
-
-    seniorityList.forEach(
-        s -> {
-          double val = (double) s / 365;
-          if (val < 1) {
-            map.put("<1", map.get("<1") + 1);
-          } else if (val >= 1 && val <= 2) {
-            map.put("1-2", map.get("1-2") + 1);
-          } else if (val > 2 && val <= 3) {
-            map.put("2-3", map.get("2-3") + 1);
-          } else if (val > 3 && val <= 4) {
-            map.put("3-4", map.get("3-4") + 1);
-          } else if (val > 4 && val <= 5) {
-            map.put("4-5", map.get("4-5") + 1);
-          } else {
-            map.put(">5", map.get(">5") + 1);
-          }
-        });
+    for (AreaDto area : areaList) {
+      List<Integer> seniorityList =
+          chartRepository.getAllEmployeeSeniorityForChartByAreaName(area.getName());
+      seniorityList.forEach(
+          s -> {
+            double val = (double) s / 365;
+            if (val < 1) {
+              map.put("<1", map.get("<1") + 1);
+            } else if (val >= 1 && val <= 2) {
+              map.put("1-2", map.get("1-2") + 1);
+            } else if (val > 2 && val <= 3) {
+              map.put("2-3", map.get("2-3") + 1);
+            } else if (val > 3 && val <= 4) {
+              map.put("3-4", map.get("3-4") + 1);
+            } else if (val > 4 && val <= 5) {
+              map.put("4-5", map.get("4-5") + 1);
+            } else {
+              map.put(">5", map.get(">5") + 1);
+            }
+          });
+    }
 
     List<GeneralChart> list = new ArrayList<>();
     map.forEach(
@@ -106,8 +131,7 @@ public class ChartServiceImpl implements ChartService {
     return list;
   }
 
-  private List<GeneralChart> getAge(String areaName) {
-    List<Integer> ageList = chartRepository.getAllEmployeeAgeForChartByAreaName(areaName);
+  private List<GeneralChart> getAge(List<AreaDto> areaList) {
     Map<String, Integer> map = new LinkedHashMap<>();
     map.put("18-24", 0);
     map.put("25-35", 0);
@@ -116,23 +140,26 @@ public class ChartServiceImpl implements ChartService {
     map.put("56-65", 0);
     map.put(">66", 0);
 
-    for (Integer s : ageList) {
-      if (s == null) {
-        continue;
-      }
-      double val = (double) s / 365;
-      if (val >= 18 && val <= 24) {
-        map.put("18-24", map.get("18-24") + 1);
-      } else if (val >= 25 && val <= 35) {
-        map.put("25-35", map.get("25-35") + 1);
-      } else if (val > 36 && val <= 45) {
-        map.put("36-45", map.get("36-45") + 1);
-      } else if (val > 46 && val <= 55) {
-        map.put("46-55", map.get("46-55") + 1);
-      } else if (val > 56 && val <= 65) {
-        map.put("56-65", map.get("56-65") + 1);
-      } else {
-        map.put(">66", map.get(">66") + 1);
+    for (AreaDto area : areaList) {
+      List<Integer> ageList = chartRepository.getAllEmployeeAgeForChartByAreaName(area.getName());
+      for (Integer s : ageList) {
+        if (s == null) {
+          continue;
+        }
+        double val = (double) s / 365;
+        if (val >= 18 && val <= 24) {
+          map.put("18-24", map.get("18-24") + 1);
+        } else if (val >= 25 && val <= 35) {
+          map.put("25-35", map.get("25-35") + 1);
+        } else if (val > 36 && val <= 45) {
+          map.put("36-45", map.get("36-45") + 1);
+        } else if (val > 46 && val <= 55) {
+          map.put("46-55", map.get("46-55") + 1);
+        } else if (val > 56 && val <= 65) {
+          map.put("56-65", map.get("56-65") + 1);
+        } else {
+          map.put(">66", map.get(">66") + 1);
+        }
       }
     }
 
@@ -148,7 +175,7 @@ public class ChartServiceImpl implements ChartService {
     return list;
   }
 
-  private List<GeneralChart> getWorkingType(String areaName) {
+  private List<GeneralChart> getWorkingType(List<AreaDto> areaList) {
     List<WorkingTypeDto> workingTypeIDs = chartRepository.getAllWorkingType();
     List<GeneralChart> list = new ArrayList<>();
 
@@ -156,9 +183,13 @@ public class ChartServiceImpl implements ChartService {
         type -> {
           GeneralChart chart = new GeneralChart();
           chart.setLabel(EWorkingType.getLabel(type.getName()));
-          chart.setValue(
-              chartRepository.countTotalEmployeeByContractTypeAndAreaName(
-                  areaName, type.getType_id()));
+          int value = 0;
+          for (AreaDto area : areaList) {
+            value =
+                chartRepository.countTotalEmployeeByContractTypeAndAreaName(
+                    area.getName(), type.getType_id());
+          }
+          chart.setValue(value);
           list.add(chart);
         });
     return list;
@@ -167,7 +198,7 @@ public class ChartServiceImpl implements ChartService {
   @Override
   public OrganizationalChart getOrganizational() {
     OrganizationalChart chart = new OrganizationalChart();
-    chart.setTitle("HRM");
+    chart.setTitle("Company Name");
     chart.setChildren(getAreaManager());
 
     return chart;
