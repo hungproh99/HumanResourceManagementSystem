@@ -67,9 +67,7 @@ public class OvertimeRepositoryImpl implements OvertimeRepositoryCustom {
     DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select(OVERTIME_TYPE.OVERTIME_TYPE_)
-        .from(OVERTIME)
-        .leftJoin(OVERTIME_TYPE)
-        .on(OVERTIME_TYPE.OVERTIME_TYPE_ID.eq(OVERTIME.OVERTIME_TYPE_ID))
+        .from(OVERTIME_TYPE)
         .fetchInto(String.class);
   }
 

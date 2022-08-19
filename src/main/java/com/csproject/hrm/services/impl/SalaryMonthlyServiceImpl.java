@@ -641,8 +641,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
     BigDecimal totalAllowance = getEmployeeAllowanceResponseList(employeeId).getTotal();
     BigDecimal totalTax =
-        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary)
-            .getTotal();
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary).getTotal();
     BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     BigDecimal salaryPerPoint =
         (salaryContractDto

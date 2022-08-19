@@ -68,7 +68,7 @@ public class Constants {
   public static final String AREA_INVALID = "Invalid Area";
   public static final String JOB_INVALID = "Invalid Job";
   public static final String OFFICE_INVALID = "Invalid Office";
-  public static final String DOMAIN_EMAIL = "@thegork.tk";
+  public static final String DOMAIN_EMAIL = "@thegorf.tk";
   public static final String FILL_NOT_FULL = "Please fill full in form";
   public static final String CSV_NULL_DATA = "Field Csv null data";
   public static final String PHONE_VALIDATION = "^\\d{9,10}$";
