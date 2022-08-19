@@ -5,9 +5,7 @@ import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.services.ChartService;
-import com.csproject.hrm.services.EmployeeDetailService;
-import com.csproject.hrm.services.HolidayCalenderService;
+import com.csproject.hrm.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,14 +41,16 @@ public class ChartController {
   public ResponseEntity<?> getGeneralEmployeeDataForChart(HttpServletRequest request) {
     String areaName = "";
     String headerAuth = request.getHeader(AUTHORIZATION);
+    String employeeId = "huynq1";
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
-      String employeeId = jwtUtils.getIdFromJwtToken(jwt);
+      employeeId = jwtUtils.getIdFromJwtToken(jwt);
       areaName =
           Objects.requireNonNullElse(chartService.getAreaNameByEmployeeID(employeeId), areaName);
     }
 
-    return ResponseEntity.ok(chartService.getGeneralEmployeeDataForChartByAreaName(areaName));
+    return ResponseEntity.ok(
+        chartService.getGeneralEmployeeDataForChartByAreaName(employeeId, areaName));
   }
 
   @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")

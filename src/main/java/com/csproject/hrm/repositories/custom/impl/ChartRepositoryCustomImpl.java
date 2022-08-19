@@ -31,6 +31,7 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
   @Override
   public String getAreaNameByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    System.out.println();
     return dslContext
         .select(AREA.NAME)
         .from(EMPLOYEE)
@@ -171,23 +172,6 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
   @Override
   public List<EmployeeChart> getEmployeeByManagerIDAndAreaID(String managerID, long areaID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    System.out.println(
-        dslContext
-            .select(
-                EMPLOYEE.FULL_NAME.as("name"),
-                EMPLOYEE.AVATAR,
-                EMPLOYEE.EMPLOYEE_ID.as("employeeID"))
-            .from(EMPLOYEE)
-            .leftJoin(WORKING_CONTRACT)
-            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
-            .leftJoin(WORKING_PLACE)
-            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(AREA)
-            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-            .where(EMPLOYEE.MANAGER_ID.eq(managerID))
-            .and(EMPLOYEE.WORKING_STATUS.isTrue())
-            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-            .and(AREA.AREA_ID.eq(areaID)));
     return dslContext
         .select(
             EMPLOYEE.FULL_NAME.as("name"), EMPLOYEE.AVATAR, EMPLOYEE.EMPLOYEE_ID.as("employeeID"))

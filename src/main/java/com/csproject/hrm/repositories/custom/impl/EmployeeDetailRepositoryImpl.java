@@ -606,14 +606,13 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
             .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue());
 
-    System.out.println(query);
-
     WorkingInfoResponse workingInfoResponse =
         Objects.requireNonNullElse(
             query.fetchOneInto(WorkingInfoResponse.class), new WorkingInfoResponse());
     workingInfoResponse.setManager_name(
-        Objects.requireNonNullElse(
-            getManagerByEmployeeID(employeeID).split("-")[0].trim(), "admin"));
+        Objects.requireNonNullElse(getManagerByEmployeeID(employeeID), "Nguyen Quang Huy - huynq1")
+            .split("-")[0]
+            .trim());
     return workingInfoResponse;
   }
 
