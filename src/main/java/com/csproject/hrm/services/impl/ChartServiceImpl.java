@@ -185,7 +185,7 @@ public class ChartServiceImpl implements ChartService {
           chart.setLabel(EWorkingType.getLabel(type.getName()));
           int value = 0;
           for (AreaDto area : areaList) {
-            value =
+            value +=
                 chartRepository.countTotalEmployeeByContractTypeAndAreaName(
                     area.getName(), type.getType_id());
           }
