@@ -33,4 +33,13 @@ public enum EPolicyName {
     }
     throw new CustomErrorException(HttpStatus.BAD_REQUEST, POLICY_NAME_INVALID);
   }
+
+  public static long getValue(String policyName) {
+    for (EPolicyName ePolicyName : EPolicyName.values()) {
+      if (ePolicyName.name().equalsIgnoreCase(policyName)) {
+        return ePolicyName.value;
+      }
+    }
+    throw new CustomErrorException(HttpStatus.BAD_REQUEST, POLICY_NAME_INVALID);
+  }
 }

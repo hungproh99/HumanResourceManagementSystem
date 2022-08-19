@@ -339,6 +339,8 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       insertMultiEmployee(hrmRequestList);
     } catch (IOException e) {
       throw new RuntimeException(e);
+    } catch (NumberFormatException e) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Only input number in salary");
     }
   }
 
@@ -394,94 +396,101 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         checkValidFormatExcel(row);
         continue;
       }
-      String fullName = row.getCell(0).getStringCellValue();
-      Long role = ERole.getValue(row.getCell(1).getStringCellValue());
+      try {
+        String fullName = row.getCell(0).getStringCellValue();
+        Long role = ERole.getValue(row.getCell(1).getStringCellValue());
         String phone = "0" + (int) row.getCell(2).getNumericCellValue();
-      String gender = row.getCell(3).getStringCellValue();
+        String gender = row.getCell(3).getStringCellValue();
         LocalDate birthDate = row.getCell(4).getLocalDateTimeCellValue().toLocalDate();
-      Long grade = EGradeType.getValue(row.getCell(5).getStringCellValue());
-      Long position = EJob.getValue(row.getCell(6).getStringCellValue());
-      Long office = EOffice.getValue(row.getCell(7).getStringCellValue());
-      Long area = EArea.getValue(row.getCell(8).getStringCellValue());
-      Long workingType = EWorkingType.getValue(row.getCell(9).getStringCellValue());
+        Long grade = EGradeType.getValue(row.getCell(5).getStringCellValue());
+        Long position = EJob.getValue(row.getCell(6).getStringCellValue());
+        Long office = EOffice.getValue(row.getCell(7).getStringCellValue());
+        Long area = EArea.getValue(row.getCell(8).getStringCellValue());
+        Long workingType = EWorkingType.getValue(row.getCell(9).getStringCellValue());
         String managerId = row.getCell(10).toString();
-      Long employeeType = EEmployeeType.getValue(row.getCell(11).getStringCellValue());
+        Long employeeType = EEmployeeType.getValue(row.getCell(11).getStringCellValue());
         String personalEmail = row.getCell(12).toString();
         LocalDate startDate = row.getCell(13).getLocalDateTimeCellValue().toLocalDate();
         LocalDate endDate = row.getCell(14).getLocalDateTimeCellValue().toLocalDate();
-      BigDecimal baseSalary = BigDecimal.valueOf(row.getCell(15).getNumericCellValue());
-      BigDecimal salary = BigDecimal.valueOf(row.getCell(16).getNumericCellValue());
+        BigDecimal baseSalary = BigDecimal.valueOf(row.getCell(15).getNumericCellValue());
+        BigDecimal salary = BigDecimal.valueOf(row.getCell(16).getNumericCellValue());
 
-      if (row.getCell(0) == null
-          || row.getCell(1) == null
-          || row.getCell(2) == null
-          || row.getCell(3) == null
-          || row.getCell(4) == null
-          || row.getCell(5) == null
-          || row.getCell(6) == null
-          || row.getCell(7) == null
-          || row.getCell(8) == null
-          || row.getCell(9) == null
-          || row.getCell(10) == null
-          || row.getCell(11) == null
-          || row.getCell(12) == null
-          || row.getCell(13) == null
-          || row.getCell(14) == null
-          || row.getCell(15) == null
-          || row.getCell(16) == null) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in excel");
-      } else if (!roleRepository.existsById(role)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
-      } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
-      } else if (!areaRepository.existsById(area)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
-      } else if (!officeRepository.existsById(office)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
-      } else if (!gradeRepository.existsById(grade)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
-      } else if (!jobRepository.existsById(position)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
-      } else if (!workingTypeRepository.existsById(workingType)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
-      } else if (!employeeRepository.existsById(managerId)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
-      } else if (!employeeTypeRepository.existsById(employeeType)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
-      } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Personal Email not valid");
-      } else if (birthDate.isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Birth Date must be enough 18 age");
-      } else if (startDate.isAfter(endDate)) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
-      } else if (endDate.isBefore(LocalDate.now())) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not before Current Date");
-      } else if (baseSalary.compareTo(BigDecimal.valueOf(Double.parseDouble("5000000"))) < 0) {
-        throw new CustomErrorException(
-            HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
-      } else if (baseSalary.compareTo(salary) >= 0) {
-        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must less than Salary");
+        if (row.getCell(0) == null
+            || row.getCell(1) == null
+            || row.getCell(2) == null
+            || row.getCell(3) == null
+            || row.getCell(4) == null
+            || row.getCell(5) == null
+            || row.getCell(6) == null
+            || row.getCell(7) == null
+            || row.getCell(8) == null
+            || row.getCell(9) == null
+            || row.getCell(10) == null
+            || row.getCell(11) == null
+            || row.getCell(12) == null
+            || row.getCell(13) == null
+            || row.getCell(14) == null
+            || row.getCell(15) == null
+            || row.getCell(16) == null) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Have empty field in excel");
+        } else if (!roleRepository.existsById(role)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Role not exist");
+        } else if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Gender must be Female/Male");
+        } else if (!areaRepository.existsById(area)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Area not exist");
+        } else if (!officeRepository.existsById(office)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Office not exist");
+        } else if (!gradeRepository.existsById(grade)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Grade not exist");
+        } else if (!jobRepository.existsById(position)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Position not exist");
+        } else if (!workingTypeRepository.existsById(workingType)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Working Type not exist");
+        } else if (!employeeRepository.existsById(managerId)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Manager Id not exist");
+        } else if (!employeeTypeRepository.existsById(employeeType)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Employee Type not exist");
+        } else if (!personalEmail.matches(EMAIL_VALIDATION)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Personal Email not valid");
+        } else if (birthDate.isAfter(LocalDate.now().minus(18, ChronoUnit.YEARS))) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Birth Date must be enough 18 age");
+        } else if (startDate.isAfter(endDate)) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
+        } else if (endDate.isBefore(LocalDate.now())) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+        } else if (baseSalary.compareTo(BigDecimal.valueOf(Double.parseDouble("5000000"))) < 0) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
+        } else if (baseSalary.compareTo(salary) >= 0) {
+          throw new CustomErrorException(
+              HttpStatus.BAD_REQUEST, "Base Salary must less than Salary");
+        }
+        hrmRequestList.add(
+            HrmRequest.builder()
+                .fullName(fullName)
+                .role(role)
+                .phone(phone)
+                .gender(gender)
+                .birthDate(birthDate)
+                .grade(grade)
+                .position(position)
+                .office(office)
+                .area(area)
+                .workingType(workingType)
+                .managerId(managerId)
+                .employeeType(employeeType)
+                .personalEmail(personalEmail)
+                .startDate(startDate)
+                .endDate(endDate)
+                .salary(salary)
+                .baseSalary(baseSalary)
+                .build());
+      } catch (NumberFormatException e) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Only input number in salary");
       }
-      hrmRequestList.add(
-          HrmRequest.builder()
-              .fullName(fullName)
-              .role(role)
-              .phone(phone)
-              .gender(gender)
-              .birthDate(birthDate)
-              .grade(grade)
-              .position(position)
-              .office(office)
-              .area(area)
-              .workingType(workingType)
-              .managerId(managerId)
-              .employeeType(employeeType)
-              .personalEmail(personalEmail)
-              .startDate(startDate)
-              .endDate(endDate)
-              .salary(salary)
-              .baseSalary(baseSalary)
-              .build());
     }
     if (hrmRequestList.isEmpty()) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Nothing to insert");

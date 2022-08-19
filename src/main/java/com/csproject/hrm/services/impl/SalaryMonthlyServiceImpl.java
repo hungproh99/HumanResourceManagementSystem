@@ -163,6 +163,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         .employeeAllowanceResponseList(employeeAllowanceResponseList)
         .employeeInsuranceResponseList(employeeInsuranceResponseList)
         .employeeTaxResponseList(employeeTaxResponseList)
+        .comment(salaryMonthlyResponse.get().getComment())
+        .checked_by(salaryMonthlyResponse.get().getChecked_by())
         .build();
   }
 
@@ -170,10 +172,12 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   public void upsertSalaryMonthlyByEmployeeIdList(LocalDate startDate, LocalDate endDate) {
     List<SalaryMonthlyDto> salaryMonthlyDtoList = new ArrayList<>();
     List<String> employeeIdList = employeeRepository.getAllEmployeeIdActive();
-    employeeIdList.forEach(
-        employeeId -> {
-          salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
-        });
+    for (String employeeId : employeeIdList) {
+      if (employeeId.equalsIgnoreCase("admin")) {
+        continue;
+      }
+      salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
+    }
     salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);
   }
 
@@ -637,8 +641,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     BigDecimal additionalSalary = salaryContractDto.get().getAdditional_salary();
     BigDecimal totalAllowance = getEmployeeAllowanceResponseList(employeeId).getTotal();
     BigDecimal totalTax =
-        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary)
-            .getTotal();
+        getEmployeeTaxResponseList(employeeId, baseSalary, additionalSalary).getTotal();
     BigDecimal totalInsurance = getEmployeeInsuranceResponseList(employeeId, baseSalary).getTotal();
     BigDecimal salaryPerPoint =
         (salaryContractDto

@@ -670,7 +670,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchCount(
         dslContext
-            .select()
+            .select(RELATIVE_INFORMATION.RELATIVE_ID)
             .from(RELATIVE_INFORMATION)
             .leftJoin(EMPLOYEE)
             .on(EMPLOYEE.EMPLOYEE_ID.eq(RELATIVE_INFORMATION.EMPLOYEE_ID))

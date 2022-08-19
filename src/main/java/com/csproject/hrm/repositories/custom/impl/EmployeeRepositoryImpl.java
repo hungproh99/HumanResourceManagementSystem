@@ -104,6 +104,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getEndDate(),
                   hrmPojo.getBaseSalary(),
                   hrmPojo.getSalary().subtract(hrmPojo.getBaseSalary())));
+          queries.add(insertInsurance(configuration, hrmPojo.getEmployeeId()));
+          queries.add(insertAllowance(configuration, hrmPojo.getEmployeeId()));
+          queries.add(insertTax(configuration, hrmPojo.getEmployeeId()));
           DSL.using(configuration).batch(queries).execute();
         });
   }
@@ -148,6 +151,9 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getEndDate(),
                         hrmPojo.getBaseSalary(),
                         hrmPojo.getSalary().subtract(hrmPojo.getBaseSalary())));
+                queries.add(insertInsurance(configuration, hrmPojo.getEmployeeId()));
+                queries.add(insertAllowance(configuration, hrmPojo.getEmployeeId()));
+                queries.add(insertTax(configuration, hrmPojo.getEmployeeId()));
               });
 
           DSL.using(configuration).batch(queries).execute();
@@ -222,81 +228,81 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .fetchInto(HrmResponse.class);
   }
 
-//  @Override
-//  public List<String> getListManagerByName(String name) {
-//    final DSLContext dslContext = DSL.using(connection.getConnection());
-//    if (name.contains("-")) {
-//      String split[] = name.split("-");
-//      return dslContext
-//          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-//          .from(EMPLOYEE)
-//          .leftJoin(ROLE_TYPE)
-//          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-//          .where(
-//              EMPLOYEE
-//                  .FULL_NAME
-//                  .upper()
-//                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
-//          .and(
-//              EMPLOYEE
-//                  .EMPLOYEE_ID
-//                  .upper()
-//                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
-//          .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
-//          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-//          .fetchInto(String.class);
-//    }
-//    return dslContext
-//        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-//        .from(EMPLOYEE)
-//        .leftJoin(ROLE_TYPE)
-//        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-//        .where(
-//            EMPLOYEE
-//                .FULL_NAME
-//                .upper()
-//                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
-//        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
-//        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-//        .fetchInto(String.class);
-//  }
+  //  @Override
+  //  public List<String> getListManagerByName(String name) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    if (name.contains("-")) {
+  //      String split[] = name.split("-");
+  //      return dslContext
+  //          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+  //          .from(EMPLOYEE)
+  //          .leftJoin(ROLE_TYPE)
+  //          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+  //          .where(
+  //              EMPLOYEE
+  //                  .FULL_NAME
+  //                  .upper()
+  //                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
+  //          .and(
+  //              EMPLOYEE
+  //                  .EMPLOYEE_ID
+  //                  .upper()
+  //                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
+  //          .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+  //          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+  //          .fetchInto(String.class);
+  //    }
+  //    return dslContext
+  //        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+  //        .from(EMPLOYEE)
+  //        .leftJoin(ROLE_TYPE)
+  //        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+  //        .where(
+  //            EMPLOYEE
+  //                .FULL_NAME
+  //                .upper()
+  //                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
+  //        .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
+  //        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+  //        .fetchInto(String.class);
+  //  }
 
-//  @Override
-//  public List<String> getListEmployeeByNameAndId(String name) {
-//    final DSLContext dslContext = DSL.using(connection.getConnection());
-//    if (name.contains("-")) {
-//      String split[] = name.split("-");
-//      return dslContext
-//          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-//          .from(EMPLOYEE)
-//          .leftJoin(ROLE_TYPE)
-//          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-//          .where(
-//              EMPLOYEE
-//                  .FULL_NAME
-//                  .upper()
-//                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
-//          .and(
-//              EMPLOYEE
-//                  .EMPLOYEE_ID
-//                  .upper()
-//                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
-//          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-//          .fetchInto(String.class);
-//    }
-//    return dslContext
-//        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
-//        .from(EMPLOYEE)
-//        .leftJoin(ROLE_TYPE)
-//        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
-//        .where(
-//            EMPLOYEE
-//                .FULL_NAME
-//                .upper()
-//                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
-//        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
-//        .fetchInto(String.class);
-//  }
+  //  @Override
+  //  public List<String> getListEmployeeByNameAndId(String name) {
+  //    final DSLContext dslContext = DSL.using(connection.getConnection());
+  //    if (name.contains("-")) {
+  //      String split[] = name.split("-");
+  //      return dslContext
+  //          .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+  //          .from(EMPLOYEE)
+  //          .leftJoin(ROLE_TYPE)
+  //          .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+  //          .where(
+  //              EMPLOYEE
+  //                  .FULL_NAME
+  //                  .upper()
+  //                  .like(PERCENT_CHARACTER + split[0].toUpperCase() + PERCENT_CHARACTER))
+  //          .and(
+  //              EMPLOYEE
+  //                  .EMPLOYEE_ID
+  //                  .upper()
+  //                  .like(PERCENT_CHARACTER + split[1].toUpperCase() + PERCENT_CHARACTER))
+  //          .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+  //          .fetchInto(String.class);
+  //    }
+  //    return dslContext
+  //        .select(EMPLOYEE.FULL_NAME.concat(" (").concat(EMPLOYEE.EMPLOYEE_ID).concat(")"))
+  //        .from(EMPLOYEE)
+  //        .leftJoin(ROLE_TYPE)
+  //        .on(ROLE_TYPE.TYPE_ID.eq(EMPLOYEE.ROLE_TYPE))
+  //        .where(
+  //            EMPLOYEE
+  //                .FULL_NAME
+  //                .upper()
+  //                .like(PERCENT_CHARACTER + name.toUpperCase() + PERCENT_CHARACTER))
+  //        .orderBy(EMPLOYEE.EMPLOYEE_ID.asc())
+  //        .fetchInto(String.class);
+  //  }
 
   public Select<?> countAllEmployee(List<Condition> conditions) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
@@ -647,15 +653,15 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .fetchInto(String.class);
   }
 
-//  @Override
-//  public Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId) {
-//    List<Condition> conditions = new ArrayList<>();
-//    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
-//    List<OrderField<?>> sortFields = new ArrayList<>();
-//    sortFields.add(EMPLOYEE.EMPLOYEE_ID.desc());
-//    return findAllEmployee(conditions, sortFields, Pagination.defaultPage())
-//        .fetchOptionalInto(HrmResponse.class);
-//  }
+  //  @Override
+  //  public Optional<HrmResponse> getEmployeeByEmployeeId(String employeeId) {
+  //    List<Condition> conditions = new ArrayList<>();
+  //    conditions.add(EMPLOYEE.EMPLOYEE_ID.eq(employeeId));
+  //    List<OrderField<?>> sortFields = new ArrayList<>();
+  //    sortFields.add(EMPLOYEE.EMPLOYEE_ID.desc());
+  //    return findAllEmployee(conditions, sortFields, Pagination.defaultPage())
+  //        .fetchOptionalInto(HrmResponse.class);
+  //  }
 
   @Override
   public List<EmployeeNameAndID> getListManagerHigherOfArea(String employeeId, Integer level) {
@@ -701,20 +707,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
   @Override
   public List<EmployeeNameAndID> getListManagerLowerOfArea(String employeeId, Integer level) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    final var area =
-        dslContext
-            .select(AREA.NAME)
-            .from(EMPLOYEE)
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-            .leftJoin(WORKING_PLACE)
-            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
-            .leftJoin(AREA)
-            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
-            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
-            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
-            .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-            .fetchOneInto(String.class);
 
     return dslContext
         .select(EMPLOYEE.FULL_NAME.as("name"), EMPLOYEE.EMPLOYEE_ID.as("employeeID"))
@@ -731,7 +723,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
         .and(EMPLOYEE.LEVEL.ge(level))
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
-        .and(AREA.NAME.eq(area))
         .and(ROLE_TYPE.ROLE.eq(ERole.ROLE_MANAGER.name()))
         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
@@ -779,5 +770,42 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
               });
         });
     dslContext.batch(queries).execute();
+  }
+
+  private Insert<?> insertInsurance(Configuration config, String employeeId) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE_INSURANCE,
+            EMPLOYEE_INSURANCE.INSURANCE_STATUS,
+            EMPLOYEE_INSURANCE.EMPLOYEE_ID,
+            EMPLOYEE_INSURANCE.POLICY_NAME_ID)
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.HI.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.SI.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.UI.name()));
+  }
+
+  private Insert<?> insertTax(Configuration config, String employeeId) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE_TAX,
+            EMPLOYEE_TAX.TAX_STATUS,
+            EMPLOYEE_TAX.EMPLOYEE_ID,
+            EMPLOYEE_TAX.POLICY_NAME_ID)
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.VNP.name()));
+  }
+
+  private Insert<?> insertAllowance(Configuration config, String employeeId) {
+    return DSL.using(config)
+        .insertInto(
+            EMPLOYEE_ALLOWANCE,
+            EMPLOYEE_ALLOWANCE.ALLOWANCE_STATUS,
+            EMPLOYEE_ALLOWANCE.EMPLOYEE_ID,
+            EMPLOYEE_ALLOWANCE.POLICY_NAME_ID)
+        .values(
+            Boolean.TRUE,
+            employeeId,
+            EPolicyName.getValue(EPolicyName.TRANSPORTATION_ALLOWANCE.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.PHONE_ALLOWANCE.name()))
+        .values(Boolean.TRUE, employeeId, EPolicyName.getValue(EPolicyName.MEAL_ALLOWANCE.name()));
   }
 }
