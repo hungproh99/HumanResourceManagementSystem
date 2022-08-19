@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -79,6 +80,9 @@ public class Employee {
 
   @Column(name = "level")
   private int level;
+
+//  @Column(name = "level")
+//  private LocalDateTime createDate;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "card_id")

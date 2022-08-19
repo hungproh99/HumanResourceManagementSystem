@@ -580,7 +580,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
                 salaryMonthlyRemindResponse.getDuration().toString(),
                 salaryMonthlyRemindResponse.getDuration().compareTo(currDate) + "",
                 FROM_EMAIL,
-                TO_EMAIL,
+                approveEmail,
                 "Remind Request");
           }
         });

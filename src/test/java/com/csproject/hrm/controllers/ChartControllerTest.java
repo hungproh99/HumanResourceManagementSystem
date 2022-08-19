@@ -6,7 +6,9 @@ import com.csproject.hrm.config.TestSecurityConfig;
 import com.csproject.hrm.dto.chart.*;
 import com.csproject.hrm.dto.response.EmployeeNameAndID;
 import com.csproject.hrm.jwt.JwtUtils;
-import com.csproject.hrm.services.impl.*;
+import com.csproject.hrm.services.impl.ChartServiceImpl;
+import com.csproject.hrm.services.impl.EmployeeDetailServiceImpl;
+import com.csproject.hrm.services.impl.HolidayCalenderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,8 +69,7 @@ public class ChartControllerTest {
 
     GeneralDataCharts response = ChartDataSample.GENERAL_DATA_CHARTS;
 
-    Mockito.when(chartService.getGeneralEmployeeDataForChartByAreaName(areaName))
-        .thenReturn(response);
+    Mockito.when(chartService.getGeneralEmployeeDataForChartByAreaName(employeeId, areaName));
 
     RequestBuilder requestBuilder =
         MockMvcRequestBuilders.get(REQUEST_MAPPING + "/get_general_data_chart")

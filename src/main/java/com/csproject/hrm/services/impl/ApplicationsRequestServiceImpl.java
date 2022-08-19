@@ -5,9 +5,17 @@ import com.csproject.hrm.common.excel.ExcelExportApplicationRequest;
 import com.csproject.hrm.common.general.GeneralFunction;
 import com.csproject.hrm.common.general.SalaryCalculator;
 import com.csproject.hrm.dto.dto.*;
-import com.csproject.hrm.dto.request.*;
-import com.csproject.hrm.dto.response.*;
-import com.csproject.hrm.exception.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
+import com.csproject.hrm.dto.response.ApplicationRequestRemindResponse;
+import com.csproject.hrm.dto.response.ApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.ListApplicationsRequestResponse;
+import com.csproject.hrm.dto.response.PolicyTypeAndNameResponse;
+import com.csproject.hrm.exception.CustomDataNotFoundException;
+import com.csproject.hrm.exception.CustomErrorException;
+import com.csproject.hrm.exception.CustomParameterConstraintException;
 import com.csproject.hrm.jooq.QueryParam;
 import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.ApplicationsRequestService;
@@ -23,7 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -239,6 +250,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             + " - "
             + applicationRequestDto.get().getRequestName();
     String requestStatus = ERequestStatus.getLabel(ERequestStatus.REJECTED.name());
+    String createEmail = employeeRepository.getEmployeeEmailByEmployeeId(employeeId);
     applicationsRequestRepository.updateRejectApplicationRequest(
         rejectApplicationRequestRequest, LocalDateTime.now());
     generalFunction.sendEmailUpdateRequest(
@@ -250,7 +262,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         approverName,
         applicationRequestDto.get().getRequestId().toString(),
         FROM_EMAIL,
-        TO_EMAIL,
+        createEmail,
         "Reject Request");
   }
 
@@ -444,6 +456,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     String employeeName = employeeRepository.getEmployeeNameByEmployeeId(employeeId);
     String approveId = requestDto.getApproveId();
     String approverName = employeeRepository.getEmployeeNameByEmployeeId(approveId);
+    String createEmail = employeeRepository.getEmployeeEmailByEmployeeId(employeeId);
     String requestTitle = requestDto.getRequestType() + " - " + requestDto.getRequestName();
     String requestStatus = ERequestStatus.getLabel(ERequestStatus.APPROVED.name());
     LocalDate currentDate = LocalDate.now();
@@ -553,7 +566,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
         approverName,
         requestDto.getRequestId().toString(),
         FROM_EMAIL,
-        TO_EMAIL,
+        createEmail,
         "Approve Request");
   }
 
@@ -1356,7 +1369,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 applicationRequestRemindResponse.getDuration().compareTo(currDate) + "",
                 FROM_EMAIL,
-                TO_EMAIL,
+                approveEmail,
                 "Remind Request");
           }
         });
