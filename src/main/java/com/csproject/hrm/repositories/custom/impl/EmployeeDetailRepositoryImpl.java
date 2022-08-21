@@ -280,7 +280,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         .select()
         .from(WORKING_PLACE)
         .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(contractID))
-        .and(WORKING_PLACE.WORKING_PLACE_STATUS.eq(true))
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
         .fetchOneInto(WorkingPlaceDto.class);
   }
 
@@ -724,13 +724,6 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                   workingInfoRequest.getPosition(),
                   workingInfoRequest.getGrade());
           if (salaryChange) {
-            updateSalaryContract(
-                configuration,
-                workingInfoRequest.getEmployeeId(),
-                new BigDecimal(workingInfoRequest.getBaseSalary()),
-                new BigDecimal(workingInfoRequest.getFinalSalary()),
-                workingInfoRequest.getStartDate(),
-                true);
           } else {
             //            salaryContractRepository.insertNewSalaryContract(
             //                workingInfoRequest.getEmployeeId(),
@@ -740,12 +733,26 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             //                true);
           }
           if (placeChange) {
-            queries.add(updateWorkingPlace(configuration, workingInfoRequest));
+            salaryContractRepository.insertSalaryContract(
+                workingInfoRequest.getEmployeeId(),
+                new BigDecimal(workingInfoRequest.getBaseSalary()),
+                new BigDecimal(workingInfoRequest.getFinalSalary()),
+                workingInfoRequest.getStartDate(),
+                false,
+                workingInfoRequest.getWorkingContractId());
           } else {
-            workingInfoRequest.setWorkingPlaceId(workingPlace.getWorking_place_id());
+            Long workingContractId = insertWorkingContract(configuration, workingInfoRequest);
+            workingInfoRequest.setWorkingContractId(workingContractId);
             workingInfoRequest.setStartDate(
                 Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate());
             queries.add(insertWorkingPlace(configuration, workingInfoRequest));
+            salaryContractRepository.insertSalaryContract(
+                workingInfoRequest.getEmployeeId(),
+                new BigDecimal(workingInfoRequest.getBaseSalary()),
+                new BigDecimal(workingInfoRequest.getFinalSalary()),
+                workingInfoRequest.getStartDate(),
+                false,
+                workingContractId);
           }
           DSL.using(configuration).batch(queries).execute();
         });
@@ -765,6 +772,24 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     return (salaryContractDto.get().getBase_salary().equals(newSalary));
   }
 
+  private Long insertWorkingContract(
+      Configuration configuration, WorkingInfoRequest workingInfoRequest) {
+    return DSL.using(configuration)
+        .insertInto(
+            WORKING_CONTRACT,
+            WORKING_CONTRACT.START_DATE,
+            WORKING_CONTRACT.END_DATE,
+            WORKING_CONTRACT.CONTRACT_STATUS,
+            WORKING_CONTRACT.EMPLOYEE_ID)
+        .values(
+            workingInfoRequest.getStartDate(),
+            workingInfoRequest.getStartDate().plusYears(2),
+            false,
+            workingInfoRequest.getEmployeeId())
+        .returningResult(WORKING_CONTRACT.WORKING_CONTRACT_ID)
+        .fetchOneInto(Long.class);
+  }
+
   private Update<?> updateWorkingPlace(
       Configuration configuration, WorkingInfoRequest workingInfoRequest) {
     return DSL.using(configuration)
@@ -780,11 +805,11 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
 
   private Insert<?> insertWorkingPlace(
       Configuration configuration, WorkingInfoRequest workingInfoRequest) {
-    DSL.using(configuration)
-        .update(WORKING_PLACE)
-        .set(WORKING_PLACE.WORKING_PLACE_STATUS, false)
-        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(workingInfoRequest.getWorkingPlaceId()))
-        .execute();
+    //    DSL.using(configuration)
+    //        .update(WORKING_PLACE)
+    //        .set(WORKING_PLACE.WORKING_PLACE_STATUS, false)
+    //        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(workingInfoRequest.getWorkingPlaceId()))
+    //        .execute();
     return DSL.using(configuration)
         .insertInto(
             WORKING_PLACE,
@@ -801,7 +826,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
             workingInfoRequest.getPosition(),
             workingInfoRequest.getOffice(),
             workingInfoRequest.getGrade(),
-            true,
+            false,
             workingInfoRequest.getStartDate());
   }
 

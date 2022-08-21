@@ -12,9 +12,18 @@ public interface SalaryContractRepositoryCustom {
   void insertNewSalaryContractByIncreaseSalary(
       String employeeId, BigDecimal newSalary, LocalDate startDate, boolean status);
 
-	void updateSalaryContract(String employeeId, BigDecimal newSalary, LocalDate startDate, boolean status);
-	
-	Optional<SalaryContractDto> getSalaryContractByEmployeeId(String employeeId);
+  void insertSalaryContract(
+      String employeeId,
+      BigDecimal baseSalary,
+      BigDecimal finalSalary,
+      LocalDate startDate,
+      boolean status,
+      Long workingContractId);
+
+  void updateSalaryContract(
+      String employeeId, BigDecimal newSalary, LocalDate startDate, boolean status);
+
+  Optional<SalaryContractDto> getSalaryContractByEmployeeId(String employeeId);
 
   void updateStatusSalaryContract(Boolean status, LocalDate dateCheck);
 }
