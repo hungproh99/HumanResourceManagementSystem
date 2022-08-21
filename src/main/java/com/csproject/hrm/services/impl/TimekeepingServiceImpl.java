@@ -117,9 +117,10 @@ public class TimekeepingServiceImpl implements TimekeepingService {
             String status = null;
             for (int i = 0; i < timekeepingResponse.getTimekeeping_status().size(); i++) {
               if (i == timekeepingResponse.getTimekeeping_status().size() - 1) {
-                status += status;
+                status += timekeepingResponse.getTimekeeping_status().get(i);
+              } else {
+                status += timekeepingResponse.getTimekeeping_status().get(i) + ", ";
               }
-              status += status + ", ";
             }
             csvPrinter.printRecord(
                 timekeepingResponseList.getFull_name(),
