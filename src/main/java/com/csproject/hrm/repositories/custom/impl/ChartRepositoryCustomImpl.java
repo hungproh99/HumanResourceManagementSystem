@@ -31,7 +31,6 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
   @Override
   public String getAreaNameByEmployeeID(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
-    System.out.println();
     return dslContext
         .select(AREA.NAME)
         .from(EMPLOYEE)
@@ -281,6 +280,7 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
         .select(WORKING_CONTRACT.START_DATE)
         .from(WORKING_CONTRACT)
         .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeID))
+        .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
         .fetchOneInto(LocalDate.class);
   }
 }

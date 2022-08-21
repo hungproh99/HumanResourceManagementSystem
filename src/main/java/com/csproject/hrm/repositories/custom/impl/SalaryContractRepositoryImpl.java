@@ -5,9 +5,7 @@ import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.repositories.custom.SalaryContractRepositoryCustom;
 import lombok.AllArgsConstructor;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Query;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -67,6 +65,37 @@ public class SalaryContractRepositoryImpl implements SalaryContractRepositoryCus
                 SALARY_CONTRACT.START_DATE)
             .values(newSalary.subtract(oldBaseSalary), status, workingContractId, startDate)
             .execute();
+  }
+
+  @Override
+  public void insertSalaryContract(String employeeId, BigDecimal baseSalary, BigDecimal finalSalary,
+                                   LocalDate startDate, boolean status, Long workingContractId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    final var oldBaseSalary =
+        dslContext
+            .select(SALARY_CONTRACT.BASE_SALARY)
+            .from(SALARY_CONTRACT)
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+            .where(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .fetchOneInto(BigDecimal.class);
+
+    dslContext
+        .insertInto(
+            SALARY_CONTRACT,
+            SALARY_CONTRACT.ADDITIONAL_SALARY,
+            SALARY_CONTRACT.BASE_SALARY,
+            SALARY_CONTRACT.SALARY_CONTRACT_STATUS,
+            SALARY_CONTRACT.WORKING_CONTRACT_ID,
+            SALARY_CONTRACT.START_DATE)
+        .values(
+            finalSalary.subtract(oldBaseSalary), baseSalary, status, workingContractId, startDate)
+        .execute();
   }
 
   @Override

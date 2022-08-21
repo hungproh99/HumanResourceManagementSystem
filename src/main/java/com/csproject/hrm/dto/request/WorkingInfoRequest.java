@@ -3,10 +3,9 @@ package com.csproject.hrm.dto.request;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-
-import static com.csproject.hrm.common.constant.Constants.NUMERIC_VALIDATION;
 
 @Data
 @AllArgsConstructor
@@ -16,11 +15,9 @@ public class WorkingInfoRequest {
   private String employeeId;
 
   @NotBlank(message = "Base Salary must not be blank!")
-  @Pattern(regexp = NUMERIC_VALIDATION, message = "Base Salary accept numeric only!")
   private String baseSalary;
 
   @NotBlank(message = "Final Salary must not be blank!")
-  @Pattern(regexp = NUMERIC_VALIDATION, message = "Final Salary accept numeric only!")
   private String finalSalary;
 
   @Positive(message = "Office must be a positive number!")
