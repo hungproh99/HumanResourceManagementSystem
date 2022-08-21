@@ -311,11 +311,11 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   public List<SalaryMonthlyResponse> getListPersonalSalaryMonthlyToExport(
       QueryParam queryParam, List<Long> list, String employeeId) {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
-    Condition condition = DSL.noCondition();
-    condition =
-        condition
+    conditions.add(
+        DSL.noCondition()
             .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId))
-            .and(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name()));
+            .and(SALARY_STATUS.NAME.eq(ESalaryMonthly.APPROVED.name())));
+    Condition condition = DSL.noCondition();
     for (Long salaryMonthId : list) {
       condition = condition.or(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthId));
     }

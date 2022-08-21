@@ -199,7 +199,7 @@ public class SalaryMonthlyController {
   @DeleteMapping(value = URI_DELETE_DEDUCTION_SALARY)
   @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> deleteDeductionSalary(
-      @Positive(message = "deductionId must be a positive number!") @RequestParam
+      @Positive(message = "Deduction Id must be a positive number!") @RequestParam
           Long deductionId) {
     salaryMonthlyService.deleteDeductionSalary(deductionId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
@@ -216,7 +216,7 @@ public class SalaryMonthlyController {
   @DeleteMapping(value = URI_DELETE_BONUS_SALARY)
   @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> deleteBonusSalary(
-      @Positive(message = "bonusId must be a positive number!") @RequestParam Long bonusId) {
+      @Positive(message = "Bonus Id must be a positive number!") @RequestParam Long bonusId) {
     salaryMonthlyService.deleteBonusSalary(bonusId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -232,7 +232,7 @@ public class SalaryMonthlyController {
   @DeleteMapping(value = URI_DELETE_ADVANCE_SALARY)
   @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> deleteAdvanceSalary(
-      @Positive(message = "advanceId must be a positive number!") @RequestParam Long advanceId) {
+      @Positive(message = "Advance Id must be a positive number!") @RequestParam Long advanceId) {
     salaryMonthlyService.deleteAdvanceSalary(advanceId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }

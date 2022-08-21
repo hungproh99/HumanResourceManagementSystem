@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ExcelExportEmployee {
@@ -61,6 +64,8 @@ public class ExcelExportEmployee {
     } else if (value instanceof Date) {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
       cell.setCellValue(simpleDateFormat.format(value));
+    } else if (value instanceof LocalTime) {
+      cell.setCellValue(((LocalDate) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     } else {
       cell.setCellValue((String) value);
     }

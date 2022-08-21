@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ExcelExportTimekeeping {
@@ -64,7 +65,7 @@ public class ExcelExportTimekeeping {
     } else if (value instanceof LocalDate) {
       cell.setCellValue((LocalDate) value);
     } else if (value instanceof LocalTime) {
-      cell.setCellValue(LocalDateTime.from((LocalTime) value));
+      cell.setCellValue(((LocalDate) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     } else {
       cell.setCellValue((String) value);
     }

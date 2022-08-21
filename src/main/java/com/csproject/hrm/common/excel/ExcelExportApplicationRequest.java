@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ExcelExportApplicationRequest {
@@ -28,7 +29,7 @@ public class ExcelExportApplicationRequest {
   }
 
   private void writeHeaderLine() {
-    sheet = workbook.createSheet("Employee");
+    sheet = workbook.createSheet("Request");
 
     Row row = sheet.createRow(0);
 
@@ -62,7 +63,7 @@ public class ExcelExportApplicationRequest {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
       cell.setCellValue(simpleDateFormat.format(value));
     } else if (value instanceof LocalDateTime) {
-      cell.setCellValue((LocalDateTime) value);
+      cell.setCellValue(((LocalDateTime) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     } else {
       cell.setCellValue((String) value);
     }

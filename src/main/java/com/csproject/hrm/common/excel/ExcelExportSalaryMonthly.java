@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ExcelExportSalaryMonthly {
@@ -28,7 +29,7 @@ public class ExcelExportSalaryMonthly {
   }
 
   private void writeHeaderLine() {
-    sheet = workbook.createSheet("Employee");
+    sheet = workbook.createSheet("Salary");
 
     Row row = sheet.createRow(0);
 
@@ -70,7 +71,7 @@ public class ExcelExportSalaryMonthly {
     } else if (value instanceof BigDecimal) {
       cell.setCellValue(new BigDecimal(value.toString()).doubleValue());
     } else if (value instanceof LocalDate) {
-      cell.setCellValue((LocalDate) value);
+      cell.setCellValue(((LocalDate) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     } else {
       cell.setCellValue((String) value);
     }
