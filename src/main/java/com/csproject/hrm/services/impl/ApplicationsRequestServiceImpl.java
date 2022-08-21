@@ -1175,7 +1175,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
       employeeName + " - " + employeeId,
       currentTitle,
       currentArea,
-      type,
+      typeName,
       String.valueOf(value),
       String.valueOf(startDate),
       employee
@@ -1188,7 +1188,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               employeeName + " - " + employeeId,
               currentTitle,
               currentArea,
-              typeName,
+              type,
               String.valueOf(value),
               String.valueOf(startDate),
               employee
