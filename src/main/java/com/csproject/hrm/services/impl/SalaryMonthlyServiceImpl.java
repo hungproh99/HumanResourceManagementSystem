@@ -428,11 +428,17 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
         deductionSalaryRequest.getDeductionSalaryId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "deductionSalaryId \"" + deductionSalaryRequest.getDeductionSalaryId() + "\" not exist");
+          "Deduction Salary Id \""
+              + deductionSalaryRequest.getDeductionSalaryId()
+              + "\" not exist");
     } else if (!deductionTypeRepository.existsById(deductionSalaryRequest.getDeductionTypeId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "deductionTypeId \"" + deductionSalaryRequest.getDeductionTypeId() + "\" not exist");
+          "Deduction Type Id \"" + deductionSalaryRequest.getDeductionTypeId() + "\" not exist");
+    } else if (deductionSalaryRequest.getValue() == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Value must be not null");
+    } else if (deductionSalaryRequest.getValue().compareTo(BigDecimal.ZERO) < 0) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Value must be positive");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         deductionSalaryRepository.getSalaryMonthlyInfoByDeductionSalary(
@@ -470,11 +476,15 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     if (!bonusSalaryRepository.checkExistBonusSalary(bonusSalaryRequest.getBonusSalaryId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "bonusSalaryId \"" + bonusSalaryRequest.getBonusSalaryId() + "\" not exist");
+          "Bonus Salary Id \"" + bonusSalaryRequest.getBonusSalaryId() + "\" not exist");
     } else if (!bonusTypeRepository.existsById(bonusSalaryRequest.getBonusTypeId())) {
       throw new CustomErrorException(
           HttpStatus.BAD_REQUEST,
-          "bonusTypeId \"" + bonusSalaryRequest.getBonusTypeId() + "\" not exist");
+          "Bonus Type Id \"" + bonusSalaryRequest.getBonusTypeId() + "\" not exist");
+    } else if (bonusSalaryRequest.getValue() == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Value must be not null");
+    } else if (bonusSalaryRequest.getValue().compareTo(BigDecimal.ZERO) < 0) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Value must be positive");
     }
     Optional<SalaryMonthlyInfoDto> salaryMonthlyInfoDto =
         bonusSalaryRepository.getSalaryMonthlyInfoByBonusSalary(

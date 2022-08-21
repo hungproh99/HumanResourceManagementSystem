@@ -76,9 +76,7 @@ public class HrmRequest {
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate endDate;
 
-  @Positive(message = "Base Salary must be a positive number!")
   private BigDecimal baseSalary;
 
-  @Positive(message = "Salary must be a positive number!")
   private BigDecimal salary;
 }

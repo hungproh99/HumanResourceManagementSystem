@@ -16,7 +16,6 @@ public class BonusSalaryRequest {
   @Positive(message = "Bonus Salary Id must be a positive number!")
   private Long bonusSalaryId;
 
-  @Positive(message = "Value must be a positive number!")
   private BigDecimal value;
 
   private String description;

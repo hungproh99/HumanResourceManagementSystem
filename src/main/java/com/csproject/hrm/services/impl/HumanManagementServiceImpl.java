@@ -87,6 +87,14 @@ public class HumanManagementServiceImpl implements HumanManagementService {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not after Start Date");
     } else if (hrmRequest.getEndDate().isBefore(LocalDate.now())) {
       throw new CustomErrorException(HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+    } else if (hrmRequest.getSalary() == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Salary must be not null");
+    } else if (hrmRequest.getBaseSalary() == null) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must be not null");
+    } else if (hrmRequest.getSalary().compareTo(BigDecimal.ZERO) < 0) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Salary must be positive");
+    } else if (hrmRequest.getBaseSalary().compareTo(BigDecimal.ZERO) < 0) {
+      throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must be positive");
     } else if (hrmRequest
             .getBaseSalary()
             .compareTo(BigDecimal.valueOf(Double.parseDouble("5000000")))
@@ -302,6 +310,14 @@ public class HumanManagementServiceImpl implements HumanManagementService {
           } else if (endDate.isBefore(LocalDate.now())) {
             throw new CustomErrorException(
                 HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+          } else if (salary == null) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Salary must be not null");
+          } else if (baseSalary == null) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must be not null");
+          } else if (salary.compareTo(BigDecimal.ZERO) < 0) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Salary must be positive");
+          } else if (baseSalary.compareTo(BigDecimal.ZERO) < 0) {
+            throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must be positive");
           } else if (baseSalary.compareTo(BigDecimal.valueOf(Double.parseDouble("5000000"))) < 0) {
             throw new CustomErrorException(
                 HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
@@ -461,6 +477,14 @@ public class HumanManagementServiceImpl implements HumanManagementService {
         } else if (endDate.isBefore(LocalDate.now())) {
           throw new CustomErrorException(
               HttpStatus.BAD_REQUEST, "End Date not before Current Date");
+        } else if (salary == null) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Salary must be not null");
+        } else if (baseSalary == null) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must be not null");
+        } else if (salary.compareTo(BigDecimal.ZERO) < 0) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Salary must be positive");
+        } else if (baseSalary.compareTo(BigDecimal.ZERO) < 0) {
+          throw new CustomErrorException(HttpStatus.BAD_REQUEST, "Base Salary must be positive");
         } else if (baseSalary.compareTo(BigDecimal.valueOf(Double.parseDouble("5000000"))) < 0) {
           throw new CustomErrorException(
               HttpStatus.BAD_REQUEST, "Base Salary must greater than 5000000 VND");
