@@ -742,7 +742,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
                 workingInfoRequest.getWorkingContractId());
           } else {
             Long workingContractId = insertWorkingContract(configuration, workingInfoRequest);
-            workingInfoRequest.setWorkingPlaceId(workingContractId);
+            workingInfoRequest.setWorkingContractId(workingContractId);
             workingInfoRequest.setStartDate(
                 Instant.now().atZone(ZoneId.of("UTC+07")).toLocalDate());
             queries.add(insertWorkingPlace(configuration, workingInfoRequest));
