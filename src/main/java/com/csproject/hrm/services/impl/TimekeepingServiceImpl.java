@@ -114,12 +114,15 @@ public class TimekeepingServiceImpl implements TimekeepingService {
         for (TimekeepingResponses timekeepingResponseList : timekeepingResponses) {
           for (TimekeepingResponse timekeepingResponse :
               timekeepingResponseList.getTimekeepingResponses()) {
-            String status = null;
+            String status = "";
             for (int i = 0; i < timekeepingResponse.getTimekeeping_status().size(); i++) {
               if (i == timekeepingResponse.getTimekeeping_status().size() - 1) {
-                status += timekeepingResponse.getTimekeeping_status().get(i);
+                status +=
+                    timekeepingResponse.getTimekeeping_status().get(i).getTimekeeping_status();
               } else {
-                status += timekeepingResponse.getTimekeeping_status().get(i) + ", ";
+                status +=
+                    timekeepingResponse.getTimekeeping_status().get(i).getTimekeeping_status()
+                        + ", ";
               }
             }
             csvPrinter.printRecord(
