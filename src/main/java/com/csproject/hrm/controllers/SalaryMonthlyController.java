@@ -121,7 +121,8 @@ public class SalaryMonthlyController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+        "Content-Disposition",
+        "attachment; filename=Salary_Monthly_" + timestamp.getTime() + ".xlsx");
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
@@ -174,7 +175,8 @@ public class SalaryMonthlyController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+        "Content-Disposition",
+        "attachment; filename=Salary_Monthly_" + timestamp.getTime() + ".xlsx");
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);

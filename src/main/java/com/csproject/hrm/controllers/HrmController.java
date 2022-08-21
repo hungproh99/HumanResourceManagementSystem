@@ -183,7 +183,7 @@ public class HrmController {
     servletResponse.setContentType("text/csv; charset=UTF-8");
     servletResponse.addHeader(
         "Content-Disposition",
-        "attachment; filename=\"employees_" + timestamp.getTime() + ".csv\"");
+        "attachment; filename=\"Employees_" + timestamp.getTime() + ".csv\"");
     humanManagementService.exportEmployeeToCsv(servletResponse.getWriter(), listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
@@ -195,7 +195,7 @@ public class HrmController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+        "Content-Disposition", "attachment; filename=Employees_" + timestamp.getTime() + ".xlsx");
     humanManagementService.exportEmployeeToExcel(servletResponse, listId);
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
