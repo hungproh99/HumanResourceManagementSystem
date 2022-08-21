@@ -1,6 +1,9 @@
 package com.csproject.hrm.controllers;
 
-import com.csproject.hrm.dto.request.*;
+import com.csproject.hrm.dto.request.ApplicationsRequestCreateRequest;
+import com.csproject.hrm.dto.request.ApplicationsRequestRequest;
+import com.csproject.hrm.dto.request.RejectApplicationRequestRequest;
+import com.csproject.hrm.dto.request.UpdateApplicationRequestRequest;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.exception.errors.ErrorResponse;
 import com.csproject.hrm.jooq.Context;
@@ -194,7 +197,8 @@ public class ApplicationsRequestController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+        "Content-Disposition",
+        "attachment; filename=Application_Request_" + timestamp.getTime() + ".xlsx");
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);
@@ -245,7 +249,8 @@ public class ApplicationsRequestController {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     servletResponse.setContentType("application/octet-stream");
     servletResponse.addHeader(
-        "Content-Disposition", "attachment; filename=employees_" + timestamp.getTime() + ".xlsx");
+        "Content-Disposition",
+        "attachment; filename=Application_Request_" + timestamp.getTime() + ".xlsx");
     String headerAuth = request.getHeader(AUTHORIZATION);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(BEARER)) {
       String jwt = headerAuth.substring(7);

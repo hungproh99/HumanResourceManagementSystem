@@ -16,8 +16,8 @@ import static com.csproject.hrm.common.constant.Constants.PASSWORD_VALIDATION;
 @NoArgsConstructor
 @Builder
 public class LoginRequest {
-  @NotBlank(message = "email must not be blank!")
-  @Pattern(regexp = EMAIL_VALIDATION, message = "email is not valid!")
+  @NotBlank(message = "Email must not be blank!")
+  @Pattern(regexp = EMAIL_VALIDATION, message = "Email is not valid!")
   private String email;
 
   @NotBlank(message = "password must not be blank!")

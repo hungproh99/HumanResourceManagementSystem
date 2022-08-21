@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,7 +16,6 @@ public class DeductionSalaryRequest {
   @Positive(message = "Deduction Salary Id must be a positive number!")
   private Long deductionSalaryId;
 
-  @Positive(message = "Value must be a positive number!")
   private BigDecimal value;
 
   private String description;
