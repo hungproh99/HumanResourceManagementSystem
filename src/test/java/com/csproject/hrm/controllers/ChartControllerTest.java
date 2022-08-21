@@ -57,13 +57,13 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetGeneralEmployeeDataForChart_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetGeneralEmployeeDataForChart_Manager_Normal() throws Exception {
     String employeeId = "huynq100";
     String areaName = chartService.getAreaNameByEmployeeID(employeeId);
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     GeneralDataCharts response = ChartDataSample.GENERAL_DATA_CHARTS;
 
@@ -88,11 +88,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetOrganizational_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetOrganizational_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     OrganizationalChart response = ChartDataSample.ORGANIZATIONAL_CHART;
 
@@ -117,13 +117,13 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetLeaveCompanyReason_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetLeaveCompanyReason_Manager_Normal() throws Exception {
     String employeeId = "huynq100";
     String areaName = chartService.getAreaNameByEmployeeID(employeeId);
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<LeaveCompanyChart> response = ChartDataSample.LEAVE_COMPANY_CHARTS;
 
@@ -148,11 +148,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetPaidLeaveReason_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetPaidLeaveReason_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<PaidLeaveChart> response = ChartDataSample.PAID_LEAVE_CHARTS;
 
@@ -180,11 +180,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetSalaryStructure_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetSalaryStructure_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<GeneralSalaryChart> response = ChartDataSample.SALARY_STRUCTURE;
 
@@ -212,11 +212,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetSalaryStructure_Admin_EmployeeIDIsEmpty() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetSalaryStructure_Manager_EmployeeIDIsEmpty() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<GeneralSalaryChart> response = ChartDataSample.SALARY_STRUCTURE;
 
@@ -243,11 +243,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetSalaryHistory_Yearly_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetSalaryHistory_Yearly_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<GeneralSalaryChart> response = ChartDataSample.SALARY_HISTORY_YEARLY;
 
@@ -275,11 +275,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetSalaryHistory_Yearly_Admin_EmployeeIDIsEmpty() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetSalaryHistory_Yearly_Manager_EmployeeIDIsEmpty() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<GeneralSalaryChart> response = ChartDataSample.SALARY_HISTORY_YEARLY;
 
@@ -307,11 +307,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetSalaryHistory_Monthly_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetSalaryHistory_Monthly_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<GeneralSalaryChart> response = ChartDataSample.SALARY_HISTORY_MONTHLY;
 
@@ -340,11 +340,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetAllEmployeeByManagerID_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetAllEmployeeByManagerID_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<EmployeeNameAndID> response = ChartDataSample.EMPLOYEE_NAME_AND_IDS;
 
@@ -369,11 +369,11 @@ public class ChartControllerTest {
 
   @Test
   @WithMockUser(
-      value = "admin",
-      roles = {"ADMIN"})
-  void testGetAllHoliday_Admin_Normal() throws Exception {
+      value = "manager",
+      roles = {"MANAGER"})
+  void testGetAllHoliday_Manager_Normal() throws Exception {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.isUserInRole("ADMIN")).thenReturn(true);
+    when(request.isUserInRole("MANAGER")).thenReturn(true);
 
     List<LocalDate> response = ChartDataSample.DATE_LIST;
 
