@@ -867,7 +867,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               }
             case 4:
               {
-                checkLevelAndValueToApprove(applicationsRequest, "salary");
+                //                checkLevelAndValueToApprove(applicationsRequest, "salary");
                 applicationsRequest =
                     createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
@@ -948,14 +948,14 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             String msg = "";
             if ("salary".equalsIgnoreCase(entry.getKey())) {
               msg = "Salary Increment";
-              throw new CustomErrorException(
-                  HttpStatus.BAD_REQUEST,
-                  "You don't have permission to create "
-                      + msg
-                      + " "
-                      + "request have value larger than "
-                      + rangePolicy.getValue()
-                      + ".");
+              //              throw new CustomErrorException(
+              //                  HttpStatus.BAD_REQUEST,
+              //                  "You don't have permission to create "
+              //                      + msg
+              //                      + " "
+              //                      + "request have value larger than "
+              //                      + rangePolicy.getValue()
+              //                      + ".");
             } else {
               msg = "Bonus";
               if (Long.valueOf(value).compareTo(Long.valueOf(rangePolicy.getValue())) > 0) {
