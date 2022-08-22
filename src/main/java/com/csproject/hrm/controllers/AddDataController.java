@@ -41,10 +41,10 @@ public class AddDataController {
   @GetMapping("/add_data_timekeeping")
   public ResponseEntity<?> getListApplicationsRequestReceive() {
     List<TimeKeepingDataDto> employeeIdList = new ArrayList<>();
-    employeeIdList.add(new TimeKeepingDataDto("MaiNN2", 1));
+    employeeIdList.add(new TimeKeepingDataDto("QuangNM1", 1));
 
-    LocalDate startDate = LocalDate.parse("2022-08-01");
-    LocalDate endDate = LocalDate.parse("2022-08-19");
+    LocalDate startDate = LocalDate.parse("2022-04-01");
+    LocalDate endDate = LocalDate.parse("2022-04-30");
     List<LocalDate> getListHoliday = salaryCalculator.getAllHolidayByRange(startDate, endDate);
     List<LocalDate> getListWeekend = salaryCalculator.getAllWeekendByRange(startDate, endDate);
     List<LocalDate> addList =

@@ -5,7 +5,9 @@ import com.csproject.hrm.jooq.DBConnection;
 import com.csproject.hrm.jooq.JooqHelper;
 import com.csproject.hrm.repositories.custom.SalaryContractRepositoryCustom;
 import lombok.AllArgsConstructor;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Query;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -173,18 +175,20 @@ public class SalaryContractRepositoryImpl implements SalaryContractRepositoryCus
                         .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
                         .fetchOneInto(Long.class);
 
-                dslContext
-                    .update(SALARY_CONTRACT)
-                    .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, false)
-                    .where(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(workingContractId))
-                    .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
-                    .execute();
-
-                queries.add(
+                final var updateOldSalaryContract =
                     dslContext
                         .update(SALARY_CONTRACT)
-                        .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, status)
-                        .where(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(salaryContractId)));
+                        .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, false)
+                        .where(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(workingContractId))
+                        .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+                        .execute();
+
+                final var updateNewSalaryContract =
+                    queries.add(
+                        dslContext
+                            .update(SALARY_CONTRACT)
+                            .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, status)
+                            .where(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(salaryContractId)));
               });
         });
     dslContext.batch(queries).execute();

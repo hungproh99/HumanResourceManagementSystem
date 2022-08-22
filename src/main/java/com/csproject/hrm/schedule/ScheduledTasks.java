@@ -48,6 +48,7 @@ public class ScheduledTasks {
   public void updateSalaryContractPerMonth() {
     LocalDate currentDate = LocalDate.now();
     salaryContractService.updateStatusSalaryContract(true, currentDate);
+    salaryContractService.updateStatusWorkingContract(true, currentDate);
   }
 
   @Scheduled(cron = "0 00 07 ? * * ")
