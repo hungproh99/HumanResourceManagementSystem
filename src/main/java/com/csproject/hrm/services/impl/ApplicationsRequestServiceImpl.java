@@ -867,7 +867,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
               }
             case 4:
               {
-                //                checkLevelAndValueToApprove(applicationsRequest, "salary");
+                checkLevelAndValueToApprove(applicationsRequest, "salary");
                 applicationsRequest =
                     createRequestForNominationAndSalaryIncreaseOrBonus(applicationsRequest);
                 break;
@@ -948,14 +948,30 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             String msg = "";
             if ("salary".equalsIgnoreCase(entry.getKey())) {
               msg = "Salary Increment";
-              //              throw new CustomErrorException(
-              //                  HttpStatus.BAD_REQUEST,
-              //                  "You don't have permission to create "
-              //                      + msg
-              //                      + " "
-              //                      + "request have value larger than "
-              //                      + rangePolicy.getValue()
-              //                      + ".");
+              Long currSalary =
+                  Long.valueOf(
+                      Objects.requireNonNullElse(
+                              employeeDetailRepository
+                                  .findWorkingInfo(applicationsRequest.getEmployeeId())
+                                  .getFinal_salary(),
+                              "0")
+                          .split("\\.")[0]);
+              Long newSalary = Long.parseLong(value);
+              if (newSalary <= currSalary) {
+                throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST, "New salary must be greater than the current salary!");
+              }
+              Long upSalary = newSalary - currSalary;
+              if (upSalary.compareTo(Long.valueOf(rangePolicy.getValue())) > 0) {
+                throw new CustomErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    "You don't have permission to create "
+                        + msg
+                        + " "
+                        + "request have value greater than "
+                        + rangePolicy.getValue()
+                        + ".");
+              }
             } else {
               msg = "Bonus";
               if (Long.valueOf(value).compareTo(Long.valueOf(rangePolicy.getValue())) > 0) {
@@ -964,7 +980,7 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
                     "You don't have permission to create "
                         + msg
                         + " "
-                        + "request have value larger than "
+                        + "request have value greater than "
                         + rangePolicy.getValue()
                         + ".");
               }
@@ -1153,7 +1169,8 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
     if (applicationsRequest.getRequestNameId().intValue() == 4) {
       BigDecimal currSalary = workingContractRepository.getBaseSalaryByEmployeeID(employeeId);
       if (value.compareTo(currSalary) < 0) {
-        throw new CustomErrorException("Increase salary must larger current salary!");
+        throw new CustomErrorException(
+            HttpStatus.BAD_REQUEST, "Increase salary must larger current salary!");
       }
     }
 
