@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,4 +20,5 @@ public class HrmPojo extends HrmRequest {
   private boolean contractStatus;
   private boolean placeStatus;
   private int level;
+  private LocalDateTime createDate;
 }

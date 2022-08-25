@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,6 +51,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
     List<Condition> conditions = queryHelper.queryFilters(queryParam, field2Map);
     conditions.add(EMPLOYEE.EMPLOYEE_ID.ne(employeeId));
     List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(EMPLOYEE.CREATE_DATE.desc());
     sortFields.add(WORKING_CONTRACT.START_DATE.desc());
     sortFields.add(EMPLOYEE.EMPLOYEE_ID.asc());
 
@@ -87,7 +89,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                   hrmPojo.getManagerId(),
                   hrmPojo.getEmployeeType(),
                   hrmPojo.getPersonalEmail(),
-                  hrmPojo.getLevel())
+                  hrmPojo.getLevel(),
+                  hrmPojo.getCreateDate())
               .execute();
           queries.add(
               insertWorkingContractAndWorkingPlaceRecord(
@@ -134,7 +137,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
                         hrmPojo.getManagerId(),
                         hrmPojo.getEmployeeType(),
                         hrmPojo.getPersonalEmail(),
-                        hrmPojo.getLevel())
+                        hrmPojo.getLevel(),
+                        hrmPojo.getCreateDate())
                     .execute();
                 queries.add(
                     insertWorkingContractAndWorkingPlaceRecord(
@@ -397,7 +401,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
       String managerId,
       Long employeeType,
       String personalEmail,
-      int level) {
+      int level,
+      LocalDateTime createDate) {
     return DSL.using(config)
         .insertInto(
             EMPLOYEE,
@@ -414,7 +419,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             EMPLOYEE.MANAGER_ID,
             EMPLOYEE.EMPLOYEE_TYPE_ID,
             EMPLOYEE.PERSONAL_EMAIL,
-            EMPLOYEE.LEVEL)
+            EMPLOYEE.LEVEL,
+            EMPLOYEE.CREATE_DATE)
         .values(
             employeeId,
             companyEmail,
@@ -429,7 +435,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
             managerId,
             employeeType,
             personalEmail,
-            level);
+            level,
+            createDate);
   }
 
   private Insert<?> insertWorkingContractAndWorkingPlaceRecord(

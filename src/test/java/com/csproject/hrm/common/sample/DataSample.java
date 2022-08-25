@@ -437,7 +437,8 @@ public class DataSample {
           "HRM",
           true,
           true,
-          1);
+          1,
+          LocalDateTime.now());
 
   public static final List<WorkingTypeDto> LIST_WORKING_TYPE =
       Arrays.asList(

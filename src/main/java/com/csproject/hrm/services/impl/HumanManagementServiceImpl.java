@@ -29,6 +29,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -615,6 +616,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
     if (hrmRequest.getStartDate().isBefore(LocalDate.now())) {
       workStatus = true;
     }
+    LocalDateTime createDate = LocalDateTime.now();
 
     HrmPojo hrmPojo =
         HrmPojo.builder()
@@ -623,6 +625,7 @@ public class HumanManagementServiceImpl implements HumanManagementService {
             .contractStatus(true)
             .placeStatus(true)
             .level(level)
+            .createDate(createDate)
             .companyName(companyName)
             .fullName(hrmRequest.getFullName())
             .role(hrmRequest.getRole())

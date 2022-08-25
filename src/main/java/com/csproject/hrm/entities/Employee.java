@@ -81,8 +81,8 @@ public class Employee {
   @Column(name = "level")
   private int level;
 
-//  @Column(name = "level")
-//  private LocalDateTime createDate;
+  @Column(name = "create_date")
+  private LocalDateTime createDate;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "card_id")
