@@ -176,6 +176,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       if (employeeId.equalsIgnoreCase("admin")) {
         continue;
       }
+      if (salaryMonthlyRepository.checkExistSalaryMonthlyByDate(startDate, endDate, employeeId)) {
+        continue;
+      }
       salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
     }
     salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);

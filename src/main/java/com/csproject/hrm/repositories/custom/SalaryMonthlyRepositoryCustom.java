@@ -55,4 +55,6 @@ public interface SalaryMonthlyRepositoryCustom {
   boolean checkAlreadyApproveOrReject(Long salaryMonthlyId);
 
   void deleteAllReviewSalaryBySalaryId(Long salaryMonthId);
+
+  boolean checkExistSalaryMonthlyByDate(LocalDate startDate, LocalDate endDate, String employeeId);
 }

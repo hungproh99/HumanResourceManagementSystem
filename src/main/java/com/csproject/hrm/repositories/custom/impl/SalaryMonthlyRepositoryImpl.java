@@ -4,7 +4,9 @@ import com.csproject.hrm.common.enums.ESalaryMonthly;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.response.SalaryMonthlyRemindResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.exception.CustomErrorException;
 import com.csproject.hrm.jooq.*;
 import com.csproject.hrm.repositories.custom.SalaryMonthlyRepositoryCustom;
@@ -364,8 +366,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
       condition = condition.or(SALARY_MONTHLY.SALARY_ID.eq(salaryMonthId));
     }
     conditions.add(condition);
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
     return getAllPersonalSalaryMonthly(conditions, sortFields, queryParam.pagination)
         .fetchInto(SalaryMonthlyResponse.class);
   }
@@ -376,8 +377,7 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     List<Condition> conditions = new ArrayList<>();
     final var mergeFilters =
         queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+    List<OrderField<?>> sortFields = new ArrayList<>();
     LocalDate currDate = LocalDate.now();
     mergeFilters.forEach(
         (key, values) -> {
@@ -481,6 +481,25 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     final DSLContext dslContext = DSL.using(connection.getConnection());
     final var query =
         dslContext.delete(REVIEW_SALARY).where(REVIEW_SALARY.SALARY_ID.eq(salaryMonthId)).execute();
+  }
+
+  @Override
+  public boolean checkExistSalaryMonthlyByDate(
+      LocalDate startDate, LocalDate endDate, String employeeId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext.fetchExists(
+        dslContext
+            .select(SALARY_MONTHLY.SALARY_ID)
+            .from(SALARY_MONTHLY)
+            .leftJoin(SALARY_CONTRACT)
+            .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(SALARY_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+            .where(SALARY_MONTHLY.START_DATE.eq(startDate))
+            .and(SALARY_MONTHLY.END_DATE.eq(endDate))
+            .and(EMPLOYEE.EMPLOYEE_ID.eq(employeeId)));
   }
 
   private Select<?> getListSalaryMonthlyRemind(LocalDate checkDate) {
