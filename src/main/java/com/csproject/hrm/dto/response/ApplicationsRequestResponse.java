@@ -20,7 +20,7 @@ public class ApplicationsRequestResponse {
   private String request_type;
   private String request_name;
   private String description;
-  private String request_status;
+  private String request_status_name;
   private LocalDateTime change_status_time;
   private LocalDateTime duration;
   private String approver;

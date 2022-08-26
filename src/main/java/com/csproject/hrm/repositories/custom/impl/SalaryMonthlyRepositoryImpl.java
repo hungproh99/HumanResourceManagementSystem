@@ -28,6 +28,7 @@ import static org.jooq.codegen.maven.example.tables.SalaryContract.SALARY_CONTRA
 import static org.jooq.codegen.maven.example.tables.SalaryMonthly.SALARY_MONTHLY;
 import static org.jooq.codegen.maven.example.tables.WorkingContract.WORKING_CONTRACT;
 import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.when;
 
 @AllArgsConstructor
 public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCustom {
@@ -70,8 +71,34 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
     List<Condition> conditions = new ArrayList<>();
     final var mergeFilters =
         queryParam.filters.stream().collect(Collectors.groupingBy(filter -> filter.field));
-    List<OrderField<?>> sortFields =
-        queryHelper.queryOrderBy(queryParam, field2Map, EMPLOYEE.EMPLOYEE_ID);
+
+    final List<OrderField<?>> sortFields = new ArrayList<>();
+    sortFields.add(
+        when(
+                SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                    ESalaryMonthly.getValue(ESalaryMonthly.PENDING.name())),
+                1)
+            .when(
+                SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                    ESalaryMonthly.getValue(ESalaryMonthly.APPROVED.name())),
+                2)
+            .when(
+                SALARY_MONTHLY.SALARY_STATUS_ID.eq(
+                    ESalaryMonthly.getValue(ESalaryMonthly.REJECTED.name())),
+                3)
+            .asc());
+
+    for (OrderByClause clause : queryParam.orderByList) {
+      final Field<?> field = field2Map.get(clause.field);
+      if (Objects.isNull(field)) {
+        throw new CustomErrorException(HttpStatus.BAD_REQUEST, ORDER_BY_INVALID);
+      }
+      if (clause.orderBy.equals(OrderBy.ASC)) {
+        sortFields.add(field.asc().nullsLast());
+      } else {
+        sortFields.add(field.desc().nullsLast());
+      }
+    }
 
     LocalDate currDate = LocalDate.now();
     mergeFilters.forEach(
@@ -97,7 +124,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
           }
           conditions.add(condition);
         });
-
+    System.out.println(
+        getAllManagementSalaryMonthly(conditions, sortFields, queryParam.pagination, employeeId));
     List<SalaryMonthlyResponse> salaryMonthlyResponses =
         getAllManagementSalaryMonthly(conditions, sortFields, queryParam.pagination, employeeId)
             .fetchInto(SalaryMonthlyResponse.class);
@@ -296,13 +324,29 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
   @Override
   public void updateRejectSalaryMonthly(RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var managerId =
+        dslContext
+            .select(EMPLOYEE.MANAGER_ID)
+            .from(EMPLOYEE)
+            .leftJoin(WORKING_CONTRACT)
+            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(SALARY_CONTRACT)
+            .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(SALARY_MONTHLY)
+            .on(SALARY_MONTHLY.SALARY_CONTRACT_ID.eq(SALARY_CONTRACT.SALARY_CONTRACT_ID))
+            .where(SALARY_MONTHLY.SALARY_ID.eq(rejectSalaryMonthlyRequest.getSalaryMonthlyId()))
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isTrue())
+            .fetchOneInto(String.class);
+
     final var query =
         dslContext
             .update(SALARY_MONTHLY)
             .set(
                 SALARY_MONTHLY.SALARY_STATUS_ID,
-                ESalaryMonthly.getValue(ESalaryMonthly.REJECTED.name()))
+                ESalaryMonthly.getValue(ESalaryMonthly.PENDING.name()))
             .set(SALARY_MONTHLY.COMMENT, rejectSalaryMonthlyRequest.getComment())
+            .set(SALARY_MONTHLY.APPROVER, managerId)
             .where(SALARY_MONTHLY.SALARY_ID.eq(rejectSalaryMonthlyRequest.getSalaryMonthlyId()))
             .execute();
   }
@@ -430,6 +474,13 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
                     .or(
                         SALARY_MONTHLY.SALARY_STATUS_ID.eq(
                             ESalaryMonthly.getValue(ESalaryMonthly.APPROVED.name())))));
+  }
+
+  @Override
+  public void deleteAllReviewSalaryBySalaryId(Long salaryMonthId) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    final var query =
+        dslContext.delete(REVIEW_SALARY).where(REVIEW_SALARY.SALARY_ID.eq(salaryMonthId)).execute();
   }
 
   private Select<?> getListSalaryMonthlyRemind(LocalDate checkDate) {
@@ -658,7 +709,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
             SALARY_MONTHLY.START_DATE.as("startDate"),
             SALARY_MONTHLY.END_DATE.as("endDate"),
             SALARY_STATUS.NAME.as("salaryStatus"),
-            SALARY_MONTHLY.COMMENT)
+            SALARY_MONTHLY.COMMENT,
+            SALARY_MONTHLY.SALARY_STATUS_ID)
         .from(SALARY_MONTHLY)
         .leftJoin(SALARY_CONTRACT)
         .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
@@ -674,7 +726,6 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
         .on(SALARY_STATUS.STATUS_ID.eq(SALARY_MONTHLY.SALARY_STATUS_ID))
         .where(conditions)
         .and(SALARY_MONTHLY.APPROVER.eq(employeeId))
-        .orderBy(sortFields)
         .unionAll(
             dslContext
                 .select(
@@ -696,7 +747,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
                     SALARY_MONTHLY.START_DATE.as("startDate"),
                     SALARY_MONTHLY.END_DATE.as("endDate"),
                     SALARY_STATUS.NAME.as("salaryStatus"),
-                    SALARY_MONTHLY.COMMENT)
+                    SALARY_MONTHLY.COMMENT,
+                    SALARY_MONTHLY.SALARY_STATUS_ID)
                 .from(SALARY_MONTHLY)
                 .leftJoin(SALARY_CONTRACT)
                 .on(SALARY_CONTRACT.SALARY_CONTRACT_ID.eq(SALARY_MONTHLY.SALARY_CONTRACT_ID))
@@ -715,8 +767,8 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
                 .leftJoin(selectReview)
                 .on(selectReview.field(REVIEW_SALARY.SALARY_ID).eq(SALARY_MONTHLY.SALARY_ID))
                 .where(conditions)
-                .and(selectReview.field(REVIEW_SALARY.EMPLOYEE_ID).eq(employeeId))
-                .orderBy(sortFields))
+                .and(selectReview.field(REVIEW_SALARY.EMPLOYEE_ID).eq(employeeId)))
+        .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
   }

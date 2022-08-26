@@ -31,11 +31,11 @@ public class ScheduledTasks {
     humanManagementService.updateWorkingStatusForListEmployee(currDate.toLocalDate());
   }
 
-  @Scheduled(cron = "0 50 23 ? * * ")
-  public void scheduleTaskUpdatePointDay() {
-    LocalDate currentDate = LocalDate.now();
-    timekeepingService.upsertPointPerDay(currentDate);
-  }
+//  @Scheduled(cron = "0 50 23 ? * * ")
+//  public void scheduleTaskUpdatePointDay() {
+//    LocalDate currentDate = LocalDate.now();
+//    timekeepingService.upsertPointPerDay(currentDate);
+//  }
 
   @Scheduled(cron = "0 59 23 L * ?")
   public void scheduleTaskCreateSalaryMonthly() {
