@@ -246,6 +246,14 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PutMapping("apply_new_salary")
+  public ResponseEntity<?> applyNewSalary(
+      @Valid @RequestBody WorkingInfoRequest workingInfoRequest) {
+    employeeDetailService.applyNewSalary(workingInfoRequest);
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
+  }
+
   @PreAuthorize(value = "hasRole('ADMIN')")
   @GetMapping("get_role_by_employeeid")
   public ResponseEntity<?> getRole(

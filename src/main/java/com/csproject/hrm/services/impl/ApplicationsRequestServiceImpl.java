@@ -1101,6 +1101,20 @@ public class ApplicationsRequestServiceImpl implements ApplicationsRequestServic
             employeeDetailRepository.getEmployeeInfoByEmployeeID(
                 applicationsRequest.getCreateEmployeeId()));
 
+    Long currSalary =
+        Long.valueOf(
+            Objects.requireNonNullElse(
+                    employeeDetailRepository
+                        .findWorkingInfo(applicationsRequest.getEmployeeId())
+                        .getFinal_salary(),
+                    "0")
+                .split("\\.")[0]);
+    Long advance = Long.parseLong(value);
+    if (advance > currSalary) {
+      throw new CustomErrorException(
+          HttpStatus.BAD_REQUEST, "Advance value must be less than the current salary!");
+    }
+
     String[] valueArray = {approver, value, String.valueOf(date), employee};
 
     return setDescription(setData(applicationsRequest, valueArray), valueArray);

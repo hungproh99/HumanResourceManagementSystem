@@ -14,6 +14,8 @@ public interface WorkingPlaceRepositoryCustom {
 
   List<JobDto> getListPosition();
 
+  WorkingPlaceDto getWorkingPlaceByID(Long workingPlaceID);
+
   List<GradeDto> getListGradeByPosition(Long jodId);
 
   boolean checkExistJobId(Long jodId);

@@ -57,6 +57,24 @@ public class WorkingPlaceRepositoryImpl implements WorkingPlaceRepositoryCustom 
   }
 
   @Override
+  public WorkingPlaceDto getWorkingPlaceByID(Long workingPlaceID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+    return dslContext
+        .select(
+            WORKING_PLACE.WORKING_PLACE_ID,
+            WORKING_PLACE.WORKING_PLACE_STATUS,
+            WORKING_PLACE.WORKING_CONTRACT_ID,
+            WORKING_PLACE.AREA_ID,
+            WORKING_PLACE.GRADE_ID,
+            WORKING_PLACE.JOB_ID,
+            WORKING_PLACE.OFFICE_ID,
+            WORKING_PLACE.START_DATE)
+        .from(WORKING_PLACE)
+        .where(WORKING_PLACE.WORKING_PLACE_ID.eq(workingPlaceID))
+        .fetchOneInto(WorkingPlaceDto.class);
+  }
+
+  @Override
   public List<GradeDto> getListGradeByPosition(Long jodId) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext

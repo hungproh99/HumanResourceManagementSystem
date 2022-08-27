@@ -20,4 +20,5 @@ public class WorkingInfoResponse {
   private String salary_contract_id;
   private String working_contract_id;
   private String working_place_id;
+  private WorkingInfoResponse newWorkingInfo;
 }
