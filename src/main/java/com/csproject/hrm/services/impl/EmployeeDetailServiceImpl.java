@@ -2,7 +2,6 @@ package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
-import com.csproject.hrm.dto.dto.WorkingPlaceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.*;
@@ -276,11 +275,12 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     workingInfo.setEmployee_type(EEmployeeType.getLabel(workingInfo.getEmployee_type()));
 
     WorkingInfoResponse workingInfoNew = employeeDetailRepository.findNewWorkingInfo(employeeID);
-    workingInfoNew.setArea(EArea.getLabel(workingInfoNew.getArea()));
-    workingInfoNew.setOffice(EOffice.getLabel(workingInfoNew.getOffice()));
-    workingInfoNew.setPosition(EJob.getLabel(workingInfoNew.getPosition()));
-    workingInfoNew.setGrade(EGradeType.getLabel(workingInfoNew.getGrade()));
-
+    if (workingInfoNew != null) {
+      workingInfoNew.setArea(EArea.getLabel(workingInfoNew.getArea()));
+      workingInfoNew.setOffice(EOffice.getLabel(workingInfoNew.getOffice()));
+      workingInfoNew.setPosition(EJob.getLabel(workingInfoNew.getPosition()));
+      workingInfoNew.setGrade(EGradeType.getLabel(workingInfoNew.getGrade()));
+    }
     workingInfo.setNewWorkingInfo(workingInfoNew);
 
     return workingInfo;
@@ -299,8 +299,8 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
       throw new CustomParameterConstraintException("Salary Contract ID is require!");
     }
 
-    WorkingPlaceDto workingPlace =
-        workingPlaceRepository.getWorkingPlaceByID(workingInfoRequest.getWorkingPlaceId());
+    //    WorkingPlaceDto workingPlace =
+    //        workingPlaceRepository.getWorkingPlaceByID(workingInfoRequest.getWorkingPlaceId());
 
     //    if (workingPlace.getWorking_place_status()) {
     salaryContractRepository.updateStatusSalaryContract(true, workingInfoRequest.getStartDate());
