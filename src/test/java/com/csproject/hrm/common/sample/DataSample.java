@@ -8,12 +8,8 @@ import com.csproject.hrm.dto.response.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static com.csproject.hrm.common.enums.ERole.ROLE_MANAGER;
 
@@ -65,21 +61,7 @@ public class DataSample {
   public static final TaxAndInsuranceResponse TAX_AND_INSURANCE_RESPONSE =
       new TaxAndInsuranceResponse(null, Arrays.asList());
   public static final WorkingInfoResponse WORKING_INFO_RESPONSE =
-      new WorkingInfoResponse(
-          "12000000.00",
-          "4000000" + ".00",
-          "Hà Nội Office",
-          "Back Office",
-          "IT",
-          "Develop 2",
-          "Full Time",
-          "2020-09-09",
-          "Trainee",
-          "huynq100",
-          "Nguyen Quang Huy",
-          "6",
-          "6",
-          "12");
+      new WorkingInfoResponse();
   public static final EmployeeAdditionalInfo EMPLOYEE_ADDITIONAL_INFO =
       new EmployeeAdditionalInfo(
           null,

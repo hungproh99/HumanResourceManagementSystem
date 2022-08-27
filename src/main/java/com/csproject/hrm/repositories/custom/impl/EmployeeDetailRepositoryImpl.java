@@ -257,7 +257,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         configuration -> {
           queries.add(updateEmployee(configuration, employeeDetailRequest));
           WorkingPlaceDto workingPlace =
-              getWorkingPlaceByContractID(employeeDetailRequest.getWorking_contract_id());
+              getWorkingPlaceByContractID(true, employeeDetailRequest.getWorking_contract_id());
           queries.add(updateWorkingContract(configuration, employeeDetailRequest));
           if (workingPlace.getJob_id().equals(employeeDetailRequest.getJob_id())
               && workingPlace.getArea_id().equals(employeeDetailRequest.getArea_id())
@@ -274,13 +274,14 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
         });
   }
 
-  private WorkingPlaceDto getWorkingPlaceByContractID(Long contractID) {
+  @Override
+  public WorkingPlaceDto getWorkingPlaceByContractID(Boolean status, Long contractID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext
         .select()
         .from(WORKING_PLACE)
         .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(contractID))
-        .and(WORKING_PLACE.WORKING_PLACE_STATUS.isTrue())
+        .and(WORKING_PLACE.WORKING_PLACE_STATUS.eq(status))
         .fetchOneInto(WorkingPlaceDto.class);
   }
 
@@ -617,6 +618,73 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
   }
 
   @Override
+  public WorkingInfoResponse findNewWorkingInfo(String employeeID) {
+    final DSLContext dslContext = DSL.using(connection.getConnection());
+
+    var latestWorkingContractID =
+        dslContext
+            .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
+            .from(WORKING_CONTRACT)
+            .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeID))
+            .orderBy(WORKING_CONTRACT.WORKING_CONTRACT_ID.desc())
+            .limit(1)
+            .offset(0)
+            .fetchOneInto(Long.class);
+    var workingContractStatus =
+        dslContext
+            .select(WORKING_CONTRACT.CONTRACT_STATUS)
+            .from(WORKING_CONTRACT)
+            .where(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(latestWorkingContractID))
+            .fetchOneInto(Boolean.class);
+
+    LocalDate now = LocalDate.now(ZoneId.of("UTC+07"));
+
+    final var query =
+        dslContext
+            .select(
+                (SALARY_CONTRACT.ADDITIONAL_SALARY.add(SALARY_CONTRACT.BASE_SALARY))
+                    .as("final_salary"),
+                SALARY_CONTRACT.BASE_SALARY,
+                OFFICE.NAME.as("office"),
+                AREA.NAME.as("area"),
+                JOB.POSITION,
+                GRADE_TYPE.NAME.as("grade"),
+                SALARY_CONTRACT.START_DATE,
+                SALARY_CONTRACT.SALARY_CONTRACT_ID,
+                WORKING_CONTRACT.WORKING_CONTRACT_ID,
+                WORKING_PLACE.WORKING_PLACE_ID)
+            .from(WORKING_CONTRACT)
+            .leftJoin(EMPLOYEE)
+            .on(EMPLOYEE.EMPLOYEE_ID.eq(WORKING_CONTRACT.EMPLOYEE_ID))
+            .leftJoin(WORKING_PLACE)
+            .on(WORKING_PLACE.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(AREA)
+            .on(AREA.AREA_ID.eq(WORKING_PLACE.AREA_ID))
+            .leftJoin(OFFICE)
+            .on(OFFICE.OFFICE_ID.eq(WORKING_PLACE.OFFICE_ID))
+            .leftJoin(JOB)
+            .on(Tables.JOB.JOB_ID.eq(WORKING_PLACE.JOB_ID))
+            .leftJoin(GRADE_TYPE)
+            .on(Tables.GRADE_TYPE.GRADE_ID.eq(WORKING_PLACE.GRADE_ID))
+            .leftJoin(WORKING_TYPE)
+            .on(WORKING_TYPE.TYPE_ID.eq(EMPLOYEE.WORKING_TYPE_ID))
+            .leftJoin(SALARY_CONTRACT)
+            .on(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(WORKING_CONTRACT.WORKING_CONTRACT_ID))
+            .leftJoin(EMPLOYEE_TYPE)
+            .on(EMPLOYEE_TYPE.TYPE_ID.eq(EMPLOYEE.EMPLOYEE_TYPE_ID))
+            .where(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeID))
+            .and(SALARY_CONTRACT.SALARY_CONTRACT_STATUS.isFalse())
+            .and(WORKING_CONTRACT.CONTRACT_STATUS.eq(workingContractStatus))
+            .and(WORKING_PLACE.WORKING_PLACE_STATUS.eq(workingContractStatus))
+            .and(SALARY_CONTRACT.START_DATE.ge(now))
+            .orderBy(SALARY_CONTRACT.START_DATE.asc())
+            .limit(1)
+            .offset(0);
+
+    return query.fetchOneInto(WorkingInfoResponse.class);
+  }
+
+  @Override
   public boolean checkEmployeeIDIsExists(String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     return dslContext.fetchExists(
@@ -702,7 +770,7 @@ public class EmployeeDetailRepositoryImpl implements EmployeeDetailRepositoryCus
     List<Query> queries = new ArrayList<>();
     final DSLContext dslContext = DSL.using(connection.getConnection());
     WorkingPlaceDto workingPlace =
-        getWorkingPlaceByContractID(workingInfoRequest.getWorkingContractId());
+        getWorkingPlaceByContractID(true, workingInfoRequest.getWorkingContractId());
     dslContext.transaction(
         configuration -> {
           queries.add(

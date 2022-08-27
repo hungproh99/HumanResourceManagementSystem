@@ -2,10 +2,11 @@ package com.csproject.hrm.services.impl;
 
 import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.EmployeeInsuranceDto;
+import com.csproject.hrm.dto.dto.WorkingPlaceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import com.csproject.hrm.exception.*;
-import com.csproject.hrm.repositories.EmployeeDetailRepository;
+import com.csproject.hrm.repositories.*;
 import com.csproject.hrm.services.EmployeeDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,9 @@ import static com.csproject.hrm.common.constant.Constants.*;
 public class EmployeeDetailServiceImpl implements EmployeeDetailService {
 
   @Autowired EmployeeDetailRepository employeeDetailRepository;
+  @Autowired SalaryContractRepository salaryContractRepository;
+  @Autowired WorkingContractRepository workingContractRepository;
+  @Autowired WorkingPlaceRepository workingPlaceRepository;
 
   @Override
   public List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID) {
@@ -159,19 +163,6 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     if (!employeeDetailRequest.getCompany_email().matches(EMAIL_VALIDATION)) {
       throw new CustomParameterConstraintException(INVALID_EMAIL_FORMAT);
     }
-    if (employeeDetailRequest.getFull_name() == null
-        || employeeDetailRequest.getGender() == null
-        || employeeDetailRequest.getBirth_date() == null
-        || employeeDetailRequest.getWorking_status() == null
-        || employeeDetailRequest.getWorking_contract_id() == null
-        || employeeDetailRequest.getStart_date() == null
-        || employeeDetailRequest.getEnd_date() == null
-        || employeeDetailRequest.getArea_id() == null
-        || employeeDetailRequest.getOffice_id() == null
-        || employeeDetailRequest.getJob_id() == null
-        || employeeDetailRequest.getGrade_id() == null) {
-      throw new CustomParameterConstraintException(FILL_NOT_FULL);
-    }
     long yearToCurrent =
         ChronoUnit.YEARS.between(
             LocalDate.now(ZoneId.of("UTC+07")), employeeDetailRequest.getBirth_date());
@@ -283,7 +274,35 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     workingInfo.setWorking_type(EWorkingType.getLabel(workingInfo.getWorking_type()));
     workingInfo.setGrade(EGradeType.getLabel(workingInfo.getGrade()));
     workingInfo.setEmployee_type(EEmployeeType.getLabel(workingInfo.getEmployee_type()));
+
+    WorkingInfoResponse workingInfoNew = employeeDetailRepository.findNewWorkingInfo(employeeID);
+
+    workingInfo.setNewWorkingInfo(workingInfoNew);
+
     return workingInfo;
+  }
+
+  @Override
+  public void applyNewSalary(WorkingInfoRequest workingInfoRequest) {
+
+    if (workingInfoRequest.getStartDate() == null) {
+      throw new CustomParameterConstraintException("Start Date is require!");
+    }
+    if (workingInfoRequest.getWorkingPlaceId() == null) {
+      throw new CustomParameterConstraintException("Working Place ID is require!");
+    }
+    if (workingInfoRequest.getSalaryContractId() == null) {
+      throw new CustomParameterConstraintException("Salary Contract is require!");
+    }
+
+    WorkingPlaceDto workingPlace =
+        workingPlaceRepository.getWorkingPlaceByID(workingInfoRequest.getWorkingPlaceId());
+    if (workingPlace.getWorking_place_status()) {
+      salaryContractRepository.updateStatusSalaryContract(true, workingInfoRequest.getStartDate());
+    } else {
+      workingContractRepository.updateStatusWorking(true, workingInfoRequest.getStartDate());
+      salaryContractRepository.updateStatusSalaryContract(true, workingInfoRequest.getStartDate());
+    }
   }
 
   @Override

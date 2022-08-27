@@ -1,5 +1,6 @@
 package com.csproject.hrm.repositories.custom;
 
+import com.csproject.hrm.dto.dto.WorkingPlaceDto;
 import com.csproject.hrm.dto.request.*;
 import com.csproject.hrm.dto.response.*;
 import org.springframework.stereotype.Repository;
@@ -28,6 +29,8 @@ public interface EmployeeDetailRepositoryCustom {
 
   void updateEmployeeDetail(EmployeeDetailRequest employeeDetailRequest);
 
+  WorkingPlaceDto getWorkingPlaceByContractID(Boolean status, Long contractID);
+
   List<RelativeInformationResponse> findRelativeByEmployeeID(String employeeID);
 
   CareerHistoryResponse findCareerHistoryByEmployeeID(String employeeID);
@@ -43,6 +46,8 @@ public interface EmployeeDetailRepositoryCustom {
   EmployeeDetailResponse findMainDetail(String employeeID);
 
   WorkingInfoResponse findWorkingInfo(String employeeID);
+
+  WorkingInfoResponse findNewWorkingInfo(String employeeID);
 
   boolean checkEmployeeIDIsExists(String employeeID);
 
