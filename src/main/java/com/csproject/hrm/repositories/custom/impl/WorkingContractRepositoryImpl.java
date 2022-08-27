@@ -108,70 +108,8 @@ public class WorkingContractRepositoryImpl implements WorkingContractRepositoryC
                         .update(SALARY_CONTRACT)
                         .set(SALARY_CONTRACT.SALARY_CONTRACT_STATUS, status)
                         .where(SALARY_CONTRACT.WORKING_CONTRACT_ID.eq(newWorkingContract))
-                        .execute();
-              });
-        });
-  }
-
-  @Override
-  public void updateStatusWorking(Boolean status, LocalDate dateCheck) {
-    final DSLContext dslContext = DSL.using(connection.getConnection());
-    List<Long> workingContractIdList =
-        dslContext
-            .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
-            .from(WORKING_CONTRACT)
-            .where(month(WORKING_CONTRACT.START_DATE).eq(dateCheck.getMonth().getValue()))
-            .and(year(WORKING_CONTRACT.START_DATE).eq(dateCheck.getYear()))
-            .and(WORKING_CONTRACT.CONTRACT_STATUS.isFalse())
-            .fetchInto(Long.class);
-
-    dslContext.transaction(
-        configuration -> {
-          workingContractIdList.forEach(
-              newWorkingContract -> {
-                String employeeId =
-                    dslContext
-                        .select(EMPLOYEE.EMPLOYEE_ID)
-                        .from(EMPLOYEE)
-                        .leftJoin(WORKING_CONTRACT)
-                        .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
-                        .where(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(newWorkingContract))
-                        .fetchOneInto(String.class);
-
-                Long oldWorkingContractId =
-                    dslContext
-                        .select(WORKING_CONTRACT.WORKING_CONTRACT_ID)
-                        .from(WORKING_CONTRACT)
-                        .where(WORKING_CONTRACT.CONTRACT_STATUS.isTrue())
-                        .and(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeId))
-                        .fetchOneInto(Long.class);
-
-                final var updateOldWorkingContract =
-                    dslContext
-                        .update(WORKING_CONTRACT)
-                        .set(WORKING_CONTRACT.CONTRACT_STATUS, false)
-                        .where(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(oldWorkingContractId))
-                        .execute();
-
-                final var updateNewWorkingContract =
-                    dslContext
-                        .update(WORKING_CONTRACT)
-                        .set(WORKING_CONTRACT.CONTRACT_STATUS, status)
-                        .where(WORKING_CONTRACT.WORKING_CONTRACT_ID.eq(newWorkingContract))
-                        .execute();
-
-                final var updateOldWorkingPlace =
-                    dslContext
-                        .update(WORKING_PLACE)
-                        .set(WORKING_PLACE.WORKING_PLACE_STATUS, false)
-                        .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(oldWorkingContractId))
-                        .execute();
-
-                final var updateNewWorkingPlace =
-                    dslContext
-                        .update(WORKING_PLACE)
-                        .set(WORKING_PLACE.WORKING_PLACE_STATUS, status)
-                        .where(WORKING_PLACE.WORKING_CONTRACT_ID.eq(newWorkingContract))
+                        .and(month(SALARY_CONTRACT.START_DATE).eq(dateCheck.getMonth().getValue()))
+                        .and(year(SALARY_CONTRACT.START_DATE).eq(dateCheck.getYear()))
                         .execute();
               });
         });
