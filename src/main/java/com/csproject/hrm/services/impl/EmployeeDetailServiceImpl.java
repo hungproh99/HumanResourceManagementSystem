@@ -276,12 +276,10 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
     workingInfo.setEmployee_type(EEmployeeType.getLabel(workingInfo.getEmployee_type()));
 
     WorkingInfoResponse workingInfoNew = employeeDetailRepository.findNewWorkingInfo(employeeID);
-    workingInfoNew.setArea(EArea.getLabel(workingInfo.getArea()));
-    workingInfoNew.setOffice(EOffice.getLabel(workingInfo.getOffice()));
-    workingInfoNew.setPosition(EJob.getLabel(workingInfo.getPosition()));
-    workingInfoNew.setWorking_type(EWorkingType.getLabel(workingInfo.getWorking_type()));
-    workingInfoNew.setGrade(EGradeType.getLabel(workingInfo.getGrade()));
-    workingInfoNew.setEmployee_type(EEmployeeType.getLabel(workingInfo.getEmployee_type()));
+    workingInfoNew.setArea(EArea.getLabel(workingInfoNew.getArea()));
+    workingInfoNew.setOffice(EOffice.getLabel(workingInfoNew.getOffice()));
+    workingInfoNew.setPosition(EJob.getLabel(workingInfoNew.getPosition()));
+    workingInfoNew.setGrade(EGradeType.getLabel(workingInfoNew.getGrade()));
 
     workingInfo.setNewWorkingInfo(workingInfoNew);
 
@@ -298,17 +296,19 @@ public class EmployeeDetailServiceImpl implements EmployeeDetailService {
       throw new CustomParameterConstraintException("Working Place ID is require!");
     }
     if (workingInfoRequest.getSalaryContractId() == null) {
-      throw new CustomParameterConstraintException("Salary Contract is require!");
+      throw new CustomParameterConstraintException("Salary Contract ID is require!");
     }
 
     WorkingPlaceDto workingPlace =
         workingPlaceRepository.getWorkingPlaceByID(workingInfoRequest.getWorkingPlaceId());
-    if (workingPlace.getWorking_place_status()) {
-      salaryContractRepository.updateStatusSalaryContract(true, workingInfoRequest.getStartDate());
-    } else {
-      workingContractRepository.updateStatusWorking(true, workingInfoRequest.getStartDate());
-      salaryContractRepository.updateStatusSalaryContract(true, workingInfoRequest.getStartDate());
-    }
+
+    //    if (workingPlace.getWorking_place_status()) {
+    salaryContractRepository.updateStatusSalaryContract(true, workingInfoRequest.getStartDate());
+    //    } else {
+    //      salaryContractRepository.updateStatusSalaryContract(true,
+    // workingInfoRequest.getStartDate());
+    workingContractRepository.updateStatusWorkingContract(true, workingInfoRequest.getStartDate());
+    //    }
   }
 
   @Override

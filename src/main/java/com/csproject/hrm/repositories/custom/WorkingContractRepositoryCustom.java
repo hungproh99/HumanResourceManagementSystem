@@ -10,6 +10,4 @@ public interface WorkingContractRepositoryCustom {
   BigDecimal getBaseSalaryByEmployeeID(String employeeID);
 
   void updateStatusWorkingContract(Boolean status, LocalDate dateCheck);
-
-  void updateStatusWorking(Boolean status, LocalDate dateCheck);
 }
