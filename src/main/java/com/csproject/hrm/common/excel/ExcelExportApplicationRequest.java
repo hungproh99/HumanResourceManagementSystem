@@ -89,7 +89,7 @@ public class ExcelExportApplicationRequest {
       createCell(row, columnCount++, applicationsRequestResponse.getRequest_type(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getRequest_name(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getDescription(), style);
-      createCell(row, columnCount++, applicationsRequestResponse.getRequest_status(), style);
+      createCell(row, columnCount++, applicationsRequestResponse.getRequest_status_name(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getChange_status_time(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getDuration(), style);
       createCell(row, columnCount++, applicationsRequestResponse.getApprover(), style);

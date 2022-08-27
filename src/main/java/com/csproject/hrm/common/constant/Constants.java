@@ -99,7 +99,7 @@ public class Constants {
   public static final String GRADE_TYPE_INVALID = "Invalid Grade Type";
   public static final String CREATE_DATE = "createDate";
   public static final String IS_BOOKMARK = "is_bookmark";
-  public static final String REQUEST_STATUS = "request_status";
+  public static final String REQUEST_STATUS_NAME = "request_status_name";
   public static final String REQUEST_TYPE = "request_type";
   public static final String REQUEST_TITLE = "request_title";
   public static final String ACTIVE = "Active";
@@ -130,4 +130,5 @@ public class Constants {
   public static final String END_DATE = "endDate";
   public static final String SALARY_STATUS_PARAM = "salaryStatus";
   public static final String NULL_PARAMETER = "Null Parameter";
+  public static final String LATEST_DATE = "latestDate";
 }

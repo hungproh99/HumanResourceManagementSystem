@@ -3,7 +3,9 @@ package com.csproject.hrm.repositories.custom;
 import com.csproject.hrm.dto.dto.SalaryMonthlyDto;
 import com.csproject.hrm.dto.request.RejectSalaryMonthlyRequest;
 import com.csproject.hrm.dto.request.UpdateSalaryMonthlyRequest;
-import com.csproject.hrm.dto.response.*;
+import com.csproject.hrm.dto.response.SalaryMonthlyRemindResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponse;
+import com.csproject.hrm.dto.response.SalaryMonthlyResponseList;
 import com.csproject.hrm.jooq.QueryParam;
 import org.springframework.stereotype.Repository;
 
@@ -51,4 +53,8 @@ public interface SalaryMonthlyRepositoryCustom {
   //  void updateAllSalaryMonthlyRemind(Long salaryMonthlyId, boolean isRemind);
 
   boolean checkAlreadyApproveOrReject(Long salaryMonthlyId);
+
+  void deleteAllReviewSalaryBySalaryId(Long salaryMonthId);
+
+  boolean checkExistSalaryMonthlyByDate(LocalDate startDate, LocalDate endDate, String employeeId);
 }

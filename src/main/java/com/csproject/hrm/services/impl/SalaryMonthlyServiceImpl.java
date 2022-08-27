@@ -176,6 +176,9 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
       if (employeeId.equalsIgnoreCase("admin")) {
         continue;
       }
+      if (salaryMonthlyRepository.checkExistSalaryMonthlyByDate(startDate, endDate, employeeId)) {
+        continue;
+      }
       salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
     }
     salaryMonthlyRepository.updateSalaryMonthlyByListEmployee(salaryMonthlyDtoList);
@@ -378,7 +381,7 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
               + rejectSalaryMonthlyRequest.getSalaryMonthlyId()
               + "\" already approve or reject");
     }
-    salaryMonthlyRepository.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
+    updateRejectAndDeleteReviewSalaryMonthly(rejectSalaryMonthlyRequest);
   }
 
   @Override
@@ -575,9 +578,8 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
                   salaryMonthlyRemindResponse.getApprover());
           if (salaryMonthlyRemindResponse.getDuration().isEqual(currDate)
               || salaryMonthlyRemindResponse.getDuration().isBefore(currDate)) {
-            salaryMonthlyRepository.updateRejectSalaryMonthly(
-                new RejectSalaryMonthlyRequest(
-                    salaryMonthlyRemindResponse.getSalaryMonthlyId(), "Out of Duration"));
+            salaryMonthlyRepository.updateStatusSalaryMonthlyBySalaryMonthlyId(
+                salaryMonthlyRemindResponse.getSalaryMonthlyId(), ESalaryMonthly.APPROVED.name());
           } else {
             generalFunction.sendEmailRemindSalary(
                 approveName,
@@ -604,6 +606,13 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
   @Override
   public List<BonusTypeDto> getListBonusTypeDto() {
     return bonusSalaryRepository.getListBonusTypeDto();
+  }
+
+  private void updateRejectAndDeleteReviewSalaryMonthly(
+      RejectSalaryMonthlyRequest rejectSalaryMonthlyRequest) {
+    salaryMonthlyRepository.updateRejectSalaryMonthly(rejectSalaryMonthlyRequest);
+    salaryMonthlyRepository.deleteAllReviewSalaryBySalaryId(
+        rejectSalaryMonthlyRequest.getSalaryMonthlyId());
   }
 
   private SalaryMonthlyDto upsertSalaryMonthly(

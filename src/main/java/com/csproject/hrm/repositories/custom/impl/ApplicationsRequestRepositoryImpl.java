@@ -1,6 +1,5 @@
 package com.csproject.hrm.repositories.custom.impl;
 
-import com.csproject.hrm.common.constant.Constants;
 import com.csproject.hrm.common.enums.ERequestName;
 import com.csproject.hrm.common.enums.ERequestStatus;
 import com.csproject.hrm.common.enums.ERequestType;
@@ -51,6 +50,7 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
     field2Map.put(REQUEST_STATUS_PARAM, REQUEST_STATUS.NAME);
     field2Map.put(REQUEST_TYPE_PARAM, REQUEST_TYPE.NAME);
     field2Map.put(REQUEST_ID_PARAM, APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID);
+    field2Map.put(LATEST_DATE, APPLICATIONS_REQUEST.LATEST_DATE);
   }
 
   @Autowired private final JooqHelper queryHelper;
@@ -125,6 +125,76 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         dslContext
             .select(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID, REVIEW_REQUEST.EMPLOYEE_ID)
             .from(REVIEW_REQUEST);
+    System.out.println(
+        dslContext
+            .select(
+                APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
+                EMPLOYEE.EMPLOYEE_ID,
+                EMPLOYEE.FULL_NAME,
+                APPLICATIONS_REQUEST.CREATE_DATE,
+                REQUEST_NAME.NAME.as("request_name"),
+                REQUEST_TYPE.NAME.as("request_type"),
+                APPLICATIONS_REQUEST.DESCRIPTION,
+                REQUEST_STATUS.NAME.as(REQUEST_STATUS_NAME),
+                APPLICATIONS_REQUEST.REQUEST_STATUS,
+                APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                APPLICATIONS_REQUEST.DURATION,
+                APPLICATIONS_REQUEST.APPROVER,
+                (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                        .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                    .as(IS_BOOKMARK),
+                APPLICATIONS_REQUEST.COMMENT,
+                APPLICATIONS_REQUEST.LATEST_DATE)
+            .from(EMPLOYEE)
+            .leftJoin(APPLICATIONS_REQUEST)
+            .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+            .leftJoin(REQUEST_STATUS)
+            .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+            .leftJoin(REQUEST_NAME)
+            .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
+            .leftJoin(REQUEST_TYPE)
+            .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+            .where(conditions)
+            .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
+            .unionAll(
+                dslContext
+                    .select(
+                        APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID,
+                        EMPLOYEE.EMPLOYEE_ID,
+                        EMPLOYEE.FULL_NAME,
+                        APPLICATIONS_REQUEST.CREATE_DATE,
+                        REQUEST_NAME.NAME.as("request_name"),
+                        REQUEST_TYPE.NAME.as("request_type"),
+                        APPLICATIONS_REQUEST.DESCRIPTION,
+                        REQUEST_STATUS.NAME.as(REQUEST_STATUS_NAME),
+                        APPLICATIONS_REQUEST.REQUEST_STATUS,
+                        APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
+                        APPLICATIONS_REQUEST.DURATION,
+                        APPLICATIONS_REQUEST.APPROVER,
+                        (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
+                                .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
+                            .as(IS_BOOKMARK),
+                        APPLICATIONS_REQUEST.COMMENT,
+                        APPLICATIONS_REQUEST.LATEST_DATE)
+                    .from(EMPLOYEE)
+                    .leftJoin(APPLICATIONS_REQUEST)
+                    .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
+                    .leftJoin(REQUEST_STATUS)
+                    .on(APPLICATIONS_REQUEST.REQUEST_STATUS.eq(REQUEST_STATUS.TYPE_ID))
+                    .leftJoin(REQUEST_NAME)
+                    .on(APPLICATIONS_REQUEST.REQUEST_NAME.eq(REQUEST_NAME.REQUEST_NAME_ID))
+                    .leftJoin(REQUEST_TYPE)
+                    .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
+                    .leftJoin(selectReview)
+                    .on(
+                        selectReview
+                            .field(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
+                            .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
+                    .where(conditions)
+                    .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId)))
+            .orderBy(sortFields)
+            .limit(pagination.limit)
+            .offset(pagination.offset));
 
     return dslContext
         .select(
@@ -135,14 +205,16 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             REQUEST_NAME.NAME.as("request_name"),
             REQUEST_TYPE.NAME.as("request_type"),
             APPLICATIONS_REQUEST.DESCRIPTION,
-            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+            REQUEST_STATUS.NAME.as(REQUEST_STATUS_NAME),
+            APPLICATIONS_REQUEST.REQUEST_STATUS,
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
             APPLICATIONS_REQUEST.DURATION,
             APPLICATIONS_REQUEST.APPROVER,
             (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                     .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
                 .as(IS_BOOKMARK),
-            APPLICATIONS_REQUEST.COMMENT)
+            APPLICATIONS_REQUEST.COMMENT,
+            APPLICATIONS_REQUEST.LATEST_DATE)
         .from(EMPLOYEE)
         .leftJoin(APPLICATIONS_REQUEST)
         .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -154,7 +226,6 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
         .on(REQUEST_NAME.REQUEST_TYPE_ID.eq(REQUEST_TYPE.TYPE_ID))
         .where(conditions)
         .and(APPLICATIONS_REQUEST.APPROVER.eq(employeeId))
-        .orderBy(sortFields)
         .unionAll(
             dslContext
                 .select(
@@ -165,14 +236,16 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                     REQUEST_NAME.NAME.as("request_name"),
                     REQUEST_TYPE.NAME.as("request_type"),
                     APPLICATIONS_REQUEST.DESCRIPTION,
-                    REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+                    REQUEST_STATUS.NAME.as(REQUEST_STATUS_NAME),
+                    APPLICATIONS_REQUEST.REQUEST_STATUS,
                     APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
                     APPLICATIONS_REQUEST.DURATION,
                     APPLICATIONS_REQUEST.APPROVER,
                     (when(APPLICATIONS_REQUEST.IS_BOOKMARK.isTrue(), "True")
                             .when(APPLICATIONS_REQUEST.IS_BOOKMARK.isFalse(), "False"))
                         .as(IS_BOOKMARK),
-                    APPLICATIONS_REQUEST.COMMENT)
+                    APPLICATIONS_REQUEST.COMMENT,
+                    APPLICATIONS_REQUEST.LATEST_DATE)
                 .from(EMPLOYEE)
                 .leftJoin(APPLICATIONS_REQUEST)
                 .on(APPLICATIONS_REQUEST.EMPLOYEE_ID.eq(EMPLOYEE.EMPLOYEE_ID))
@@ -188,8 +261,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
                         .field(REVIEW_REQUEST.APPLICATIONS_REQUEST_ID)
                         .eq(APPLICATIONS_REQUEST.APPLICATION_REQUEST_ID))
                 .where(conditions)
-                .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId))
-                .orderBy(sortFields))
+                .and(selectReview.field(REVIEW_REQUEST.EMPLOYEE_ID).eq(employeeId)))
+        .orderBy(sortFields)
         .limit(pagination.limit)
         .offset(pagination.offset);
   }
@@ -210,7 +283,8 @@ public class ApplicationsRequestRepositoryImpl implements ApplicationsRequestRep
             REQUEST_NAME.NAME.as("request_name"),
             REQUEST_TYPE.NAME.as("request_type"),
             APPLICATIONS_REQUEST.DESCRIPTION,
-            REQUEST_STATUS.NAME.as(Constants.REQUEST_STATUS),
+            REQUEST_STATUS.NAME.as(REQUEST_STATUS_NAME),
+            APPLICATIONS_REQUEST.REQUEST_STATUS,
             APPLICATIONS_REQUEST.LATEST_DATE.as(CHANGE_STATUS_TIME),
             APPLICATIONS_REQUEST.DURATION,
             APPLICATIONS_REQUEST.APPROVER,

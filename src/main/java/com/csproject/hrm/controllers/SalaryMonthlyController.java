@@ -22,11 +22,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
 import static com.csproject.hrm.common.constant.Constants.*;
 import static com.csproject.hrm.common.uri.Uri.*;
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -279,5 +283,14 @@ public class SalaryMonthlyController {
   @PreAuthorize(value = "hasRole('MANAGER')")
   public ResponseEntity<?> getListBonusType() {
     return ResponseEntity.ok(salaryMonthlyService.getListBonusTypeDto());
+  }
+
+  @PostMapping(value = URI_GENERATE_SALARY_MONTHLY)
+  @PreAuthorize(value = "hasRole('ADMIN')")
+  public ResponseEntity<?> generateSalaryMonthly(@RequestParam String generateDate) {
+    LocalDate date = LocalDate.parse(generateDate, DateTimeFormatter.ISO_LOCAL_DATE);
+    salaryMonthlyService.upsertSalaryMonthlyByEmployeeIdList(
+        date.with(firstDayOfMonth()), date.with(lastDayOfMonth()));
+    return ResponseEntity.ok(new ErrorResponse(HttpStatus.CREATED, REQUEST_SUCCESS));
   }
 }
