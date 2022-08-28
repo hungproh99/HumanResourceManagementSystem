@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -96,17 +95,31 @@ public class ExcelExportTimekeeping {
         createCell(row, columnCount++, timekeepingResponses.getPosition(), style);
         createCell(row, columnCount++, timekeepingResponses.getGrade(), style);
         createCell(row, columnCount++, timekeepingResponse.getCurrent_date(), style);
-        String timekeepingStatus = null;
+        String timekeepingStatus = "";
         for (int i = 0; i < timekeepingResponse.getTimekeeping_status().size(); i++) {
           if (i == timekeepingResponse.getTimekeeping_status().size() - 1) {
-            timekeepingStatus += timekeepingResponse.getTimekeeping_status().get(i);
+            timekeepingStatus +=
+                timekeepingResponse.getTimekeeping_status().get(i).getTimekeeping_status();
           } else {
-            timekeepingStatus += timekeepingResponse.getTimekeeping_status().get(i) + ", ";
+            timekeepingStatus +=
+                timekeepingResponse.getTimekeeping_status().get(i).getTimekeeping_status() + ", ";
           }
         }
         createCell(row, columnCount++, timekeepingStatus, style);
-        createCell(row, columnCount++, timekeepingResponse.getFirst_check_in().toString(), style);
-        createCell(row, columnCount++, timekeepingResponse.getLast_check_out().toString(), style);
+        createCell(
+            row,
+            columnCount++,
+            timekeepingResponse.getFirst_check_in() != null
+                ? timekeepingResponse.getFirst_check_in().toString()
+                : "",
+            style);
+        createCell(
+            row,
+            columnCount++,
+            timekeepingResponse.getLast_check_out() != null
+                ? timekeepingResponse.getLast_check_out().toString()
+                : "",
+            style);
       }
     }
   }

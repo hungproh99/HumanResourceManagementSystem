@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -174,9 +175,6 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
     List<String> employeeIdList = employeeRepository.getAllEmployeeIdActive();
     for (String employeeId : employeeIdList) {
       if (employeeId.equalsIgnoreCase("admin")) {
-        continue;
-      }
-      if (salaryMonthlyRepository.checkExistSalaryMonthlyByDate(startDate, endDate, employeeId)) {
         continue;
       }
       salaryMonthlyDtoList.add(upsertSalaryMonthly(startDate, endDate, employeeId));
@@ -667,12 +665,12 @@ public class SalaryMonthlyServiceImpl implements SalaryMonthlyService {
                 .get()
                 .getAdditional_salary()
                 .add(salaryContractDto.get().getBase_salary()))
-            .divide(BigDecimal.valueOf(standardPoint), 2, RoundingMode.HALF_UP);
+            .divide(BigDecimal.valueOf(standardPoint), 10, RoundingMode.HALF_UP);
     BigDecimal finalSalary = BigDecimal.ZERO;
     if (actualWorkingPoint != 0) {
       finalSalary =
           salaryPerPoint
-              .multiply(BigDecimal.valueOf(actualWorkingPoint))
+              .multiply(BigDecimal.valueOf(actualWorkingPoint), new MathContext(4))
               .add(
                   salaryPerPoint.multiply(
                       BigDecimal.valueOf(totalOTPoint != null ? totalOTPoint : 0D)))

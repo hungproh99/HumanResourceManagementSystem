@@ -315,11 +315,22 @@ public class SalaryMonthlyRepositoryImpl implements SalaryMonthlyRepositoryCusto
               .set(SALARY_MONTHLY.APPROVER, updateSalaryMonthlyRequest.getApproverId())
               .where(SALARY_MONTHLY.SALARY_ID.eq(updateSalaryMonthlyRequest.getSalaryMonthlyId()))
               .execute();
-          final var insertForwarder =
-              dslContext
-                  .insertInto(REVIEW_SALARY, REVIEW_SALARY.EMPLOYEE_ID, REVIEW_SALARY.SALARY_ID)
-                  .values(employeeId, updateSalaryMonthlyRequest.getSalaryMonthlyId())
-                  .execute();
+          final var checkExistForwarder =
+              dslContext.fetchExists(
+                  dslContext
+                      .select(REVIEW_SALARY.REVIEW_ID)
+                      .from(REVIEW_SALARY)
+                      .where(
+                          REVIEW_SALARY.SALARY_ID.eq(
+                              updateSalaryMonthlyRequest.getSalaryMonthlyId()))
+                      .and(REVIEW_SALARY.EMPLOYEE_ID.eq(employeeId)));
+          if (!checkExistForwarder) {
+            final var insertForwarder =
+                dslContext
+                    .insertInto(REVIEW_SALARY, REVIEW_SALARY.EMPLOYEE_ID, REVIEW_SALARY.SALARY_ID)
+                    .values(employeeId, updateSalaryMonthlyRequest.getSalaryMonthlyId())
+                    .execute();
+          }
         });
   }
 
