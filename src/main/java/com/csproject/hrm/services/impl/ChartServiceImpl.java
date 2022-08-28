@@ -363,7 +363,13 @@ public class ChartServiceImpl implements ChartService {
       salaryMonthly = salaryMonthlyService.getSalaryMonthlyDetailBySalaryMonthlyId(salaryID);
     }
 
+    Optional<SalaryContractDto> salaryContract =
+        salaryContractRepository.getSalaryContractByEmployeeId(employeeID);
+
     map.put("Base", Objects.requireNonNullElse(salaryMonthly.getBase_salary(), BigDecimal.ZERO));
+    map.put(
+        "Additional",
+        Objects.requireNonNullElse(salaryContract.get().getAdditional_salary(), BigDecimal.ZERO));
     map.put(
         "Bonus",
         Objects.requireNonNullElse(
