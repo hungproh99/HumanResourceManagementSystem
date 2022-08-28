@@ -25,9 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -184,10 +182,36 @@ public class TimekeepingServiceImpl implements TimekeepingService {
       if (list.isEmpty()) {
         return Optional.empty();
       }
+
       Long timekeepingID = list.get().getTimekeeping_id();
-      list.get()
-          .setCheck_in_check_outs(
-              timekeepingRepository.getCheckInCheckOutByTimekeepingID(timekeepingID));
+
+      List<CheckInCheckOutResponse> listCheckInCheckOut =
+          timekeepingRepository.getCheckInCheckOutByTimekeepingID(timekeepingID);
+
+      String totalWorkingTime = "0.0";
+
+      int hour = 0;
+      int minute = 0;
+
+      for (CheckInCheckOutResponse checkInCheckOutResponse : listCheckInCheckOut) {
+        LocalTime checkIn = checkInCheckOutResponse.getCheckin();
+        LocalTime checkOut = checkInCheckOutResponse.getCheckout();
+
+        int hourIn = checkIn.getHour();
+        int hourOut = checkOut.getHour();
+        int minuteIn = checkIn.getMinute();
+        int minuteOut = checkOut.getMinute();
+
+        int i = (hourOut * 60 + minuteOut) - (hourIn * 60 + minuteIn);
+        hour += Math.floorDiv(i, 60);
+        minute += Math.floorMod(i, 60);
+      }
+
+      totalWorkingTime = hour + "." + minute;
+
+      list.get().setTotal_working_time(totalWorkingTime);
+
+      list.get().setCheck_in_check_outs(listCheckInCheckOut);
       List<ListTimekeepingStatusResponse> listTimekeepingStatusResponse =
           timekeepingRepository.getListTimekeepingStatus(timekeepingID);
       listTimekeepingStatusResponse.forEach(
