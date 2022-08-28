@@ -1,9 +1,7 @@
 package com.csproject.hrm.repositories.custom.impl;
 
 import com.csproject.hrm.common.constant.Constants;
-import com.csproject.hrm.common.enums.EGradeType;
-import com.csproject.hrm.common.enums.EJob;
-import com.csproject.hrm.common.enums.ETimekeepingStatus;
+import com.csproject.hrm.common.enums.*;
 import com.csproject.hrm.dto.dto.TimekeepingDto;
 import com.csproject.hrm.dto.dto.TimekeepingIdOvertimeTypeDto;
 import com.csproject.hrm.dto.response.*;
@@ -17,10 +15,7 @@ import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -319,32 +314,6 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
                 TIMEKEEPING.TIMEKEEPING_ID,
                 EMPLOYEE.EMPLOYEE_ID,
                 TIMEKEEPING.DATE.as(CURRENT_DATE),
-                floor(
-                        (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
-                                .multiply(60)
-                                .add(minute(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT)))
-                                .minus(
-                                    hour(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN))
-                                        .multiply(60)
-                                        .add(
-                                            minute(
-                                                firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN)))))
-                            .divide(60))
-                    .cast(SQLDataType.INTEGER)
-                    .concat(".")
-                    .concat(
-                        (hour(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT))
-                                .multiply(60)
-                                .add(minute(lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT)))
-                                .minus(
-                                    hour(firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN))
-                                        .multiply(60)
-                                        .add(
-                                            minute(
-                                                firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN)))))
-                            .modulo(60)
-                            .cast(SQLDataType.INTEGER))
-                    .as(TOTAL_WORKING_TIME),
                 firstTimeCheckIn.field(CHECKIN_CHECKOUT.CHECKIN).as(FIRST_CHECK_IN),
                 lastTimeCheckOut.field(CHECKIN_CHECKOUT.CHECKOUT).as(LAST_CHECK_OUT))
             .from(EMPLOYEE)
@@ -445,8 +414,7 @@ public class TimekeepingRepositoryImpl implements TimekeepingRepositoryCustom {
   }
 
   @Override
-  public void insertTimekeepingByEmployeeId(
-      String employeeId, List<LocalDate> localDateList) {
+  public void insertTimekeepingByEmployeeId(String employeeId, List<LocalDate> localDateList) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
     List<Query> queries = new ArrayList<>();
     dslContext.transaction(
