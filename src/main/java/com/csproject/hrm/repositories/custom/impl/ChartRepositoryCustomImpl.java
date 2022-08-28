@@ -232,6 +232,17 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
   public int countPaidLeaveReasonByDateAndReasonID(
       LocalDate startDate, LocalDate endDate, Long reasonID, String employeeID) {
     final DSLContext dslContext = DSL.using(connection.getConnection());
+    System.out.println(
+        dslContext
+            .select(PAID_LEAVE_REASON.REASON_ID)
+            .from(PAID_LEAVE_REASON)
+            .leftJoin(PAID_LEAVE)
+            .on(PAID_LEAVE.PAID_LEAVE_REASON_ID.eq(PAID_LEAVE_REASON.REASON_ID))
+            .leftJoin(TIMEKEEPING)
+            .on(PAID_LEAVE.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
+            .where(PAID_LEAVE_REASON.REASON_ID.eq(reasonID))
+            .and(TIMEKEEPING.DATE.between(startDate, endDate))
+            .and(TIMEKEEPING.EMPLOYEE_ID.eq(employeeID)));
     return dslContext.fetchCount(
         dslContext
             .select(PAID_LEAVE_REASON.REASON_ID)
@@ -240,11 +251,9 @@ public class ChartRepositoryCustomImpl implements ChartRepositoryCustom {
             .on(PAID_LEAVE.PAID_LEAVE_REASON_ID.eq(PAID_LEAVE_REASON.REASON_ID))
             .leftJoin(TIMEKEEPING)
             .on(PAID_LEAVE.TIMEKEEPING_ID.eq(TIMEKEEPING.TIMEKEEPING_ID))
-            .leftJoin(WORKING_CONTRACT)
-            .on(WORKING_CONTRACT.EMPLOYEE_ID.eq(TIMEKEEPING.EMPLOYEE_ID))
             .where(PAID_LEAVE_REASON.REASON_ID.eq(reasonID))
             .and(TIMEKEEPING.DATE.between(startDate, endDate))
-            .and(WORKING_CONTRACT.EMPLOYEE_ID.eq(employeeID)));
+            .and(TIMEKEEPING.EMPLOYEE_ID.eq(employeeID)));
   }
 
   @Override
