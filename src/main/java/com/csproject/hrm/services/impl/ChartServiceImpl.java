@@ -366,6 +366,10 @@ public class ChartServiceImpl implements ChartService {
     Optional<SalaryContractDto> salaryContract =
         salaryContractRepository.getSalaryContractByEmployeeId(employeeID);
 
+    if (salaryMonthly.getFinal_salary().compareTo(BigDecimal.ZERO) == 0) {
+      salaryMonthly = new SalaryMonthlyDetailResponse();
+    }
+
     map.put("Base", Objects.requireNonNullElse(salaryMonthly.getBase_salary(), BigDecimal.ZERO));
     map.put(
         "Additional",
