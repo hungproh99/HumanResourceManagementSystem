@@ -22,7 +22,7 @@ public class DBConnection {
           DriverManager.getConnection(
               "jdbc:mysql://awseb-e-3tmtipzvke-stack-awsebrdsdatabase-eqfxaihqukay.cmdnwkpbg63s.us-west-2.rds.amazonaws.com:3306/human_resource_management?autoReconnect=true",
               "root",
-              "123456789");
+              "Chuate1visao");
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
