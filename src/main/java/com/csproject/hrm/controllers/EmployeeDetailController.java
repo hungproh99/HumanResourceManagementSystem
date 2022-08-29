@@ -200,7 +200,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PutMapping(URI_UPDATE_WORKING_HISTORY_INFO)
   public ResponseEntity<?> updateWorkingHistory(
       @Valid @RequestBody WorkingHistoryRequest workingHistory) {
@@ -216,7 +216,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
   @PutMapping(URI_UPDATE_EDUCATION_INFO)
   public ResponseEntity<?> updateEducationInfo(@Valid @RequestBody EducationRequest education) {
     employeeDetailService.updateEducationInfo(education);
@@ -230,7 +230,7 @@ public class EmployeeDetailController {
     return ResponseEntity.ok(new ErrorResponse(HttpStatus.ACCEPTED, REQUEST_SUCCESS));
   }
 
-  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER') or hasRole('USER')")
+  @PreAuthorize(value = "hasRole('ADMIN') or hasRole('MANAGER')")
   @PutMapping("update_tax_and_insurance")
   public ResponseEntity<?> updateTaxAndInsurance(
       @Valid @RequestBody TaxAndInsuranceRequest taxAndInsurance) {
