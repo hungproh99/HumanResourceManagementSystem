@@ -368,12 +368,20 @@ public class ChartServiceImpl implements ChartService {
 
     if (salaryMonthly.getFinal_salary().compareTo(BigDecimal.ZERO) == 0) {
       salaryMonthly = new SalaryMonthlyDetailResponse();
+      salaryMonthly.setBonusSalaryResponseList(new BonusSalaryResponseList());
+      salaryMonthly.setDeductionSalaryResponseList(new DeductionSalaryResponseList());
+      salaryMonthly.setAdvanceSalaryResponseList(new AdvanceSalaryResponseList());
+      salaryMonthly.setEmployeeTaxResponseList(new EmployeeTaxResponseList());
+      salaryMonthly.setEmployeeInsuranceResponseList(new EmployeeInsuranceResponseList());
     }
 
     map.put("Base", Objects.requireNonNullElse(salaryMonthly.getBase_salary(), BigDecimal.ZERO));
     map.put(
         "Additional",
-        Objects.requireNonNullElse(salaryContract.get().getAdditional_salary(), BigDecimal.ZERO));
+        (salaryMonthly.getFinal_salary() == null)
+            ? BigDecimal.ZERO
+            : Objects.requireNonNullElse(
+                salaryContract.get().getAdditional_salary(), BigDecimal.ZERO));
     map.put(
         "Bonus",
         Objects.requireNonNullElse(
